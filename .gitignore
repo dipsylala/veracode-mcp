@@ -1,0 +1,58 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+*.coverprofile
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+mcp-server
+mcp-server.exe
+
+# Generated API clients (keep structure, ignore contents except README)
+api/generated/*/
+!api/generated/*/README.md
+!api/generated/README.md
+
+# Environment files
+.env
+.env.local
+
+# Credentials (never commit these!)
+*.pem
+*.key
+*.crt
+veracode-credentials.json
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp

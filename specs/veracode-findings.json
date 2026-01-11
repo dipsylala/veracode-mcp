@@ -1,0 +1,2410 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "description": "Veracode Findings API Documentation\n\nUse one of the following base URLs depending on the region for your account:\n* https://api.veracode.com/ - Veracode US Region (default)\n* https://api.veracode.eu/ - Veracode European Region\n* https://api.veracode.us/ - Veracode US Federal Region",
+    "version": "2.1",
+    "title": "Veracode Findings API Specification",
+    "termsOfService": "urn:tos",
+    "contact": {},
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.veracode.com"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Application findings information.",
+      "description": "Returns findings information from Veracode scans."
+    },
+    {
+      "name": "CWE API information",
+      "description": "Returns CWE information for the findings in the scan."
+    },
+    {
+      "name": "Manual scans information.",
+      "description": "Returns manual testing findings information from the Veracode Manual Penetration Testing (MPT) scan."
+    }
+  ],
+  "paths": {
+    "/appsec/v1/categories": {
+      "get": {
+        "tags": [
+          "CWE API information"
+        ],
+        "summary": "getCategories",
+        "description": "Returns a list of CWE categories.",
+        "operationId": "getCategoriesUsingGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResourceOfCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again."
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Category page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/appsec/v1/categories/{category}": {
+      "get": {
+        "tags": [
+          "CWE API information"
+        ],
+        "summary": "getCategory",
+        "description": "Returns CWE Category information and links to associated resources.",
+        "operationId": "getCategoryUsingGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Category details page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/appsec/v1/cwes": {
+      "get": {
+        "tags": [
+          "CWE API information"
+        ],
+        "summary": "getCwes",
+        "description": "Returns a list of CWEs.",
+        "operationId": "getCwesUsingGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResourceOfCwe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again."
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "CWE page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/appsec/v1/cwes/{cwe}": {
+      "get": {
+        "tags": [
+          "CWE API information"
+        ],
+        "summary": "getCwe",
+        "description": "Returns CWE information and links to associated resources.",
+        "operationId": "getCweUsingGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cwe"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CweDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "CWE details page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/appsec/v2/applications/{application_guid}/findings": {
+      "get": {
+        "tags": [
+          "Application findings information."
+        ],
+        "summary": "getFindings",
+        "description": "Returns findings information from Veracode scans.",
+        "operationId": "getFindingsUsingGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ApplicationGuid"
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          },
+          {
+            "$ref": "#/components/parameters/Cve"
+          },
+          {
+            "$ref": "#/components/parameters/Cvss"
+          },
+          {
+            "$ref": "#/components/parameters/CvssGte"
+          },
+          {
+            "$ref": "#/components/parameters/CweList"
+          },
+          {
+            "$ref": "#/components/parameters/FindingCategory"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeAnnotations"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeExpirationDate"
+          },
+          {
+            "$ref": "#/components/parameters/MitigatedAfter"
+          },
+          {
+            "$ref": "#/components/parameters/NewFindingsOnly"
+          },
+          {
+            "$ref": "#/components/parameters/ScaDependencyMode"
+          },
+          {
+            "$ref": "#/components/parameters/ScaScanMode"
+          },
+          {
+            "$ref": "#/components/parameters/ScanType"
+          },
+          {
+            "$ref": "#/components/parameters/FindingsSeverity"
+          },
+          {
+            "$ref": "#/components/parameters/FindingsSeverityGte"
+          },
+          {
+            "$ref": "#/components/parameters/PolicyViolation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResourceOfFinding"
+                },
+                "examples": {
+                  "SCAFinding": {
+                    "$ref": "#/components/examples/FindingsSCAExample"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again."
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Finding page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/mpt/v1/scans": {
+      "get": {
+        "tags": [
+          "Manual scans information."
+        ],
+        "summary": "Get Manual Scans",
+        "description": "Returns a list of pointers to the manual scans performed on the application.",
+        "operationId": "getManualScans",
+        "parameters": [
+          {
+            "name": "application",
+            "in": "query",
+            "description": "The application GUID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page number, which defaults to zero.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The page size (0-500). Defaults to 100.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request. Returns an array of scans.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelOfScan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelScan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelScan"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelScan"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "This page does not exist. Verify the URI and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelScan"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelScan"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server-side error. Please try again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelScan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mpt/v1/scans/{scan}": {
+      "get": {
+        "tags": [
+          "Manual scans information."
+        ],
+        "summary": "get a Manual Scan",
+        "description": "Returns manual scan information and links to associated resources.",
+        "operationId": "getManualScan",
+        "parameters": [
+          {
+            "name": "scan",
+            "in": "path",
+            "description": "The manual scan ID.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request. Returns a scan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelScan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelScan"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelScan"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "This page does not exist. Verify the URI and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelScan"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelScan"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server-side error. Please try again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelScan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mpt/v1/scans/{scan_id}/findings": {
+      "get": {
+        "tags": [
+          "Manual scans information."
+        ],
+        "summary": "getFindings",
+        "description": "Returns findings information from Veracode scans.",
+        "operationId": "getScanFindings",
+        "parameters": [
+          {
+            "name": "scan_id",
+            "in": "path",
+            "description": "The manual scan identifier.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "include_artifacts",
+            "in": "query",
+            "description": "Include the artifacts, such as code samples and screenshots, in the manual finding response.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request. Returns an array of manual testing findings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelOfManualFinding"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "This page does not exist. Verify the URI and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server-side error. Please try again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelEntityModelManualFinding"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mpt/v1/findings/{finding}": {
+      "get": {
+        "tags": [
+          "Manual scans information."
+        ],
+        "summary": "getFinding",
+        "description": "Returns manual testing finding information and links to associated resources.",
+        "operationId": "getManualFinding",
+        "parameters": [
+          {
+            "name": "finding",
+            "in": "path",
+            "description": "The manual finding identifier.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "include_artifacts",
+            "in": "query",
+            "description": "Include the artifacts, such as code samples and screenshots, in the manual finding response.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request. Returns a manual testing finding.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualFinding"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "This page does not exist. Verify the URI and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server-side error. Please try again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelManualFinding"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Page": {
+        "name": "page",
+        "in": "query",
+        "description": "Page number. The default is 0.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "allowEmptyValue": false
+      },
+      "Size": {
+        "name": "size",
+        "in": "query",
+        "description": "Page size (0-500). The default is 100.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "allowEmptyValue": false
+      },
+      "Category": {
+        "name": "category",
+        "in": "path",
+        "description": "The CWE category identifier.",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "allowEmptyValue": false
+      },
+      "Cwe": {
+        "name": "cwe",
+        "in": "path",
+        "description": "The CWE ID.",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "ApplicationGuid": {
+        "name": "application_guid",
+        "in": "path",
+        "description": "The application identifier.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Context": {
+        "name": "context",
+        "in": "query",
+        "description": "Context type, which filters results to show only the findings of this specific context type. The findings status parameter is relative to this context parameter.",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "allowEmptyValue": false
+      },
+      "Cve": {
+        "name": "cve",
+        "in": "query",
+        "description": "CVE ID.",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "allowEmptyValue": false
+      },
+      "Cvss": {
+        "name": "cvss",
+        "in": "query",
+        "description": "CVSS ID (0-10), which can be double (decimal) values. This filter returns all findings with a CVSS value equal to the provided value.",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "format": "double"
+        },
+        "allowEmptyValue": false
+      },
+      "CvssGte": {
+        "name": "cvss_gte",
+        "in": "query",
+        "description": "CVSS ID (0-10), which can be double (decimal) values. This filter returns all findings with a CVSS value greater than or equal to the provided value.",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "format": "double"
+        },
+        "allowEmptyValue": false
+      },
+      "CweList": {
+        "name": "cwe",
+        "in": "query",
+        "description": "CWE ID (single or comma-delimited).",
+        "required": false,
+        "explode": true,
+        "style": "form",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "FindingCategory": {
+        "name": "finding_category",
+        "in": "query",
+        "description": "Category of finding (single or comma-delimited). Not valid for the SCA scan type.",
+        "required": false,
+        "explode": true,
+        "style": "form",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "allowEmptyValue": false
+      },
+      "IncludeAnnotations": {
+        "name": "include_annot",
+        "in": "query",
+        "description": "Use this flag to include the annotations in the response. Not valid for the SCA scan type.",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "allowEmptyValue": false
+      },
+      "IncludeExpirationDate": {
+        "name": "include_exp_date",
+        "in": "query",
+        "description": "Use this flag to include findings grace period expiry date in the response.",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "allowEmptyValue": false
+      },
+      "MitigatedAfter": {
+        "name": "mitigated_after",
+        "in": "query",
+        "description": "Return all findings with annotations mitigated after the specified date. Does not apply to the SCA scan type. Use date format: yyyy-MM-dd",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "allowEmptyValue": false
+      },
+      "NewFindingsOnly": {
+        "name": "new",
+        "in": "query",
+        "description": "Use this flag to include only new findings in the current context (policy or sandbox) in the response.",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "allowEmptyValue": false
+      },
+      "ScaDependencyMode": {
+        "name": "sca_dep_mode",
+        "in": "query",
+        "description": "Return all findings with the specified SCA dependency mode. Only valid for the SCA scan type.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "UNKNOWN",
+            "DIRECT",
+            "TRANSITIVE",
+            "BOTH"
+          ]
+        },
+        "allowEmptyValue": false
+      },
+      "ScaScanMode": {
+        "name": "sca_scan_mode",
+        "in": "query",
+        "description": "Return all findings from SCA scans of the specified scan mode. Only valid for the SCA scan type.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "UPLOAD",
+            "AGENT",
+            "BOTH"
+          ]
+        },
+        "allowEmptyValue": false
+      },
+      "ScanType": {
+        "name": "scan_type",
+        "in": "query",
+        "description": "Type of scan in which the finding was found (single or comma-delimited).",
+        "required": false,
+        "explode": true,
+        "style": "form",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "STATIC",
+              "DYNAMIC",
+              "MANUAL",
+              "SCA"
+            ]
+          }
+        },
+        "allowEmptyValue": false
+      },
+      "FindingsSeverity": {
+        "name": "severity",
+        "in": "query",
+        "description": "This filter returns all findings with this severity value (0-5).",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "allowEmptyValue": false
+      },
+      "FindingsSeverityGte": {
+        "name": "severity_gte",
+        "in": "query",
+        "description": "This filter returns all scan findings with a severity value greater than or equal to the value of the filter (0-5).",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "allowEmptyValue": false
+      },
+      "PolicyViolation": {
+        "name": "violates_policy",
+        "in": "query",
+        "description": "Use this flag to filter the results based on whether the results violate the policy associated with the application. True means the results negatively impact the policy and should be fixed. Not valid for the SCA scan type.",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "allowEmptyValue": false
+      }
+    },
+    "schemas": {
+      "Links": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Link"
+        }
+      },
+      "Annotation": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "The mitigation action that was applied to the finding.",
+            "enum": [
+              "COMMENT",
+              "FP",
+              "APPDESIGN",
+              "OSENV",
+              "NETENV",
+              "REJECTED",
+              "APPROVED",
+              "CONFORMS",
+              "DEVIATES",
+              "CUSTOMCLEANSERAPPROVED",
+              "REMEDIATED",
+              "NOACTIONTAKEN",
+              "REOPENED",
+              "CUSTOMCLEANSERPROPOSED",
+              "CUSTOMCLEANSERUSERCOMMENT",
+              "LIBRARY",
+              "ACCEPTRISK",
+              "DEFER",
+              "BYENV",
+              "BYDESIGN",
+              "REJECT",
+              "APPROVE"
+            ]
+          },
+          "comment": {
+            "type": "string",
+            "description": "All comments associated with the mitigation action."
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date the annotation was added. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z."
+          },
+          "remaining_risk": {
+            "type": "string",
+            "description": "The value in the Remaining Risk field from the Comment column."
+          },
+          "specifics": {
+            "type": "string",
+            "description": "The value in the Specifics field from the Comment column."
+          },
+          "technique": {
+            "type": "string",
+            "description": "The value in the Technique field from the Comment column."
+          },
+          "user_name": {
+            "type": "string",
+            "description": "The user who added the comment."
+          },
+          "verification": {
+            "type": "string",
+            "description": "The value of the Verification field in the Comment column."
+          }
+        }
+      },
+      "CWEReference": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "The CWE category."
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique ID of the category."
+          },
+          "name": {
+            "type": "string",
+            "description": "Category name."
+          },
+          "recommendation": {
+            "type": "string",
+            "description": "Category recommendation."
+          }
+        }
+      },
+      "CweDetail": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "CWE description."
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The unique CWE ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "CWE name."
+          },
+          "recommendation": {
+            "type": "string",
+            "description": "CWE recommendation."
+          },
+          "references": {
+            "type": "array",
+            "description": "CWE reference name and URL.",
+            "items": {
+              "$ref": "#/components/schemas/CWEReference"
+            }
+          },
+          "remediation_effort": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The level of effort it will take to fix this finding. Values: 1=Trivial, 2=Implementation error, 3=Complex implementation error, 4=Simple design error, 5=Complex design error."
+          },
+          "severity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "CWE severity."
+          }
+        }
+      },
+      "EmbeddedCategory": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            }
+          }
+        }
+      },
+      "EmbeddedCwe": {
+        "type": "object",
+        "properties": {
+          "cwes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CweDetail"
+            }
+          }
+        }
+      },
+      "EmbeddedFinding": {
+        "type": "object",
+        "properties": {
+          "findings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            }
+          }
+        }
+      },
+      "ScaFindingExploitability": {
+        "type": "object",
+        "description": "Exploitability data for the associated vulnerability.",
+        "properties": {
+          "exploit_service_status": {
+            "type": "string",
+            "description": "The response status of the service that provides the exploitability data. Valid values are \"available\" and \"temporarily unavailable\".",
+            "example": "available"
+          },
+          "cve_full": {
+            "type": "string",
+            "description": "The canonical format of the CVE for which exploitability data is being provided. This value is blank if no data for the CVE is available.",
+            "example": "CVE-2019-0201"
+          },
+          "epss_status": {
+            "type": "string",
+            "description": "The status of the EPSS data lookup for the given cve_full. Valid values are \"match found\" or \"no match found\".",
+            "example": "match found"
+          },
+          "epss_score": {
+            "type": "number",
+            "description": "The EPSS score for the given cve_full.",
+            "example": 0.00107
+          },
+          "epss_percentile": {
+            "type": "number",
+            "description": "The EPSS percentile for the given cve_full.",
+            "example": 0.42186
+          },
+          "epss_score_date": {
+            "type": "string",
+            "description": "The date the EPSS score was generated.",
+            "example": "2023-06-05"
+          },
+          "epss_model_version": {
+            "type": "string",
+            "description": "The EPSS identifier for the model used to generate the score.",
+            "example": "v2023.03.01"
+          },
+          "epss_citation": {
+            "type": "string",
+            "description": "Reference citation for the EPSS data.",
+            "example": "See EPSS at https://www.first.org/epss"
+          },
+          "exploit_observed": {
+            "type": "boolean",
+            "description": "`true` when the vulnerability has an exploit that is publicly available, regardless of whether the exploit is a proof of concept or is actively being exploited in the wild.",
+            "example": false
+          },
+          "exploit_source": {
+            "type": "string",
+            "description": "The source for the `exploit_observed` data. If `exploit_observed` is `false`, this field is typically empty or omitted.",
+            "example": "KEV"
+          },
+          "exploit_note": {
+            "type": "string",
+            "description": "Descriptive information about the `exploit_observed` value, if available.",
+            "example": "See https://www.veracode.com/blog/security-news/resolving-webp-zero-day-vulnerability-cve-2023-4863 for details on this known exploited vulnerability."
+          }
+        }
+      },
+      "Cwe": {
+        "type": "string",
+        "description": "The CWE (Common Weakness Enumeration) of the finding."
+      },
+      "Cvss": {
+        "type": "string",
+        "description": "The CVSS associated with the finding."
+      },
+      "Severity": {
+        "type": "integer",
+        "description": "Severity of the finding."
+      },
+      "StaticFinding": {
+        "type": "object",
+        "properties": {
+          "cwe": {
+            "type": "object", "properties": { "id": { "type": "integer", "format": "int32" }, "name": { "type": "string" }, "href": { "type": "string" } }
+          },
+          "cvss": {
+            "$ref": "#/components/schemas/Cvss"
+          },
+          "severity": {
+            "type": "integer"
+          },
+          "exploitability": {
+            "type": "integer",
+            "description": "The likelihood that this finding could be exploited by an attacker. Values: -2: Very Unlikely, -1: Unlikely, 0: Neutral, 1: Likely, 2: Very Likely."
+          },
+          "attack_vector": {
+            "type": "string",
+            "description": "The function or class where the finding exists."
+          },
+          "file_line_number": {
+            "type": "integer",
+            "description": "The line number where the finding exists in the file."
+          },
+          "file_name": {
+            "type": "string",
+            "description": "The name of the file where the finding exists."
+          },
+          "file_path": {
+            "type": "string",
+            "description": "The path to the file where the finding exists."
+          },
+          "finding_category": {
+            "type": "object", "properties": { "id": { "type": "integer", "format": "int32" }, "name": { "type": "string" }, "href": { "type": "string" } },
+            "description": "The finding category."
+          },
+          "module": {
+            "type": "string",
+            "description": "The name of the module where the finding exists."
+          },
+          "procedure": {
+            "type": "string",
+            "description": "The name of the procedure where the finding exists."
+          },
+          "relative_location": {
+            "type": "integer",
+            "description": "The relative location of the finding in the procedure."
+          }
+        }
+      },
+      "DynamicFinding": {
+        "type": "object",
+        "properties": {
+          "cwe": {
+            "type": "object", "properties": { "id": { "type": "integer", "format": "int32" }, "name": { "type": "string" }, "href": { "type": "string" } }
+          },
+          "cvss": {
+            "$ref": "#/components/schemas/Cvss"
+          },
+          "severity": {
+            "type": "integer"
+          },
+          "attack_vector": {
+            "type": "string",
+            "description": "URL or some input parameter."
+          },
+          "hostname": {
+            "type": "string",
+            "description": "The hostname of the URL that contains the vulnerability."
+          },
+          "port": {
+            "type": "string",
+            "description": "The port of the hostname that was attacked."
+          },
+          "path": {
+            "type": "string",
+            "description": "The URI path."
+          },
+          "plugin": {
+            "type": "string",
+            "description": "The type of attack sent."
+          },
+          "finding_category": {
+            "type": "object", "properties": { "id": { "type": "integer", "format": "int32" }, "name": { "type": "string" }, "href": { "type": "string" } },
+            "description": "The finding category."
+          },
+          "URL": {
+            "type": "string",
+            "description": "The URL of the location where the finding exists."
+          },
+          "vulnerable_parameter": {
+            "type": "string",
+            "description": "The parameter that contains a vulnerability."
+          },
+          "discovered_by_vsa": {
+            "type": "string",
+            "description": "Whether the finding was discovered by Virtual Scan Appliance."
+          }
+        }
+      },
+      "ManualFindingV2": {
+        "type": "object",
+        "properties": {
+          "cwe": {
+            "type": "object", "properties": { "id": { "type": "integer", "format": "int32" }, "name": { "type": "string" }, "href": { "type": "string" } }
+          },
+          "cvss": {
+            "$ref": "#/components/schemas/Cvss"
+          },
+          "severity": {
+            "type": "integer"
+          },
+          "capec_id": {
+            "type": "string",
+            "description": "Attack category, which contains subcategories, such as abuse of functionality, spoofing, probabilistic techniques, exploitation of authentication, resource depletion, exploitation of privilege/trust, injection, data structure attacks, data leakage attacks, resource manipulation, time and state attacks."
+          },
+          "exploit_desc": {
+            "type": "string",
+            "description": "Description of the cause of the finding."
+          },
+          "exploit_difficulty": {
+            "type": "string",
+            "description": "Category of the level of effort needed to fix the finding."
+          },
+          "input_vector": {
+            "type": "string",
+            "description": "URL for the attack vector."
+          },
+          "location": {
+            "type": "string",
+            "description": "The relative location of finding."
+          },
+          "module": {
+            "type": "string",
+            "description": "The module where the finding exists."
+          },
+          "remediation_desc": {
+            "type": "string",
+            "description": "Description of the remediation needed for the attack vector."
+          },
+          "severity_desc": {
+            "type": "string",
+            "description": "Description of the severity of finding."
+          }
+        }
+      },
+      "ScaFinding": {
+        "type": "object",
+        "properties": {
+          "cwe": {
+            "$ref": "#/components/schemas/ScaFindingCwe"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/ScaFindingSeverity"
+          },
+          "component_id": {
+            "type": "string",
+            "description": "Unique ID for the component."
+          },
+          "licenses": {
+            "type": "array",
+            "description": "Displays all licenses found for a component with the specified risk rating.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "license_id": {
+                  "type": "string",
+                  "description": "The identifier for the license of the component.",
+                  "example": "bsd-3-clause"
+                },
+                "risk_rating": {
+                  "type": "string",
+                  "description": "The risk score of this license.",
+                  "example": "2"
+                }
+              }
+            }
+          },
+          "cve": {
+            "$ref": "#/components/schemas/ScaFindingCve"
+          },
+          "version": {
+            "type": "string",
+            "description": "The version of the third-party component.",
+            "example": "1.0.2.c1"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "UUID",
+            "description": "The product ID containing the vulnerability.",
+            "example": "92900924-a921-446a-9542-83a007b718a0"
+          },
+          "component_filename": {
+            "type": "string",
+            "description": "The component filename."
+          },
+          "language": {
+            "type": "string",
+            "description": "The coding language."
+          },
+          "component_path(s)": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "The path of the component with the vulnerability.",
+                  "example": "file330108_1682024184933_html/master-binary/objective-c/cocoapods/Podfile.lock/OpenSSL-Static"
+                }
+              }
+            },
+            "description": "The list of component paths containing this vulnerability."
+          },
+          "metadata": {
+            "type": "string",
+            "description": "Displays metadata values, such as the SCA scan mode and dependency mode."
+          }
+        }
+      },
+      "ScaFindingCwe": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The canonical numeric ID of the CWE.",
+            "example": 399
+          },
+          "name": {
+            "type": "string",
+            "description": "The canonical description of the CWE.",
+            "example": "Resource Management Errors"
+          },
+          "href": {
+            "type": "string",
+            "description": "Finding CWE href"
+          }
+        }
+      },
+      "ScaFindingCve": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The identifier for this vulnerability. While typically a CVE, this field can also identify non-CVE assigned vulnerabilities, such as SRCCLR-SID-23134.",
+            "example": "CVE-2016-2515"
+          },
+          "cvss": {
+            "type": "number",
+            "description": "The Common Vulnerability Scoring System score for this CVE.",
+            "example": 7.8
+          },
+          "href": {
+            "type": "string",
+            "description": "A link to the CVE in the NVD or other database.",
+            "example": "http://nvd.nist.gov/vuln/detail/CVE-2016-2515\""
+          },
+          "severity": {
+            "type": "integer",
+            "description": "The assigned severity of this vulnerability.",
+            "example": "High"
+          },
+          "vector": {
+            "type": "string",
+            "description": "The assigned vector for this vulnerability.",
+            "example": "AV:N/AC:L/Au:N/C:N/I:N/A:C"
+          },
+          "cvss3": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "type": "number",
+                "description": "The assigned CVSS v3 score for this vulnerability.",
+                "example": 7.5
+              },
+              "severity": {
+                "type": "integer",
+                "description": "The assigned CVSS v3 severity for this vulnerability.",
+                "example": "High"
+              },
+              "vector": {
+                "type": "string",
+                "description": "The assigned CVSS v3 vector for this vulnerability.",
+                "example": "AV:N/AC:L/Au:N/C:N/I:N/A:C"
+              }
+            }
+          },
+          "exploitability": {
+            "$ref": "#/components/schemas/ScaFindingExploitability"
+          }
+        }
+      },
+      "ScaFindingSeverity": {
+        "type": "number",
+        "description": "An assigned severity for the vulnerability.",
+        "example": 4
+      },
+      "Finding": {
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "array",
+            "description": "All comments and explanatory notes related to this application finding.",
+            "items": {
+              "$ref": "#/components/schemas/Annotation"
+            }
+          },
+          "build_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The build ID."
+          },
+          "context_guid": {
+            "type": "string",
+            "description": "The context ID."
+          },
+          "context_type": {
+            "type": "string",
+            "description": "Context type, which filters results to show only the findings of this specific context type. The findings status parameter is relative to this context parameter.",
+            "enum": [
+              "APPLICATION",
+              "SANDBOX"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of times a finding occurs in an application, often referred to as prevalence."
+          },
+          "description": {
+            "type": "string",
+            "description": "The detailed description of the finding."
+          },
+          "finding_details": {
+            "type": "object",
+            "description": "Structured data about the finding.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/StaticFinding"
+              },
+              {
+                "$ref": "#/components/schemas/DynamicFinding"
+              },
+              {
+                "$ref": "#/components/schemas/ManualFinding"
+              },
+              {
+                "$ref": "#/components/schemas/ScaFinding"
+              }
+            ]
+          },
+          "finding_status": {
+            "$ref": "#/components/schemas/FindingStatus"
+          },
+          "grace_period_expires_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date on which a grace period expires for the finding. Veracode calculates this date based on the last date a finding was opened (First Found or Last Reopened date), and based on the grace period provided in the security policy assigned to the application. This date only applies to findings that impact policy compliance. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z."
+          },
+          "issue_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique ID within the context of this application."
+          },
+          "scan_type": {
+            "type": "string",
+            "description": "The type of scan that Veracode used to discover this finding: static, dynamic, manual, SCA.",
+            "enum": [
+              "STATIC",
+              "DYNAMIC",
+              "MANUAL",
+              "SCA"
+            ]
+          },
+          "violates_policy": {
+            "type": "boolean",
+            "description": "Policy is violated or not."
+          }
+        }
+      },
+      "FindingStatus": {
+        "type": "object",
+        "properties": {
+          "first_found_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date when the finding was first found. For SCA findings, this date may reference the latest of either the date the vulnerability was published to the Veracode vulnerability database or the date the library was found in a scan. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z."
+          },
+          "last_seen_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time when the finding was last seen. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z."
+          },
+          "mitigation_review_status": {
+            "type": "string",
+            "description": "Field indicating if the mitigation applied to the finding conforms to or deviates from industry standards."
+          },
+          "new": {
+            "type": "boolean",
+            "description": "Use this flag to indicate if this is the first time this finding appeared in any context of the latest scan."
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Resolution of the finding."
+          },
+          "resolution_status": {
+            "type": "string",
+            "description": "The resolution status of the finding."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the finding: open or closed."
+          }
+        }
+      },
+      "PagedResourceOfCategory": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "$ref": "#/components/schemas/EmbeddedCategory"
+          },
+          "_link": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "PagedResourceOfCwe": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "$ref": "#/components/schemas/EmbeddedCwe"
+          },
+          "_link": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        },
+        "title": "PagedResourceOfCwe"
+      },
+      "PagedResourceOfFinding": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "$ref": "#/components/schemas/EmbeddedFinding"
+          },
+          "_link": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        },
+        "title": "PagedResourceOfFinding"
+      },
+      "Scan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the scan.",
+            "format": "int32"
+          },
+          "applicationId": {
+            "type": "integer",
+            "description": "Unique identifier of the application.",
+            "format": "int32"
+          },
+          "applicationGuid": {
+            "type": "string",
+            "description": "Application identifier (UUID)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the scan."
+          },
+          "created": {
+            "type": "string",
+            "description": "Date and time of scan creation.",
+            "format": "date-time"
+          },
+          "submitted": {
+            "type": "string",
+            "description": "Date and time of scan submission.",
+            "format": "date-time"
+          },
+          "completed": {
+            "type": "string",
+            "description": "Date and time the scan completed.",
+            "format": "date-time"
+          },
+          "published": {
+            "type": "string",
+            "description": "Date and time of scan publication.",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current scan status.",
+            "enum": [
+              "incomplete",
+              "not_submitted_to_engine",
+              "submitted_to_engine",
+              "scan_errors",
+              "scan_in_process",
+              "scan_cancelled",
+              "scan_internal_error",
+              "pending_internal_review",
+              "results_ready",
+              "pre_scan_submitted",
+              "pre_scan_failed",
+              "pre_scan_success",
+              "no_modules_defined",
+              "pending_vendor_confirmation",
+              "pre_scan_cancelled",
+              "scan_on_hold",
+              "timeframe_pending",
+              "paused",
+              "stopping",
+              "pausing"
+            ]
+          },
+          "scanType": {
+            "type": "string",
+            "description": "Scan type."
+          }
+        },
+        "description": "Details about a scan."
+      },
+      "EntityModelScan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the scan.",
+            "format": "int32"
+          },
+          "applicationId": {
+            "type": "integer",
+            "description": "Unique identifier of the application.",
+            "format": "int32"
+          },
+          "applicationGuid": {
+            "type": "string",
+            "description": "Application identifier (UUID)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the scan."
+          },
+          "created": {
+            "type": "string",
+            "description": "Date and time of scan creation.",
+            "format": "date-time"
+          },
+          "submitted": {
+            "type": "string",
+            "description": "Date and time of scan submission.",
+            "format": "date-time"
+          },
+          "completed": {
+            "type": "string",
+            "description": "Date and time the scan completed.",
+            "format": "date-time"
+          },
+          "published": {
+            "type": "string",
+            "description": "Date and time of scan publication.",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current scan status.",
+            "enum": [
+              "incomplete",
+              "not_submitted_to_engine",
+              "submitted_to_engine",
+              "scan_errors",
+              "scan_in_process",
+              "scan_cancelled",
+              "scan_internal_error",
+              "pending_internal_review",
+              "results_ready",
+              "pre_scan_submitted",
+              "pre_scan_failed",
+              "pre_scan_success",
+              "no_modules_defined",
+              "pending_vendor_confirmation",
+              "pre_scan_cancelled",
+              "scan_on_hold",
+              "timeframe_pending",
+              "paused",
+              "stopping",
+              "pausing"
+            ]
+          },
+          "scanType": {
+            "type": "string",
+            "description": "Scan type."
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "EmbeddedScan": {
+        "type": "object",
+        "properties": {
+          "scans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Scan"
+            }
+          }
+        }
+      },
+      "PagedModelOfScan": {
+        "type": "object",
+        "properties": {
+          "__embedded": {
+            "$ref": "#/components/schemas/EmbeddedScan"
+          },
+          "__link": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "_page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "ManualFinding": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier (Long).",
+            "format": "int64"
+          },
+          "externalId": {
+            "type": "integer",
+            "description": "Alternative identifier of application finding that is unique to this application.",
+            "format": "int64"
+          },
+          "scanId": {
+            "type": "integer",
+            "description": "Scan identifier of this finding.",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "description": "Internal classification of the finding."
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the finding."
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of duplicate findings found in all modules.",
+            "format": "int32"
+          },
+          "severity": {
+            "type": "integer",
+            "description": "Severity of the finding.",
+            "format": "int32"
+          },
+          "exploitability": {
+            "type": "integer",
+            "description": "Exploitability of the finding.",
+            "format": "int32"
+          },
+          "cwe": {
+            "type": "integer",
+            "description": "The CWE identifier.",
+            "format": "int32"
+          },
+          "cvss": {
+            "type": "number",
+            "description": "The CVSS score.",
+            "format": "double"
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Resolution of the finding."
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Open",
+              "Valid",
+              "False Positive",
+              "Incomplete",
+              "Internal",
+              "Escalate"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "description": "Date the scan finding was found.",
+            "format": "date-time"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "matchedId": {
+            "type": "integer",
+            "description": "Identifier that matches this finding.",
+            "format": "int64"
+          },
+          "appendix": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Appendix"
+            }
+          }
+        },
+        "description": "Details of a Manual Penetration Testing (MPT) finding."
+      },
+      "EmbeddedManualFinding": {
+        "type": "object",
+        "properties": {
+          "manualFindings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ManualFinding"
+            }
+          }
+        }
+      },
+      "PagedModelOfManualFinding": {
+        "type": "object",
+        "properties": {
+          "__embedded": {
+            "$ref": "#/components/schemas/EmbeddedManualFinding"
+          },
+          "__link": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "_page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "PagedModelEntityModelScan": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "scans": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelScan"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "Appendix": {
+        "type": "object",
+        "properties": {
+          "codeSamples": {
+            "type": "array",
+            "description": "List of code samples associated with a manual finding.",
+            "items": {
+              "type": "string",
+              "description": "List of code samples associated with a manual finding."
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "Appendix description."
+          },
+          "screenshots": {
+            "type": "array",
+            "description": "List of screenshots associated with a manual finding.",
+            "items": {
+              "$ref": "#/components/schemas/Screenshot"
+            }
+          }
+        },
+        "description": "An add-on item for the manual finding, which contains associated artifacts for a manual finding."
+      },
+      "Screenshot": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The screenshot file data.",
+            "items": {
+              "type": "string",
+              "description": "The screenshot file data.",
+              "format": "byte"
+            }
+          },
+          "format": {
+            "type": "string",
+            "description": "File format of the screenshot."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the screenshot."
+          }
+        },
+        "description": "A screenshot associated with the manual finding."
+      },
+      "Source": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "scanId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "capecId": {
+            "type": "integer",
+            "description": "Unique indentifier for the attack category which contains subcategories as (abuse of functionality, spoofing, probabilistic techniques, exploitation of authentication, resource depletion, exploitation of privilege/trust, injection, data structure attacks, data leakage attacks, resource manipulation, and time and state attacks).",
+            "format": "int32"
+          },
+          "exploitDesc": {
+            "type": "string",
+            "description": "Description of the cause of the manual finding."
+          },
+          "exploitDifficulty": {
+            "type": "integer",
+            "description": "Category of level of effort needed to fix the manual finding.",
+            "format": "int32"
+          },
+          "inputVector": {
+            "type": "string",
+            "description": "URL for the attack vector."
+          },
+          "location": {
+            "type": "string",
+            "description": "Relative location of the manual finding."
+          },
+          "module": {
+            "type": "string",
+            "description": "Module where the manual finding exists."
+          },
+          "remediationDesc": {
+            "type": "string",
+            "description": "Description of remediation needed for the attack vector."
+          },
+          "severityDesc": {
+            "type": "string",
+            "description": "Description of the severity of the manual finding."
+          },
+          "note": {
+            "type": "string",
+            "description": "Review note of the manual finding."
+          },
+          "appendix_views": {
+            "type": "array",
+            "writeOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Appendix"
+            }
+          }
+        },
+        "description": "Object representation of the source of a manual finding."
+      },
+      "EntityModelManualFinding": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier (Long).",
+            "format": "int64"
+          },
+          "externalId": {
+            "type": "integer",
+            "description": "Alternative identifier of application finding that is unique to this application.",
+            "format": "int64"
+          },
+          "scanId": {
+            "type": "integer",
+            "description": "Scan identifier of this finding.",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "description": "Internal classification of the finding."
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the finding."
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of duplicate findings found in all modules.",
+            "format": "int32"
+          },
+          "severity": {
+            "type": "integer",
+            "description": "Severity of the finding.",
+            "format": "int32"
+          },
+          "exploitability": {
+            "type": "integer",
+            "description": "Exploitability of the finding.",
+            "format": "int32"
+          },
+          "cwe": {
+            "type": "integer",
+            "description": "The CWE identifier.",
+            "format": "int32"
+          },
+          "cvss": {
+            "type": "number",
+            "description": "The CVSS score.",
+            "format": "double"
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Resolution of the finding."
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Open",
+              "Valid",
+              "False Positive",
+              "Incomplete",
+              "Internal",
+              "Escalate"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "description": "Date the scan finding was found.",
+            "format": "date-time"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "matchedId": {
+            "type": "integer",
+            "description": "Identifier that matches this finding.",
+            "format": "int64"
+          },
+          "appendix": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Appendix"
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelEntityModelManualFinding": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "findings": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelManualFinding"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "Link": {
+        "type": "object",
+        "properties": {
+          "deprecation": {
+            "type": "string",
+            "xml": {
+              "name": "deprecation",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "href": {
+            "type": "string",
+            "xml": {
+              "name": "href",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "hreflang": {
+            "type": "string",
+            "xml": {
+              "name": "hreflang",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "media": {
+            "type": "string",
+            "xml": {
+              "name": "media",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "rel": {
+            "type": "string",
+            "xml": {
+              "name": "rel",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "templated": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string",
+            "xml": {
+              "name": "title",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "type": {
+            "type": "string",
+            "xml": {
+              "name": "type",
+              "attribute": true,
+              "wrapped": false
+            }
+          }
+        }
+      },
+      "PageMetadata": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int64",
+            "xml": {
+              "name": "number",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64",
+            "xml": {
+              "name": "size",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "total_elements": {
+            "type": "integer",
+            "format": "int64",
+            "xml": {
+              "name": "total_elements",
+              "attribute": true,
+              "wrapped": false
+            }
+          },
+          "total_pages": {
+            "type": "integer",
+            "format": "int64",
+            "xml": {
+              "name": "total_pages",
+              "attribute": true,
+              "wrapped": false
+            }
+          }
+        }
+      }
+    },
+    "examples": {
+      "FindingsSCAExample": {
+        "summary": "scan_type=SCA finding",
+        "description": "A getFindings response with a single finding of scan_type=SCA.",
+        "value": {
+          "_embedded": {
+            "findings": [
+              {
+                "scan_type": "SCA",
+                "description": "console-io is a module that allows users to implement a web console in their application. A malicious user could bypass the authentication and execute any command that the user who is running the console-io application 2.2.13 and earlier is able to run. This means that if console-io was running from root, the attacker would have full access to the system. This vulnerability exists because the console-io application does not configure socket.io to require authentication, which allows a malicious user to connect via a websocket to send commands and receive the response.",
+                "count": 1,
+                "context_type": "APPLICATION",
+                "context_guid": "9873e434-7056-4203-bf85-4625e0139768",
+                "violates_policy": false,
+                "finding_status": {
+                  "first_found_date": "2023-04-20T16:35:49.354Z",
+                  "status": "OPEN",
+                  "resolution": "UNRESOLVED",
+                  "new": false,
+                  "resolution_status": "NONE",
+                  "last_seen_date": "2023-04-20T20:57:09.927Z"
+                },
+                "finding_details": {
+                  "severity": 5,
+                  "cwe": {
+                    "id": 287,
+                    "name": "Improper Authentication",
+                    "href": "https://api.veracode.com/appsec/v1/cwes/287"
+                  },
+                  "component_id": "01234567-43e4-4286-9db4-1a3e24f8e835",
+                  "licenses": [
+                    {
+                      "license_id": "mit",
+                      "risk_rating": "2"
+                    }
+                  ],
+                  "metadata": {
+                    "sca_scan_mode": "UPLOAD",
+                    "sca_dep_mode": "UNKNOWN"
+                  },
+                  "cve": {
+                    "name": "CVE-2016-10532",
+                    "cvss": 10,
+                    "href": "http://nvd.nist.gov/vuln/detail/CVE-2016-10532",
+                    "severity": "Very High",
+                    "vector": "AV:N/AC:L/Au:N/C:C/I:C/A:C",
+                    "cvss3": {
+                      "score": 9.8,
+                      "severity": "Very High",
+                      "vector": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+                    },
+                    "exploitability": {
+                      "full_cve": "CVE-2023-4863",
+                      "epss_score": 0.38328,
+                      "epss_percentile": 0.96873,
+                      "epss_score_date": "2023-12-20",
+                      "epss_model_version": "v2023.03.01",
+                      "epss_citation": "See EPSS at https://www.first.org/epss",
+                      "epss_status": "match found",
+                      "exploit_service_status": "available",
+                      "exploit_observed": true,
+                      "exploit_source": "KEV",
+                      "exploit_note": "See https://www.veracode.com/blog/security-news/resolving-webp-zero-day-vulnerability-cve-2023-4863 for details on this known exploited vulnerability."
+                    }
+                  },
+                  "product_id": "01234567-6456-4bcc-b1c1-9411d3939dc5",
+                  "component_filename": "console-io",
+                  "language": "JAVASCRIPT",
+                  "component_path": [
+                    {
+                      "path": "file330108_1682024184933_html/master-binary/javascript/yarn/yarn-lock-with-dev-dependencies/node_modules/console-io"
+                    },
+                    {
+                      "path": "file330108_1682024184933_html/master-binary/javascript/yarn/yarn-scopes/node_modules/console-io"
+                    }
+                  ],
+                  "version": "2.6.3"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

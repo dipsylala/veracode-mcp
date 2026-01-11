@@ -1,0 +1,1384 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Veracode Applications API Documentation\n\nUse one of the following base URLs depending on the region for your account:\n* https://api.veracode.com/ - Veracode US Region (default)\n* https://api.veracode.eu/ - Veracode European Region\n* https://api.veracode.us/ - Veracode US Federal Region",
+    "version": "1.0",
+    "title": "Veracode Applications API Specification",
+    "termsOfService": "urn:tos",
+    "contact": {},
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "host": "api.veracode.com",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Application information API",
+      "description": "Application Controller"
+    },
+    {
+      "name": "Sandbox information API",
+      "description": "Sandbox Controller"
+    }
+  ],
+  "paths": {
+    "/appsec/v1/applications": {
+      "get": {
+        "tags": [
+          "Application information API"
+        ],
+        "summary": "getApplications",
+        "description": "Returns a list of applications. Each applications has links to sandboxes, findings, and policies. The policy is associated with an application in the application profile and in other associations via parameters such as App_Team.",
+        "operationId": "getApplicationsUsingGET",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "business_unit",
+            "in": "query",
+            "description": "Business unit.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "custom_field_names",
+            "in": "query",
+            "description": "Custom field names to search.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "custom_field_values",
+            "in": "query",
+            "description": "Custom field values to search.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "legacy_id",
+            "in": "query",
+            "description": "The unique identifier of the Veracode Platform application.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "modified_after",
+            "in": "query",
+            "description": "Filter the results to return only those modified after this date. If there are multiple results for the same application, only the last modified result is returned. Format: yyyy-MM-dd",
+            "required": false,
+            "type": "string",
+            "format": "date-time",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Application name. URL-encode any special characters.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number. Defaults to 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "policy",
+            "in": "query",
+            "description": "policy",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "policy_compliance",
+            "in": "query",
+            "description": "The policy compliance status.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false,
+            "enum": [
+              "DETERMINING",
+              "NOT_ASSESSED",
+              "DID_NOT_PASS",
+              "CONDITIONAL_PASS",
+              "VENDOR_REVIEW",
+              "PASSED"
+            ]
+          },
+          {
+            "name": "policy_compliance_checked_after",
+            "in": "query",
+            "description": "Filter the results to return only those with policy compliance checked after this date. Format: yyyy-MM-dd",
+            "required": false,
+            "type": "string",
+            "format": "date-time",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "policy_guid",
+            "in": "query",
+            "description": "Policy GUID of the policy to change.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "scan_status",
+            "in": "query",
+            "description": "The scan status of the application.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "CREATED",
+                "UNPUBLISHED",
+                "DELETED",
+                "PARTIAL_PUBLISH",
+                "PARTIAL_UNPUBLISH",
+                "INCOMPLETE",
+                "SCAN_SUBMITTED",
+                "IN_QUEUE",
+                "STOPPING",
+                "PAUSING",
+                "IN_PROGRESS",
+                "ANALYSIS_ERRORS",
+                "SCAN_CANCELED",
+                "INTERNAL_REVIEW",
+                "VERIFYING_RESULTS",
+                "SUBMITTED_FOR_NTO_PRE_SCAN",
+                "SUBMITTED_FOR_DYNAMIC_PRE_SCAN",
+                "PRE_SCAN_FAILED",
+                "READY_TO_SUBMIT",
+                "NTO_PENDING_SUBMISSION",
+                "PRE_SCAN_COMPLETE",
+                "MODULE_SELECTION_REQUIRED",
+                "PENDING_VENDOR_ACCEPTANCE",
+                "SHOW_OSRDB",
+                "PUBLISHED",
+                "PUBLISHED_TO_VENDOR",
+                "PUBLISHED_TO_ENTERPRISE",
+                "PENDING_ACCOUNT_APPROVAL",
+                "PENDING_LEGAL_AGREEMENT",
+                "SCAN_IN_PROGRESS",
+                "SCAN_IN_PROGRESS_PARTIAL_RESULTS_READY",
+                "PROMOTE_IN_PROGRESS",
+                "PRE_SCAN_CANCELED",
+                "NTO_PRE_SCAN_CANCELED",
+                "SCAN_HELD_APPROVAL",
+                "SCAN_HELD_LOGIN_INSTRUCTIONS",
+                "SCAN_HELD_LOGIN",
+                "SCAN_HELD_INSTRUCTIONS",
+                "SCAN_HELD_HOLDS_FINISHED",
+                "SCAN_REQUESTED",
+                "TIMEFRAMEPENDING_ID",
+                "PAUSED_ID",
+                "STATIC_VALIDATING_UPLOAD",
+                "PUBLISHED_TO_ENTERPRISEINT"
+              ]
+            },
+            "collectionFormat": "multi",
+            "allowEmptyValue": false,
+            "enum": [
+              "CREATED",
+              "UNPUBLISHED",
+              "DELETED",
+              "PARTIAL_PUBLISH",
+              "PARTIAL_UNPUBLISH",
+              "INCOMPLETE",
+              "SCAN_SUBMITTED",
+              "IN_QUEUE",
+              "STOPPING",
+              "PAUSING",
+              "IN_PROGRESS",
+              "ANALYSIS_ERRORS",
+              "SCAN_CANCELED",
+              "INTERNAL_REVIEW",
+              "VERIFYING_RESULTS",
+              "SUBMITTED_FOR_NTO_PRE_SCAN",
+              "SUBMITTED_FOR_DYNAMIC_PRE_SCAN",
+              "PRE_SCAN_FAILED",
+              "READY_TO_SUBMIT",
+              "NTO_PENDING_SUBMISSION",
+              "PRE_SCAN_COMPLETE",
+              "MODULE_SELECTION_REQUIRED",
+              "PENDING_VENDOR_ACCEPTANCE",
+              "SHOW_OSRDB",
+              "PUBLISHED",
+              "PUBLISHED_TO_VENDOR",
+              "PUBLISHED_TO_ENTERPRISE",
+              "PENDING_ACCOUNT_APPROVAL",
+              "PENDING_LEGAL_AGREEMENT",
+              "SCAN_IN_PROGRESS",
+              "SCAN_IN_PROGRESS_PARTIAL_RESULTS_READY",
+              "PROMOTE_IN_PROGRESS",
+              "PRE_SCAN_CANCELED",
+              "NTO_PRE_SCAN_CANCELED",
+              "SCAN_HELD_APPROVAL",
+              "SCAN_HELD_LOGIN_INSTRUCTIONS",
+              "SCAN_HELD_LOGIN",
+              "SCAN_HELD_INSTRUCTIONS",
+              "SCAN_HELD_HOLDS_FINISHED",
+              "SCAN_REQUESTED",
+              "TIMEFRAMEPENDING_ID",
+              "PAUSED_ID",
+              "STATIC_VALIDATING_UPLOAD",
+              "PUBLISHED_TO_ENTERPRISEINT"
+            ]
+          },
+          {
+            "name": "scan_type",
+            "in": "query",
+            "description": "The scan type of the application scans.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false,
+            "enum": [
+              "STATIC",
+              "DYNAMIC",
+              "MANUAL"
+            ]
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size, up to 500. The default is 50.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "sort_by_custom_field_name",
+            "in": "query",
+            "description": "Custom field name on which to sort.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "tag",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "team",
+            "in": "query",
+            "description": "Filter the results by team name.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "schema": {
+              "$ref": "#/definitions/PagedResourceOfApplication"
+            }
+          },
+          "202": {
+            "description": "The application is created.",
+            "schema": {
+              "$ref": "#/definitions/PagedResourceOfApplication"
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again."
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Application page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "Application information API"
+        ],
+        "summary": "createApplication",
+        "description": "Creates a new application and links it to associated resources such as policies and sandboxes.",
+        "operationId": "createApplicationUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "application",
+            "description": "The application object to be created.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "202": {
+            "description": "The application is created.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Application page not found. Verify the URI and try again."
+          },
+          "409": {
+            "description": "The application is currently in use by another user. Try again later."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/appsec/v1/applications/{applicationGuid}": {
+      "get": {
+        "tags": [
+          "Application information API"
+        ],
+        "summary": "getApplication",
+        "description": "Returns application information and links to associated resources.",
+        "operationId": "getApplicationUsingGET",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "applicationGuid",
+            "in": "path",
+            "description": "The application GUID.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "202": {
+            "description": "The application is created.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Application page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side errors. Please try again later."
+          }
+        },
+        "deprecated": false
+      },
+      "put": {
+        "tags": [
+          "Application information API"
+        ],
+        "summary": "Updates an application",
+        "operationId": "updateApplicationUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "application",
+            "description": "The Application object being updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          {
+            "name": "applicationGuid",
+            "in": "path",
+            "description": "The application GUID.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "method",
+            "in": "query",
+            "description": "This method performs a partial update of any custom policy data.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "policy_guid",
+            "in": "query",
+            "description": "Policy GUID of the policy to be changed.",
+            "required": false,
+            "type": "string",
+            "allowEmptyValue": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "202": {
+            "description": "The application is updated.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again."
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Application page not found. Verify the URI and try again."
+          },
+          "409": {
+            "description": "The application is currently in use by another user. Try again later."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Application information API"
+        ],
+        "summary": "deleteApplication",
+        "operationId": "deleteApplicationUsingDELETE",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "applicationGuid",
+            "in": "path",
+            "description": "The application GUID.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "204": {
+            "description": "The application is deleted.",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "400": {
+            "description": "Invalid application",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "409": {
+            "description": "The application is currently in use by another user. Try again later."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/appsec/v1/applications/{applicationGuid}/sandboxes": {
+      "get": {
+        "tags": [
+          "Sandbox information API"
+        ],
+        "summary": "getSandboxes",
+        "description": "Sandboxes provide the ability to scan applications and measure the results against the policy rules without affecting the policy compliance of the entire application.",
+        "operationId": "getSandboxesUsingGET",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "applicationGuid",
+            "in": "path",
+            "description": "The application GUID.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number. Defaults to 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size, up to 500. The default is 50.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "schema": {
+              "$ref": "#/definitions/PagedResourceOfSandbox"
+            }
+          },
+          "202": {
+            "description": "The sandbox is created.",
+            "schema": {
+              "$ref": "#/definitions/PagedResourceOfSandbox"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Sandbox page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "Sandbox information API"
+        ],
+        "summary": "createSandbox",
+        "description": "Creates sandbox and returns the created sandbox details and links to associated resources.",
+        "operationId": "createSandboxUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "applicationGuid",
+            "in": "path",
+            "description": "The application GUID.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "sandbox",
+            "description": "The sandbox object to create.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Sandbox"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "schema": {
+              "$ref": "#/definitions/Sandbox"
+            }
+          },
+          "202": {
+            "description": "The sandbox is created.",
+            "schema": {
+              "$ref": "#/definitions/Sandbox"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Sandbox page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side errors. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/appsec/v1/applications/{applicationGuid}/sandboxes/{sandboxGuid}": {
+      "get": {
+        "tags": [
+          "Sandbox information API"
+        ],
+        "summary": "getSandbox",
+        "description": "Returns sandbox information and links to associated resources.",
+        "operationId": "getSandboxUsingGET",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "applicationGuid",
+            "in": "path",
+            "description": "The application GUID.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sandboxGuid",
+            "in": "path",
+            "description": "The sandbox GUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "schema": {
+              "$ref": "#/definitions/Sandbox"
+            }
+          },
+          "202": {
+            "description": "The sandbox is created.",
+            "schema": {
+              "$ref": "#/definitions/Sandbox"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "404": {
+            "description": "Sandbox page not found. Verify the URI and try again."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later."
+          },
+          "500": {
+            "description": "Server-side error. Please try again later."
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "AppCustomFieldName": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the application was created. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of the category.",
+          "readOnly": true
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the application was modified. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "organization_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "AppCustomFieldName"
+    },
+    "AppCustomFieldValue": {
+      "type": "object",
+      "properties": {
+        "app_custom_field_name": {
+          "$ref": "#/definitions/AppCustomFieldName"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the application was created. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "field_name_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of the category."
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": "AppCustomFieldValue"
+    },
+    "AppPolicy": {
+      "type": "object",
+      "properties": {
+        "guid": {
+          "type": "string"
+        },
+        "is_default": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string",
+          "description": "The policy name.",
+          "readOnly": true
+        },
+        "policy_compliance_status": {
+          "type": "string",
+          "description": "The policy compliance status.",
+          "readOnly": true,
+          "enum": [
+            "DETERMINING",
+            "NOT_ASSESSED",
+            "DID_NOT_PASS",
+            "CONDITIONAL_PASS",
+            "PASSED",
+            "VENDOR_REVIEW"
+          ]
+        }
+      },
+      "title": "AppPolicy"
+    },
+    "AppTeam": {
+      "type": "object",
+      "properties": {
+        "guid": {
+          "type": "string",
+          "description": "The team ID in the Veracode Identity API."
+        },
+        "team_id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The legacy team_id.",
+          "readOnly": true
+        },
+        "team_name": {
+          "type": "string",
+          "description": "Team name.",
+          "readOnly": true
+        }
+      },
+      "title": "AppTeam"
+    },
+    "Application": {
+      "type": "object",
+      "properties": {
+        "app_profile_url": {
+          "type": "string",
+          "description": "Unique path to the application profile.",
+          "readOnly": true
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the application was created. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "guid": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "last_completed_scan_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date and time of the last completed scan for this application. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the application was modified. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "oid": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "organization_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "profile": {
+          "$ref": "#/definitions/ApplicationProfile"
+        },
+        "results_url": {
+          "type": "string",
+          "description": "Unique path to the latest results.",
+          "readOnly": true
+        },
+        "scans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApplicationScan"
+          }
+        }
+      },
+      "title": "Application"
+    },
+    "ApplicationProfile": {
+      "type": "object",
+      "properties": {
+        "archer_app_name": {
+          "type": "string"
+        },
+        "business_criticality": {
+          "type": "string",
+          "enum": [
+            "VERY_HIGH",
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "VERY_LOW"
+          ]
+        },
+        "business_owners": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BusinessOwner"
+          }
+        },
+        "business_unit": {
+          "$ref": "#/definitions/BusinessUnit"
+        },
+        "custom_field_values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppCustomFieldValue"
+          }
+        },
+        "custom_fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomNameValue"
+          }
+        },
+        "custom_kms_alias": {
+          "type": "string",
+          "description": "Alias for the Customer Managed Encryption Key."
+        },
+        "description": {
+          "type": "string"
+        },
+        "git_repo_url": {
+          "type": "string",
+          "description": "The URL of the Git repository associated with the application. Veracode includes findings from the Git repository in the reporting for this application."
+        },
+        "name": {
+          "type": "string"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppPolicy"
+          }
+        },
+        "settings": {
+          "$ref": "#/definitions/ApplicationSettings"
+        },
+        "tags": {
+          "type": "string"
+        },
+        "teams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppTeam"
+          }
+        }
+      },
+      "title": "ApplicationProfile"
+    },
+    "ApplicationScan": {
+      "type": "object",
+      "properties": {
+        "internal_status": {
+          "type": "string"
+        },
+        "modified_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date when the scan results were published. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "scan_type": {
+          "type": "string",
+          "description": "Type of scan in which this finding was discovered.",
+          "readOnly": true,
+          "enum": [
+            "STATIC",
+            "DYNAMIC",
+            "MANUAL",
+            "SCA"
+          ]
+        },
+        "scan_url": {
+          "type": "string",
+          "description": "Unique path to the latest scan.",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Scan status",
+          "enum": [
+            "CREATED",
+            "UNPUBLISHED",
+            "DELETED",
+            "PARTIAL_PUBLISH",
+            "PARTIAL_UNPUBLISH",
+            "INCOMPLETE",
+            "SCAN_SUBMITTED",
+            "IN_QUEUE",
+            "STOPPING",
+            "PAUSING",
+            "IN_PROGRESS",
+            "ANALYSIS_ERRORS",
+            "SCAN_CANCELED",
+            "INTERNAL_REVIEW",
+            "VERIFYING_RESULTS",
+            "SUBMITTED_FOR_NTO_PRE_SCAN",
+            "SUBMITTED_FOR_DYNAMIC_PRE_SCAN",
+            "PRE_SCAN_FAILED",
+            "READY_TO_SUBMIT",
+            "NTO_PENDING_SUBMISSION",
+            "PRE_SCAN_COMPLETE",
+            "MODULE_SELECTION_REQUIRED",
+            "PENDING_VENDOR_ACCEPTANCE",
+            "SHOW_OSRDB",
+            "PUBLISHED",
+            "PUBLISHED_TO_VENDOR",
+            "PUBLISHED_TO_ENTERPRISE",
+            "PENDING_ACCOUNT_APPROVAL",
+            "PENDING_LEGAL_AGREEMENT",
+            "SCAN_IN_PROGRESS",
+            "SCAN_IN_PROGRESS_PARTIAL_RESULTS_READY",
+            "PROMOTE_IN_PROGRESS",
+            "PRE_SCAN_CANCELED",
+            "NTO_PRE_SCAN_CANCELED",
+            "SCAN_HELD_APPROVAL",
+            "SCAN_HELD_LOGIN_INSTRUCTIONS",
+            "SCAN_HELD_LOGIN",
+            "SCAN_HELD_INSTRUCTIONS",
+            "SCAN_HELD_HOLDS_FINISHED",
+            "SCAN_REQUESTED",
+            "TIMEFRAMEPENDING_ID",
+            "PAUSED_ID",
+            "STATIC_VALIDATING_UPLOAD",
+            "PUBLISHED_TO_ENTERPRISEINT"
+          ]
+        }
+      },
+      "title": "ApplicationScan",
+      "description": "Reference to the latest scan of this application."
+    },
+    "ApplicationSettings": {
+      "type": "object",
+      "properties": {
+        "dynamic_scan_approval_not_required": {
+          "type": "boolean"
+        },
+        "nextday_consultation_allowed": {
+          "type": "boolean"
+        },
+        "sca_enabled": {
+          "type": "boolean"
+        },
+        "static_scan_dependencies_allowed": {
+          "type": "boolean"
+        }
+      },
+      "title": "ApplicationSettings"
+    },
+    "BusinessOwner": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "title": "BusinessOwner"
+    },
+    "BusinessUnit": {
+      "type": "object",
+      "properties": {
+        "guid": {
+          "type": "string",
+          "description": "The business unit GUID."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The business unit ID in the Veracode database.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The business unit name.",
+          "readOnly": true
+        }
+      },
+      "title": "BusinessUnit"
+    },
+    "CustomNameValue": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The custom field name."
+        },
+        "value": {
+          "type": "string",
+          "description": "The custom field value. Note: All applications in your organization use the same set of custom field values."
+        }
+      },
+      "title": "CustomNameValue"
+    },
+    "EmbeddedApplication": {
+      "type": "object",
+      "properties": {
+        "applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Application"
+          }
+        }
+      },
+      "title": "EmbeddedApplication"
+    },
+    "EmbeddedSandbox": {
+      "type": "object",
+      "properties": {
+        "sandboxes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Sandbox"
+          }
+        }
+      },
+      "title": "EmbeddedSandbox"
+    },
+    "Link": {
+      "type": "object",
+      "properties": {
+        "deprecation": {
+          "type": "string",
+          "xml": {
+            "name": "deprecation",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "href": {
+          "type": "string",
+          "xml": {
+            "name": "href",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "hreflang": {
+          "type": "string",
+          "xml": {
+            "name": "hreflang",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "media": {
+          "type": "string",
+          "xml": {
+            "name": "media",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "rel": {
+          "type": "string",
+          "xml": {
+            "name": "rel",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "templated": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string",
+          "xml": {
+            "name": "title",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "type": {
+          "type": "string",
+          "xml": {
+            "name": "type",
+            "attribute": true,
+            "wrapped": false
+          }
+        }
+      },
+      "title": "Link"
+    },
+    "PageMetadata": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "format": "int64",
+          "xml": {
+            "name": "number",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64",
+          "xml": {
+            "name": "size",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "total_elements": {
+          "type": "integer",
+          "format": "int64",
+          "xml": {
+            "name": "total_elements",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "total_pages": {
+          "type": "integer",
+          "format": "int64",
+          "xml": {
+            "name": "total_pages",
+            "attribute": true,
+            "wrapped": false
+          }
+        }
+      },
+      "title": "PageMetadata"
+    },
+    "PagedResourceOfApplication": {
+      "type": "object",
+      "properties": {
+        "_embedded": {
+          "$ref": "#/definitions/EmbeddedApplication"
+        },
+        "_links": {
+          "$ref": "#/definitions/Link"
+        },
+        "page": {
+          "$ref": "#/definitions/PageMetadata"
+        }
+      },
+      "title": "PagedResourceOfApplication"
+    },
+    "PagedResourceOfSandbox": {
+      "type": "object",
+      "properties": {
+        "_embedded": {
+          "$ref": "#/definitions/EmbeddedSandbox"
+        },
+        "_links": {
+          "$ref": "#/definitions/Link"
+        },
+        "page": {
+          "$ref": "#/definitions/PageMetadata"
+        }
+      },
+      "title": "PagedResourceOfSandbox"
+    },
+    "Sandbox": {
+      "type": "object",
+      "properties": {
+        "application_guid": {
+          "type": "string"
+        },
+        "auto_recreate": {
+          "type": "boolean"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the sandbox was created. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "custom_fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomNameValue"
+          }
+        },
+        "guid": {
+          "type": "string",
+          "description": "Unique identifier (UUID).",
+          "readOnly": true
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Internal ID.",
+          "readOnly": true
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the sandbox was modified. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The sandbox name"
+        },
+        "organization_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "owner_username": {
+          "type": "string"
+        }
+      },
+      "title": "Sandbox"
+    }
+  }
+}

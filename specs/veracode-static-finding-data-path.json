@@ -1,0 +1,332 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Veracode Static Finding Data Path API",
+    "description": "Replacement for https://analysiscenter.veracode.com/api/5.0/getcallstacks.do",
+    "version": "v2"
+  },
+  "servers": [
+    {
+      "url": "https://api.veracode.com/",
+      "description": "Veracode Global Region (default)"
+    },
+    {
+      "url": "https://api.veracode.eu/",
+      "description": "Veracode European Region"
+    },
+    {
+      "url": "https://api.veracode.us/",
+      "description": "Veracode US Federal Region"
+    }
+  ],
+  "paths": {
+    "/appsec/v2/applications/{app_guid}/findings/{issue_id}/static_flaw_info": {
+      "get": {
+        "tags": [
+          "Static Flaw data paths information. "
+        ],
+        "summary": "Returns information on the data path for a static analysis finding.",
+        "description": "Returns detailed data path information on a static analysis finding, including module name, filepath, function name, and code line numbers.",
+        "parameters": [
+          {
+            "name": "app_guid",
+            "in": "path",
+            "required": true,
+            "description": "GUID for the application.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issue_id",
+            "in": "path",
+            "required": true,
+            "description": "Flaw ID of the finding.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "description": "If specified, the ID of the development sandbox to which this finding belongs.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You have successfully submitted your request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaticFlaws"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Verify all the components of your request and try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "You are not authorized to perform this action."
+          },
+          "403": {
+            "description": "Access denied. You are not authorized to make this request."
+          },
+          "429": {
+            "description": "Request limit exceeded. You have sent too many requests in a single time period. Submit your request again later. "
+          },
+          "500": {
+            "description": "Server-side error. Please try again and if the error persists, contact Veracode Technical Support.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Link": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string",
+            "description": "Endpoint related to the current request."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the link."
+          },
+          "templated": {
+            "type": "boolean",
+            "description": "Determines whether the \"href\" property is a template."
+          }
+        },
+        "required": [
+          "href"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message.",
+            "readOnly": true
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code.",
+            "readOnly": true
+          }
+        }
+      },
+      "IssueSummary": {
+        "type": "object",
+        "example": {
+          "app_guid": "1234-5678-9012",
+          "issue_id": 7
+        },
+        "properties": {
+          "app_guid": {
+            "type": "string",
+            "readOnly": true,
+            "description": "GUID for the application."
+          },
+          "name": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32",
+            "description": "ID of the application."
+          },
+          "build_id": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32",
+            "description": "ID of the build."
+          },
+          "issue_id": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32",
+            "description": "Flaw or issues ID of the finding."
+          },
+          "context": {
+            "type": "string",
+            "readOnly": true,
+            "description": "GUID of the specified sandbox."
+          }
+        }
+      },
+      "StaticFlaws": {
+        "type": "object",
+        "properties": {
+          "issue_summary": {
+            "$ref": "#/components/schemas/IssueSummary"
+          },
+          "data_paths": {
+            "type": "array",
+            "description": "Call stacks.",
+            "items": {
+              "$ref": "#/components/schemas/DataPaths"
+            }
+          },
+          "_links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        },
+        "example": {
+          "issue_summary": {
+            "app_guid": "12345678-abcdefgh",
+            "name": "javascans1.jar",
+            "build_id": 2,
+            "issue_id": 3,
+            "context": "sandbox_guid"
+          },
+          "data_paths": [
+            {
+              "module_name": "javascans1.jar",
+              "steps": 2,
+              "local_path": "SQLinjection.java",
+              "function_name": "example1",
+              "line_number": 24,
+              "calls": [
+                {
+                  "data_path": 2,
+                  "file_name": "SQLinjection.java",
+                  "file_path": "SQLinjection.java",
+                  "function_name": "example1",
+                  "line_number": 24
+                },
+                {
+                  "data_path": 1,
+                  "file_name": "SQLinjection.java",
+                  "file_path": "SQLinjection.java",
+                  "function_name": "example1",
+                  "line_number": 11
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "DataPaths": {
+        "type": "object",
+        "description": "Call stack object that contains basic information unique to this call stack and the sequence of function calls that make up the call stack.",
+        "example": {
+          "module_name": "javascans1.jar",
+          "steps": 2,
+          "local_path": "SQLinjection.java",
+          "function_name": "example1",
+          "line_number": 24,
+          "calls": [
+            {
+              "data_path": 2,
+              "file_name": "SQLinjection.java",
+              "file_path": "SQLinjection.java",
+              "function_name": "example1",
+              "line_number": 24
+            },
+            {
+              "data_path": 1,
+              "file_name": "SQLinjection.java",
+              "file_path": "SQLinjection.java",
+              "function_name": "example1",
+              "line_number": 11
+            }
+          ]
+        },
+        "properties": {
+          "module_name": {
+            "type": "string",
+            "description": "Name of the module that contains the finding.",
+            "readOnly": true
+          },
+          "steps": {
+            "type": "integer",
+            "description": "Call steps.",
+            "readOnly": true
+          },
+          "local_path": {
+            "type": "string",
+            "description": "Local filepath to the file that contains the finding.",
+            "readOnly": true
+          },
+          "function_name": {
+            "type": "string",
+            "description": "Name of the function that contains the finding.",
+            "readOnly": true
+          },
+          "line_number": {
+            "type": "integer",
+            "description": "Code line number where the finding exists.",
+            "readOnly": true
+          },
+          "calls": {
+            "type": "array",
+            "description": "Attack vector parameters associated with this request.",
+            "items": {
+              "$ref": "#/components/schemas/Call"
+            }
+          }
+        }
+      },
+      "Call": {
+        "type": "object",
+        "description": "Call object that contains the data path number, filename, function name, and code line number of each call in the call stack.",
+        "example": {
+          "data_path": 2,
+          "file_name": "SQLinjection.java",
+          "file_path": "SQLinjection.java",
+          "function_name": "example1",
+          "line_number": 24
+        },
+        "properties": {
+          "data_path": {
+            "type": "integer",
+            "description": "Call sequence in the data path."
+          },
+          "file_name": {
+            "type": "string",
+            "description": "Filename.",
+            "readOnly": true
+          },
+          "file_path": {
+            "type": "string",
+            "description": "Filepath.",
+            "readOnly": true
+          },
+          "function_name": {
+            "type": "string",
+            "description": "Function name.",
+            "readOnly": true
+          },
+          "line_number": {
+            "type": "integer",
+            "description": "Code line number within the file.",
+            "readOnly": true
+          }
+        }
+      }
+    }
+  }
+}

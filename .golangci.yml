@@ -1,0 +1,90 @@
+run:
+  timeout: 5m
+  tests: true
+  build-tags:
+    - integration
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters:
+  disable-all: true
+  enable:
+    # Essential linters
+    - errcheck      # Checks for unchecked errors
+    - gosimple      # Simplifies code
+    - govet         # Reports suspicious constructs
+    - ineffassign   # Detects ineffectual assignments
+    - staticcheck   # Advanced static analysis
+    - unused        # Finds unused code
+    
+    # Style & formatting
+    - gofmt         # Checks if code is formatted
+    - goimports     # Checks if imports are formatted
+    
+    # Code quality
+    - misspell      # Finds commonly misspelled words
+    - unconvert     # Removes unnecessary type conversions
+    - unparam       # Finds unused function parameters
+    - dupl          # Finds code duplication
+    
+    # Performance
+    - prealloc      # Finds slice declarations with non-zero initial length
+    
+    # Bugs
+    - bodyclose     # Checks HTTP response body is closed
+    - noctx         # Finds sending HTTP requests without context
+    - rowserrcheck  # Checks Rows.Err is checked
+    - sqlclosecheck # Checks SQL rows/statements are closed
+    
+    # Security
+    - gosec         # Security issues
+
+linters-settings:
+  gofmt:
+    simplify: true
+    
+  goimports:
+    local-prefixes: github.com/dipsylala/veracodemcp-go
+    
+  govet:
+    check-shadowing: true
+    enable-all: true
+    
+  errcheck:
+    check-blank: true
+    check-type-assertions: true
+    
+  staticcheck:
+    go: "1.21"
+    checks: ["all"]
+    
+  gosec:
+    severity: medium
+    confidence: medium
+    
+  dupl:
+    threshold: 100
+    
+  misspell:
+    locale: US
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  
+  # Exclude all linters from generated code
+  exclude-rules:
+    - path: api/generated/
+      linters:
+        - all
+    - path: _test\.go
+      linters:
+        - dupl
+        - gosec
+        
+  # Don't hide new issues in existing code
+  new: false
