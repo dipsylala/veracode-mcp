@@ -1,0 +1,370 @@
+openapi: 3.0.0
+info:
+  description: Replacement for https://analysiscenter.veracode.com/api/5.0/getdynamicflaws.do
+  title: Veracode Dynamic Flaw API
+  version: v2
+servers:
+- description: Veracode Global Region (default)
+  url: https://api.veracode.com/
+- description: Veracode European Region
+  url: https://api.veracode.eu/
+- description: Veracode US Federal Region
+  url: https://api.veracode.us/
+paths:
+  /appsec/v2/applications/{app_guid}/findings/{issue_id}/dynamic_flaw_info:
+    get:
+      description: "Returns detailed information about a single dynamic flaw, including\
+        \ the CWE, description, recommendation, and associated HTTP requests."
+      parameters:
+      - description: GUID for the application.
+        explode: false
+        in: path
+        name: app_guid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Unique issue ID for the scanned application.
+        explode: false
+        in: path
+        name: issue_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DynamicFlaw"
+          description: You have successfully submitted your request. Flaw information
+            retrieved successfully.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "Invalid request. Verify all the components of your request\
+            \ and, then, try again."
+        "401":
+          description: You are not authorized to perform this action.
+        "403":
+          description: Access denied. You are not authorized to make this request.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "Server-side error. Please try again. If the error persists,\
+            \ contact Veracode Technical Support."
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "Request timed out. Please try again. If the error persists,\
+            \ ensure you have set the correct system time and there are no network\
+            \ connection issues."
+      summary: Returns information on a specific dynamic flaw.
+components:
+  schemas:
+    Link:
+      example:
+        templated: true
+        name: name
+        href: href
+      properties:
+        href:
+          description: Endpoint for the current request.
+          type: string
+        name:
+          description: Name of the link.
+          type: string
+        templated:
+          description: "True if the \"href\" property is a template. Otherwise, False."
+          type: boolean
+      required:
+      - href
+      type: object
+    Error:
+      example:
+        code: code
+        _links:
+          help:
+            templated: true
+            name: name
+            href: href
+        message: message
+      properties:
+        message:
+          description: Error message.
+          readOnly: true
+          type: string
+        code:
+          description: Error code.
+          readOnly: true
+          type: string
+        _links:
+          $ref: "#/components/schemas/Error__links"
+      type: object
+    IssueSummary:
+      example:
+        app_guid: 1234xcc_ffggd4543_4trcf
+        issue_id: 7
+        engine_version: ""
+        cwe_id: 526
+        description: HTTP response headers often contain information identifying technologies
+          and version numbers that tools or attackers can use to target subsequent
+          attacks. 'Server Microsoft-IIS 7.5' was observed in the server response.
+        recommendation: "To suppress version information from Apache, set ServerTokens\
+          \ to prod. More information can be found at http://httpd.apache.org/docs/current/mod/core.html#servertokens.\
+          \ For Microsoft IIS versions earlier than 5.1 use Microsoft's URLScan found\
+          \ at http://support.microsoft.com/default.aspx?scid=kb;en-us;307608. For\
+          \ IIS version 5.1 and higher please use UrlScan 3.1 http://www.iis.net/downloads/microsoft/urlscan.\
+          \ For nginx remove the version information by setting \"server_tokens\"\
+          \ to \"off\" in the nginx configuration file. More information can be found\
+          \ at http://nginx.org/en/docs/http/ngx_http_core_module.html#server_tokens.\
+          \ For other services or devices, consult documentation to determine how\
+          \ to disable extraneous headers."
+      properties:
+        app_guid:
+          description: GUID for the application.
+          readOnly: true
+          type: string
+        app_id:
+          description: Unique identifier for the application.
+          format: int32
+          readOnly: true
+          type: integer
+        build_id:
+          description: ID of the build.
+          format: int32
+          readOnly: true
+          type: integer
+        issue_id:
+          description: Unique identifier for the flaw.
+          format: int32
+          readOnly: true
+          type: integer
+        engine_version:
+          description: "Version of the scanner engine that discovered the flaw. Optionally,\
+            \ the value can be an empty string."
+          readOnly: true
+          type: string
+        cwe_id:
+          description: Unique CWE ID for the flaw.
+          format: int32
+          type: integer
+        description:
+          description: Description of the flaw.
+          readOnly: true
+          type: string
+        recommendation:
+          description: Recommended process for fixing the flaw.
+          readOnly: true
+          type: string
+      type: object
+    DynamicFlaw:
+      example:
+        dynamic_flaw_info:
+          request:
+            url: https://vuln.example.com/forms/bankLoan.aspx?loadAmount=1000000
+            raw_bytes: R0VUIC9wbGVhc2VfcHJldGVuZF90aGlzX2lzX2FfcmVhbF9odHRwX3JlcXVlc3QgSFRUUC8xLjEK
+            secure: true
+            port: 443
+            protocol: HTTP
+            method: get
+            path: /forms/bankLoad.aspx
+            uri: /forms/bankLoan.aspx?loadAmount=1000000
+            body: ""
+            referer: https://vuln.example.com/forms/applyNow.html
+            attack_vectors:
+            - id: 0
+              name: Server&#x3a; Microsoft-IIS&#x2f;7.5
+              type: HEADER
+              description: banner
+              original_value: Microsoft-IIS&#x2f;7.5"
+              injected_value: ""
+          response:
+            raw_bytes: MjAwIE9LXHJcblNlcnZlcjogU29tZXRoaW5nQ29vbDEuMFxyXG5cclxuPGh0bWw+PGgxPkhlbGxvIFdvcmxkPC9oMT48L2h0bWw+Cg
+        _links:
+          help:
+            templated: true
+            name: name
+            href: href
+        issue_summary:
+          app_guid: 1234xcc_ffggd4543_4trcf
+          issue_id: 7
+          engine_version: ""
+          cwe_id: 526
+          description: HTTP response headers often contain information identifying
+            technologies and version numbers that tools or attackers can use to target
+            subsequent attacks. 'Server Microsoft-IIS 7.5' was observed in the server
+            response.
+          recommendation: "To suppress version information from Apache, set ServerTokens\
+            \ to prod. More information can be found at http://httpd.apache.org/docs/current/mod/core.html#servertokens.\
+            \ For Microsoft IIS versions earlier than 5.1 use Microsoft's URLScan\
+            \ found at http://support.microsoft.com/default.aspx?scid=kb;en-us;307608.\
+            \ For IIS version 5.1 and higher please use UrlScan 3.1 http://www.iis.net/downloads/microsoft/urlscan.\
+            \ For nginx remove the version information by setting \"server_tokens\"\
+            \ to \"off\" in the nginx configuration file. More information can be\
+            \ found at http://nginx.org/en/docs/http/ngx_http_core_module.html#server_tokens.\
+            \ For other services or devices, consult documentation to determine how\
+            \ to disable extraneous headers."
+      properties:
+        issue_summary:
+          $ref: "#/components/schemas/IssueSummary"
+        dynamic_flaw_info:
+          $ref: "#/components/schemas/DynamicSpecificFlawInfo"
+        _links:
+          $ref: "#/components/schemas/Error__links"
+      type: object
+    DynamicSpecificFlawInfo:
+      example:
+        request:
+          url: https://vuln.example.com/forms/bankLoan.aspx?loadAmount=1000000
+          raw_bytes: R0VUIC9wbGVhc2VfcHJldGVuZF90aGlzX2lzX2FfcmVhbF9odHRwX3JlcXVlc3QgSFRUUC8xLjEK
+          secure: true
+          port: 443
+          protocol: HTTP
+          method: get
+          path: /forms/bankLoad.aspx
+          uri: /forms/bankLoan.aspx?loadAmount=1000000
+          body: ""
+          referer: https://vuln.example.com/forms/applyNow.html
+          attack_vectors:
+          - id: 0
+            name: Server&#x3a; Microsoft-IIS&#x2f;7.5
+            type: HEADER
+            description: banner
+            original_value: Microsoft-IIS&#x2f;7.5"
+            injected_value: ""
+        response:
+          raw_bytes: MjAwIE9LXHJcblNlcnZlcjogU29tZXRoaW5nQ29vbDEuMFxyXG5cclxuPGh0bWw+PGgxPkhlbGxvIFdvcmxkPC9oMT48L2h0bWw+Cg
+      properties:
+        request:
+          $ref: "#/components/schemas/Request"
+        response:
+          $ref: "#/components/schemas/Response"
+      type: object
+    Request:
+      example:
+        url: https://vuln.example.com/forms/bankLoan.aspx?loadAmount=1000000
+        raw_bytes: R0VUIC9wbGVhc2VfcHJldGVuZF90aGlzX2lzX2FfcmVhbF9odHRwX3JlcXVlc3QgSFRUUC8xLjEK
+        secure: true
+        port: 443
+        protocol: HTTP
+        method: get
+        path: /forms/bankLoad.aspx
+        uri: /forms/bankLoan.aspx?loadAmount=1000000
+        body: ""
+        referer: https://vuln.example.com/forms/applyNow.html
+        attack_vectors:
+        - id: 0
+          name: Server&#x3a; Microsoft-IIS&#x2f;7.5
+          type: HEADER
+          description: banner
+          original_value: Microsoft-IIS&#x2f;7.5"
+          injected_value: ""
+      properties:
+        url:
+          description: URL associated with this request.
+          type: string
+        raw_bytes:
+          description: Base64-encoded raw HTTP request payload.
+          readOnly: true
+          type: string
+        secure:
+          description: "True if this is a secure HTTPS request, false if HTTP."
+          readOnly: true
+          type: boolean
+        port:
+          description: TCP port to which this request was made.
+          readOnly: true
+          type: integer
+        protocol:
+          description: "Protocol associated with this request. Typically, HTTP."
+          readOnly: true
+          type: string
+        method:
+          description: "HTTP method of the request (GET, POST, PUT, PATCH, etc.).\
+            \ Can include custom methods."
+          readOnly: true
+          type: string
+        path:
+          description: "Path of the URL associated with this request. For example,\
+            \ no scheme, hostname, port, or parameter information."
+          readOnly: true
+          type: string
+        uri:
+          description: "Relative URI associated with this request, not including the\
+            \ host."
+          readOnly: true
+          type: string
+        body:
+          description: Body of the request. May be empty.
+          readOnly: true
+          type: string
+        referer:
+          description: "Referer, from the HTTP header, associated with the request."
+          readOnly: true
+          type: string
+        attack_vectors:
+          description: Attack vector parameters associated with this request.
+          items:
+            $ref: "#/components/schemas/AttackVector"
+          type: array
+      type: object
+    AttackVector:
+      example:
+        name: Server&#x3a; Microsoft-IIS&#x2f;7.5
+        type: HEADER
+        description: banner
+        original_value: Microsoft-IIS&#x2f;7.5"
+        injected_value: ""
+      properties:
+        name:
+          description: Name of the attack vector parameter.
+          readOnly: true
+          type: string
+        type:
+          description: Type of attack vector parameter.
+          enum:
+          - QUERY
+          - HEADER
+          - COOKIE
+          - BODY
+          - PATHPARAM
+          readOnly: true
+          type: string
+        original_value:
+          description: Original value of the attack vector.
+          readOnly: true
+          type: string
+        injected_value:
+          description: "Injected value of the attack vector, after the scan engine\
+            \ has modified it to detect a flaw."
+          readOnly: true
+          type: string
+      type: object
+    Response:
+      properties:
+        raw_bytes:
+          description: Base64-encoded raw HTTP response payload.
+          readOnly: true
+          type: string
+      type: object
+    Error__links:
+      example:
+        help:
+          templated: true
+          name: name
+          href: href
+      properties:
+        help:
+          $ref: "#/components/schemas/Link"
+      readOnly: true
+      required:
+      - help
+      type: object

@@ -1,0 +1,43 @@
+openapi: 3.0.1
+info:
+  contact: {}
+  description: |+
+    Veracode Healthcheck API Documentation
+
+     This API is only available in the Veracode Commercial Region
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+  termsOfService: urn:tos
+  title: Veracode Healthcheck API Specification
+  version: "1.0"
+servers:
+- url: //api.veracode.com/
+tags:
+- description: The healthcheck API.
+  name: Healthcheck APIs
+paths:
+  /healthcheck/status:
+    get:
+      deprecated: false
+      description: Returns 200 to verify that authentication services are operational.
+      responses:
+        "200":
+          content: {}
+          description: 'You have successfully submitted your request. '
+        "401":
+          content: {}
+          description: 'You are not authorized to perform this action. '
+        "403":
+          content: {}
+          description: 'Access denied. You are not authorized to make this request. '
+        "500":
+          content: {}
+          description: 'Server-side error. Please try again later. '
+      summary: checkStatus
+      tags:
+      - Healthcheck APIs
+components:
+  schemas: {}
+x-original-swagger-version: "2.0"

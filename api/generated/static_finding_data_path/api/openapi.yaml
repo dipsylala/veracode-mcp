@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  description: Replacement for https://analysiscenter.veracode.com/api/5.0/getcallstacks.do
+  title: Veracode Static Finding Data Path API
+  version: v2
+servers:
+- description: Veracode Global Region (default)
+  url: https://api.veracode.com/
+- description: Veracode European Region
+  url: https://api.veracode.eu/
+- description: Veracode US Federal Region
+  url: https://api.veracode.us/
+paths:
+  /appsec/v2/applications/{app_guid}/findings/{issue_id}/static_flaw_info:
+    get:
+      description: "Returns detailed data path information on a static analysis finding,\
+        \ including module name, filepath, function name, and code line numbers."
+      parameters:
+      - description: GUID for the application.
+        explode: false
+        in: path
+        name: app_guid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Flaw ID of the finding.
+        explode: false
+        in: path
+        name: issue_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: "If specified, the ID of the development sandbox to which this\
+          \ finding belongs."
+        explode: true
+        in: query
+        name: context
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaticFlaws"
+          description: You have successfully submitted your request.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          description: You are not authorized to perform this action.
+        "403":
+          description: Access denied. You are not authorized to make this request.
+        "429":
+          description: 'Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later. '
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "Server-side error. Please try again and if the error persists,\
+            \ contact Veracode Technical Support."
+      summary: Returns information on the data path for a static analysis finding.
+      tags:
+      - 'Static Flaw data paths information. '
+components:
+  schemas:
+    Link:
+      properties:
+        href:
+          description: Endpoint related to the current request.
+          type: string
+        name:
+          description: Name of the link.
+          type: string
+        templated:
+          description: Determines whether the "href" property is a template.
+          type: boolean
+      required:
+      - href
+      type: object
+    Error:
+      example:
+        code: code
+        message: message
+      properties:
+        message:
+          description: Error message.
+          readOnly: true
+          type: string
+        code:
+          description: Error code.
+          readOnly: true
+          type: string
+      type: object
+    IssueSummary:
+      example:
+        app_guid: 1234-5678-9012
+        issue_id: 7
+      properties:
+        app_guid:
+          description: GUID for the application.
+          readOnly: true
+          type: string
+        name:
+          description: ID of the application.
+          format: int32
+          readOnly: true
+          type: integer
+        build_id:
+          description: ID of the build.
+          format: int32
+          readOnly: true
+          type: integer
+        issue_id:
+          description: Flaw or issues ID of the finding.
+          format: int32
+          readOnly: true
+          type: integer
+        context:
+          description: GUID of the specified sandbox.
+          readOnly: true
+          type: string
+      type: object
+    StaticFlaws:
+      example:
+        issue_summary:
+          app_guid: 12345678-abcdefgh
+          name: javascans1.jar
+          build_id: 2
+          issue_id: 3
+          context: sandbox_guid
+        data_paths:
+        - module_name: javascans1.jar
+          steps: 2
+          local_path: SQLinjection.java
+          function_name: example1
+          line_number: 24
+          calls:
+          - data_path: 2
+            file_name: SQLinjection.java
+            file_path: SQLinjection.java
+            function_name: example1
+            line_number: 24
+          - data_path: 1
+            file_name: SQLinjection.java
+            file_path: SQLinjection.java
+            function_name: example1
+            line_number: 11
+      properties:
+        issue_summary:
+          $ref: "#/components/schemas/IssueSummary"
+        data_paths:
+          description: Call stacks.
+          items:
+            $ref: "#/components/schemas/DataPaths"
+          type: array
+        _links:
+          items:
+            $ref: "#/components/schemas/Link"
+          type: array
+      type: object
+    DataPaths:
+      description: Call stack object that contains basic information unique to this
+        call stack and the sequence of function calls that make up the call stack.
+      example:
+        module_name: javascans1.jar
+        steps: 2
+        local_path: SQLinjection.java
+        function_name: example1
+        line_number: 24
+        calls:
+        - data_path: 2
+          file_name: SQLinjection.java
+          file_path: SQLinjection.java
+          function_name: example1
+          line_number: 24
+        - data_path: 1
+          file_name: SQLinjection.java
+          file_path: SQLinjection.java
+          function_name: example1
+          line_number: 11
+      properties:
+        module_name:
+          description: Name of the module that contains the finding.
+          readOnly: true
+          type: string
+        steps:
+          description: Call steps.
+          readOnly: true
+          type: integer
+        local_path:
+          description: Local filepath to the file that contains the finding.
+          readOnly: true
+          type: string
+        function_name:
+          description: Name of the function that contains the finding.
+          readOnly: true
+          type: string
+        line_number:
+          description: Code line number where the finding exists.
+          readOnly: true
+          type: integer
+        calls:
+          description: Attack vector parameters associated with this request.
+          items:
+            $ref: "#/components/schemas/Call"
+          type: array
+      type: object
+    Call:
+      description: "Call object that contains the data path number, filename, function\
+        \ name, and code line number of each call in the call stack."
+      example:
+        data_path: 2
+        file_name: SQLinjection.java
+        file_path: SQLinjection.java
+        function_name: example1
+        line_number: 24
+      properties:
+        data_path:
+          description: Call sequence in the data path.
+          type: integer
+        file_name:
+          description: Filename.
+          readOnly: true
+          type: string
+        file_path:
+          description: Filepath.
+          readOnly: true
+          type: string
+        function_name:
+          description: Function name.
+          readOnly: true
+          type: string
+        line_number:
+          description: Code line number within the file.
+          readOnly: true
+          type: integer
+      type: object

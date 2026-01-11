@@ -34,11 +34,6 @@ dist/
 mcp-server
 mcp-server.exe
 
-# Generated API clients (keep structure, ignore contents except README)
-api/generated/*/
-!api/generated/*/README.md
-!api/generated/README.md
-
 # Environment files
 .env
 .env.local

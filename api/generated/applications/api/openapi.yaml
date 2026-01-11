@@ -1,0 +1,1820 @@
+openapi: 3.0.1
+info:
+  contact: {}
+  description: |-
+    Veracode Applications API Documentation
+
+    Use one of the following base URLs depending on the region for your account:
+    * https://api.veracode.com/ - Veracode US Region (default)
+    * https://api.veracode.eu/ - Veracode European Region
+    * https://api.veracode.us/ - Veracode US Federal Region
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+  termsOfService: urn:tos
+  title: Veracode Applications API Specification
+  version: "1.0"
+servers:
+- url: //api.veracode.com/
+tags:
+- description: Application Controller
+  name: Application information API
+- description: Sandbox Controller
+  name: Sandbox information API
+paths:
+  /appsec/v1/applications:
+    get:
+      deprecated: false
+      description: "Returns a list of applications. Each applications has links to\
+        \ sandboxes, findings, and policies. The policy is associated with an application\
+        \ in the application profile and in other associations via parameters such\
+        \ as App_Team."
+      operationId: getApplicationsUsingGET
+      parameters:
+      - allowEmptyValue: false
+        description: Business unit.
+        in: query
+        name: business_unit
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Custom field names to search.
+        explode: true
+        in: query
+        name: custom_field_names
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Custom field values to search.
+        explode: true
+        in: query
+        name: custom_field_values
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: The unique identifier of the Veracode Platform application.
+        in: query
+        name: legacy_id
+        schema:
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: "Filter the results to return only those modified after this\
+          \ date. If there are multiple results for the same application, only the\
+          \ last modified result is returned. Format: yyyy-MM-dd"
+        in: query
+        name: modified_after
+        schema:
+          format: date-time
+          type: string
+      - allowEmptyValue: false
+        description: Application name. URL-encode any special characters.
+        in: query
+        name: name
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Page number. Defaults to 0.
+        in: query
+        name: page
+        schema:
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: policy
+        in: query
+        name: policy
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: The policy compliance status.
+        in: query
+        name: policy_compliance
+        schema:
+          enum:
+          - DETERMINING
+          - NOT_ASSESSED
+          - DID_NOT_PASS
+          - CONDITIONAL_PASS
+          - VENDOR_REVIEW
+          - PASSED
+          type: string
+      - allowEmptyValue: false
+        description: "Filter the results to return only those with policy compliance\
+          \ checked after this date. Format: yyyy-MM-dd"
+        in: query
+        name: policy_compliance_checked_after
+        schema:
+          format: date-time
+          type: string
+      - allowEmptyValue: false
+        description: Policy GUID of the policy to change.
+        in: query
+        name: policy_guid
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: The scan status of the application.
+        explode: true
+        in: query
+        name: scan_status
+        schema:
+          enum:
+          - CREATED
+          - UNPUBLISHED
+          - DELETED
+          - PARTIAL_PUBLISH
+          - PARTIAL_UNPUBLISH
+          - INCOMPLETE
+          - SCAN_SUBMITTED
+          - IN_QUEUE
+          - STOPPING
+          - PAUSING
+          - IN_PROGRESS
+          - ANALYSIS_ERRORS
+          - SCAN_CANCELED
+          - INTERNAL_REVIEW
+          - VERIFYING_RESULTS
+          - SUBMITTED_FOR_NTO_PRE_SCAN
+          - SUBMITTED_FOR_DYNAMIC_PRE_SCAN
+          - PRE_SCAN_FAILED
+          - READY_TO_SUBMIT
+          - NTO_PENDING_SUBMISSION
+          - PRE_SCAN_COMPLETE
+          - MODULE_SELECTION_REQUIRED
+          - PENDING_VENDOR_ACCEPTANCE
+          - SHOW_OSRDB
+          - PUBLISHED
+          - PUBLISHED_TO_VENDOR
+          - PUBLISHED_TO_ENTERPRISE
+          - PENDING_ACCOUNT_APPROVAL
+          - PENDING_LEGAL_AGREEMENT
+          - SCAN_IN_PROGRESS
+          - SCAN_IN_PROGRESS_PARTIAL_RESULTS_READY
+          - PROMOTE_IN_PROGRESS
+          - PRE_SCAN_CANCELED
+          - NTO_PRE_SCAN_CANCELED
+          - SCAN_HELD_APPROVAL
+          - SCAN_HELD_LOGIN_INSTRUCTIONS
+          - SCAN_HELD_LOGIN
+          - SCAN_HELD_INSTRUCTIONS
+          - SCAN_HELD_HOLDS_FINISHED
+          - SCAN_REQUESTED
+          - TIMEFRAMEPENDING_ID
+          - PAUSED_ID
+          - STATIC_VALIDATING_UPLOAD
+          - PUBLISHED_TO_ENTERPRISEINT
+          items:
+            enum:
+            - CREATED
+            - UNPUBLISHED
+            - DELETED
+            - PARTIAL_PUBLISH
+            - PARTIAL_UNPUBLISH
+            - INCOMPLETE
+            - SCAN_SUBMITTED
+            - IN_QUEUE
+            - STOPPING
+            - PAUSING
+            - IN_PROGRESS
+            - ANALYSIS_ERRORS
+            - SCAN_CANCELED
+            - INTERNAL_REVIEW
+            - VERIFYING_RESULTS
+            - SUBMITTED_FOR_NTO_PRE_SCAN
+            - SUBMITTED_FOR_DYNAMIC_PRE_SCAN
+            - PRE_SCAN_FAILED
+            - READY_TO_SUBMIT
+            - NTO_PENDING_SUBMISSION
+            - PRE_SCAN_COMPLETE
+            - MODULE_SELECTION_REQUIRED
+            - PENDING_VENDOR_ACCEPTANCE
+            - SHOW_OSRDB
+            - PUBLISHED
+            - PUBLISHED_TO_VENDOR
+            - PUBLISHED_TO_ENTERPRISE
+            - PENDING_ACCOUNT_APPROVAL
+            - PENDING_LEGAL_AGREEMENT
+            - SCAN_IN_PROGRESS
+            - SCAN_IN_PROGRESS_PARTIAL_RESULTS_READY
+            - PROMOTE_IN_PROGRESS
+            - PRE_SCAN_CANCELED
+            - NTO_PRE_SCAN_CANCELED
+            - SCAN_HELD_APPROVAL
+            - SCAN_HELD_LOGIN_INSTRUCTIONS
+            - SCAN_HELD_LOGIN
+            - SCAN_HELD_INSTRUCTIONS
+            - SCAN_HELD_HOLDS_FINISHED
+            - SCAN_REQUESTED
+            - TIMEFRAMEPENDING_ID
+            - PAUSED_ID
+            - STATIC_VALIDATING_UPLOAD
+            - PUBLISHED_TO_ENTERPRISEINT
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: The scan type of the application scans.
+        in: query
+        name: scan_type
+        schema:
+          enum:
+          - STATIC
+          - DYNAMIC
+          - MANUAL
+          type: string
+      - allowEmptyValue: false
+        description: "Page size, up to 500. The default is 50."
+        in: query
+        name: size
+        schema:
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Custom field name on which to sort.
+        in: query
+        name: sort_by_custom_field_name
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: tag
+        in: query
+        name: tag
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Filter the results by team name.
+        in: query
+        name: team
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResourceOfApplication"
+          description: You have successfully submitted your request.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResourceOfApplication"
+          description: The application is created.
+        "400":
+          content: {}
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content: {}
+          description: Application page not found. Verify the URI and try again.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side error. Please try again later.
+      summary: getApplications
+      tags:
+      - Application information API
+    post:
+      deprecated: false
+      description: Creates a new application and links it to associated resources
+        such as policies and sandboxes.
+      operationId: createApplicationUsingPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Application"
+        description: The application object to be created.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: You have successfully submitted your request.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: The application is created.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content: {}
+          description: Application page not found. Verify the URI and try again.
+        "409":
+          content: {}
+          description: The application is currently in use by another user. Try again
+            later.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side error. Please try again later.
+      summary: createApplication
+      tags:
+      - Application information API
+      x-codegen-request-body-name: application
+  /appsec/v1/applications/{applicationGuid}:
+    delete:
+      deprecated: false
+      operationId: deleteApplicationUsingDELETE
+      parameters:
+      - description: The application GUID.
+        in: path
+        name: applicationGuid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: The application is deleted.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: Invalid application
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "409":
+          content: {}
+          description: The application is currently in use by another user. Try again
+            later.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side error. Please try again later.
+      summary: deleteApplication
+      tags:
+      - Application information API
+    get:
+      deprecated: false
+      description: Returns application information and links to associated resources.
+      operationId: getApplicationUsingGET
+      parameters:
+      - description: The application GUID.
+        in: path
+        name: applicationGuid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: You have successfully submitted your request.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: The application is created.
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content: {}
+          description: Application page not found. Verify the URI and try again.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side errors. Please try again later.
+      summary: getApplication
+      tags:
+      - Application information API
+    put:
+      deprecated: false
+      operationId: updateApplicationUsingPUT
+      parameters:
+      - description: The application GUID.
+        in: path
+        name: applicationGuid
+        required: true
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: This method performs a partial update of any custom policy data.
+        in: query
+        name: method
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Policy GUID of the policy to be changed.
+        in: query
+        name: policy_guid
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Application"
+        description: The Application object being updated.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: You have successfully submitted your request.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+          description: The application is updated.
+        "400":
+          content: {}
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content: {}
+          description: Application page not found. Verify the URI and try again.
+        "409":
+          content: {}
+          description: The application is currently in use by another user. Try again
+            later.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side error. Please try again later.
+      summary: Updates an application
+      tags:
+      - Application information API
+      x-codegen-request-body-name: application
+  /appsec/v1/applications/{applicationGuid}/sandboxes:
+    get:
+      deprecated: false
+      description: Sandboxes provide the ability to scan applications and measure
+        the results against the policy rules without affecting the policy compliance
+        of the entire application.
+      operationId: getSandboxesUsingGET
+      parameters:
+      - description: The application GUID.
+        in: path
+        name: applicationGuid
+        required: true
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Page number. Defaults to 0.
+        in: query
+        name: page
+        schema:
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: "Page size, up to 500. The default is 50."
+        in: query
+        name: size
+        schema:
+          format: int32
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResourceOfSandbox"
+          description: You have successfully submitted your request.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResourceOfSandbox"
+          description: The sandbox is created.
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content: {}
+          description: Sandbox page not found. Verify the URI and try again.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side error. Please try again later.
+      summary: getSandboxes
+      tags:
+      - Sandbox information API
+    post:
+      deprecated: false
+      description: Creates sandbox and returns the created sandbox details and links
+        to associated resources.
+      operationId: createSandboxUsingPOST
+      parameters:
+      - description: The application GUID.
+        in: path
+        name: applicationGuid
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Sandbox"
+        description: The sandbox object to create.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sandbox"
+          description: You have successfully submitted your request.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sandbox"
+          description: The sandbox is created.
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content: {}
+          description: Sandbox page not found. Verify the URI and try again.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side errors. Please try again later.
+      summary: createSandbox
+      tags:
+      - Sandbox information API
+      x-codegen-request-body-name: sandbox
+  /appsec/v1/applications/{applicationGuid}/sandboxes/{sandboxGuid}:
+    get:
+      deprecated: false
+      description: Returns sandbox information and links to associated resources.
+      operationId: getSandboxUsingGET
+      parameters:
+      - description: The application GUID.
+        in: path
+        name: applicationGuid
+        required: true
+        schema:
+          type: string
+      - description: The sandbox GUID
+        in: path
+        name: sandboxGuid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sandbox"
+          description: You have successfully submitted your request.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sandbox"
+          description: The sandbox is created.
+        "401":
+          content: {}
+          description: You are not authorized to perform this action.
+        "403":
+          content: {}
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content: {}
+          description: Sandbox page not found. Verify the URI and try again.
+        "429":
+          content: {}
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content: {}
+          description: Server-side error. Please try again later.
+      summary: getSandbox
+      tags:
+      - Sandbox information API
+components:
+  schemas:
+    AppCustomFieldName:
+      example:
+        created: 2000-01-23T04:56:07.000+00:00
+        organization_id: 2
+        name: name
+        modified: 2000-01-23T04:56:07.000+00:00
+        id: 5
+        sort_order: 7
+      properties:
+        created:
+          description: "The date and time when the application was created. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        id:
+          description: Unique identifier of the category.
+          format: int32
+          readOnly: true
+          type: integer
+        modified:
+          description: "The date and time when the application was modified. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        name:
+          type: string
+        organization_id:
+          format: int32
+          type: integer
+        sort_order:
+          format: int32
+          type: integer
+      title: AppCustomFieldName
+      type: object
+    AppCustomFieldValue:
+      example:
+        created: 2000-01-23T04:56:07.000+00:00
+        id: 3
+        app_custom_field_name:
+          created: 2000-01-23T04:56:07.000+00:00
+          organization_id: 2
+          name: name
+          modified: 2000-01-23T04:56:07.000+00:00
+          id: 5
+          sort_order: 7
+        value: value
+        field_name_id: 9
+      properties:
+        app_custom_field_name:
+          $ref: "#/components/schemas/AppCustomFieldName"
+        created:
+          description: "The date and time when the application was created. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        field_name_id:
+          format: int32
+          type: integer
+        id:
+          description: Unique identifier of the category.
+          format: int32
+          type: integer
+        value:
+          type: string
+      title: AppCustomFieldValue
+      type: object
+    AppPolicy:
+      example:
+        name: name
+        guid: guid
+        policy_compliance_status: DETERMINING
+        is_default: true
+      properties:
+        guid:
+          type: string
+        is_default:
+          type: boolean
+        name:
+          description: The policy name.
+          readOnly: true
+          type: string
+        policy_compliance_status:
+          description: The policy compliance status.
+          enum:
+          - DETERMINING
+          - NOT_ASSESSED
+          - DID_NOT_PASS
+          - CONDITIONAL_PASS
+          - PASSED
+          - VENDOR_REVIEW
+          readOnly: true
+          type: string
+      title: AppPolicy
+      type: object
+    AppTeam:
+      example:
+        guid: guid
+        team_id: 2
+        team_name: team_name
+      properties:
+        guid:
+          description: The team ID in the Veracode Identity API.
+          type: string
+        team_id:
+          description: The legacy team_id.
+          format: int32
+          readOnly: true
+          type: integer
+        team_name:
+          description: Team name.
+          readOnly: true
+          type: string
+      title: AppTeam
+      type: object
+    Application:
+      example:
+        scans:
+        - internal_status: internal_status
+          scan_type: STATIC
+          modified_date: 2000-01-23T04:56:07.000+00:00
+          scan_url: scan_url
+          status: CREATED
+        - internal_status: internal_status
+          scan_type: STATIC
+          modified_date: 2000-01-23T04:56:07.000+00:00
+          scan_url: scan_url
+          status: CREATED
+        created: 2000-01-23T04:56:07.000+00:00
+        organization_id: 1
+        profile:
+          settings:
+            static_scan_dependencies_allowed: true
+            nextday_consultation_allowed: true
+            sca_enabled: true
+            dynamic_scan_approval_not_required: true
+          teams:
+          - guid: guid
+            team_id: 2
+            team_name: team_name
+          - guid: guid
+            team_id: 2
+            team_name: team_name
+          business_criticality: VERY_HIGH
+          custom_fields:
+          - name: name
+            value: value
+          - name: name
+            value: value
+          policies:
+          - name: name
+            guid: guid
+            policy_compliance_status: DETERMINING
+            is_default: true
+          - name: name
+            guid: guid
+            policy_compliance_status: DETERMINING
+            is_default: true
+          description: description
+          business_owners:
+          - name: name
+            email: email
+          - name: name
+            email: email
+          business_unit:
+            name: name
+            guid: guid
+            id: 5
+          archer_app_name: archer_app_name
+          tags: tags
+          custom_kms_alias: custom_kms_alias
+          custom_field_values:
+          - created: 2000-01-23T04:56:07.000+00:00
+            id: 3
+            app_custom_field_name:
+              created: 2000-01-23T04:56:07.000+00:00
+              organization_id: 2
+              name: name
+              modified: 2000-01-23T04:56:07.000+00:00
+              id: 5
+              sort_order: 7
+            value: value
+            field_name_id: 9
+          - created: 2000-01-23T04:56:07.000+00:00
+            id: 3
+            app_custom_field_name:
+              created: 2000-01-23T04:56:07.000+00:00
+              organization_id: 2
+              name: name
+              modified: 2000-01-23T04:56:07.000+00:00
+              id: 5
+              sort_order: 7
+            value: value
+            field_name_id: 9
+          name: name
+          git_repo_url: git_repo_url
+        guid: guid
+        modified: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        last_completed_scan_date: 2000-01-23T04:56:07.000+00:00
+        oid: 6
+        results_url: results_url
+        app_profile_url: app_profile_url
+      properties:
+        app_profile_url:
+          description: Unique path to the application profile.
+          readOnly: true
+          type: string
+        created:
+          description: "The date and time when the application was created. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        guid:
+          type: string
+        id:
+          format: int32
+          type: integer
+        last_completed_scan_date:
+          description: "Date and time of the last completed scan for this application.\
+            \ The date/time format is per RFC3339 and ISO-8601, and the timezone is\
+            \ UTC. Example: 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        modified:
+          description: "The date and time when the application was modified. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        oid:
+          format: int32
+          type: integer
+        organization_id:
+          format: int32
+          type: integer
+        profile:
+          $ref: "#/components/schemas/ApplicationProfile"
+        results_url:
+          description: Unique path to the latest results.
+          readOnly: true
+          type: string
+        scans:
+          items:
+            $ref: "#/components/schemas/ApplicationScan"
+          type: array
+      title: Application
+      type: object
+    ApplicationProfile:
+      example:
+        settings:
+          static_scan_dependencies_allowed: true
+          nextday_consultation_allowed: true
+          sca_enabled: true
+          dynamic_scan_approval_not_required: true
+        teams:
+        - guid: guid
+          team_id: 2
+          team_name: team_name
+        - guid: guid
+          team_id: 2
+          team_name: team_name
+        business_criticality: VERY_HIGH
+        custom_fields:
+        - name: name
+          value: value
+        - name: name
+          value: value
+        policies:
+        - name: name
+          guid: guid
+          policy_compliance_status: DETERMINING
+          is_default: true
+        - name: name
+          guid: guid
+          policy_compliance_status: DETERMINING
+          is_default: true
+        description: description
+        business_owners:
+        - name: name
+          email: email
+        - name: name
+          email: email
+        business_unit:
+          name: name
+          guid: guid
+          id: 5
+        archer_app_name: archer_app_name
+        tags: tags
+        custom_kms_alias: custom_kms_alias
+        custom_field_values:
+        - created: 2000-01-23T04:56:07.000+00:00
+          id: 3
+          app_custom_field_name:
+            created: 2000-01-23T04:56:07.000+00:00
+            organization_id: 2
+            name: name
+            modified: 2000-01-23T04:56:07.000+00:00
+            id: 5
+            sort_order: 7
+          value: value
+          field_name_id: 9
+        - created: 2000-01-23T04:56:07.000+00:00
+          id: 3
+          app_custom_field_name:
+            created: 2000-01-23T04:56:07.000+00:00
+            organization_id: 2
+            name: name
+            modified: 2000-01-23T04:56:07.000+00:00
+            id: 5
+            sort_order: 7
+          value: value
+          field_name_id: 9
+        name: name
+        git_repo_url: git_repo_url
+      properties:
+        archer_app_name:
+          type: string
+        business_criticality:
+          enum:
+          - VERY_HIGH
+          - HIGH
+          - MEDIUM
+          - LOW
+          - VERY_LOW
+          type: string
+        business_owners:
+          items:
+            $ref: "#/components/schemas/BusinessOwner"
+          type: array
+        business_unit:
+          $ref: "#/components/schemas/BusinessUnit"
+        custom_field_values:
+          items:
+            $ref: "#/components/schemas/AppCustomFieldValue"
+          type: array
+        custom_fields:
+          items:
+            $ref: "#/components/schemas/CustomNameValue"
+          type: array
+        custom_kms_alias:
+          description: Alias for the Customer Managed Encryption Key.
+          type: string
+        description:
+          type: string
+        git_repo_url:
+          description: The URL of the Git repository associated with the application.
+            Veracode includes findings from the Git repository in the reporting for
+            this application.
+          type: string
+        name:
+          type: string
+        policies:
+          items:
+            $ref: "#/components/schemas/AppPolicy"
+          type: array
+        settings:
+          $ref: "#/components/schemas/ApplicationSettings"
+        tags:
+          type: string
+        teams:
+          items:
+            $ref: "#/components/schemas/AppTeam"
+          type: array
+      title: ApplicationProfile
+      type: object
+    ApplicationScan:
+      description: Reference to the latest scan of this application.
+      example:
+        internal_status: internal_status
+        scan_type: STATIC
+        modified_date: 2000-01-23T04:56:07.000+00:00
+        scan_url: scan_url
+        status: CREATED
+      properties:
+        internal_status:
+          type: string
+        modified_date:
+          description: "The date when the scan results were published. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        scan_type:
+          description: Type of scan in which this finding was discovered.
+          enum:
+          - STATIC
+          - DYNAMIC
+          - MANUAL
+          - SCA
+          readOnly: true
+          type: string
+        scan_url:
+          description: Unique path to the latest scan.
+          readOnly: true
+          type: string
+        status:
+          description: Scan status
+          enum:
+          - CREATED
+          - UNPUBLISHED
+          - DELETED
+          - PARTIAL_PUBLISH
+          - PARTIAL_UNPUBLISH
+          - INCOMPLETE
+          - SCAN_SUBMITTED
+          - IN_QUEUE
+          - STOPPING
+          - PAUSING
+          - IN_PROGRESS
+          - ANALYSIS_ERRORS
+          - SCAN_CANCELED
+          - INTERNAL_REVIEW
+          - VERIFYING_RESULTS
+          - SUBMITTED_FOR_NTO_PRE_SCAN
+          - SUBMITTED_FOR_DYNAMIC_PRE_SCAN
+          - PRE_SCAN_FAILED
+          - READY_TO_SUBMIT
+          - NTO_PENDING_SUBMISSION
+          - PRE_SCAN_COMPLETE
+          - MODULE_SELECTION_REQUIRED
+          - PENDING_VENDOR_ACCEPTANCE
+          - SHOW_OSRDB
+          - PUBLISHED
+          - PUBLISHED_TO_VENDOR
+          - PUBLISHED_TO_ENTERPRISE
+          - PENDING_ACCOUNT_APPROVAL
+          - PENDING_LEGAL_AGREEMENT
+          - SCAN_IN_PROGRESS
+          - SCAN_IN_PROGRESS_PARTIAL_RESULTS_READY
+          - PROMOTE_IN_PROGRESS
+          - PRE_SCAN_CANCELED
+          - NTO_PRE_SCAN_CANCELED
+          - SCAN_HELD_APPROVAL
+          - SCAN_HELD_LOGIN_INSTRUCTIONS
+          - SCAN_HELD_LOGIN
+          - SCAN_HELD_INSTRUCTIONS
+          - SCAN_HELD_HOLDS_FINISHED
+          - SCAN_REQUESTED
+          - TIMEFRAMEPENDING_ID
+          - PAUSED_ID
+          - STATIC_VALIDATING_UPLOAD
+          - PUBLISHED_TO_ENTERPRISEINT
+          type: string
+      title: ApplicationScan
+      type: object
+    ApplicationSettings:
+      example:
+        static_scan_dependencies_allowed: true
+        nextday_consultation_allowed: true
+        sca_enabled: true
+        dynamic_scan_approval_not_required: true
+      properties:
+        dynamic_scan_approval_not_required:
+          type: boolean
+        nextday_consultation_allowed:
+          type: boolean
+        sca_enabled:
+          type: boolean
+        static_scan_dependencies_allowed:
+          type: boolean
+      title: ApplicationSettings
+      type: object
+    BusinessOwner:
+      example:
+        name: name
+        email: email
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+      title: BusinessOwner
+      type: object
+    BusinessUnit:
+      example:
+        name: name
+        guid: guid
+        id: 5
+      properties:
+        guid:
+          description: The business unit GUID.
+          type: string
+        id:
+          description: The business unit ID in the Veracode database.
+          format: int32
+          readOnly: true
+          type: integer
+        name:
+          description: The business unit name.
+          readOnly: true
+          type: string
+      title: BusinessUnit
+      type: object
+    CustomNameValue:
+      example:
+        name: name
+        value: value
+      properties:
+        name:
+          description: The custom field name.
+          type: string
+        value:
+          description: "The custom field value. Note: All applications in your organization\
+            \ use the same set of custom field values."
+          type: string
+      title: CustomNameValue
+      type: object
+    EmbeddedApplication:
+      example:
+        applications:
+        - scans:
+          - internal_status: internal_status
+            scan_type: STATIC
+            modified_date: 2000-01-23T04:56:07.000+00:00
+            scan_url: scan_url
+            status: CREATED
+          - internal_status: internal_status
+            scan_type: STATIC
+            modified_date: 2000-01-23T04:56:07.000+00:00
+            scan_url: scan_url
+            status: CREATED
+          created: 2000-01-23T04:56:07.000+00:00
+          organization_id: 1
+          profile:
+            settings:
+              static_scan_dependencies_allowed: true
+              nextday_consultation_allowed: true
+              sca_enabled: true
+              dynamic_scan_approval_not_required: true
+            teams:
+            - guid: guid
+              team_id: 2
+              team_name: team_name
+            - guid: guid
+              team_id: 2
+              team_name: team_name
+            business_criticality: VERY_HIGH
+            custom_fields:
+            - name: name
+              value: value
+            - name: name
+              value: value
+            policies:
+            - name: name
+              guid: guid
+              policy_compliance_status: DETERMINING
+              is_default: true
+            - name: name
+              guid: guid
+              policy_compliance_status: DETERMINING
+              is_default: true
+            description: description
+            business_owners:
+            - name: name
+              email: email
+            - name: name
+              email: email
+            business_unit:
+              name: name
+              guid: guid
+              id: 5
+            archer_app_name: archer_app_name
+            tags: tags
+            custom_kms_alias: custom_kms_alias
+            custom_field_values:
+            - created: 2000-01-23T04:56:07.000+00:00
+              id: 3
+              app_custom_field_name:
+                created: 2000-01-23T04:56:07.000+00:00
+                organization_id: 2
+                name: name
+                modified: 2000-01-23T04:56:07.000+00:00
+                id: 5
+                sort_order: 7
+              value: value
+              field_name_id: 9
+            - created: 2000-01-23T04:56:07.000+00:00
+              id: 3
+              app_custom_field_name:
+                created: 2000-01-23T04:56:07.000+00:00
+                organization_id: 2
+                name: name
+                modified: 2000-01-23T04:56:07.000+00:00
+                id: 5
+                sort_order: 7
+              value: value
+              field_name_id: 9
+            name: name
+            git_repo_url: git_repo_url
+          guid: guid
+          modified: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          last_completed_scan_date: 2000-01-23T04:56:07.000+00:00
+          oid: 6
+          results_url: results_url
+          app_profile_url: app_profile_url
+        - scans:
+          - internal_status: internal_status
+            scan_type: STATIC
+            modified_date: 2000-01-23T04:56:07.000+00:00
+            scan_url: scan_url
+            status: CREATED
+          - internal_status: internal_status
+            scan_type: STATIC
+            modified_date: 2000-01-23T04:56:07.000+00:00
+            scan_url: scan_url
+            status: CREATED
+          created: 2000-01-23T04:56:07.000+00:00
+          organization_id: 1
+          profile:
+            settings:
+              static_scan_dependencies_allowed: true
+              nextday_consultation_allowed: true
+              sca_enabled: true
+              dynamic_scan_approval_not_required: true
+            teams:
+            - guid: guid
+              team_id: 2
+              team_name: team_name
+            - guid: guid
+              team_id: 2
+              team_name: team_name
+            business_criticality: VERY_HIGH
+            custom_fields:
+            - name: name
+              value: value
+            - name: name
+              value: value
+            policies:
+            - name: name
+              guid: guid
+              policy_compliance_status: DETERMINING
+              is_default: true
+            - name: name
+              guid: guid
+              policy_compliance_status: DETERMINING
+              is_default: true
+            description: description
+            business_owners:
+            - name: name
+              email: email
+            - name: name
+              email: email
+            business_unit:
+              name: name
+              guid: guid
+              id: 5
+            archer_app_name: archer_app_name
+            tags: tags
+            custom_kms_alias: custom_kms_alias
+            custom_field_values:
+            - created: 2000-01-23T04:56:07.000+00:00
+              id: 3
+              app_custom_field_name:
+                created: 2000-01-23T04:56:07.000+00:00
+                organization_id: 2
+                name: name
+                modified: 2000-01-23T04:56:07.000+00:00
+                id: 5
+                sort_order: 7
+              value: value
+              field_name_id: 9
+            - created: 2000-01-23T04:56:07.000+00:00
+              id: 3
+              app_custom_field_name:
+                created: 2000-01-23T04:56:07.000+00:00
+                organization_id: 2
+                name: name
+                modified: 2000-01-23T04:56:07.000+00:00
+                id: 5
+                sort_order: 7
+              value: value
+              field_name_id: 9
+            name: name
+            git_repo_url: git_repo_url
+          guid: guid
+          modified: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          last_completed_scan_date: 2000-01-23T04:56:07.000+00:00
+          oid: 6
+          results_url: results_url
+          app_profile_url: app_profile_url
+      properties:
+        applications:
+          items:
+            $ref: "#/components/schemas/Application"
+          type: array
+      title: EmbeddedApplication
+      type: object
+    EmbeddedSandbox:
+      example:
+        sandboxes:
+        - created: 2000-01-23T04:56:07.000+00:00
+          custom_fields:
+          - name: name
+            value: value
+          - name: name
+            value: value
+          organization_id: 6
+          owner_username: owner_username
+          name: name
+          guid: guid
+          modified: 2000-01-23T04:56:07.000+00:00
+          auto_recreate: true
+          id: 0
+          application_guid: application_guid
+        - created: 2000-01-23T04:56:07.000+00:00
+          custom_fields:
+          - name: name
+            value: value
+          - name: name
+            value: value
+          organization_id: 6
+          owner_username: owner_username
+          name: name
+          guid: guid
+          modified: 2000-01-23T04:56:07.000+00:00
+          auto_recreate: true
+          id: 0
+          application_guid: application_guid
+      properties:
+        sandboxes:
+          items:
+            $ref: "#/components/schemas/Sandbox"
+          type: array
+      title: EmbeddedSandbox
+      type: object
+    Link:
+      example:
+        hreflang: hreflang
+        templated: true
+        rel: rel
+        href: href
+        media: media
+        deprecation: deprecation
+        title: title
+        type: type
+      properties:
+        deprecation:
+          type: string
+          xml:
+            attribute: true
+            name: deprecation
+            wrapped: false
+        href:
+          type: string
+          xml:
+            attribute: true
+            name: href
+            wrapped: false
+        hreflang:
+          type: string
+          xml:
+            attribute: true
+            name: hreflang
+            wrapped: false
+        media:
+          type: string
+          xml:
+            attribute: true
+            name: media
+            wrapped: false
+        rel:
+          type: string
+          xml:
+            attribute: true
+            name: rel
+            wrapped: false
+        templated:
+          type: boolean
+        title:
+          type: string
+          xml:
+            attribute: true
+            name: title
+            wrapped: false
+        type:
+          type: string
+          xml:
+            attribute: true
+            name: type
+            wrapped: false
+      title: Link
+      type: object
+    PageMetadata:
+      example:
+        number: 4
+        size: 7
+        total_elements: 1
+        total_pages: 1
+      properties:
+        number:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: number
+            wrapped: false
+        size:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: size
+            wrapped: false
+        total_elements:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: total_elements
+            wrapped: false
+        total_pages:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: total_pages
+            wrapped: false
+      title: PageMetadata
+      type: object
+    PagedResourceOfApplication:
+      example:
+        _embedded:
+          applications:
+          - scans:
+            - internal_status: internal_status
+              scan_type: STATIC
+              modified_date: 2000-01-23T04:56:07.000+00:00
+              scan_url: scan_url
+              status: CREATED
+            - internal_status: internal_status
+              scan_type: STATIC
+              modified_date: 2000-01-23T04:56:07.000+00:00
+              scan_url: scan_url
+              status: CREATED
+            created: 2000-01-23T04:56:07.000+00:00
+            organization_id: 1
+            profile:
+              settings:
+                static_scan_dependencies_allowed: true
+                nextday_consultation_allowed: true
+                sca_enabled: true
+                dynamic_scan_approval_not_required: true
+              teams:
+              - guid: guid
+                team_id: 2
+                team_name: team_name
+              - guid: guid
+                team_id: 2
+                team_name: team_name
+              business_criticality: VERY_HIGH
+              custom_fields:
+              - name: name
+                value: value
+              - name: name
+                value: value
+              policies:
+              - name: name
+                guid: guid
+                policy_compliance_status: DETERMINING
+                is_default: true
+              - name: name
+                guid: guid
+                policy_compliance_status: DETERMINING
+                is_default: true
+              description: description
+              business_owners:
+              - name: name
+                email: email
+              - name: name
+                email: email
+              business_unit:
+                name: name
+                guid: guid
+                id: 5
+              archer_app_name: archer_app_name
+              tags: tags
+              custom_kms_alias: custom_kms_alias
+              custom_field_values:
+              - created: 2000-01-23T04:56:07.000+00:00
+                id: 3
+                app_custom_field_name:
+                  created: 2000-01-23T04:56:07.000+00:00
+                  organization_id: 2
+                  name: name
+                  modified: 2000-01-23T04:56:07.000+00:00
+                  id: 5
+                  sort_order: 7
+                value: value
+                field_name_id: 9
+              - created: 2000-01-23T04:56:07.000+00:00
+                id: 3
+                app_custom_field_name:
+                  created: 2000-01-23T04:56:07.000+00:00
+                  organization_id: 2
+                  name: name
+                  modified: 2000-01-23T04:56:07.000+00:00
+                  id: 5
+                  sort_order: 7
+                value: value
+                field_name_id: 9
+              name: name
+              git_repo_url: git_repo_url
+            guid: guid
+            modified: 2000-01-23T04:56:07.000+00:00
+            id: 0
+            last_completed_scan_date: 2000-01-23T04:56:07.000+00:00
+            oid: 6
+            results_url: results_url
+            app_profile_url: app_profile_url
+          - scans:
+            - internal_status: internal_status
+              scan_type: STATIC
+              modified_date: 2000-01-23T04:56:07.000+00:00
+              scan_url: scan_url
+              status: CREATED
+            - internal_status: internal_status
+              scan_type: STATIC
+              modified_date: 2000-01-23T04:56:07.000+00:00
+              scan_url: scan_url
+              status: CREATED
+            created: 2000-01-23T04:56:07.000+00:00
+            organization_id: 1
+            profile:
+              settings:
+                static_scan_dependencies_allowed: true
+                nextday_consultation_allowed: true
+                sca_enabled: true
+                dynamic_scan_approval_not_required: true
+              teams:
+              - guid: guid
+                team_id: 2
+                team_name: team_name
+              - guid: guid
+                team_id: 2
+                team_name: team_name
+              business_criticality: VERY_HIGH
+              custom_fields:
+              - name: name
+                value: value
+              - name: name
+                value: value
+              policies:
+              - name: name
+                guid: guid
+                policy_compliance_status: DETERMINING
+                is_default: true
+              - name: name
+                guid: guid
+                policy_compliance_status: DETERMINING
+                is_default: true
+              description: description
+              business_owners:
+              - name: name
+                email: email
+              - name: name
+                email: email
+              business_unit:
+                name: name
+                guid: guid
+                id: 5
+              archer_app_name: archer_app_name
+              tags: tags
+              custom_kms_alias: custom_kms_alias
+              custom_field_values:
+              - created: 2000-01-23T04:56:07.000+00:00
+                id: 3
+                app_custom_field_name:
+                  created: 2000-01-23T04:56:07.000+00:00
+                  organization_id: 2
+                  name: name
+                  modified: 2000-01-23T04:56:07.000+00:00
+                  id: 5
+                  sort_order: 7
+                value: value
+                field_name_id: 9
+              - created: 2000-01-23T04:56:07.000+00:00
+                id: 3
+                app_custom_field_name:
+                  created: 2000-01-23T04:56:07.000+00:00
+                  organization_id: 2
+                  name: name
+                  modified: 2000-01-23T04:56:07.000+00:00
+                  id: 5
+                  sort_order: 7
+                value: value
+                field_name_id: 9
+              name: name
+              git_repo_url: git_repo_url
+            guid: guid
+            modified: 2000-01-23T04:56:07.000+00:00
+            id: 0
+            last_completed_scan_date: 2000-01-23T04:56:07.000+00:00
+            oid: 6
+            results_url: results_url
+            app_profile_url: app_profile_url
+        _links:
+          hreflang: hreflang
+          templated: true
+          rel: rel
+          href: href
+          media: media
+          deprecation: deprecation
+          title: title
+          type: type
+        page:
+          number: 4
+          size: 7
+          total_elements: 1
+          total_pages: 1
+      properties:
+        _embedded:
+          $ref: "#/components/schemas/EmbeddedApplication"
+        _links:
+          $ref: "#/components/schemas/Link"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+      title: PagedResourceOfApplication
+      type: object
+    PagedResourceOfSandbox:
+      example:
+        _embedded:
+          sandboxes:
+          - created: 2000-01-23T04:56:07.000+00:00
+            custom_fields:
+            - name: name
+              value: value
+            - name: name
+              value: value
+            organization_id: 6
+            owner_username: owner_username
+            name: name
+            guid: guid
+            modified: 2000-01-23T04:56:07.000+00:00
+            auto_recreate: true
+            id: 0
+            application_guid: application_guid
+          - created: 2000-01-23T04:56:07.000+00:00
+            custom_fields:
+            - name: name
+              value: value
+            - name: name
+              value: value
+            organization_id: 6
+            owner_username: owner_username
+            name: name
+            guid: guid
+            modified: 2000-01-23T04:56:07.000+00:00
+            auto_recreate: true
+            id: 0
+            application_guid: application_guid
+        _links:
+          hreflang: hreflang
+          templated: true
+          rel: rel
+          href: href
+          media: media
+          deprecation: deprecation
+          title: title
+          type: type
+        page:
+          number: 4
+          size: 7
+          total_elements: 1
+          total_pages: 1
+      properties:
+        _embedded:
+          $ref: "#/components/schemas/EmbeddedSandbox"
+        _links:
+          $ref: "#/components/schemas/Link"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+      title: PagedResourceOfSandbox
+      type: object
+    Sandbox:
+      example:
+        created: 2000-01-23T04:56:07.000+00:00
+        custom_fields:
+        - name: name
+          value: value
+        - name: name
+          value: value
+        organization_id: 6
+        owner_username: owner_username
+        name: name
+        guid: guid
+        modified: 2000-01-23T04:56:07.000+00:00
+        auto_recreate: true
+        id: 0
+        application_guid: application_guid
+      properties:
+        application_guid:
+          type: string
+        auto_recreate:
+          type: boolean
+        created:
+          description: "The date and time when the sandbox was created. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        custom_fields:
+          items:
+            $ref: "#/components/schemas/CustomNameValue"
+          type: array
+        guid:
+          description: Unique identifier (UUID).
+          readOnly: true
+          type: string
+        id:
+          description: Internal ID.
+          format: int32
+          readOnly: true
+          type: integer
+        modified:
+          description: "The date and time when the sandbox was modified. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          readOnly: true
+          type: string
+        name:
+          description: The sandbox name
+          type: string
+        organization_id:
+          format: int32
+          type: integer
+        owner_username:
+          type: string
+      title: Sandbox
+      type: object
+x-original-swagger-version: "2.0"
