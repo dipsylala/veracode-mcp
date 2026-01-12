@@ -22,7 +22,8 @@ type StaticFlaws struct {
 	IssueSummary *IssueSummary `json:"issue_summary,omitempty"`
 	// Call stacks.
 	DataPaths []DataPaths `json:"data_paths,omitempty"`
-	Links     []Link      `json:"_links,omitempty"`
+	// PATCHED: Changed from []Link to map[string]interface{} to support object-based _links from API
+	Links map[string]interface{} `json:"_links,omitempty"`
 }
 
 // NewStaticFlaws instantiates a new StaticFlaws object
@@ -107,9 +108,9 @@ func (o *StaticFlaws) SetDataPaths(v []DataPaths) {
 }
 
 // GetLinks returns the Links field value if set, zero value otherwise.
-func (o *StaticFlaws) GetLinks() []Link {
+func (o *StaticFlaws) GetLinks() map[string]interface{} {
 	if o == nil || IsNil(o.Links) {
-		var ret []Link
+		var ret map[string]interface{}
 		return ret
 	}
 	return o.Links
@@ -117,7 +118,7 @@ func (o *StaticFlaws) GetLinks() []Link {
 
 // GetLinksOk returns a tuple with the Links field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *StaticFlaws) GetLinksOk() ([]Link, bool) {
+func (o *StaticFlaws) GetLinksOk() (map[string]interface{}, bool) {
 	if o == nil || IsNil(o.Links) {
 		return nil, false
 	}
@@ -133,8 +134,8 @@ func (o *StaticFlaws) HasLinks() bool {
 	return false
 }
 
-// SetLinks gets a reference to the given []Link and assigns it to the Links field.
-func (o *StaticFlaws) SetLinks(v []Link) {
+// SetLinks gets a reference to the given map and assigns it to the Links field.
+func (o *StaticFlaws) SetLinks(v map[string]interface{}) {
 	o.Links = v
 }
 
@@ -154,9 +155,7 @@ func (o StaticFlaws) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DataPaths) {
 		toSerialize["data_paths"] = o.DataPaths
 	}
-	if !IsNil(o.Links) {
-		toSerialize["_links"] = o.Links
-	}
+	// PATCHED: Exclude _links from response - not needed by users
 	return toSerialize, nil
 }
 

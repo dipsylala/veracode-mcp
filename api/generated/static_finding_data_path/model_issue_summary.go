@@ -21,8 +21,8 @@ var _ MappedNullable = &IssueSummary{}
 type IssueSummary struct {
 	// GUID for the application.
 	AppGuid *string `json:"app_guid,omitempty"`
-	// ID of the application.
-	Name *int32 `json:"name,omitempty"`
+	// Name of the application. PATCHED: Changed from int32 to string to match actual API response.
+	Name *string `json:"name,omitempty"`
 	// ID of the build.
 	BuildId *int32 `json:"build_id,omitempty"`
 	// Flaw or issues ID of the finding.
@@ -81,9 +81,9 @@ func (o *IssueSummary) SetAppGuid(v string) {
 }
 
 // GetName returns the Name field value if set, zero value otherwise.
-func (o *IssueSummary) GetName() int32 {
+func (o *IssueSummary) GetName() string {
 	if o == nil || IsNil(o.Name) {
-		var ret int32
+		var ret string
 		return ret
 	}
 	return *o.Name
@@ -91,7 +91,7 @@ func (o *IssueSummary) GetName() int32 {
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IssueSummary) GetNameOk() (*int32, bool) {
+func (o *IssueSummary) GetNameOk() (*string, bool) {
 	if o == nil || IsNil(o.Name) {
 		return nil, false
 	}
@@ -107,8 +107,8 @@ func (o *IssueSummary) HasName() bool {
 	return false
 }
 
-// SetName gets a reference to the given int32 and assigns it to the Name field.
-func (o *IssueSummary) SetName(v int32) {
+// SetName gets a reference to the given string and assigns it to the Name field.
+func (o *IssueSummary) SetName(v string) {
 	o.Name = &v
 }
 

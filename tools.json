@@ -123,6 +123,30 @@
       ]
     },
     {
+      "name": "get-finding-details",
+      "description": "Get more details about a flaw from a DYNAMIC or STATIC scan",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+        },
+        {
+          "name": "app_profile",
+          "type": "string",
+          "isRequired": false,
+          "description": "Application Profile name to get findings for. If not provided, will automatically read from .veracode-workspace.json in the application directory. The tool will lookup the application GUID by name using the Veracode API."
+        },
+        {
+          "name": "flaw_id",
+          "type": "number",
+          "isRequired": true,
+          "description": "The Flaw ID of the finding to retrieve details for."
+        }
+      ]
+    },
+    {
       "name": "get-sca-findings",
       "description": "Get third-party library vulnerabilities from SCA (Software Composition Analysis) scans.\n\nReturns: Vulnerable dependencies, outdated libraries, license issues, known CVEs in open source components\nIncludes: CWE ID, CVE ID, component name/version, CVSS score, severity, status\nRelated: get-static-findings (source code), get-dynamic-findings (runtime)\n\nDisplay as table: | Flaw ID | Severity | CWE | CVE | Component | Version | Description |",
       "params": [

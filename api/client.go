@@ -187,3 +187,13 @@ func (c *VeracodeClient) GetAuthContext(ctx context.Context) context.Context {
 	// in the HTTP client, so no need to add anything to the context
 	return ctx
 }
+
+// StaticFindingDataPathClient returns the static finding data path API client
+func (c *VeracodeClient) StaticFindingDataPathClient() *static_finding_data_path.APIClient {
+	return c.staticFindingDataPathClient
+}
+
+// DynamicFlawClient returns the dynamic flaw API client
+func (c *VeracodeClient) DynamicFlawClient() *dynamic_flaw.APIClient {
+	return c.dynamicFlawClient
+}

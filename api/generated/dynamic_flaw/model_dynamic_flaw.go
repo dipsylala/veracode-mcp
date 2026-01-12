@@ -153,9 +153,7 @@ func (o DynamicFlaw) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DynamicFlawInfo) {
 		toSerialize["dynamic_flaw_info"] = o.DynamicFlawInfo
 	}
-	if !IsNil(o.Links) {
-		toSerialize["_links"] = o.Links
-	}
+	// PATCHED: Exclude _links from response - not needed by users
 	return toSerialize, nil
 }
 

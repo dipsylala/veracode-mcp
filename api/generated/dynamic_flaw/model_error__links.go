@@ -13,7 +13,6 @@ package dynamic_flaw
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 )
 
 // checks if the ErrorLinks type satisfies the MappedNullable interface at compile time
@@ -21,7 +20,8 @@ var _ MappedNullable = &ErrorLinks{}
 
 // ErrorLinks struct for ErrorLinks
 type ErrorLinks struct {
-	Help Link `json:"help"`
+	Help *Link `json:"help,omitempty"`
+	Self *Link `json:"self,omitempty"`
 }
 
 type _ErrorLinks ErrorLinks
@@ -30,9 +30,8 @@ type _ErrorLinks ErrorLinks
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewErrorLinks(help Link) *ErrorLinks {
+func NewErrorLinks() *ErrorLinks {
 	this := ErrorLinks{}
-	this.Help = help
 	return &this
 }
 
@@ -44,28 +43,68 @@ func NewErrorLinksWithDefaults() *ErrorLinks {
 	return &this
 }
 
-// GetHelp returns the Help field value
+// GetHelp returns the Help field value if set, zero value otherwise.
 func (o *ErrorLinks) GetHelp() Link {
-	if o == nil {
+	if o == nil || IsNil(o.Help) {
 		var ret Link
 		return ret
 	}
-
-	return o.Help
+	return *o.Help
 }
 
-// GetHelpOk returns a tuple with the Help field value
+// GetHelpOk returns a tuple with the Help field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ErrorLinks) GetHelpOk() (*Link, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Help) {
 		return nil, false
 	}
-	return &o.Help, true
+	return o.Help, true
+}
+
+// HasHelp returns a boolean if a field has been set.
+func (o *ErrorLinks) HasHelp() bool {
+	if o != nil && !IsNil(o.Help) {
+		return true
+	}
+
+	return false
 }
 
 // SetHelp sets field value
 func (o *ErrorLinks) SetHelp(v Link) {
-	o.Help = v
+	o.Help = &v
+}
+
+// GetSelf returns the Self field value if set, zero value otherwise.
+func (o *ErrorLinks) GetSelf() Link {
+	if o == nil || IsNil(o.Self) {
+		var ret Link
+		return ret
+	}
+	return *o.Self
+}
+
+// GetSelfOk returns a tuple with the Self field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ErrorLinks) GetSelfOk() (*Link, bool) {
+	if o == nil || IsNil(o.Self) {
+		return nil, false
+	}
+	return o.Self, true
+}
+
+// HasSelf returns a boolean if a field has been set.
+func (o *ErrorLinks) HasSelf() bool {
+	if o != nil && !IsNil(o.Self) {
+		return true
+	}
+
+	return false
+}
+
+// SetSelf sets field value
+func (o *ErrorLinks) SetSelf(v Link) {
+	o.Self = &v
 }
 
 func (o ErrorLinks) MarshalJSON() ([]byte, error) {
@@ -78,36 +117,23 @@ func (o ErrorLinks) MarshalJSON() ([]byte, error) {
 
 func (o ErrorLinks) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["help"] = o.Help
+	if !IsNil(o.Help) {
+		toSerialize["help"] = o.Help
+	}
+	if !IsNil(o.Self) {
+		toSerialize["self"] = o.Self
+	}
 	return toSerialize, nil
 }
 
 func (o *ErrorLinks) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"help",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
-		}
-	}
+	// PATCHED: Removed required property validation and DisallowUnknownFields
+	// The Veracode API returns different fields in _links depending on the response type
 
 	varErrorLinks := _ErrorLinks{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
+	// PATCHED: Allow unknown fields to support API responses with additional link types
 	err = decoder.Decode(&varErrorLinks)
 
 	if err != nil {
