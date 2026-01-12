@@ -7,53 +7,39 @@ import (
 	"time"
 )
 
+const APIHealthToolName = "api-health"
+
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool("api-health", func() ToolImplementation {
+	RegisterTool(APIHealthToolName, func() ToolImplementation {
 		return NewAPIHealthTool()
 	})
 }
 
 // APIHealthTool provides the api-health tool
-type APIHealthTool struct {
-	name        string
-	description string
-}
+type APIHealthTool struct{}
 
 // NewAPIHealthTool creates a new API health check tool
 func NewAPIHealthTool() *APIHealthTool {
-	return &APIHealthTool{
-		name:        "api-health",
-		description: "Checks the health and availability of Veracode API endpoints",
-	}
-}
-
-// Name returns the tool name
-func (t *APIHealthTool) Name() string {
-	return t.name
-}
-
-// Description returns the tool description
-func (t *APIHealthTool) Description() string {
-	return t.description
+	return &APIHealthTool{}
 }
 
 // Initialize sets up the tool
 func (t *APIHealthTool) Initialize() error {
-	log.Printf("Initializing tool: %s", t.name)
+	log.Printf("Initializing tool: %s", APIHealthToolName)
 	return nil
 }
 
 // RegisterHandlers registers the API health check handler
 func (t *APIHealthTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", t.name)
-	registry.RegisterHandler("api-health", t.handleAPIHealth)
+	log.Printf("Registering handlers for tool: %s", APIHealthToolName)
+	registry.RegisterHandler(APIHealthToolName, t.handleAPIHealth)
 	return nil
 }
 
 // Shutdown cleans up tool resources
 func (t *APIHealthTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", t.name)
+	log.Printf("Shutting down tool: %s", APIHealthToolName)
 	return nil
 }
 

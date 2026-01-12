@@ -16,15 +16,24 @@ func RegisterTool(name string, constructor func() ToolImplementation) {
 	toolRegistry[name] = constructor
 }
 
-// GetAllTools returns instances of all registered tools
+// RegisteredTool wraps a tool implementation with its registered name
+type RegisteredTool struct {
+	Name string
+	Impl ToolImplementation
+}
+
+// GetAllTools returns instances of all registered tools with their names
 // This is called by the main package during server initialization
-func GetAllTools() []ToolImplementation {
+func GetAllTools() []RegisteredTool {
 	registryMu.RLock()
 	defer registryMu.RUnlock()
 
-	tools := make([]ToolImplementation, 0, len(toolRegistry))
-	for _, constructor := range toolRegistry {
-		tools = append(tools, constructor())
+	tools := make([]RegisteredTool, 0, len(toolRegistry))
+	for name, constructor := range toolRegistry {
+		tools = append(tools, RegisteredTool{
+			Name: name,
+			Impl: constructor(),
+		})
 	}
 	return tools
 }

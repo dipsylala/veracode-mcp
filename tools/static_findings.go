@@ -12,54 +12,40 @@ import (
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
+const StaticFindingsToolName = "get-static-findings"
+
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool("static-findings", func() ToolImplementation {
+	RegisterTool(StaticFindingsToolName, func() ToolImplementation {
 		return NewStaticFindingsTool()
 	})
 }
 
 // StaticFindingsTool provides the get-static-findings tool
-type StaticFindingsTool struct {
-	name        string
-	description string
-}
+type StaticFindingsTool struct{}
 
 // NewStaticFindingsTool creates a new static findings tool
 func NewStaticFindingsTool() *StaticFindingsTool {
-	return &StaticFindingsTool{
-		name:        "static-findings",
-		description: "Provides get-static-findings tool for retrieving source code vulnerabilities from SAST scans",
-	}
-}
-
-// Name returns the tool name
-func (t *StaticFindingsTool) Name() string {
-	return t.name
-}
-
-// Description returns the tool description
-func (t *StaticFindingsTool) Description() string {
-	return t.description
+	return &StaticFindingsTool{}
 }
 
 // Initialize sets up the tool
 func (t *StaticFindingsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", t.name)
+	log.Printf("Initializing tool: %s", StaticFindingsToolName)
 	// TODO: Initialize Veracode API client, load credentials, etc.
 	return nil
 }
 
 // RegisterHandlers registers the static findings handler
 func (t *StaticFindingsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", t.name)
-	registry.RegisterHandler("get-static-findings", t.handleGetStaticFindings)
+	log.Printf("Registering handlers for tool: %s", StaticFindingsToolName)
+	registry.RegisterHandler(StaticFindingsToolName, t.handleGetStaticFindings)
 	return nil
 }
 
 // Shutdown cleans up tool resources
 func (t *StaticFindingsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", t.name)
+	log.Printf("Shutting down tool: %s", StaticFindingsToolName)
 	return nil
 }
 

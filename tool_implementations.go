@@ -18,9 +18,8 @@ func NewToolImplRegistry() *ToolImplRegistry {
 	}
 }
 
-// Register adds a tool implementation to the registry
-func (r *ToolImplRegistry) Register(tool tools.ToolImplementation) error {
-	name := tool.Name()
+// Register adds a tool implementation to the registry with its registered name
+func (r *ToolImplRegistry) Register(name string, tool tools.ToolImplementation) error {
 	if _, exists := r.tools[name]; exists {
 		return nil // Already registered, skip
 	}
@@ -64,26 +63,26 @@ func LoadAllTools(registry *ToolImplRegistry, handlerRegistry *ToolHandlerRegist
 	// Get all auto-registered tools from the tools package
 	allTools := tools.GetAllTools()
 
-	for _, tool := range allTools {
+	for _, regTool := range allTools {
 		// Initialize the tool
-		if err := tool.Initialize(); err != nil {
-			log.Printf("Failed to initialize tool %s: %v", tool.Name(), err)
+		if err := regTool.Impl.Initialize(); err != nil {
+			log.Printf("Failed to initialize tool %s: %v", regTool.Name, err)
 			continue
 		}
 
 		// Register the tool in the implementation registry
-		if err := registry.Register(tool); err != nil {
-			log.Printf("Failed to register tool %s: %v", tool.Name(), err)
+		if err := registry.Register(regTool.Name, regTool.Impl); err != nil {
+			log.Printf("Failed to register tool %s: %v", regTool.Name, err)
 			continue
 		}
 
 		// Register the tool's handlers
-		if err := tool.RegisterHandlers(handlerRegistry); err != nil {
-			log.Printf("Failed to register handlers for tool %s: %v", tool.Name(), err)
+		if err := regTool.Impl.RegisterHandlers(handlerRegistry); err != nil {
+			log.Printf("Failed to register handlers for tool %s: %v", regTool.Name, err)
 			continue
 		}
 
-		log.Printf("Successfully loaded tool: %s", tool.Name())
+		log.Printf("Successfully loaded tool: %s", regTool.Name)
 	}
 
 	return nil

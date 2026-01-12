@@ -12,54 +12,40 @@ import (
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
+const DynamicFindingsToolName = "get-dynamic-findings"
+
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool("dynamic-findings", func() ToolImplementation {
+	RegisterTool(DynamicFindingsToolName, func() ToolImplementation {
 		return NewDynamicFindingsTool()
 	})
 }
 
 // DynamicFindingsTool provides the get-dynamic-findings tool
-type DynamicFindingsTool struct {
-	name        string
-	description string
-}
+type DynamicFindingsTool struct{}
 
 // NewDynamicFindingsTool creates a new dynamic findings tool
 func NewDynamicFindingsTool() *DynamicFindingsTool {
-	return &DynamicFindingsTool{
-		name:        "dynamic-findings",
-		description: "Provides get-dynamic-findings tool for retrieving runtime vulnerabilities from DAST scans",
-	}
-}
-
-// Name returns the tool name
-func (t *DynamicFindingsTool) Name() string {
-	return t.name
-}
-
-// Description returns the tool description
-func (t *DynamicFindingsTool) Description() string {
-	return t.description
+	return &DynamicFindingsTool{}
 }
 
 // Initialize sets up the tool
 func (t *DynamicFindingsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", t.name)
+	log.Printf("Initializing tool: %s", DynamicFindingsToolName)
 	// TODO: Initialize Veracode API client, load credentials, etc.
 	return nil
 }
 
 // RegisterHandlers registers the dynamic findings handler
 func (t *DynamicFindingsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", t.name)
-	registry.RegisterHandler("get-dynamic-findings", t.handleGetDynamicFindings)
+	log.Printf("Registering handlers for tool: %s", DynamicFindingsToolName)
+	registry.RegisterHandler(DynamicFindingsToolName, t.handleGetDynamicFindings)
 	return nil
 }
 
 // Shutdown cleans up tool resources
 func (t *DynamicFindingsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", t.name)
+	log.Printf("Shutting down tool: %s", DynamicFindingsToolName)
 	// TODO: Close API connections, cleanup resources
 	return nil
 }
@@ -243,11 +229,11 @@ Please verify:
 	}
 
 	// Step 6: Format and return the response
-	return formatDynamicFindingsResponse(req.ApplicationPath, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
+	return formatDynamicFindingsResponse(appProfile, applicationGUID, req.Sandbox, findingsResp), nil
 }
 
 // formatDynamicFindingsResponse formats the findings API response into an MCP tool response
-func formatDynamicFindingsResponse(appPath, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{

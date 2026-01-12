@@ -21,9 +21,6 @@ func newMockTool(name, description string) *mockTool {
 	}
 }
 
-func (m *mockTool) Name() string        { return m.name }
-func (m *mockTool) Description() string { return m.description }
-
 func (m *mockTool) Initialize() error {
 	m.initialized = true
 	return nil
@@ -86,8 +83,8 @@ func TestRegisterTool(t *testing.T) {
 		t.Fatalf("Expected 1 tool, got %d", len(tools))
 	}
 
-	if tools[0].Name() != toolName {
-		t.Errorf("Expected tool name %s, got %s", toolName, tools[0].Name())
+	if tools[0].Name != toolName {
+		t.Errorf("Expected tool name %s, got %s", toolName, tools[0].Name)
 	}
 }
 
@@ -124,7 +121,7 @@ func TestRegisterMultipleTools(t *testing.T) {
 	// Verify each tool exists
 	toolNames := make(map[string]bool)
 	for _, tool := range allTools {
-		toolNames[tool.Name()] = true
+		toolNames[tool.Name] = true
 	}
 
 	for _, expected := range tools {
@@ -159,8 +156,9 @@ func TestDuplicateRegistration(t *testing.T) {
 	}
 
 	// The second registration should have replaced the first
-	if tools[0].Description() != "Second registration" {
-		t.Errorf("Expected description 'Second registration', got '%s'", tools[0].Description())
+	mock := tools[0].Impl.(*mockTool)
+	if mock.description != "Second registration" {
+		t.Errorf("Expected description 'Second registration', got '%s'", mock.description)
 	}
 }
 
@@ -184,11 +182,11 @@ func TestGetAllToolsReturnsNewInstances(t *testing.T) {
 	}
 
 	// Modify first instance
-	mock1 := tools1[0].(*mockTool)
+	mock1 := tools1[0].Impl.(*mockTool)
 	mock1.initialized = true
 
 	// Second instance should be independent
-	mock2 := tools2[0].(*mockTool)
+	mock2 := tools2[0].Impl.(*mockTool)
 	if mock2.initialized {
 		t.Error("Second instance should not be affected by changes to first instance")
 	}
@@ -211,7 +209,7 @@ func TestToolInitialization(t *testing.T) {
 		t.Fatal("Expected 1 tool")
 	}
 
-	mock := tools[0].(*mockTool)
+	mock := tools[0].Impl.(*mockTool)
 
 	// Verify not initialized yet
 	if mock.initialized {
@@ -260,7 +258,7 @@ func TestHandlerRegistration(t *testing.T) {
 	handlerReg := newMockHandlerRegistry()
 
 	// Register handlers
-	if err := tools[0].RegisterHandlers(handlerReg); err != nil {
+	if err := tools[0].Impl.RegisterHandlers(handlerReg); err != nil {
 		t.Fatalf("Failed to register handlers: %v", err)
 	}
 

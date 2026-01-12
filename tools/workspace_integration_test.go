@@ -106,7 +106,7 @@ func TestStaticFindingsTool_MissingWorkspaceConfig(t *testing.T) {
 	}
 
 	// Get the handler
-	handler := registry.handlers["get-static-findings"]
+	handler := registry.handlers[StaticFindingsToolName]
 	if handler == nil {
 		t.Fatal("Handler not registered")
 	}
@@ -180,7 +180,7 @@ func TestDynamicFindingsTool_WithWorkspaceConfig(t *testing.T) {
 	}
 
 	// Get the handler
-	handler := registry.handlers["get-dynamic-findings"]
+	handler := registry.handlers[DynamicFindingsToolName]
 	if handler == nil {
 		t.Fatal("Handler not registered")
 	}
@@ -249,7 +249,7 @@ func TestDynamicFindingsTool_MissingWorkspaceConfig(t *testing.T) {
 	}
 
 	// Get the handler
-	handler := registry.handlers["get-dynamic-findings"]
+	handler := registry.handlers[DynamicFindingsToolName]
 	if handler == nil {
 		t.Fatal("Handler not registered")
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 
 	applications "github.com/dipsylala/veracodemcp-go/api/generated/applications"
@@ -100,10 +101,16 @@ func (c *VeracodeClient) ListApplications(ctx context.Context, page, size int) (
 	req := c.applicationsClient.ApplicationInformationAPIAPI.GetApplicationsUsingGET(authCtx)
 
 	if page >= 0 {
-		req = req.Page(int32(page))
+		if page > math.MaxInt32 {
+			return nil, fmt.Errorf("page value %d exceeds maximum allowed value", page)
+		}
+		req = req.Page(int32(page)) // #nosec G115 - validated above
 	}
 	if size > 0 {
-		req = req.Size(int32(size))
+		if size > math.MaxInt32 {
+			return nil, fmt.Errorf("size value %d exceeds maximum allowed value", size)
+		}
+		req = req.Size(int32(size)) // #nosec G115 - validated above
 	}
 
 	resp, httpResp, err := req.Execute()

@@ -4,12 +4,6 @@ import "context"
 
 // ToolImplementation defines the interface that all MCP tools must implement
 type ToolImplementation interface {
-	// Name returns the unique identifier for this tool
-	Name() string
-
-	// Description returns a brief description of what this tool does
-	Description() string
-
 	// Initialize is called when the tool is loaded
 	Initialize() error
 
