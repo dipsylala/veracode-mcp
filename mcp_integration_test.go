@@ -248,12 +248,12 @@ func TestMCPToolCall_DynamicFindings(t *testing.T) {
 		t.Fatalf("Failed to create MCP server: %v", err)
 	}
 
-	// Call get-dynamic-findings tool with test application
+	// Call get-dynamic-findings tool with test application GUID
 	callParams := CallToolParams{
 		Name: "get-dynamic-findings",
 		Arguments: map[string]interface{}{
-			"application_path": "E:\\Github\\VeracodeMCP-Go", // Required workspace path
-			"app_profile":      "MCPVerademo-NET",            // Override workspace config
+			"application_path": "E:\\Github\\VeracodeMCP-Go",           // Required workspace path
+			"app_profile":      "f4e74197-1e26-42c4-ab4b-245870c93280", // App GUID for testing
 			"size":             5,
 		},
 	}
@@ -298,23 +298,42 @@ func TestMCPToolCall_DynamicFindings(t *testing.T) {
 		t.Fatal("No content returned from get-dynamic-findings")
 	}
 
-	t.Logf("Dynamic Findings Response (first 500 chars): %s", truncate(callResult.Content[0].Text, 500))
+	// Get the JSON text from the resource
+	var responseText string
+	if callResult.Content[0].Resource != nil {
+		responseText = callResult.Content[0].Resource.Text
+	} else {
+		responseText = callResult.Content[0].Text
+	}
+
+	t.Logf("Dynamic Findings Response (first 500 chars): %s", truncate(responseText, 500))
 
 	// Check if response is the graceful fallback (when credentials are invalid)
-	responseText := callResult.Content[0].Text
 	if len(responseText) > 0 && (responseText[0] != '{' && responseText[0] != '[') {
 		t.Skip("Skipping test - received fallback response (credentials may be invalid)")
 	}
 
-	// Response should be JSON with findings
+	// Response should be JSON with MCPFindingsResponse structure
 	var findingsData map[string]interface{}
 	if err := json.Unmarshal([]byte(responseText), &findingsData); err != nil {
 		t.Fatalf("Failed to parse findings response as JSON: %v", err)
 	}
 
-	// Verify response structure
-	if _, hasPage := findingsData["page"]; !hasPage {
-		t.Error("Response should contain 'page' field")
+	// Verify MCPFindingsResponse structure
+	if _, hasPagination := findingsData["pagination"]; !hasPagination {
+		t.Error("Response should contain 'pagination' field")
+	}
+
+	if _, hasApplication := findingsData["application"]; !hasApplication {
+		t.Error("Response should contain 'application' field")
+	}
+
+	if _, hasSummary := findingsData["summary"]; !hasSummary {
+		t.Error("Response should contain 'summary' field")
+	}
+
+	if _, hasFindings := findingsData["findings"]; !hasFindings {
+		t.Error("Response should contain 'findings' field")
 	}
 
 	t.Logf("Findings data keys: %v", getKeys(findingsData))
@@ -378,62 +397,70 @@ func TestMCPToolCall_StaticFindings(t *testing.T) {
 		t.Fatal("No content returned from get-static-findings")
 	}
 
-	t.Logf("Static Findings Response (first 500 chars): %s", truncate(callResult.Content[0].Text, 500))
+	// Get the JSON text from the resource
+	var responseText string
+	if callResult.Content[0].Resource != nil {
+		responseText = callResult.Content[0].Resource.Text
+	} else {
+		responseText = callResult.Content[0].Text
+	}
+
+	t.Logf("Static Findings Response (first 500 chars): %s", truncate(responseText, 500))
 
 	// Check if response is the graceful fallback (when credentials are invalid)
-	responseText := callResult.Content[0].Text
 	if len(responseText) > 0 && (responseText[0] != '{' && responseText[0] != '[') {
 		t.Skip("Skipping test - received fallback response (credentials may be invalid)")
 	}
 
-	// Response should be JSON with findings
+	// Response should be JSON with MCPFindingsResponse structure
 	var findingsData map[string]interface{}
 	if err := json.Unmarshal([]byte(responseText), &findingsData); err != nil {
 		t.Fatalf("Failed to parse findings response as JSON: %v", err)
 	}
 
-	// Verify response structure
-	if _, hasPage := findingsData["page"]; !hasPage {
-		t.Error("Response should contain 'page' field")
+	// Verify MCPFindingsResponse structure
+	if _, hasPagination := findingsData["pagination"]; !hasPagination {
+		t.Error("Response should contain 'pagination' field")
 	}
 
-	if embedded, ok := findingsData["_embedded"].(map[string]interface{}); ok {
-		if findings, ok := embedded["findings"].([]interface{}); ok {
-			t.Logf("Retrieved %d static findings", len(findings))
+	if _, hasApplication := findingsData["application"]; !hasApplication {
+		t.Error("Response should contain 'application' field")
+	}
 
-			// Verify findings have expected structure
-			if len(findings) > 0 {
-				finding := findings[0].(map[string]interface{})
+	if _, hasSummary := findingsData["summary"]; !hasSummary {
+		t.Error("Response should contain 'summary' field")
+	}
 
-				// Check for key fields
-				if _, hasDetails := finding["finding_details"]; !hasDetails {
-					t.Error("Finding should have 'finding_details' field")
-				}
+	// Check findings structure
+	if findings, ok := findingsData["findings"].([]interface{}); ok {
+		t.Logf("Retrieved %d static findings", len(findings))
 
-				if details, ok := finding["finding_details"].(map[string]interface{}); ok {
-					// Verify severity is an integer (from our spec fixes)
-					if severity, ok := details["severity"]; ok {
-						t.Logf("Severity type: %T, value: %v", severity, severity)
-						// Severity should be a number (float64 in JSON unmarshaling)
-						if _, isNumber := severity.(float64); !isNumber {
-							t.Errorf("Severity should be a number, got %T", severity)
-						}
-					}
+		// Verify findings have expected MCPFinding structure
+		if len(findings) > 0 {
+			finding := findings[0].(map[string]interface{})
 
-					// Verify CWE is an object (from our spec fixes)
-					if cwe, ok := details["cwe"]; ok {
-						t.Logf("CWE type: %T, value: %v", cwe, cwe)
-						if cweObj, ok := cwe.(map[string]interface{}); ok {
-							if _, hasID := cweObj["id"]; !hasID {
-								t.Error("CWE object should have 'id' field")
-							}
-							if _, hasName := cweObj["name"]; !hasName {
-								t.Error("CWE object should have 'name' field")
-							}
-						} else {
-							t.Errorf("CWE should be an object, got %T", cwe)
-						}
-					}
+			// Check for key MCPFinding fields
+			if _, hasFlawID := finding["flaw_id"]; !hasFlawID {
+				t.Error("Finding should have 'flaw_id' field")
+			}
+
+			if _, hasSeverity := finding["severity"]; !hasSeverity {
+				t.Error("Finding should have 'severity' field")
+			}
+
+			if _, hasScanType := finding["scan_type"]; !hasScanType {
+				t.Error("Finding should have 'scan_type' field")
+			}
+
+			if severity, ok := finding["severity"]; ok {
+				t.Logf("Severity: %v", severity)
+			}
+
+			if severityScore, ok := finding["severity_score"]; ok {
+				t.Logf("Severity score type: %T, value: %v", severityScore, severityScore)
+				// Severity score should be a number (float64 in JSON unmarshaling)
+				if _, isNumber := severityScore.(float64); !isNumber {
+					t.Errorf("Severity score should be a number, got %T", severityScore)
 				}
 			}
 		}

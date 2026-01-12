@@ -94,8 +94,9 @@ type CallToolResult struct {
 }
 
 type Content struct {
-	Type string `json:"type"`
-	Text string `json:"text,omitempty"`
+	Type     string            `json:"type"`
+	Text     string            `json:"text,omitempty"`
+	Resource *ResourceContents `json:"resource,omitempty"`
 }
 
 // Resource types

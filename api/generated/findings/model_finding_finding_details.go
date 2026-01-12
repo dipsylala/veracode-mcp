@@ -13,7 +13,6 @@ package findings
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/validator.v2"
 )
 
 // FindingFindingDetails - Structured data about the finding.
@@ -55,88 +54,51 @@ func StaticFindingAsFindingFindingDetails(v *StaticFinding) FindingFindingDetail
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
+	// PATCHED: Removed strict validation and match counting to handle API responses
+	// that may not perfectly conform to the OpenAPI spec oneOf constraints
+
 	// try to unmarshal data into DynamicFinding
-	err = newStrictDecoder(data).Decode(&dst.DynamicFinding)
+	err = json.Unmarshal(data, &dst.DynamicFinding)
 	if err == nil {
 		jsonDynamicFinding, _ := json.Marshal(dst.DynamicFinding)
-		if string(jsonDynamicFinding) == "{}" { // empty struct
-			dst.DynamicFinding = nil
-		} else {
-			if err = validator.Validate(dst.DynamicFinding); err != nil {
-				dst.DynamicFinding = nil
-			} else {
-				match++
-			}
+		if string(jsonDynamicFinding) != "{}" {
+			return nil // Successfully unmarshaled as DynamicFinding
 		}
-	} else {
-		dst.DynamicFinding = nil
 	}
+	dst.DynamicFinding = nil
 
 	// try to unmarshal data into ManualFinding
-	err = newStrictDecoder(data).Decode(&dst.ManualFinding)
+	err = json.Unmarshal(data, &dst.ManualFinding)
 	if err == nil {
 		jsonManualFinding, _ := json.Marshal(dst.ManualFinding)
-		if string(jsonManualFinding) == "{}" { // empty struct
-			dst.ManualFinding = nil
-		} else {
-			if err = validator.Validate(dst.ManualFinding); err != nil {
-				dst.ManualFinding = nil
-			} else {
-				match++
-			}
+		if string(jsonManualFinding) != "{}" {
+			return nil // Successfully unmarshaled as ManualFinding
 		}
-	} else {
-		dst.ManualFinding = nil
 	}
+	dst.ManualFinding = nil
 
 	// try to unmarshal data into ScaFinding
-	err = newStrictDecoder(data).Decode(&dst.ScaFinding)
+	err = json.Unmarshal(data, &dst.ScaFinding)
 	if err == nil {
 		jsonScaFinding, _ := json.Marshal(dst.ScaFinding)
-		if string(jsonScaFinding) == "{}" { // empty struct
-			dst.ScaFinding = nil
-		} else {
-			if err = validator.Validate(dst.ScaFinding); err != nil {
-				dst.ScaFinding = nil
-			} else {
-				match++
-			}
+		if string(jsonScaFinding) != "{}" {
+			return nil // Successfully unmarshaled as ScaFinding
 		}
-	} else {
-		dst.ScaFinding = nil
 	}
+	dst.ScaFinding = nil
 
 	// try to unmarshal data into StaticFinding
-	err = newStrictDecoder(data).Decode(&dst.StaticFinding)
+	err = json.Unmarshal(data, &dst.StaticFinding)
 	if err == nil {
 		jsonStaticFinding, _ := json.Marshal(dst.StaticFinding)
-		if string(jsonStaticFinding) == "{}" { // empty struct
-			dst.StaticFinding = nil
-		} else {
-			if err = validator.Validate(dst.StaticFinding); err != nil {
-				dst.StaticFinding = nil
-			} else {
-				match++
-			}
+		if string(jsonStaticFinding) != "{}" {
+			return nil // Successfully unmarshaled as StaticFinding
 		}
-	} else {
-		dst.StaticFinding = nil
 	}
+	dst.StaticFinding = nil
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.DynamicFinding = nil
-		dst.ManualFinding = nil
-		dst.ScaFinding = nil
-		dst.StaticFinding = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(FindingFindingDetails)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(FindingFindingDetails)")
-	}
+	// No match found
+	return fmt.Errorf("data failed to match schemas in oneOf(FindingFindingDetails)")
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

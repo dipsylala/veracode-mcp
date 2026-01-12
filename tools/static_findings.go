@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/dipsylala/veracodemcp-go/api"
+	"github.com/dipsylala/veracodemcp-go/api/generated/applications"
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
@@ -146,15 +148,24 @@ Please ensure VERACODE_API_ID and VERACODE_API_KEY environment variables are set
 		}, nil
 	}
 
-	// Step 3: Get application GUID using the profile name
-	application, err := client.GetApplicationByName(ctx, appProfile)
-	if err != nil {
-		appProfileSource := "from workspace config"
-		if hasAppProfile {
-			appProfileSource = "from parameter (overriding workspace)"
-		}
+	// Step 3: Get application GUID using the profile name (or use directly if it's a GUID)
+	var applicationGUID string
 
-		responseText := fmt.Sprintf(`Static Findings Analysis - Error
+	// Check if appProfile is already a GUID (format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+	if len(appProfile) == 36 && appProfile[8] == '-' && appProfile[13] == '-' && appProfile[18] == '-' && appProfile[23] == '-' {
+		// It's a GUID, use it directly
+		applicationGUID = appProfile
+	} else {
+		// It's an app name, look it up
+		var application *applications.Application
+		application, err = client.GetApplicationByName(ctx, appProfile)
+		if err != nil {
+			appProfileSource := "from workspace config"
+			if hasAppProfile {
+				appProfileSource = "from parameter (overriding workspace)"
+			}
+
+			responseText := fmt.Sprintf(`Static Findings Analysis - Error
 ========================
 
 Application Path: %s
@@ -167,23 +178,26 @@ Please verify:
 - The application name exists in Veracode platform
 - API credentials have sufficient permissions
 - The application name matches exactly (case-insensitive)`,
-			req.ApplicationPath,
-			appProfile,
-			appProfileSource,
-			err,
-		)
+				req.ApplicationPath,
+				appProfile,
+				appProfileSource,
+				err,
+			)
 
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": responseText,
-			}},
-		}, nil
-	}
+			return map[string]interface{}{
+				"content": []map[string]string{{
+					"type": "text",
+					"text": responseText,
+				}},
+			}, nil
+		}
 
-	applicationGUID := "unknown"
-	if application.Guid != nil {
-		applicationGUID = *application.Guid
+		// Extract GUID from application
+		if application.Guid != nil {
+			applicationGUID = *application.Guid
+		} else {
+			applicationGUID = "unknown"
+		}
 	}
 
 	// Step 4: Build the findings request
@@ -233,81 +247,136 @@ Please verify:
 
 // formatStaticFindingsResponse formats the findings API response into an MCP tool response
 func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
-	if findings == nil || len(findings.Findings) == 0 {
-		responseText := fmt.Sprintf(`Static Findings Analysis
-========================
+	// Build MCP response structure
+	response := MCPFindingsResponse{
+		Application: MCPApplication{
+			Name: appProfile,
+			ID:   applicationGUID,
+		},
+		Summary: MCPFindingsSummary{
+			BySeverity: map[string]int{
+				"critical":      0,
+				"high":          0,
+				"medium":        0,
+				"low":           0,
+				"informational": 0,
+			},
+			ByScanType: map[string]int{
+				"static": 0,
+				"sca":    0,
+				"dast":   0,
+			},
+			ByStatus: map[string]int{
+				"open":   0,
+				"closed": 0,
+			},
+			ByMitigation: map[string]int{
+				"none":     0,
+				"proposed": 0,
+				"approved": 0,
+				"rejected": 0,
+			},
+		},
+		Findings: []MCPFinding{},
+	}
 
-Application Path: %s
-App Profile: %s
-Application GUID: %s
-Sandbox: %s
+	// Add sandbox if specified
+	if sandbox != "" {
+		response.Sandbox = &MCPSandbox{
+			Name: sandbox,
+			ID:   sandbox,
+		}
+	}
 
-Status: ✓ No static findings found
+	// Add pagination info
+	if findings != nil {
+		response.Pagination = &MCPPagination{
+			CurrentPage:   findings.Page,
+			PageSize:      findings.Size,
+			TotalElements: findings.TotalCount,
+			TotalPages:    (findings.TotalCount + findings.Size - 1) / findings.Size,
+			HasNext:       (findings.Page+1)*findings.Size < findings.TotalCount,
+			HasPrevious:   findings.Page > 0,
+		}
+	}
 
-The application has been scanned and no security vulnerabilities were detected in the source code.`,
-			appPath,
-			appProfile,
-			applicationGUID,
-			valueOrDefault(sandbox, "policy scan (production)"),
-		)
+	// Process each finding
+	if findings != nil && len(findings.Findings) > 0 {
+		for _, finding := range findings.Findings {
+			// Transform severity
+			var severityNum int32
+			if finding.Severity != "" {
+				_, _ = fmt.Sscanf(finding.Severity, "%d", &severityNum)
+			}
+			transformedSeverity := TransformSeverity(&severityNum)
 
+			// Clean and extract references from description
+			cleanedDesc, references := TransformDescription(finding.Description, "STATIC")
+
+			mcpFinding := MCPFinding{
+				FlawID:           finding.ID,
+				ScanType:         "STATIC",
+				Status:           finding.Status,
+				MitigationStatus: "NONE", // TODO: Extract from API when available
+				ViolatesPolicy:   finding.ViolatesPolicy,
+				Severity:         string(transformedSeverity),
+				SeverityScore:    severityNum,
+				WeaknessType:     finding.CWE,
+				WeaknessName:     finding.CWE, // TODO: Map CWE to name
+				Description:      cleanedDesc,
+				References:       references,
+				FilePath:         finding.FilePath,
+				LineNumber:       finding.LineNumber,
+			}
+
+			response.Findings = append(response.Findings, mcpFinding)
+
+			// Update summary counts
+			response.Summary.TotalFindings++
+			if finding.Status == "OPEN" || finding.Status == "NEW" {
+				response.Summary.OpenFindings++
+			}
+			if finding.ViolatesPolicy {
+				response.Summary.PolicyViolations++
+			}
+
+			// Count by severity
+			severityKey := strings.ToLower(string(transformedSeverity))
+			response.Summary.BySeverity[severityKey]++
+
+			// Count by scan type
+			response.Summary.ByScanType["static"]++
+
+			// Count by status
+			statusKey := strings.ToLower(finding.Status)
+			if statusKey == "new" {
+				statusKey = "open"
+			}
+			response.Summary.ByStatus[statusKey]++
+		}
+	}
+
+	// Marshal response to JSON string
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
 		return map[string]interface{}{
 			"content": []map[string]string{{
 				"type": "text",
-				"text": responseText,
+				"text": fmt.Sprintf("Error formatting response: %v", err),
 			}},
+			"isError": true,
 		}
 	}
 
-	// Build findings summary
-	responseText := fmt.Sprintf(`Static Findings Analysis
-========================
-
-Application Path: %s
-App Profile: %s
-Application GUID: %s
-Sandbox: %s
-
-Total Findings: %d (showing %d)
-
-`,
-		appPath,
-		appProfile,
-		applicationGUID,
-		valueOrDefault(sandbox, "policy scan (production)"),
-		findings.TotalCount,
-		len(findings.Findings),
-	)
-
-	// Add individual findings
-	for i, finding := range findings.Findings {
-		responseText += fmt.Sprintf("Finding #%d\n", i+1)
-		responseText += "-----------\n"
-		responseText += fmt.Sprintf("ID: %s\n", finding.ID)
-		responseText += fmt.Sprintf("Severity: %s\n", finding.Severity)
-		responseText += fmt.Sprintf("CWE: %s\n", finding.CWE)
-		responseText += fmt.Sprintf("Status: %s\n", finding.Status)
-		responseText += fmt.Sprintf("Description: %s\n", finding.Description)
-
-		if finding.FilePath != "" {
-			responseText += fmt.Sprintf("File: %s", finding.FilePath)
-			if finding.LineNumber > 0 {
-				responseText += fmt.Sprintf(":%d", finding.LineNumber)
-			}
-			responseText += "\n"
-		}
-
-		if finding.ViolatesPolicy {
-			responseText += "⚠️  VIOLATES POLICY\n"
-		}
-
-		responseText += "\n"
-	}
-
+	// Return as MCP tool response with JSON content
 	return map[string]interface{}{
-		"content": []map[string]string{{
-			"type": "text",
-			"text": responseText,
+		"content": []map[string]interface{}{{
+			"type": "resource",
+			"resource": map[string]interface{}{
+				"uri":      fmt.Sprintf("veracode://findings/static/%s", applicationGUID),
+				"mimeType": "application/json",
+				"text":     string(responseJSON),
+			},
 		}},
 	}
 }

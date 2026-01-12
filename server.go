@@ -219,6 +219,36 @@ func convertToCallToolResult(result interface{}) *CallToolResult {
 
 		// Check for content field
 		if content, hasContent := resultMap["content"]; hasContent {
+			// Try []map[string]interface{} first (for resources)
+			if contentList, ok := content.([]map[string]interface{}); ok {
+				contents := make([]Content, len(contentList))
+				for i, c := range contentList {
+					cont := Content{}
+					if typ, ok := c["type"].(string); ok {
+						cont.Type = typ
+					}
+					if text, ok := c["text"].(string); ok {
+						cont.Text = text
+					}
+					// Handle resource field
+					if resource, ok := c["resource"].(map[string]interface{}); ok {
+						cont.Resource = &ResourceContents{}
+						if uri, ok := resource["uri"].(string); ok {
+							cont.Resource.URI = uri
+						}
+						if mimeType, ok := resource["mimeType"].(string); ok {
+							cont.Resource.MimeType = mimeType
+						}
+						if text, ok := resource["text"].(string); ok {
+							cont.Resource.Text = text
+						}
+					}
+					contents[i] = cont
+				}
+				return &CallToolResult{Content: contents}
+			}
+
+			// Fallback to []map[string]string (for simple text content)
 			if contentList, ok := content.([]map[string]string); ok {
 				contents := make([]Content, len(contentList))
 				for i, c := range contentList {

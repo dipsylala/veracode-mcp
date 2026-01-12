@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/dipsylala/veracodemcp-go/api"
+	"github.com/dipsylala/veracodemcp-go/api/generated/applications"
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
@@ -147,15 +149,24 @@ Please ensure VERACODE_API_ID and VERACODE_API_KEY environment variables are set
 		}, nil
 	}
 
-	// Step 3: Get application GUID using the profile name
-	application, err := client.GetApplicationByName(ctx, appProfile)
-	if err != nil {
-		appProfileSource := "from workspace config"
-		if hasAppProfile {
-			appProfileSource = "from parameter (overriding workspace)"
-		}
+	// Step 3: Get application GUID using the profile name (or use directly if it's a GUID)
+	var applicationGUID string
 
-		responseText := fmt.Sprintf(`Dynamic Findings Analysis - Error
+	// Check if appProfile is already a GUID (format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+	if len(appProfile) == 36 && appProfile[8] == '-' && appProfile[13] == '-' && appProfile[18] == '-' && appProfile[23] == '-' {
+		// It's a GUID, use it directly
+		applicationGUID = appProfile
+	} else {
+		// It's an app name, look it up
+		var application *applications.Application
+		application, err = client.GetApplicationByName(ctx, appProfile)
+		if err != nil {
+			appProfileSource := "from workspace config"
+			if hasAppProfile {
+				appProfileSource = "from parameter (overriding workspace)"
+			}
+
+			responseText := fmt.Sprintf(`Dynamic Findings Analysis - Error
 ========================
 
 Application Path: %s
@@ -168,23 +179,26 @@ Please verify:
 - The application name exists in Veracode platform
 - API credentials have sufficient permissions
 - The application name matches exactly (case-insensitive)`,
-			req.ApplicationPath,
-			appProfile,
-			appProfileSource,
-			err,
-		)
+				req.ApplicationPath,
+				appProfile,
+				appProfileSource,
+				err,
+			)
 
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": responseText,
-			}},
-		}, nil
-	}
+			return map[string]interface{}{
+				"content": []map[string]string{{
+					"type": "text",
+					"text": responseText,
+				}},
+			}, nil
+		}
 
-	applicationGUID := "unknown"
-	if application.Guid != nil {
-		applicationGUID = *application.Guid
+		// Extract GUID from application
+		if application.Guid != nil {
+			applicationGUID = *application.Guid
+		} else {
+			applicationGUID = "unknown"
+		}
 	}
 
 	// Step 4: Build the findings request
@@ -234,85 +248,195 @@ Please verify:
 
 // formatDynamicFindingsResponse formats the findings API response into an MCP tool response
 func formatDynamicFindingsResponse(appPath, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
-	if findings == nil || len(findings.Findings) == 0 {
-		responseText := fmt.Sprintf(`Dynamic Findings Analysis
-========================
+	// Build MCP response structure
+	response := MCPFindingsResponse{
+		Application: MCPApplication{
+			Name: appProfile,
+			ID:   applicationGUID,
+		},
+		Summary: MCPFindingsSummary{
+			BySeverity: map[string]int{
+				"critical":      0,
+				"high":          0,
+				"medium":        0,
+				"low":           0,
+				"informational": 0,
+			},
+			ByScanType: map[string]int{
+				"static": 0,
+				"sca":    0,
+				"dast":   0,
+			},
+			ByStatus: map[string]int{
+				"open":   0,
+				"closed": 0,
+			},
+			ByMitigation: map[string]int{
+				"none":     0,
+				"proposed": 0,
+				"approved": 0,
+				"rejected": 0,
+			},
+		},
+		Findings: []MCPFinding{},
+	}
 
-Application Path: %s
-App Profile: %s
-Application GUID: %s
-Sandbox: %s
+	// Add sandbox if specified
+	if sandbox != "" {
+		response.Sandbox = &MCPSandbox{
+			Name: sandbox,
+			ID:   sandbox,
+		}
+	}
 
-Status: ✓ No dynamic findings found
+	// Add pagination info
+	if findings != nil {
+		response.Pagination = &MCPPagination{
+			CurrentPage:   findings.Page,
+			PageSize:      findings.Size,
+			TotalElements: findings.TotalCount,
+			TotalPages:    (findings.TotalCount + findings.Size - 1) / findings.Size,
+			HasNext:       (findings.Page+1)*findings.Size < findings.TotalCount,
+			HasPrevious:   findings.Page > 0,
+		}
+	}
 
-The application has been scanned and no runtime security vulnerabilities were detected.`,
-			appPath,
-			appProfile,
-			applicationGUID,
-			valueOrDefault(sandbox, "policy scan (production)"),
-		)
+	// Process each finding
+	if findings != nil && len(findings.Findings) > 0 {
+		for _, finding := range findings.Findings {
+			// Transform severity
+			var severityNum int32
+			if finding.Severity != "" {
+				_, _ = fmt.Sscanf(finding.Severity, "%d", &severityNum)
+			}
+			transformedSeverity := TransformSeverity(&severityNum)
 
+			// Transform status (OPEN/CLOSED/UNKNOWN)
+			// Create a minimal FindingStatus for transformation
+			// Note: The API simplified Finding doesn't include full FindingStatus,
+			// so we work with the status string directly
+			status := finding.Status
+			if status == "" {
+				status = "OPEN" // Default
+			}
+
+			// Normalize status
+			var transformedStatus FindingStatus
+			switch strings.ToUpper(status) {
+			case "OPEN", "NEW":
+				transformedStatus = StatusOpen
+			case "CLOSED":
+				transformedStatus = StatusClosed
+			default:
+				transformedStatus = StatusUnknown
+			}
+
+			// Extract mitigation status from mitigations if available
+			mitigationStatus := MitigationNone
+			if len(finding.Mitigations) > 0 {
+				// Get the latest mitigation status
+				latestStatus := strings.ToUpper(finding.Mitigations[len(finding.Mitigations)-1].Status)
+				switch latestStatus {
+				case "PROPOSED":
+					mitigationStatus = MitigationProposed
+				case "APPROVED":
+					mitigationStatus = MitigationApproved
+				case "REJECTED":
+					mitigationStatus = MitigationRejected
+				default:
+					mitigationStatus = MitigationNone
+				}
+			}
+
+			// Determine policy violation using business rule:
+			// Only CLOSED + APPROVED findings don't violate policy
+			violatesPolicyValue := finding.ViolatesPolicy
+			violatesPolicy := DeterminesPolicyViolation(
+				transformedStatus,
+				mitigationStatus,
+				&violatesPolicyValue,
+			)
+
+			// Clean and extract references from description (DAST may have base64)
+			cleanedDesc, references := TransformDescription(finding.Description, "DAST")
+
+			// Parse CWE for weakness type/name
+			var cweID int32
+			weaknessType := finding.CWE
+			weaknessName := finding.CWE
+			if finding.CWE != "" {
+				// Try to extract numeric CWE ID
+				if strings.HasPrefix(strings.ToUpper(finding.CWE), "CWE-") {
+					_, _ = fmt.Sscanf(finding.CWE, "CWE-%d", &cweID)
+					weaknessType = TransformWeaknessType(&cweID)
+				}
+				// TODO: Map CWE ID to name using a lookup table
+			}
+
+			mcpFinding := MCPFinding{
+				FlawID:           finding.ID,
+				ScanType:         "DAST",
+				Status:           string(transformedStatus),
+				MitigationStatus: string(mitigationStatus),
+				ViolatesPolicy:   violatesPolicy,
+				Severity:         string(transformedSeverity),
+				SeverityScore:    severityNum,
+				WeaknessType:     weaknessType,
+				WeaknessName:     weaknessName,
+				Description:      cleanedDesc,
+				References:       references,
+				URL:              finding.URL,
+			}
+
+			response.Findings = append(response.Findings, mcpFinding)
+
+			// Update summary counts
+			response.Summary.TotalFindings++
+			if transformedStatus == StatusOpen {
+				response.Summary.OpenFindings++
+			}
+			if violatesPolicy {
+				response.Summary.PolicyViolations++
+			}
+
+			// Count by severity
+			severityKey := strings.ToLower(string(transformedSeverity))
+			response.Summary.BySeverity[severityKey]++
+
+			// Count by scan type
+			response.Summary.ByScanType["dast"]++
+
+			// Count by status
+			statusKey := strings.ToLower(string(transformedStatus))
+			response.Summary.ByStatus[statusKey]++
+
+			// Count by mitigation status
+			mitigationKey := strings.ToLower(string(mitigationStatus))
+			response.Summary.ByMitigation[mitigationKey]++
+		}
+	}
+
+	// Marshal response to JSON string
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
 		return map[string]interface{}{
 			"content": []map[string]string{{
 				"type": "text",
-				"text": responseText,
+				"text": fmt.Sprintf("Error formatting response: %v", err),
 			}},
+			"isError": true,
 		}
 	}
 
-	// Build findings summary
-	responseText := fmt.Sprintf(`Dynamic Findings Analysis
-========================
-
-Application Path: %s
-App Profile: %s
-Application GUID: %s
-Sandbox: %s
-
-Total Findings: %d (showing %d)
-
-`,
-		appPath,
-		appProfile,
-		applicationGUID,
-		valueOrDefault(sandbox, "policy scan (production)"),
-		findings.TotalCount,
-		len(findings.Findings),
-	)
-
-	// Add individual findings
-	for i, finding := range findings.Findings {
-		responseText += fmt.Sprintf("Finding #%d\n", i+1)
-		responseText += "-----------\n"
-		responseText += fmt.Sprintf("ID: %s\n", finding.ID)
-		responseText += fmt.Sprintf("Severity: %s\n", finding.Severity)
-		responseText += fmt.Sprintf("CWE: %s\n", finding.CWE)
-		responseText += fmt.Sprintf("Status: %s\n", finding.Status)
-		responseText += fmt.Sprintf("Description: %s\n", finding.Description)
-
-		if finding.URL != "" {
-			responseText += fmt.Sprintf("URL: %s\n", finding.URL)
-		}
-
-		if finding.ViolatesPolicy {
-			responseText += "⚠️  VIOLATES POLICY\n"
-		}
-
-		responseText += "\n"
-	}
-
+	// Return as MCP tool response with JSON content
 	return map[string]interface{}{
-		"content": []map[string]string{{
-			"type": "text",
-			"text": responseText,
+		"content": []map[string]interface{}{{
+			"type": "resource",
+			"resource": map[string]interface{}{
+				"uri":      fmt.Sprintf("veracode://findings/dynamic/%s", applicationGUID),
+				"mimeType": "application/json",
+				"text":     string(responseJSON),
+			},
 		}},
 	}
-}
-
-// Helper function to return value or default
-func valueOrDefault(value, defaultValue string) string {
-	if value == "" {
-		return defaultValue
-	}
-	return value
 }
