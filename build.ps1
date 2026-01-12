@@ -96,12 +96,12 @@ if (-not (Test-Path "dist")) {
     New-Item -ItemType Directory -Path "dist" | Out-Null
 }
 
-go build -o dist/mcp-server.exe .
+go build -o dist/veracode-mcp.exe .
 if ($LASTEXITCODE -eq 0) {
-    $fileInfo = Get-Item dist/mcp-server.exe
+    $fileInfo = Get-Item dist/veracode-mcp.exe
     $sizeKB = [math]::Round($fileInfo.Length / 1KB, 2)
     Write-Success "Build successful (${sizeKB} KB)"
-    Write-Host "    Output: dist/mcp-server.exe" -ForegroundColor Gray
+    Write-Host "    Output: dist/veracode-mcp.exe" -ForegroundColor Gray
 } else {
     Write-Error "Build failed"
     exit 1
@@ -116,7 +116,7 @@ if ($Quick) {
 }
 
 Write-Host "`nRun with:" -ForegroundColor Cyan
-Write-Host "  .\dist\mcp-server.exe -mode stdio" -ForegroundColor White
+Write-Host "  .\dist\veracode-mcp.exe -mode stdio" -ForegroundColor White
 Write-Host "`nBuild options:" -ForegroundColor Gray
 Write-Host "  .\build.ps1          # Full build with all checks" -ForegroundColor Gray
 Write-Host "  .\build.ps1 -Quick   # Fast build, skip checks" -ForegroundColor Gray

@@ -1,0 +1,74 @@
+{
+  "_embedded": {
+    "findings": [
+      {
+        "build_id": 54345966,
+        "context_guid": "f4e74197-1e26-42c4-ab4b-245870c93280",
+        "context_type": "APPLICATION",
+        "count": 1,
+        "description": "PHNwYW4+V2VhayBUTFN2MS4yIGNpcGhlciBUTFNfRUNESEVfUlNBX1dJVEhfQUVTXzI1Nl9DQkNfU0hBMzg0IGlzIHN1cHBvcnRlZCBvbiB2ZXJhZGVtby5td2F0c29uLnZ1bG4uc2EudmVyYWNvZGUuaW86NDQzLiA8L3NwYW4+PHNwYW4+T25seSBzdXBwb3J0IHN0cm9uZyB2ZXJzaW9ucyBvZiBjaXBoZXJzLiAgVmVyYWNvZGUgcmVjb21tZW5kcyB0aGUgZ3VpZGFuY2UgcHVibGlzaGVkIGJ5IHRoZSBOYXRpb25hbCBJbnN0aXR1dGUgb2YgU3RhbmRhcmRzIGFuZCBUZWNobm9sb2d5IChOSVNUKSwgZXhjZXJwdGVkIGJlbG93IGZyb20gTklTVCA4MDAtNTI6IENpcGhlciBzdWl0ZXMgdGhhdCB1c2UgdGhlIFRyaXBsZSBEYXRhIEVuY3J5cHRpb24gQWxnb3JpdGhtIChUREVBLCBhbHNvIHdyaXR0ZW4gYXMgM0RFUykgYXJlIG5vIGxvbmdlciBhbGxvd2VkIGR1ZSB0byB0aGUgbGltaXRlZCBhbW91bnRzIG9mIGRhdGEgdGhhdCBjYW4gYmUgcHJvY2Vzc2VkIHVuZGVyIGEgc2luZ2xlIGtleS4gVGhlIHNlcnZlciBzaG91bGQgYmUgY29uZmlndXJlZCB0byBvbmx5IHVzZSBjaXBoZXIgc3VpdGVzIGZvciB3aGljaCBpdCBoYXMgYSB2YWxpZCBjZXJ0aWZpY2F0ZSBjb250YWluaW5nIGEgc2lnbmF0dXJlIHByb3ZpZGluZyBhdCBsZWFzdCAxMTIgYml0cyBvZiBzZWN1cml0eS4gUHJlZmVyIGVwaGVtZXJhbCBrZXlzIG92ZXIgc3RhdGljIGtleXMgKGkuZS4sIHByZWZlciBESEUgb3ZlciBESCwgYW5kIHByZWZlciBFQ0RIRSBvdmVyIEVDREgpLiBFcGhlbWVyYWwga2V5cyBwcm92aWRlIHBlcmZlY3QgZm9yd2FyZCBzZWNyZWN5LiBQcmVmZXIgR0NNIG9yIENDTSBtb2RlcyBvdmVyIENCQyBtb2RlLiBUaGUgdXNlIG9mIGFuIGF1dGhlbnRpY2F0ZWQgZW5jcnlwdGlvbiBtb2RlIHByZXZlbnRzIHNldmVyYWwgYXR0YWNrcy4gTm90ZSB0aGF0IHRoZXNlIGFyZSBub3QgYXZhaWxhYmxlIGluIHZlcnNpb25zIHByaW9yIHRvIFRMUyAxLjIuIDwvc3Bhbj48c3Bhbj48YSBocmVmPSJodHRwOi8vY3dlLm1pdHJlLm9yZy9jZ2ktYmluL2p1bXBtZW51LmNnaT9pZD03NTciPkNXRTwvYT48L3NwYW4+",
+        "finding_details": {
+          "attack_vector": "Selection of Less-Secure Algorithm During Negotiation ('Algorithm Downgrade')",
+          "cwe": {
+            "href": "https://api.veracode.com/appsec/v1/cwes/757",
+            "id": 757,
+            "name": "Selection of Less-Secure Algorithm During Negotiation ('Algorithm Downgrade')"
+          },
+          "discovered_by_vsa": 0,
+          "finding_category": {
+            "href": "https://api.veracode.com/appsec/v1/categories/27",
+            "id": 27,
+            "name": "Server Configuration"
+          },
+          "hostname": "verademo.mwatson.vuln.sa.veracode.io",
+          "path": "/",
+          "plugin": "Server Configuration",
+          "port": "443",
+          "severity": 3,
+          "url": "https://verademo.mwatson.vuln.sa.veracode.io:443/",
+          "vulnerable_parameter": "TLSv1.2 cipher TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384"
+        },
+        "finding_status": {
+          "first_found_date": "2025-08-07T15:31:59.369Z",
+          "last_seen_date": "2025-08-07T15:37:46.462Z",
+          "mitigation_review_status": "NONE",
+          "new": true,
+          "resolution": "UNRESOLVED",
+          "resolution_status": "NONE",
+          "status": "OPEN"
+        },
+        "issue_id": 205,
+        "scan_type": "DYNAMIC",
+        "violates_policy": true
+      }
+    ]
+  },
+  "_links": {
+    "application": {
+      "href": "https://api.veracode.com/appsec/v1/applications/f4e74197-1e26-42c4-ab4b-245870c93280"
+    },
+    "first": {
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=DYNAMIC\u0026page=0\u0026size=1"
+    },
+    "last": {
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=DYNAMIC\u0026page=19\u0026size=1"
+    },
+    "next": {
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=DYNAMIC\u0026page=1\u0026size=1"
+    },
+    "sca": {
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA{\u0026context,severity,severity_gte,cwe,finding_category,cvss,cvss_gte,cve,violates_policy,include_annot,new,include_exp_date,mitigated_after,sca_scan_mode,sca_dep_mode}",
+      "templated": true
+    },
+    "self": {
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=DYNAMIC{\u0026context,severity,severity_gte,cwe,finding_category,cvss,cvss_gte,cve,violates_policy,include_annot,new,include_exp_date,mitigated_after,sca_scan_mode,sca_dep_mode}",
+      "templated": true
+    }
+  },
+  "page": {
+    "number": 0,
+    "size": 1,
+    "total_elements": 20,
+    "total_pages": 20
+  }
+}

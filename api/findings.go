@@ -18,9 +18,110 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 
 	findings "github.com/dipsylala/veracodemcp-go/api/generated/findings"
 )
+
+// safeInt64ToInt safely converts int64 to int, capping at MaxInt if overflow would occur
+func safeInt64ToInt(val int64) int {
+	if val > int64(math.MaxInt) {
+		return math.MaxInt
+	}
+	if val < int64(math.MinInt) {
+		return math.MinInt
+	}
+	return int(val)
+}
+
+// buildFindingsAPIRequest creates a configured API request with common parameters
+func buildFindingsAPIRequest(client *VeracodeClient, ctx context.Context, req FindingsRequest, scanType string) findings.ApiGetFindingsUsingGETRequest {
+	apiReq := client.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(ctx, req.AppProfile).
+		ScanType([]string{scanType})
+
+	// Add pagination parameters
+	if req.Page >= 0 {
+		apiReq = apiReq.Page(int32(req.Page))
+	}
+	if req.Size > 0 {
+		apiReq = apiReq.Size(int32(req.Size))
+	}
+
+	// Add CWE filter if provided
+	if len(req.CWEIDs) > 0 {
+		cweInts := make([]int32, len(req.CWEIDs))
+		for i, cwe := range req.CWEIDs {
+			var cweInt int32
+			_, _ = fmt.Sscanf(cwe, "%d", &cweInt) // nolint:errcheck
+			cweInts[i] = cweInt
+		}
+		apiReq = apiReq.Cwe(cweInts)
+	}
+
+	// Add severity filters
+	if req.Severity != nil {
+		apiReq = apiReq.Severity(*req.Severity)
+	}
+	if req.SeverityGte != nil {
+		apiReq = apiReq.SeverityGte(*req.SeverityGte)
+	}
+
+	// Add policy violation filter
+	if req.ViolatesPolicy != nil {
+		apiReq = apiReq.ViolatesPolicy(*req.ViolatesPolicy)
+	}
+
+	return apiReq
+}
+
+// executeFindingsRequest executes the API request and handles response
+func executeFindingsRequest(apiReq findings.ApiGetFindingsUsingGETRequest, req FindingsRequest, scanType string) (*FindingsResponse, error) {
+	// Call the Findings API
+	resp, httpResp, err := apiReq.Execute()
+	if httpResp != nil && httpResp.Body != nil {
+		defer func() {
+			if closeErr := httpResp.Body.Close(); closeErr != nil {
+				log.Printf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
+
+	if err != nil {
+		if httpResp != nil {
+			return nil, fmt.Errorf("API returned status %d: %w", httpResp.StatusCode, err)
+		}
+		return nil, fmt.Errorf("failed to get %s findings: %w", scanType, err)
+	}
+
+	// Check if response is valid
+	if resp == nil || resp.Embedded == nil {
+		return &FindingsResponse{
+			Findings:   []Finding{},
+			TotalCount: 0,
+			Page:       req.Page,
+			Size:       req.Size,
+		}, nil
+	}
+
+	// Convert API response to our Finding type
+	convertedFindings := convertFindings(resp.Embedded.Findings, scanType)
+
+	// Apply post-response filters
+	filteredFindings := applyFilters(convertedFindings, req)
+
+	// Get total count from pagination metadata
+	totalCount := 0
+	if resp.Page != nil && resp.Page.TotalElements != nil {
+		totalCount = safeInt64ToInt(*resp.Page.TotalElements)
+	}
+
+	return &FindingsResponse{
+		Findings:   filteredFindings,
+		TotalCount: totalCount,
+		Page:       req.Page,
+		Size:       req.Size,
+	}, nil
+}
 
 // FindingsRequest represents common parameters for findings queries
 type FindingsRequest struct {
@@ -78,90 +179,8 @@ func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsReq
 	}
 
 	authCtx := c.GetAuthContext(ctx)
-
-	// Build the API request using the fluent builder pattern
-	apiReq := c.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(authCtx, req.AppProfile).
-		ScanType([]string{"DYNAMIC"})
-
-	// Add pagination parameters
-	if req.Page >= 0 {
-		apiReq = apiReq.Page(int32(req.Page))
-	}
-	if req.Size > 0 {
-		apiReq = apiReq.Size(int32(req.Size))
-	}
-
-	// Add CWE filter if provided
-	if len(req.CWEIDs) > 0 {
-		cweInts := make([]int32, len(req.CWEIDs))
-		for i, cwe := range req.CWEIDs {
-			var cweInt int32
-			_, _ = fmt.Sscanf(cwe, "%d", &cweInt) // nolint:errcheck
-			cweInts[i] = cweInt
-		}
-		apiReq = apiReq.Cwe(cweInts)
-	}
-
-	// Add severity filter (exact match)
-	if req.Severity != nil {
-		apiReq = apiReq.Severity(*req.Severity)
-	}
-
-	// Add severity filter (greater than or equal)
-	if req.SeverityGte != nil {
-		apiReq = apiReq.SeverityGte(*req.SeverityGte)
-	}
-
-	// Add policy violation filter
-	if req.ViolatesPolicy != nil {
-		apiReq = apiReq.ViolatesPolicy(*req.ViolatesPolicy)
-	}
-
-	// Call the Findings API
-	resp, httpResp, err := apiReq.Execute()
-	if httpResp != nil && httpResp.Body != nil {
-		defer func() {
-			if closeErr := httpResp.Body.Close(); closeErr != nil {
-				log.Printf("Failed to close response body: %v", closeErr)
-			}
-		}()
-	}
-
-	if err != nil {
-		if httpResp != nil {
-			return nil, fmt.Errorf("API returned status %d: %w", httpResp.StatusCode, err)
-		}
-		return nil, fmt.Errorf("failed to get dynamic findings: %w", err)
-	}
-
-	// Check if response is valid
-	if resp == nil || resp.Embedded == nil {
-		return &FindingsResponse{
-			Findings:   []Finding{},
-			TotalCount: 0,
-			Page:       req.Page,
-			Size:       req.Size,
-		}, nil
-	}
-
-	// Convert API response to our Finding type
-	convertedFindings := convertFindings(resp.Embedded.Findings, "DYNAMIC")
-
-	// Apply post-response filters
-	filteredFindings := applyFilters(convertedFindings, req)
-
-	// Get total count from pagination metadata
-	totalCount := 0
-	if resp.Page != nil && resp.Page.TotalElements != nil {
-		totalCount = int(*resp.Page.TotalElements)
-	}
-
-	return &FindingsResponse{
-		Findings:   filteredFindings,
-		TotalCount: totalCount,
-		Page:       req.Page,
-		Size:       req.Size,
-	}, nil
+	apiReq := buildFindingsAPIRequest(c, authCtx, req, "DYNAMIC")
+	return executeFindingsRequest(apiReq, req, "DYNAMIC")
 }
 
 // GetStaticFindings retrieves SAST (Static Analysis) findings
@@ -171,90 +190,8 @@ func (c *VeracodeClient) GetStaticFindings(ctx context.Context, req FindingsRequ
 	}
 
 	authCtx := c.GetAuthContext(ctx)
-
-	// Build the API request using the fluent builder pattern
-	apiReq := c.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(authCtx, req.AppProfile).
-		ScanType([]string{"STATIC"})
-
-	// Add pagination parameters
-	if req.Page >= 0 {
-		apiReq = apiReq.Page(int32(req.Page))
-	}
-	if req.Size > 0 {
-		apiReq = apiReq.Size(int32(req.Size))
-	}
-
-	// Add CWE filter if provided
-	if len(req.CWEIDs) > 0 {
-		cweInts := make([]int32, len(req.CWEIDs))
-		for i, cwe := range req.CWEIDs {
-			var cweInt int32
-			_, _ = fmt.Sscanf(cwe, "%d", &cweInt) // nolint:errcheck
-			cweInts[i] = cweInt
-		}
-		apiReq = apiReq.Cwe(cweInts)
-	}
-
-	// Add severity filter (exact match)
-	if req.Severity != nil {
-		apiReq = apiReq.Severity(*req.Severity)
-	}
-
-	// Add severity filter (greater than or equal)
-	if req.SeverityGte != nil {
-		apiReq = apiReq.SeverityGte(*req.SeverityGte)
-	}
-
-	// Add policy violation filter
-	if req.ViolatesPolicy != nil {
-		apiReq = apiReq.ViolatesPolicy(*req.ViolatesPolicy)
-	}
-
-	// Call the Findings API
-	resp, httpResp, err := apiReq.Execute()
-	if httpResp != nil && httpResp.Body != nil {
-		defer func() {
-			if closeErr := httpResp.Body.Close(); closeErr != nil {
-				log.Printf("Failed to close response body: %v", closeErr)
-			}
-		}()
-	}
-
-	if err != nil {
-		if httpResp != nil {
-			return nil, fmt.Errorf("API returned status %d: %w", httpResp.StatusCode, err)
-		}
-		return nil, fmt.Errorf("failed to get static findings: %w", err)
-	}
-
-	// Check if response is valid
-	if resp == nil || resp.Embedded == nil {
-		return &FindingsResponse{
-			Findings:   []Finding{},
-			TotalCount: 0,
-			Page:       req.Page,
-			Size:       req.Size,
-		}, nil
-	}
-
-	// Convert API response to our Finding type
-	convertedFindings := convertFindings(resp.Embedded.Findings, "STATIC")
-
-	// Apply post-response filters
-	filteredFindings := applyFilters(convertedFindings, req)
-
-	// Get total count from pagination metadata
-	totalCount := 0
-	if resp.Page != nil && resp.Page.TotalElements != nil {
-		totalCount = int(*resp.Page.TotalElements)
-	}
-
-	return &FindingsResponse{
-		Findings:   filteredFindings,
-		TotalCount: totalCount,
-		Page:       req.Page,
-		Size:       req.Size,
-	}, nil
+	apiReq := buildFindingsAPIRequest(c, authCtx, req, "STATIC")
+	return executeFindingsRequest(apiReq, req, "STATIC")
 }
 
 // GetScaFindings retrieves SCA findings for an application
@@ -264,90 +201,8 @@ func (c *VeracodeClient) GetScaFindings(ctx context.Context, req FindingsRequest
 	}
 
 	authCtx := c.GetAuthContext(ctx)
-
-	// Build the API request using the fluent builder pattern
-	apiReq := c.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(authCtx, req.AppProfile).
-		ScanType([]string{"SCA"})
-
-	// Add pagination parameters
-	if req.Page >= 0 {
-		apiReq = apiReq.Page(int32(req.Page))
-	}
-	if req.Size > 0 {
-		apiReq = apiReq.Size(int32(req.Size))
-	}
-
-	// Add CWE filter if provided
-	if len(req.CWEIDs) > 0 {
-		cweInts := make([]int32, len(req.CWEIDs))
-		for i, cwe := range req.CWEIDs {
-			var cweInt int32
-			_, _ = fmt.Sscanf(cwe, "%d", &cweInt) // nolint:errcheck
-			cweInts[i] = cweInt
-		}
-		apiReq = apiReq.Cwe(cweInts)
-	}
-
-	// Add severity filter (exact match)
-	if req.Severity != nil {
-		apiReq = apiReq.Severity(*req.Severity)
-	}
-
-	// Add severity filter (greater than or equal)
-	if req.SeverityGte != nil {
-		apiReq = apiReq.SeverityGte(*req.SeverityGte)
-	}
-
-	// Add policy violation filter
-	if req.ViolatesPolicy != nil {
-		apiReq = apiReq.ViolatesPolicy(*req.ViolatesPolicy)
-	}
-
-	// Call the Findings API
-	resp, httpResp, err := apiReq.Execute()
-	if httpResp != nil && httpResp.Body != nil {
-		defer func() {
-			if closeErr := httpResp.Body.Close(); closeErr != nil {
-				log.Printf("Failed to close response body: %v", closeErr)
-			}
-		}()
-	}
-
-	if err != nil {
-		if httpResp != nil {
-			return nil, fmt.Errorf("API returned status %d: %w", httpResp.StatusCode, err)
-		}
-		return nil, fmt.Errorf("failed to get SCA findings: %w", err)
-	}
-
-	// Check if response is valid
-	if resp == nil || resp.Embedded == nil {
-		return &FindingsResponse{
-			Findings:   []Finding{},
-			TotalCount: 0,
-			Page:       req.Page,
-			Size:       req.Size,
-		}, nil
-	}
-
-	// Convert API response to our Finding type
-	convertedFindings := convertFindings(resp.Embedded.Findings, "SCA")
-
-	// Apply post-response filters
-	filteredFindings := applyFilters(convertedFindings, req)
-
-	// Get total count from pagination metadata
-	totalCount := 0
-	if resp.Page != nil && resp.Page.TotalElements != nil {
-		totalCount = int(*resp.Page.TotalElements)
-	}
-
-	return &FindingsResponse{
-		Findings:   filteredFindings,
-		TotalCount: totalCount,
-		Page:       req.Page,
-		Size:       req.Size,
-	}, nil
+	apiReq := buildFindingsAPIRequest(c, authCtx, req, "SCA")
+	return executeFindingsRequest(apiReq, req, "SCA")
 }
 
 // GetFindingByID retrieves a specific finding by ID

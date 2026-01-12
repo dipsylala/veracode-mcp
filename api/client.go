@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	applications "github.com/dipsylala/veracodemcp-go/api/generated/applications"
 	dynamic_flaw "github.com/dipsylala/veracodemcp-go/api/generated/dynamic_flaw"
@@ -11,7 +12,7 @@ import (
 	healthcheck "github.com/dipsylala/veracodemcp-go/api/generated/healthcheck"
 	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/generated/static_finding_data_path"
 	"github.com/dipsylala/veracodemcp-go/credentials"
-	"github.com/dipsylala/veracodemcp-go/hmac"
+	veracodehmac "github.com/dipsylala/veracodemcp-go/hmac"
 )
 
 // VeracodeClient wraps the generated API clients with authentication and configuration
@@ -35,8 +36,16 @@ type hmacTransport struct {
 
 // RoundTrip implements the http.RoundTripper interface, adding HMAC authentication to each request
 func (t *hmacTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	// Veracode's API expects query parameters to use %20 for spaces, not +
+	// Go's url.Values.Encode() uses + for spaces (per application/x-www-form-urlencoded spec)
+	// We need to normalize the query string to use %20 for proper HMAC calculation and HTTP transmission
+	if req.URL.RawQuery != "" {
+		normalizedQuery := strings.ReplaceAll(req.URL.RawQuery, "+", "%20")
+		req.URL.RawQuery = normalizedQuery
+	}
+
 	// Calculate the HMAC Authorization header
-	authHeader, err := hmac.CalculateAuthorizationHeader(req.URL, req.Method, t.apiID, t.apiKey)
+	authHeader, err := veracodehmac.CalculateAuthorizationHeader(req.URL, req.Method, t.apiID, t.apiKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to calculate HMAC authorization: %w", err)
 	}
