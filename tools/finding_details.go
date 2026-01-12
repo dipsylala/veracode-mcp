@@ -80,113 +80,76 @@ func parseFindingDetailsRequest(args map[string]interface{}) (*FindingDetailsReq
 	return req, nil
 }
 
-func (t *FindingDetailsTool) handleGetFindingDetails(ctx context.Context, args map[string]interface{}) (interface{}, error) {
-	// Parse and validate request parameters
-	req, err := parseFindingDetailsRequest(args)
-	if err != nil {
-		return map[string]interface{}{
-			"error": err.Error(),
-		}, nil
+// getAppProfileName retrieves the application profile name from request or workspace config
+func getAppProfileName(req *FindingDetailsRequest) (string, error) {
+	if req.AppProfile != "" {
+		return req.AppProfile, nil
 	}
+	return workspace.FindWorkspaceConfig(req.ApplicationPath)
+}
 
-	// Step 1: Retrieve application profile name
-	appProfile := req.AppProfile
-	hasAppProfile := appProfile != ""
-	if !hasAppProfile {
-		// Load workspace configuration
-		appProfile, err = workspace.FindWorkspaceConfig(req.ApplicationPath)
-		if err != nil {
-			return map[string]interface{}{
-				"content": []map[string]string{{
-					"type": "text",
-					"text": fmt.Sprintf(`Finding Details Lookup
-======================
-
-Application Path: %s
-
-❌ Error: %v
-`, req.ApplicationPath, err),
-				}},
-			}, nil
-		}
-	}
-
-	// Step 2: Create Veracode API client
-	client, err := api.NewVeracodeClient()
-	if err != nil {
-		return map[string]interface{}{
-			"error": fmt.Sprintf("Failed to create Veracode API client: %v", err),
-		}, nil
-	}
-
+// lookupApplicationGUID looks up the application GUID by profile name
+func lookupApplicationGUID(ctx context.Context, client *api.VeracodeClient, appProfile string) (string, error) {
 	authCtx := client.GetAuthContext(ctx)
-
-	// Step 3: Look up application GUID by profile name
 	app, err := client.GetApplicationByName(authCtx, appProfile)
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf(`Finding Details Lookup
-======================
-
-Application Path: %s
-Application Profile: %s
-
-❌ Error: Failed to lookup application
-
-%v
-
-Please verify that the application profile name is correct and that you have access to this application in Veracode.
-`, req.ApplicationPath, appProfile, err),
-			}},
-		}, nil
+		return "", err
 	}
+	return *app.Guid, nil
+}
 
-	appGUID := *app.Guid
+// tryGetStaticFlaw attempts to retrieve static flaw details
+func tryGetStaticFlaw(ctx context.Context, client *api.VeracodeClient, appGUID string, flawID int) (interface{}, error) {
+	authCtx := client.GetAuthContext(ctx)
+	issueIDStr := strconv.Itoa(flawID)
 
-	// Step 4: Try to get static flaw details first
-	issueIDStr := strconv.Itoa(req.FlawID)
 	staticFlawReq := client.StaticFindingDataPathClient().StaticFlawDataPathsInformationAPI.
 		AppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGet(authCtx, appGUID, issueIDStr)
 
 	staticFlaw, staticResp, staticErr := staticFlawReq.Execute()
 
-	// Check if static flaw was found
 	if staticErr == nil && staticResp != nil && staticResp.StatusCode == 200 && staticFlaw != nil {
-		// Successfully retrieved static flaw details
-		log.Printf("Found static flaw details for flaw ID %d", req.FlawID)
-		return formatStaticFlawDetailsResponse(req.ApplicationPath, appProfile, req.FlawID, staticFlaw), nil
+		log.Printf("Found static flaw details for flaw ID %d", flawID)
+		return staticFlaw, nil
 	}
 
-	// Log why static flaw wasn't found
 	if staticErr != nil {
-		log.Printf("Static flaw lookup failed for flaw ID %d: %v", req.FlawID, staticErr)
-	} else if staticResp != nil {
-		log.Printf("Static flaw lookup returned status %d for flaw ID %d", staticResp.StatusCode, req.FlawID)
+		log.Printf("Static flaw lookup failed for flaw ID %d: %v", flawID, staticErr)
+		return nil, staticErr
 	}
+	if staticResp != nil {
+		log.Printf("Static flaw lookup returned status %d for flaw ID %d", staticResp.StatusCode, flawID)
+	}
+	return nil, fmt.Errorf("static flaw not found")
+}
 
-	// Step 5: Static flaw not found, try dynamic flaw
+// tryGetDynamicFlaw attempts to retrieve dynamic flaw details
+func tryGetDynamicFlaw(ctx context.Context, client *api.VeracodeClient, appGUID string, flawID int) (interface{}, error) {
+	authCtx := client.GetAuthContext(ctx)
+	issueIDStr := strconv.Itoa(flawID)
+
 	dynamicFlawReq := client.DynamicFlawClient().DefaultAPI.
 		AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGet(authCtx, appGUID, issueIDStr)
 
 	dynamicFlaw, dynamicResp, dynamicErr := dynamicFlawReq.Execute()
 
-	// Check if dynamic flaw was found
 	if dynamicErr == nil && dynamicResp != nil && dynamicResp.StatusCode == 200 && dynamicFlaw != nil {
-		// Successfully retrieved dynamic flaw details
-		log.Printf("Found dynamic flaw details for flaw ID %d", req.FlawID)
-		return formatDynamicFlawDetailsResponse(req.ApplicationPath, appProfile, req.FlawID, dynamicFlaw), nil
+		log.Printf("Found dynamic flaw details for flaw ID %d", flawID)
+		return dynamicFlaw, nil
 	}
 
-	// Log why dynamic flaw wasn't found
 	if dynamicErr != nil {
-		log.Printf("Dynamic flaw lookup failed for flaw ID %d: %v", req.FlawID, dynamicErr)
-	} else if dynamicResp != nil {
-		log.Printf("Dynamic flaw lookup returned status %d for flaw ID %d", dynamicResp.StatusCode, req.FlawID)
+		log.Printf("Dynamic flaw lookup failed for flaw ID %d: %v", flawID, dynamicErr)
+		return nil, dynamicErr
 	}
+	if dynamicResp != nil {
+		log.Printf("Dynamic flaw lookup returned status %d for flaw ID %d", dynamicResp.StatusCode, flawID)
+	}
+	return nil, fmt.Errorf("dynamic flaw not found")
+}
 
-	// Step 6: Neither found - return error
+// formatErrorResponse creates a formatted error response
+func formatErrorResponse(appPath, appProfile, appGUID string, flawID int, staticErr, dynamicErr error) map[string]interface{} {
 	errorMsg := "Not found in either static or dynamic scan results"
 	if staticErr != nil {
 		errorMsg = fmt.Sprintf("Static API error: %v", staticErr)
@@ -218,9 +181,60 @@ Please verify that:
 1. The flaw ID is correct
 2. The flaw belongs to this application
 3. You have access to view findings for this application
-`, req.ApplicationPath, appProfile, appGUID, req.FlawID, errorMsg),
+`, appPath, appProfile, appGUID, flawID, errorMsg),
 		}},
-	}, nil
+	}
+}
+
+func (t *FindingDetailsTool) handleGetFindingDetails(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+	// Parse and validate request parameters
+	req, err := parseFindingDetailsRequest(args)
+	if err != nil {
+		return map[string]interface{}{"error": err.Error()}, nil
+	}
+
+	// Get application profile name
+	appProfile, err := getAppProfileName(req)
+	if err != nil {
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": fmt.Sprintf("Finding Details Lookup\n======================\n\nApplication Path: %s\n\n❌ Error: %v\n", req.ApplicationPath, err),
+			}},
+		}, nil
+	}
+
+	// Create Veracode API client
+	client, err := api.NewVeracodeClient()
+	if err != nil {
+		return map[string]interface{}{"error": fmt.Sprintf("Failed to create Veracode API client: %v", err)}, nil
+	}
+
+	// Look up application GUID
+	appGUID, err := lookupApplicationGUID(ctx, client, appProfile)
+	if err != nil {
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": fmt.Sprintf("Finding Details Lookup\n======================\n\nApplication Path: %s\nApplication Profile: %s\n\n❌ Error: Failed to lookup application\n\n%v\n\nPlease verify that the application profile name is correct and that you have access to this application in Veracode.\n", req.ApplicationPath, appProfile, err),
+			}},
+		}, nil
+	}
+
+	// Try to get static flaw details first
+	staticFlaw, staticErr := tryGetStaticFlaw(ctx, client, appGUID, req.FlawID)
+	if staticErr == nil {
+		return formatStaticFlawDetailsResponse(req.ApplicationPath, appProfile, req.FlawID, staticFlaw), nil
+	}
+
+	// Try dynamic flaw
+	dynamicFlaw, dynamicErr := tryGetDynamicFlaw(ctx, client, appGUID, req.FlawID)
+	if dynamicErr == nil {
+		return formatDynamicFlawDetailsResponse(req.ApplicationPath, appProfile, req.FlawID, dynamicFlaw), nil
+	}
+
+	// Neither found - return error
+	return formatErrorResponse(req.ApplicationPath, appProfile, appGUID, req.FlawID, staticErr, dynamicErr), nil
 }
 
 // formatStaticFlawDetailsResponse formats static flaw details into an MCP response
