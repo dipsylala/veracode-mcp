@@ -96,6 +96,14 @@ func (t *PackageWorkspaceTool) handlePackageWorkspace(ctx context.Context, args 
 		}, nil
 	}
 
+	// Clean up non-log files from output directory
+	err = cleanupOutputDirectory(outputDir)
+	if err != nil {
+		return map[string]interface{}{
+			"error": fmt.Sprintf("Failed to clean output directory: %v", err),
+		}, nil
+	}
+
 	// Build and execute packaging command
 	exitCode, duration, stdout, stderr, logFile, err := executePackagingCommand(ctx, req, outputDir)
 	if err != nil {
@@ -127,6 +135,38 @@ func validateAndPrepareDirectories(applicationPath string) (string, error) {
 	}
 
 	return outputDir, nil
+}
+
+// cleanupOutputDirectory removes all non-log files from the output directory
+func cleanupOutputDirectory(outputDir string) error {
+	// Read directory contents
+	entries, err := os.ReadDir(outputDir)
+	if err != nil {
+		// If directory doesn't exist or can't be read, that's fine
+		return nil
+	}
+
+	// Remove all files that are not log files
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		filename := entry.Name()
+		// Keep log files (those ending with .log)
+		if filepath.Ext(filename) == ".log" {
+			continue
+		}
+
+		// Remove non-log files
+		filePath := filepath.Join(outputDir, filename)
+		if err := os.Remove(filePath); err != nil {
+			// Log the error but continue with other files
+			log.Printf("Warning: Failed to remove file %s: %v", filePath, err)
+		}
+	}
+
+	return nil
 }
 
 // executePackagingCommand builds and executes the Veracode packaging command

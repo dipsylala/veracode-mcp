@@ -203,6 +203,30 @@
           "description": "Write detailed output to a log file in ./.veracode-packaging"
         }
       ]
+    },
+    {
+      "name": "pipeline-static-scan",
+      "description": "Perform a local SAST scan of the current workspace using Veracode's Pipeline Scanner",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "Argument for the *ABSOLUTE PATH* to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-project` on linux/macOS or, on Windows `C:\\\\a\\my-project`."
+        },
+        {
+          "name": "filename",
+          "type": "string",
+          "isRequired": false,
+          "description": "The file upon which to perform a pipeline scan. If not provided, the tool will scan the largest file in the .veracode-packaging folder"
+        },
+        {
+          "name": "verbose",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Enable verbose/debug output from Veracode CLI. Creates a timestamped log file with detailed output."
+        }
+      ]
     }
   ]
 }
