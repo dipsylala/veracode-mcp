@@ -64,7 +64,7 @@ type StaticFindingsRequest struct {
 func parseStaticFindingsRequest(args map[string]interface{}) (*StaticFindingsRequest, error) {
 	// Set defaults
 	req := &StaticFindingsRequest{
-		Size: 50,
+		Size: 200,
 		Page: 0,
 	}
 

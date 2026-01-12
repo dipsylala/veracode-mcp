@@ -65,7 +65,7 @@ type DynamicFindingsRequest struct {
 func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsRequest, error) {
 	// Set defaults
 	req := &DynamicFindingsRequest{
-		Size: 50,
+		Size: 200,
 		Page: 0,
 	}
 

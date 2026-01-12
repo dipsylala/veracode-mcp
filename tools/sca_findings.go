@@ -63,7 +63,7 @@ type ScaFindingsRequest struct {
 func parseScaFindingsRequest(args map[string]interface{}) (*ScaFindingsRequest, error) {
 	// Set defaults
 	req := &ScaFindingsRequest{
-		Size: 50,
+		Size: 200,
 		Page: 0,
 	}
 
