@@ -54,48 +54,92 @@ func StaticFindingAsFindingFindingDetails(v *StaticFinding) FindingFindingDetail
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
 	var err error
-	// PATCHED: Removed strict validation and match counting to handle API responses
-	// that may not perfectly conform to the OpenAPI spec oneOf constraints
+	// PATCHED: Check for discriminating fields to determine the correct type
+	// StaticFinding has: file_path, module, procedure
+	// DynamicFinding has: url, hostname, port
+	// ScaFinding has: component_filename, component_id, version
 
-	// try to unmarshal data into DynamicFinding
-	err = json.Unmarshal(data, &dst.DynamicFinding)
-	if err == nil {
-		jsonDynamicFinding, _ := json.Marshal(dst.DynamicFinding)
-		if string(jsonDynamicFinding) != "{}" {
-			return nil // Successfully unmarshaled as DynamicFinding
-		}
+	// Parse to a map to check for discriminating fields
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
 	}
-	dst.DynamicFinding = nil
 
-	// try to unmarshal data into ManualFinding
+	// Check for SCA-specific fields (try this first)
+	hasScaFields := false
+	if _, ok := raw["component_filename"]; ok {
+		hasScaFields = true
+	}
+	if _, ok := raw["component_id"]; ok {
+		hasScaFields = true
+	}
+	if _, ok := raw["component_path"]; ok { // Note: API returns component_path not component_path(s)
+		hasScaFields = true
+	}
+
+	// Check for static-specific fields
+	hasStaticFields := false
+	if _, ok := raw["file_path"]; ok {
+		hasStaticFields = true
+	}
+	if _, ok := raw["module"]; ok {
+		hasStaticFields = true
+	}
+
+	// Check for dynamic-specific fields
+	hasDynamicFields := false
+	if _, ok := raw["hostname"]; ok {
+		hasDynamicFields = true
+	}
+	if _, ok := raw["url"]; ok {
+		hasDynamicFields = true
+	}
+
+	// Try the most likely type first based on discriminating fields
+	if hasScaFields {
+		// Manually unmarshal to handle field name mismatches
+		err = json.Unmarshal(data, &dst.ScaFinding)
+		// Even if there's an error due to field mismatches, if we populated the key fields, it's OK
+		if dst.ScaFinding != nil && dst.ScaFinding.ComponentFilename != nil {
+			return nil
+		}
+		dst.ScaFinding = nil
+	}
+
+	if hasStaticFields {
+		err = json.Unmarshal(data, &dst.StaticFinding)
+		if err == nil && dst.StaticFinding != nil {
+			return nil
+		}
+		dst.StaticFinding = nil
+	}
+
+	if hasDynamicFields {
+		err = json.Unmarshal(data, &dst.DynamicFinding)
+		if err == nil && dst.DynamicFinding != nil {
+			return nil
+		}
+		dst.DynamicFinding = nil
+	}
+
+	// Fallback: try all types in order
 	err = json.Unmarshal(data, &dst.ManualFinding)
 	if err == nil {
 		jsonManualFinding, _ := json.Marshal(dst.ManualFinding)
 		if string(jsonManualFinding) != "{}" {
-			return nil // Successfully unmarshaled as ManualFinding
+			return nil
 		}
 	}
 	dst.ManualFinding = nil
 
-	// try to unmarshal data into ScaFinding
 	err = json.Unmarshal(data, &dst.ScaFinding)
 	if err == nil {
 		jsonScaFinding, _ := json.Marshal(dst.ScaFinding)
 		if string(jsonScaFinding) != "{}" {
-			return nil // Successfully unmarshaled as ScaFinding
+			return nil
 		}
 	}
 	dst.ScaFinding = nil
-
-	// try to unmarshal data into StaticFinding
-	err = json.Unmarshal(data, &dst.StaticFinding)
-	if err == nil {
-		jsonStaticFinding, _ := json.Marshal(dst.StaticFinding)
-		if string(jsonStaticFinding) != "{}" {
-			return nil // Successfully unmarshaled as StaticFinding
-		}
-	}
-	dst.StaticFinding = nil
 
 	// No match found
 	return fmt.Errorf("data failed to match schemas in oneOf(FindingFindingDetails)")

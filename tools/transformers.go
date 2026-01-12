@@ -100,14 +100,14 @@ func TransformMitigationStatus(findingStatus *findings.FindingStatus) Mitigation
 }
 
 // DeterminesPolicyViolation determines if a finding violates policy
-// Business Rule: Only CLOSED findings with APPROVED mitigations no longer affect policy compliance.
-func DeterminesPolicyViolation(status FindingStatus, mitigationStatus MitigationStatus, originalViolatesPolicy *bool) bool {
-	// Only CLOSED findings with APPROVED mitigation no longer affect policy
-	if status == StatusClosed && mitigationStatus == MitigationApproved {
+// Business Rule: CLOSED findings no longer violate policy, regardless of API response.
+func DeterminesPolicyViolation(status FindingStatus, resolutionStatus string, originalViolatesPolicy *bool) bool {
+	// CLOSED findings never violate policy (override API response)
+	if status == StatusClosed {
 		return false
 	}
 
-	// Use original API value if available
+	// For non-closed findings, use original API value if available
 	if originalViolatesPolicy != nil {
 		return *originalViolatesPolicy
 	}

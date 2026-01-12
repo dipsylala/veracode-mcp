@@ -247,11 +247,6 @@ func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox 
 				"low":           0,
 				"informational": 0,
 			},
-			ByScanType: map[string]int{
-				"static": 0,
-				"sca":    0,
-				"dast":   0,
-			},
 			ByStatus: map[string]int{
 				"open":   0,
 				"closed": 0,
@@ -284,6 +279,8 @@ func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox 
 			HasNext:       (findings.Page+1)*findings.Size < findings.TotalCount,
 			HasPrevious:   findings.Page > 0,
 		}
+		// Set total_findings to the total across all pages
+		response.Summary.TotalFindings = findings.TotalCount
 	}
 
 	// Process each finding
@@ -322,26 +319,34 @@ func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox 
 
 // processStaticFinding transforms a single API finding into an MCP finding
 func processStaticFinding(finding api.Finding) MCPFinding {
-	// Transform severity
-	var severityNum int32
-	if finding.Severity != "" {
-		_, _ = fmt.Sscanf(finding.Severity, "%d", &severityNum)
-	}
+	// Use severity score from API extraction
+	severityNum := finding.SeverityScore
 	transformedSeverity := TransformSeverity(&severityNum)
 
 	// Clean and extract references from description
 	cleanedDesc, references := TransformDescription(finding.Description, "STATIC")
 
+	// Transform mitigation status
+	mitigationStatus := "NONE"
+	if finding.ResolutionStatus != "" {
+		mitigationStatus = finding.ResolutionStatus
+	}
+
+	// Extract numeric CWE ID
+	var cweID int32
+	if finding.CWE != "" {
+		_, _ = fmt.Sscanf(finding.CWE, "CWE-%d", &cweID)
+	}
+
 	return MCPFinding{
 		FlawID:           finding.ID,
 		ScanType:         "STATIC",
 		Status:           finding.Status,
-		MitigationStatus: "NONE", // TODO: Extract from API when available
+		MitigationStatus: mitigationStatus,
 		ViolatesPolicy:   finding.ViolatesPolicy,
 		Severity:         string(transformedSeverity),
 		SeverityScore:    severityNum,
-		WeaknessType:     finding.CWE,
-		WeaknessName:     finding.CWE, // TODO: Map CWE to name
+		CweId:            cweID,
 		Description:      cleanedDesc,
 		References:       references,
 		FilePath:         finding.FilePath,
@@ -351,7 +356,7 @@ func processStaticFinding(finding api.Finding) MCPFinding {
 
 // updateStaticSummaryCounters updates the response summary based on a static finding
 func updateStaticSummaryCounters(summary *MCPFindingsSummary, finding MCPFinding) {
-	summary.TotalFindings++
+	// Note: TotalFindings is set from pagination.total_elements, not incremented per finding
 
 	if finding.Status == "OPEN" || finding.Status == "NEW" {
 		summary.OpenFindings++
@@ -364,9 +369,6 @@ func updateStaticSummaryCounters(summary *MCPFindingsSummary, finding MCPFinding
 	// Count by severity
 	severityKey := strings.ToLower(finding.Severity)
 	summary.BySeverity[severityKey]++
-
-	// Count by scan type
-	summary.ByScanType["static"]++
 
 	// Count by status
 	statusKey := strings.ToLower(finding.Status)

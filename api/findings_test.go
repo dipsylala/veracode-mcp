@@ -10,7 +10,8 @@ import (
 
 const (
 	// Test AppID provided by user
-	testAppID = "65c204e5-a74c-4b68-a62a-4bfdc08e27af"
+	testAppID        = "65c204e5-a74c-4b68-a62a-4bfdc08e27af"
+	testAppDynamicID = "f4e74197-1e26-42c4-ab4b-245870c93280" // MCPVerademo has dynamic findings
 )
 
 // TestGetStaticFindings_Integration performs a real API call to retrieve static findings
@@ -53,8 +54,22 @@ func TestGetStaticFindings_Integration(t *testing.T) {
 		if i >= 3 {
 			break
 		}
-		t.Logf("  Finding %d: ID=%s, Status=%s, Description=%s",
-			i+1, finding.ID, finding.Status, finding.Description)
+		t.Logf("  Finding %d:", i+1)
+		t.Logf("    ID: %s", finding.ID)
+		t.Logf("    Status: %s", finding.Status)
+		t.Logf("    ResolutionStatus: %s", finding.ResolutionStatus)
+		t.Logf("    ViolatesPolicy: %v", finding.ViolatesPolicy)
+		t.Logf("    Severity: %s", finding.Severity)
+		t.Logf("    SeverityScore: %d", finding.SeverityScore)
+		t.Logf("    CWE: %s", finding.CWE)
+		if len(finding.Description) > 50 {
+			t.Logf("    Description: %s...", finding.Description[:50])
+		} else {
+			t.Logf("    Description: %s", finding.Description)
+		}
+		if finding.FilePath != "" {
+			t.Logf("    FilePath: %s:%d", finding.FilePath, finding.LineNumber)
+		}
 	}
 }
 
@@ -73,7 +88,7 @@ func TestGetDynamicFindings_Integration(t *testing.T) {
 	defer cancel()
 
 	req := FindingsRequest{
-		AppProfile: testAppID,
+		AppProfile: testAppDynamicID,
 		Page:       0,
 		Size:       10,
 	}
@@ -98,8 +113,22 @@ func TestGetDynamicFindings_Integration(t *testing.T) {
 		if i >= 3 {
 			break
 		}
-		t.Logf("  Finding %d: ID=%s, Status=%s, Description=%s",
-			i+1, finding.ID, finding.Status, finding.Description)
+		t.Logf("  Finding %d:", i+1)
+		t.Logf("    ID: %s", finding.ID)
+		t.Logf("    Status: %s", finding.Status)
+		t.Logf("    ResolutionStatus: %s", finding.ResolutionStatus)
+		t.Logf("    ViolatesPolicy: %v", finding.ViolatesPolicy)
+		t.Logf("    Severity: %s", finding.Severity)
+		t.Logf("    SeverityScore: %d", finding.SeverityScore)
+		t.Logf("    CWE: %s", finding.CWE)
+		if len(finding.Description) > 50 {
+			t.Logf("    Description: %s...", finding.Description[:50])
+		} else {
+			t.Logf("    Description: %s", finding.Description)
+		}
+		if finding.URL != "" {
+			t.Logf("    URL: %s", finding.URL)
+		}
 	}
 }
 

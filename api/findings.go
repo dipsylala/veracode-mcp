@@ -1,5 +1,19 @@
 package api
 
+// NOTE ON POLYMORPHIC UNMARSHALING WORKAROUND:
+// The generated OpenAPI client has issues with FindingFindingDetails (oneOf: StaticFinding, DynamicFinding, ManualFinding, ScaFinding).
+// The UnmarshalJSON tries each type and accepts the first where the marshaled result != "{}".
+// This causes frequent misidentification:
+//   - Dynamic findings data is often unmarshaled into ScaFinding (most common case)
+//   - Static findings data can sometimes go into DynamicFinding
+//
+// SOLUTION:
+// We use the scan_type field from the parent Finding object to determine the correct extraction path,
+// and implement fallback extraction functions that can extract common fields (CWE, Severity) from
+// any variant type, even when the data is in the wrong variant.
+//
+// This is not ideal but necessary until the OpenAPI generator is fixed or we implement custom unmarshaling.
+
 import (
 	"context"
 	"fmt"
@@ -22,19 +36,24 @@ type FindingsRequest struct {
 	IncludeMitigations bool     `json:"include_mitigations,omitempty"`
 }
 
-// Finding represents a security finding (SAST or DAST)
+// Finding represents a security finding (SAST, DAST, or SCA)
 type Finding struct {
-	ID             string                 `json:"id"`
-	Severity       string                 `json:"severity"`
-	CWE            string                 `json:"cwe"`
-	Status         string                 `json:"status"`
-	Description    string                 `json:"description"`
-	FilePath       string                 `json:"file_path,omitempty"`   // SAST only
-	LineNumber     int                    `json:"line_number,omitempty"` // SAST only
-	URL            string                 `json:"url,omitempty"`         // DAST only
-	ViolatesPolicy bool                   `json:"violates_policy"`
-	Mitigations    []Mitigation           `json:"mitigations,omitempty"`
-	AdditionalInfo map[string]interface{} `json:"additional_info,omitempty"`
+	ID                string                 `json:"id"`
+	Severity          string                 `json:"severity"`       // Numeric severity as string for backward compatibility
+	SeverityScore     int32                  `json:"severity_score"` // Numeric severity score (0-5)
+	CWE               string                 `json:"cwe"`
+	Status            string                 `json:"status"`
+	ResolutionStatus  string                 `json:"resolution_status"` // Mitigation status (PROPOSED, APPROVED, REJECTED, etc.)
+	Description       string                 `json:"description"`
+	FilePath          string                 `json:"file_path,omitempty"`   // SAST only
+	LineNumber        int                    `json:"line_number,omitempty"` // SAST only
+	URL               string                 `json:"url,omitempty"`         // DAST only
+	ViolatesPolicy    bool                   `json:"violates_policy"`
+	Mitigations       []Mitigation           `json:"mitigations,omitempty"`
+	AdditionalInfo    map[string]interface{} `json:"additional_info,omitempty"`
+	ComponentFilename string                 `json:"component_filename,omitempty"` // SCA only
+	ComponentVersion  string                 `json:"component_version,omitempty"`  // SCA only
+	CVE               string                 `json:"cve,omitempty"`                // SCA only
 }
 
 // Mitigation represents a proposed fix or risk acceptance
@@ -63,6 +82,14 @@ func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsReq
 	// Build the API request using the fluent builder pattern
 	apiReq := c.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(authCtx, req.AppProfile).
 		ScanType([]string{"DYNAMIC"})
+
+	// Add pagination parameters
+	if req.Page >= 0 {
+		apiReq = apiReq.Page(int32(req.Page))
+	}
+	if req.Size > 0 {
+		apiReq = apiReq.Size(int32(req.Size))
+	}
 
 	// Add CWE filter if provided
 	if len(req.CWEIDs) > 0 {
@@ -123,9 +150,15 @@ func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsReq
 	// Apply post-response filters
 	filteredFindings := applyFilters(convertedFindings, req)
 
+	// Get total count from pagination metadata
+	totalCount := 0
+	if resp.Page != nil && resp.Page.TotalElements != nil {
+		totalCount = int(*resp.Page.TotalElements)
+	}
+
 	return &FindingsResponse{
 		Findings:   filteredFindings,
-		TotalCount: len(filteredFindings),
+		TotalCount: totalCount,
 		Page:       req.Page,
 		Size:       req.Size,
 	}, nil
@@ -142,6 +175,14 @@ func (c *VeracodeClient) GetStaticFindings(ctx context.Context, req FindingsRequ
 	// Build the API request using the fluent builder pattern
 	apiReq := c.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(authCtx, req.AppProfile).
 		ScanType([]string{"STATIC"})
+
+	// Add pagination parameters
+	if req.Page >= 0 {
+		apiReq = apiReq.Page(int32(req.Page))
+	}
+	if req.Size > 0 {
+		apiReq = apiReq.Size(int32(req.Size))
+	}
 
 	// Add CWE filter if provided
 	if len(req.CWEIDs) > 0 {
@@ -202,9 +243,108 @@ func (c *VeracodeClient) GetStaticFindings(ctx context.Context, req FindingsRequ
 	// Apply post-response filters
 	filteredFindings := applyFilters(convertedFindings, req)
 
+	// Get total count from pagination metadata
+	totalCount := 0
+	if resp.Page != nil && resp.Page.TotalElements != nil {
+		totalCount = int(*resp.Page.TotalElements)
+	}
+
 	return &FindingsResponse{
 		Findings:   filteredFindings,
-		TotalCount: len(filteredFindings),
+		TotalCount: totalCount,
+		Page:       req.Page,
+		Size:       req.Size,
+	}, nil
+}
+
+// GetScaFindings retrieves SCA findings for an application
+func (c *VeracodeClient) GetScaFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+	if !c.IsConfigured() {
+		return nil, fmt.Errorf("API credentials not configured. Set VERACODE_API_ID and VERACODE_API_KEY")
+	}
+
+	authCtx := c.GetAuthContext(ctx)
+
+	// Build the API request using the fluent builder pattern
+	apiReq := c.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(authCtx, req.AppProfile).
+		ScanType([]string{"SCA"})
+
+	// Add pagination parameters
+	if req.Page >= 0 {
+		apiReq = apiReq.Page(int32(req.Page))
+	}
+	if req.Size > 0 {
+		apiReq = apiReq.Size(int32(req.Size))
+	}
+
+	// Add CWE filter if provided
+	if len(req.CWEIDs) > 0 {
+		cweInts := make([]int32, len(req.CWEIDs))
+		for i, cwe := range req.CWEIDs {
+			var cweInt int32
+			_, _ = fmt.Sscanf(cwe, "%d", &cweInt) // nolint:errcheck
+			cweInts[i] = cweInt
+		}
+		apiReq = apiReq.Cwe(cweInts)
+	}
+
+	// Add severity filter (exact match)
+	if req.Severity != nil {
+		apiReq = apiReq.Severity(*req.Severity)
+	}
+
+	// Add severity filter (greater than or equal)
+	if req.SeverityGte != nil {
+		apiReq = apiReq.SeverityGte(*req.SeverityGte)
+	}
+
+	// Add policy violation filter
+	if req.ViolatesPolicy != nil {
+		apiReq = apiReq.ViolatesPolicy(*req.ViolatesPolicy)
+	}
+
+	// Call the Findings API
+	resp, httpResp, err := apiReq.Execute()
+	if httpResp != nil && httpResp.Body != nil {
+		defer func() {
+			if closeErr := httpResp.Body.Close(); closeErr != nil {
+				log.Printf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
+
+	if err != nil {
+		if httpResp != nil {
+			return nil, fmt.Errorf("API returned status %d: %w", httpResp.StatusCode, err)
+		}
+		return nil, fmt.Errorf("failed to get SCA findings: %w", err)
+	}
+
+	// Check if response is valid
+	if resp == nil || resp.Embedded == nil {
+		return &FindingsResponse{
+			Findings:   []Finding{},
+			TotalCount: 0,
+			Page:       req.Page,
+			Size:       req.Size,
+		}, nil
+	}
+
+	// Convert API response to our Finding type
+	convertedFindings := convertFindings(resp.Embedded.Findings, "SCA")
+
+	// Apply post-response filters
+	filteredFindings := applyFilters(convertedFindings, req)
+
+	// Get total count from pagination metadata
+	totalCount := 0
+	if resp.Page != nil && resp.Page.TotalElements != nil {
+		totalCount = int(*resp.Page.TotalElements)
+	}
+
+	return &FindingsResponse{
+		Findings:   filteredFindings,
+		TotalCount: totalCount,
 		Page:       req.Page,
 		Size:       req.Size,
 	}, nil
@@ -225,77 +365,248 @@ func convertFindings(apiFindings []findings.Finding, scanType string) []Finding 
 	result := make([]Finding, 0, len(apiFindings))
 
 	for _, apiFinding := range apiFindings {
-		finding := Finding{}
-
-		// Handle pointer fields from generated code
-		if apiFinding.IssueId != nil {
-			finding.ID = fmt.Sprintf("%d", *apiFinding.IssueId)
-		}
-		if apiFinding.Description != nil {
-			finding.Description = *apiFinding.Description
-		}
-		if apiFinding.ViolatesPolicy != nil {
-			finding.ViolatesPolicy = *apiFinding.ViolatesPolicy
-		}
-
-		// Extract severity, CWE, and other details from FindingDetails
-		// The FindingDetails is a OneOf type that can be StaticFinding, DynamicFinding, or ScaFinding
-		// For now, we'll extract what we can from the basic Finding fields
-		// TODO: Properly handle the OneOfFindingFindingDetails polymorphic type
-
-		// Extract status if available
-		if apiFinding.FindingStatus != nil && apiFinding.FindingStatus.Status != nil {
-			finding.Status = *apiFinding.FindingStatus.Status
-		}
-
-		// Extract scan-type-specific fields
-		// TODO: Properly handle the OneOfFindingFindingDetails polymorphic type
-		// Static findings should extract: finding.FilePath, finding.LineNumber
-		// Dynamic findings should extract: finding.URL
-		_ = scanType // Used for future implementation
-
+		finding := convertSingleFinding(apiFinding, scanType)
 		result = append(result, finding)
 	}
 
 	return result
 }
 
-// applyFilters applies client-side filters to findings
-func applyFilters(findings []Finding, req FindingsRequest) []Finding {
-	result := make([]Finding, 0, len(findings))
+// convertSingleFinding converts a single API finding to our Finding type
+func convertSingleFinding(apiFinding findings.Finding, scanType string) Finding {
+	finding := Finding{}
 
-	for _, finding := range findings {
-		// Filter by status if specified
-		if len(req.Status) > 0 {
-			matchesStatus := false
-			for _, status := range req.Status {
-				if finding.Status == status {
-					matchesStatus = true
-					break
-				}
+	// Extract basic fields
+	extractBasicFields(&finding, &apiFinding)
+
+	// The generated client's polymorphic unmarshaling is unreliable.
+	// Use scan_type to determine which variant to extract from FindingDetails.
+	if apiFinding.FindingDetails != nil {
+		switch scanType {
+		case "STATIC":
+			// For static findings, try StaticFinding first, then DynamicFinding as fallback
+			// (due to broken unmarshaling that sometimes puts data in wrong field)
+			if apiFinding.FindingDetails.StaticFinding != nil {
+				extractStaticFindingDetails(&finding, apiFinding.FindingDetails.StaticFinding)
+			} else if apiFinding.FindingDetails.DynamicFinding != nil {
+				extractStaticFromDynamic(&finding, apiFinding.FindingDetails.DynamicFinding)
 			}
-			if !matchesStatus {
-				continue
+		case "DYNAMIC":
+			// For dynamic findings, try DynamicFinding first, then fall back to ScaFinding or StaticFinding
+			// NOTE: The generated client frequently misidentifies dynamic findings as ScaFinding
+			if apiFinding.FindingDetails.DynamicFinding != nil {
+				extractDynamicFindingDetails(&finding, apiFinding.FindingDetails.DynamicFinding)
+			} else if apiFinding.FindingDetails.ScaFinding != nil {
+				// Common case: UnmarshalJSON puts dynamic data in ScaFinding
+				extractDynamicFromSca(&finding, apiFinding.FindingDetails.ScaFinding)
+			} else if apiFinding.FindingDetails.StaticFinding != nil {
+				extractDynamicFromMismarshaled(&finding, apiFinding.FindingDetails.StaticFinding)
+			}
+		case "SCA":
+			// For SCA findings, try ScaFinding first, then fall back to other types
+			if apiFinding.FindingDetails.ScaFinding != nil {
+				extractScaFindingDetails(&finding, apiFinding.FindingDetails.ScaFinding)
+			} else if apiFinding.FindingDetails.StaticFinding != nil {
+				// Fallback: extract common fields from StaticFinding
+				extractStaticFindingDetails(&finding, apiFinding.FindingDetails.StaticFinding)
+			} else if apiFinding.FindingDetails.DynamicFinding != nil {
+				// Fallback: extract common fields from DynamicFinding
+				extractDynamicFindingDetails(&finding, apiFinding.FindingDetails.DynamicFinding)
 			}
 		}
-
-		result = append(result, finding)
 	}
 
-	// Apply pagination
-	startIdx := req.Page * req.Size
-	endIdx := startIdx + req.Size
+	return finding
+}
 
-	if startIdx >= len(result) {
-		return []Finding{}
+// extractBasicFields extracts common fields from the API finding
+func extractBasicFields(finding *Finding, apiFinding *findings.Finding) {
+	if apiFinding.IssueId != nil {
+		finding.ID = fmt.Sprintf("%d", *apiFinding.IssueId)
+	}
+	if apiFinding.Description != nil {
+		finding.Description = *apiFinding.Description
+	}
+	if apiFinding.ViolatesPolicy != nil {
+		finding.ViolatesPolicy = *apiFinding.ViolatesPolicy
 	}
 
-	if endIdx > len(result) {
-		endIdx = len(result)
+	// Extract status and resolution status if available
+	if apiFinding.FindingStatus != nil {
+		if apiFinding.FindingStatus.Status != nil {
+			finding.Status = *apiFinding.FindingStatus.Status
+		}
+		if apiFinding.FindingStatus.ResolutionStatus != nil {
+			finding.ResolutionStatus = *apiFinding.FindingStatus.ResolutionStatus
+		}
+	}
+}
+
+// extractStaticFindingDetails extracts fields from static finding details
+func extractStaticFindingDetails(finding *Finding, staticDetails *findings.StaticFinding) {
+	if staticDetails == nil {
+		return
 	}
 
-	if req.Size > 0 {
-		return result[startIdx:endIdx]
+	// Extract CWE information
+	if staticDetails.Cwe != nil && staticDetails.Cwe.Id != nil {
+		finding.CWE = fmt.Sprintf("CWE-%d", *staticDetails.Cwe.Id)
+	}
+
+	// Extract severity
+	if staticDetails.Severity != nil {
+		finding.SeverityScore = *staticDetails.Severity
+		finding.Severity = fmt.Sprintf("%d", *staticDetails.Severity)
+	}
+
+	// Extract file path and line number
+	if staticDetails.FilePath != nil {
+		finding.FilePath = *staticDetails.FilePath
+	}
+	if staticDetails.FileLineNumber != nil {
+		finding.LineNumber = int(*staticDetails.FileLineNumber)
+	}
+}
+
+// extractStaticFindingDetails extracts fields from static finding details stored in DynamicFinding
+// when the generated client incorrectly unmarshaled static data as dynamic
+func extractStaticFromDynamic(finding *Finding, dynamicDetails *findings.DynamicFinding) {
+	if dynamicDetails == nil {
+		return
+	}
+
+	// Extract CWE - both types have this field
+	if dynamicDetails.Cwe != nil && dynamicDetails.Cwe.Id != nil {
+		finding.CWE = fmt.Sprintf("CWE-%d", *dynamicDetails.Cwe.Id)
+	}
+
+	// Extract severity - both types have this field
+	if dynamicDetails.Severity != nil {
+		finding.SeverityScore = *dynamicDetails.Severity
+		finding.Severity = fmt.Sprintf("%d", *dynamicDetails.Severity)
+	}
+
+	// FilePath and FileLineNumber are not in DynamicFinding, so they won't be extracted
+	// This is a limitation of the broken unmarshaling
+}
+
+// extractDynamicFindingDetails extracts fields from dynamic finding details
+func extractDynamicFindingDetails(finding *Finding, dynamicDetails *findings.DynamicFinding) {
+	if dynamicDetails == nil {
+		return
+	}
+
+	// Extract CWE information
+	if dynamicDetails.Cwe != nil && dynamicDetails.Cwe.Id != nil {
+		finding.CWE = fmt.Sprintf("CWE-%d", *dynamicDetails.Cwe.Id)
+	}
+
+	// Extract severity
+	if dynamicDetails.Severity != nil {
+		finding.SeverityScore = *dynamicDetails.Severity
+		finding.Severity = fmt.Sprintf("%d", *dynamicDetails.Severity)
+	}
+
+	// Extract URL
+	if dynamicDetails.URL != nil {
+		finding.URL = *dynamicDetails.URL
+	}
+}
+
+// extractDynamicFromMismarshaled extracts dynamic finding data from a StaticFinding
+// when the generated client incorrectly unmarshaled dynamic data as static
+func extractDynamicFromMismarshaled(finding *Finding, staticDetails *findings.StaticFinding) {
+	if staticDetails == nil {
+		return
+	}
+
+	// Extract CWE - both types have this field
+	if staticDetails.Cwe != nil && staticDetails.Cwe.Id != nil {
+		finding.CWE = fmt.Sprintf("CWE-%d", *staticDetails.Cwe.Id)
+	}
+
+	// Extract severity - both types have this field
+	if staticDetails.Severity != nil {
+		finding.SeverityScore = *staticDetails.Severity
+		finding.Severity = fmt.Sprintf("%d", *staticDetails.Severity)
+	}
+
+	// URL is not in StaticFinding, so it won't be extracted
+	// This is a limitation of the broken unmarshaling
+}
+
+// extractDynamicFromSca extracts dynamic finding fields from ScaFinding
+// when the generated client incorrectly unmarshaled dynamic data as SCA
+func extractDynamicFromSca(finding *Finding, scaDetails *findings.ScaFinding) {
+	if scaDetails == nil {
+		return
+	}
+
+	// Extract CWE - ScaFinding has CWE with ID as float32
+	if scaDetails.Cwe != nil && scaDetails.Cwe.Id != nil {
+		finding.CWE = fmt.Sprintf("CWE-%d", int32(*scaDetails.Cwe.Id))
+	}
+
+	// Extract severity - ScaFinding has severity as float32
+	if scaDetails.Severity != nil {
+		finding.SeverityScore = int32(*scaDetails.Severity)
+		finding.Severity = fmt.Sprintf("%d", int32(*scaDetails.Severity))
+	}
+
+	// URL is not in ScaFinding, so it won't be extracted
+	// This is a limitation of the broken unmarshaling
+}
+
+// extractScaFindingDetails extracts fields from SCA finding details
+func extractScaFindingDetails(finding *Finding, scaDetails *findings.ScaFinding) {
+	if scaDetails == nil {
+		return
+	}
+
+	// Extract CWE - ScaFinding has CWE with ID as float32
+	if scaDetails.Cwe != nil && scaDetails.Cwe.Id != nil {
+		finding.CWE = fmt.Sprintf("CWE-%d", int32(*scaDetails.Cwe.Id))
+	}
+
+	// Extract severity - ScaFinding has severity as float32
+	if scaDetails.Severity != nil {
+		finding.SeverityScore = int32(*scaDetails.Severity)
+		finding.Severity = fmt.Sprintf("%d", int32(*scaDetails.Severity))
+	}
+
+	// Extract SCA-specific component information
+	if scaDetails.ComponentFilename != nil {
+		finding.ComponentFilename = *scaDetails.ComponentFilename
+	}
+
+	if scaDetails.Version != nil {
+		finding.ComponentVersion = *scaDetails.Version
+	}
+
+	// Extract CVE information if available
+	if scaDetails.Cve != nil && scaDetails.Cve.Name != nil {
+		finding.CVE = *scaDetails.Cve.Name
+	}
+}
+
+// applyFilters applies client-side filters to findings
+// applyFilters applies client-side filters that are not supported by the API
+// Currently only Status filtering is done client-side, as the API doesn't support it.
+// Pagination is now handled server-side via Page and Size parameters.
+func applyFilters(findings []Finding, req FindingsRequest) []Finding {
+	// Filter by status if specified (not supported by API)
+	if len(req.Status) == 0 {
+		return findings
+	}
+
+	result := make([]Finding, 0, len(findings))
+	for _, finding := range findings {
+		for _, status := range req.Status {
+			if finding.Status == status {
+				result = append(result, finding)
+				break
+			}
+		}
 	}
 
 	return result

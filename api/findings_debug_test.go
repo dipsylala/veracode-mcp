@@ -25,18 +25,45 @@ func TestStaticFindings_DebugRawResponse(t *testing.T) {
 	}
 
 	// Make authenticated API request
-	bodyBytes := makeAuthenticatedRequest(t, apiID, apiSecret, baseURL)
+	bodyBytes := makeAuthenticatedRequest(t, apiID, apiSecret, baseURL, "STATIC")
 
 	// Save and log responses
-	saveAndLogResponses(t, bodyBytes)
+	saveAndLogResponses(t, bodyBytes, "static")
 
 	// Parse and analyze findings structure
 	analyzeEmbeddedFindings(t, bodyBytes)
 }
 
-func makeAuthenticatedRequest(t *testing.T, apiID, apiSecret, baseURL string) []byte {
+// TestDynamicFindings_DebugRawResponse captures the raw API response for dynamic findings
+func TestDynamicFindings_DebugRawResponse(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping debug test in short mode")
+	}
+
+	apiID, apiSecret, baseURL, err := credentials.GetCredentials()
+	if err != nil {
+		t.Skipf("Skipping test: %v", err)
+	}
+
+	// Make authenticated API request
+	bodyBytes := makeAuthenticatedRequest(t, apiID, apiSecret, baseURL, "DYNAMIC")
+
+	// Save and log responses
+	saveAndLogResponses(t, bodyBytes, "dynamic")
+
+	// Parse and analyze findings structure
+	analyzeEmbeddedFindings(t, bodyBytes)
+}
+
+func makeAuthenticatedRequest(t *testing.T, apiID, apiSecret, baseURL, scanType string) []byte {
+	// Use MCPVerademo for dynamic findings, original test app for static
+	appID := testAppID // Default to static test app
+	if scanType == "DYNAMIC" {
+		appID = "f4e74197-1e26-42c4-ab4b-245870c93280" // MCPVerademo has dynamic findings
+	}
+
 	// Construct the URL manually
-	url := baseURL + "/appsec/v2/applications/" + testAppID + "/findings?scan_type=STATIC&size=1"
+	url := baseURL + "/appsec/v2/applications/" + appID + "/findings?scan_type=" + scanType + "&size=1"
 
 	// Create HTTP client
 	client := &http.Client{
@@ -79,9 +106,9 @@ func makeAuthenticatedRequest(t *testing.T, apiID, apiSecret, baseURL string) []
 	return bodyBytes
 }
 
-func saveAndLogResponses(t *testing.T, bodyBytes []byte) {
+func saveAndLogResponses(t *testing.T, bodyBytes []byte, scanType string) {
 	// Write raw response to file
-	rawOutputFile := "findings_api_response_raw.json"
+	rawOutputFile := "findings_api_response_raw_" + scanType + ".json"
 	if err := os.WriteFile(rawOutputFile, bodyBytes, 0644); err != nil {
 		t.Logf("Warning: Failed to write raw response to file: %v", err)
 	} else {
@@ -98,7 +125,7 @@ func saveAndLogResponses(t *testing.T, bodyBytes []byte) {
 		prettyBytes, _ := json.MarshalIndent(prettyJSON, "", "  ")
 
 		// Write pretty-printed response to file
-		prettyOutputFile := "findings_api_response_pretty.json"
+		prettyOutputFile := "findings_api_response_pretty_" + scanType + ".json"
 		if err := os.WriteFile(prettyOutputFile, prettyBytes, 0644); err != nil {
 			t.Logf("Warning: Failed to write pretty response to file: %v", err)
 		} else {

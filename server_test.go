@@ -12,9 +12,9 @@ func TestLoadToolDefinitions(t *testing.T) {
 		t.Fatalf("Failed to load embedded tools: %v", err)
 	}
 
-	// tools.json now has 4 tools: api-health, get-dynamic-findings, get-static-findings, package-workspace
-	if len(registry.Tools) != 4 {
-		t.Errorf("Expected 4 tools, got %d", len(registry.Tools))
+	// tools.json now has 5 tools: api-health, get-dynamic-findings, get-static-findings, get-sca-findings, package-workspace
+	if len(registry.Tools) != 5 {
+		t.Errorf("Expected 5 tools, got %d", len(registry.Tools))
 	}
 
 	// Check dynamic findings tool
@@ -125,8 +125,8 @@ func TestServerInitialization(t *testing.T) {
 	}
 
 	// Should have at least the JSON-defined tools
-	if len(server.tools) < 4 {
-		t.Errorf("Expected at least 4 tools, got %d", len(server.tools))
+	if len(server.tools) < 5 {
+		t.Errorf("Expected at least 5 tools, got %d", len(server.tools))
 	}
 
 	// Verify tools/list works
@@ -135,8 +135,8 @@ func TestServerInitialization(t *testing.T) {
 		t.Fatal("handleListTools returned nil")
 	}
 
-	if len(result.Tools) < 4 {
-		t.Errorf("Expected at least 4 tools in list, got %d", len(result.Tools))
+	if len(result.Tools) < 5 {
+		t.Errorf("Expected at least 5 tools in list, got %d", len(result.Tools))
 	}
 
 	// Check that our JSON-defined tools are present

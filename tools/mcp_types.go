@@ -36,8 +36,7 @@ type MCPFinding struct {
 	// Security details
 	Severity      string   `json:"severity"`       // CRITICAL, HIGH, MEDIUM, LOW, INFORMATIONAL
 	SeverityScore int32    `json:"severity_score"` // 0-5
-	WeaknessType  string   `json:"weakness_type"`  // e.g., "CWE-79"
-	WeaknessName  string   `json:"weakness_name"`
+	CweId         int32    `json:"cwe_id"`         // CWE ID number (e.g., 78 for CWE-78)
 	Description   string   `json:"description"`
 	References    []string `json:"references,omitempty"`
 
@@ -95,7 +94,6 @@ type MCPFindingsSummary struct {
 	OpenFindings     int            `json:"open_findings"`
 	PolicyViolations int            `json:"policy_violations"`
 	BySeverity       map[string]int `json:"by_severity"`
-	ByScanType       map[string]int `json:"by_scan_type"`
 	ByStatus         map[string]int `json:"by_status"`
 	ByMitigation     map[string]int `json:"by_mitigation_status"`
 }

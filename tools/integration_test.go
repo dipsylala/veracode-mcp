@@ -25,6 +25,7 @@ func TestActualToolsRegistration(t *testing.T) {
 		APIHealthToolName,
 		DynamicFindingsToolName,
 		StaticFindingsToolName,
+		ScaFindingsToolName,
 	}
 
 	for _, expected := range expectedTools {

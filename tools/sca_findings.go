@@ -12,46 +12,44 @@ import (
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
-const DynamicFindingsToolName = "get-dynamic-findings"
+const ScaFindingsToolName = "get-sca-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(DynamicFindingsToolName, func() ToolImplementation {
-		return NewDynamicFindingsTool()
+	RegisterTool(ScaFindingsToolName, func() ToolImplementation {
+		return NewScaFindingsTool()
 	})
 }
 
-// DynamicFindingsTool provides the get-dynamic-findings tool
-type DynamicFindingsTool struct{}
+// ScaFindingsTool provides the get-sca-findings tool
+type ScaFindingsTool struct{}
 
-// NewDynamicFindingsTool creates a new dynamic findings tool
-func NewDynamicFindingsTool() *DynamicFindingsTool {
-	return &DynamicFindingsTool{}
+// NewScaFindingsTool creates a new SCA findings tool
+func NewScaFindingsTool() *ScaFindingsTool {
+	return &ScaFindingsTool{}
 }
 
 // Initialize sets up the tool
-func (t *DynamicFindingsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", DynamicFindingsToolName)
-	// TODO: Initialize Veracode API client, load credentials, etc.
+func (t *ScaFindingsTool) Initialize() error {
+	log.Printf("Initializing tool: %s", ScaFindingsToolName)
 	return nil
 }
 
-// RegisterHandlers registers the dynamic findings handler
-func (t *DynamicFindingsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", DynamicFindingsToolName)
-	registry.RegisterHandler(DynamicFindingsToolName, t.handleGetDynamicFindings)
+// RegisterHandlers registers the SCA findings handler
+func (t *ScaFindingsTool) RegisterHandlers(registry HandlerRegistry) error {
+	log.Printf("Registering handlers for tool: %s", ScaFindingsToolName)
+	registry.RegisterHandler(ScaFindingsToolName, t.handleGetScaFindings)
 	return nil
 }
 
 // Shutdown cleans up tool resources
-func (t *DynamicFindingsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", DynamicFindingsToolName)
-	// TODO: Close API connections, cleanup resources
+func (t *ScaFindingsTool) Shutdown() error {
+	log.Printf("Shutting down tool: %s", ScaFindingsToolName)
 	return nil
 }
 
-// DynamicFindingsRequest represents the parsed parameters for get-dynamic-findings
-type DynamicFindingsRequest struct {
+// ScaFindingsRequest represents the parsed parameters for get-sca-findings
+type ScaFindingsRequest struct {
 	ApplicationPath string `json:"application_path"`
 	AppProfile      string `json:"app_profile,omitempty"`
 	Sandbox         string `json:"sandbox,omitempty"`
@@ -61,10 +59,10 @@ type DynamicFindingsRequest struct {
 	SeverityGte     *int32 `json:"severity_gte,omitempty"`
 }
 
-// parseDynamicFindingsRequest extracts and validates parameters from the raw args map
-func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsRequest, error) {
+// parseScaFindingsRequest extracts and validates parameters from the raw args map
+func parseScaFindingsRequest(args map[string]interface{}) (*ScaFindingsRequest, error) {
 	// Set defaults
-	req := &DynamicFindingsRequest{
+	req := &ScaFindingsRequest{
 		Size: 50,
 		Page: 0,
 	}
@@ -87,9 +85,9 @@ func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsR
 	return req, nil
 }
 
-func (t *DynamicFindingsTool) handleGetDynamicFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func (t *ScaFindingsTool) handleGetScaFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
-	req, err := parseDynamicFindingsRequest(args)
+	req, err := parseScaFindingsRequest(args)
 	if err != nil {
 		return map[string]interface{}{
 			"error": err.Error(),
@@ -112,7 +110,7 @@ func (t *DynamicFindingsTool) handleGetDynamicFindings(ctx context.Context, args
 	// Step 2: Create API client
 	client, err := api.NewVeracodeClient()
 	if err != nil {
-		responseText := fmt.Sprintf(`Dynamic Findings Analysis - Error
+		responseText := fmt.Sprintf(`SCA Findings Analysis - Error
 ========================
 
 Application Path: %s
@@ -152,7 +150,7 @@ Please ensure VERACODE_API_ID and VERACODE_API_KEY environment variables are set
 				appProfileSource = "from parameter (overriding workspace)"
 			}
 
-			responseText := fmt.Sprintf(`Dynamic Findings Analysis - Error
+			responseText := fmt.Sprintf(`SCA Findings Analysis - Error
 ========================
 
 Application Path: %s
@@ -197,21 +195,21 @@ Please verify:
 		SeverityGte: req.SeverityGte,
 	}
 
-	// Step 5: Call the API to get dynamic findings
-	findingsResp, err := client.GetDynamicFindings(ctx, findingsReq)
+	// Step 5: Call the API to get SCA findings
+	findingsResp, err := client.GetScaFindings(ctx, findingsReq)
 	if err != nil {
-		responseText := fmt.Sprintf(`Dynamic Findings Analysis - Error
+		responseText := fmt.Sprintf(`SCA Findings Analysis - Error
 ========================
 
 Application Path: %s
 App Profile: %s
 Application GUID: %s
-Error: Failed to retrieve dynamic findings
+Error: Failed to retrieve SCA findings
 
 %v
 
 Please verify:
-- The application has been scanned
+- The application has been scanned with SCA
 - API credentials have access to view findings
 - The sandbox name is correct (if specified)`,
 			req.ApplicationPath,
@@ -229,11 +227,11 @@ Please verify:
 	}
 
 	// Step 6: Format and return the response
-	return formatDynamicFindingsResponse(appProfile, applicationGUID, req.Sandbox, findingsResp), nil
+	return formatScaFindingsResponse(req.ApplicationPath, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
 }
 
-// formatDynamicFindingsResponse formats the findings API response into an MCP tool response
-func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+// formatScaFindingsResponse formats the findings API response into an MCP tool response
+func formatScaFindingsResponse(appPath, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
@@ -287,7 +285,7 @@ func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, 
 	// Process each finding
 	if findings != nil && len(findings.Findings) > 0 {
 		for _, finding := range findings.Findings {
-			mcpFinding := processDynamicFinding(finding)
+			mcpFinding := processScaFinding(finding)
 			response.Findings = append(response.Findings, mcpFinding)
 			updateSummaryCounters(&response.Summary, mcpFinding)
 		}
@@ -310,7 +308,7 @@ func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, 
 		"content": []map[string]interface{}{{
 			"type": "resource",
 			"resource": map[string]interface{}{
-				"uri":      fmt.Sprintf("veracode://findings/dynamic/%s", applicationGUID),
+				"uri":      fmt.Sprintf("veracode://findings/sca/%s", applicationGUID),
 				"mimeType": "application/json",
 				"text":     string(responseJSON),
 			},
@@ -318,8 +316,8 @@ func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, 
 	}
 }
 
-// processDynamicFinding transforms a single API finding into an MCP finding
-func processDynamicFinding(finding api.Finding) MCPFinding {
+// processScaFinding transforms a single API finding into an MCP finding
+func processScaFinding(finding api.Finding) MCPFinding {
 	// Use severity score from API extraction
 	severityNum := finding.SeverityScore
 	transformedSeverity := TransformSeverity(&severityNum)
@@ -356,7 +354,7 @@ func processDynamicFinding(finding api.Finding) MCPFinding {
 	)
 
 	// Clean and extract references from description
-	cleanedDesc, references := TransformDescription(finding.Description, "DAST")
+	cleanedDesc, references := TransformDescription(finding.Description, "SCA")
 
 	// Extract numeric CWE ID
 	var cweID int32
@@ -364,9 +362,9 @@ func processDynamicFinding(finding api.Finding) MCPFinding {
 		_, _ = fmt.Sscanf(finding.CWE, "CWE-%d", &cweID)
 	}
 
-	return MCPFinding{
+	mcpFinding := MCPFinding{
 		FlawID:           finding.ID,
-		ScanType:         "DAST",
+		ScanType:         "SCA",
 		Status:           string(transformedStatus),
 		MitigationStatus: mitigationStatus,
 		ViolatesPolicy:   violatesPolicy,
@@ -375,31 +373,23 @@ func processDynamicFinding(finding api.Finding) MCPFinding {
 		CweId:            cweID,
 		Description:      cleanedDesc,
 		References:       references,
-		URL:              finding.URL,
-	}
-}
-
-// updateSummaryCounters updates the response summary based on a finding
-func updateSummaryCounters(summary *MCPFindingsSummary, finding MCPFinding) {
-	// Note: TotalFindings is set from pagination.total_elements, not incremented per finding
-
-	if finding.Status == string(StatusOpen) {
-		summary.OpenFindings++
 	}
 
-	if finding.ViolatesPolicy {
-		summary.PolicyViolations++
+	// Add SCA-specific component information if available
+	if finding.ComponentFilename != "" || finding.ComponentVersion != "" {
+		mcpFinding.Component = &MCPComponent{
+			Name:    finding.ComponentFilename,
+			Version: finding.ComponentVersion,
+			Library: finding.ComponentFilename,
+		}
 	}
 
-	// Count by severity
-	severityKey := strings.ToLower(finding.Severity)
-	summary.BySeverity[severityKey]++
+	// Add vulnerability information if available
+	if finding.CVE != "" {
+		mcpFinding.Vulnerability = &MCPVulnerability{
+			CVEID: finding.CVE,
+		}
+	}
 
-	// Count by status
-	statusKey := strings.ToLower(finding.Status)
-	summary.ByStatus[statusKey]++
-
-	// Count by mitigation status
-	mitigationKey := strings.ToLower(finding.MitigationStatus)
-	summary.ByMitigation[mitigationKey]++
+	return mcpFinding
 }

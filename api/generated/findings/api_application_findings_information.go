@@ -38,11 +38,13 @@ type ApiGetFindingsUsingGETRequest struct {
 	includeExpDate  *bool
 	mitigatedAfter  *time.Time
 	new             *bool
+	page            *int32
 	scaDepMode      *string
 	scaScanMode     *string
 	scanType        *[]string
 	severity        *int32
 	severityGte     *int32
+	size            *int32
 	violatesPolicy  *bool
 }
 
@@ -106,6 +108,12 @@ func (r ApiGetFindingsUsingGETRequest) New(new bool) ApiGetFindingsUsingGETReque
 	return r
 }
 
+// Page number. The default is 0.
+func (r ApiGetFindingsUsingGETRequest) Page(page int32) ApiGetFindingsUsingGETRequest {
+	r.page = &page
+	return r
+}
+
 // Return all findings with the specified SCA dependency mode. Only valid for the SCA scan type.
 func (r ApiGetFindingsUsingGETRequest) ScaDepMode(scaDepMode string) ApiGetFindingsUsingGETRequest {
 	r.scaDepMode = &scaDepMode
@@ -133,6 +141,12 @@ func (r ApiGetFindingsUsingGETRequest) Severity(severity int32) ApiGetFindingsUs
 // This filter returns all scan findings with a severity value greater than or equal to the value of the filter (0-5).
 func (r ApiGetFindingsUsingGETRequest) SeverityGte(severityGte int32) ApiGetFindingsUsingGETRequest {
 	r.severityGte = &severityGte
+	return r
+}
+
+// Page size (0-500). The default is 100.
+func (r ApiGetFindingsUsingGETRequest) Size(size int32) ApiGetFindingsUsingGETRequest {
+	r.size = &size
 	return r
 }
 
@@ -232,6 +246,9 @@ func (a *ApplicationFindingsInformationAPIService) GetFindingsUsingGETExecute(r 
 	if r.new != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "new", r.new, "form", "")
 	}
+	if r.page != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
+	}
 	if r.scaDepMode != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "sca_dep_mode", r.scaDepMode, "form", "")
 	}
@@ -254,6 +271,9 @@ func (a *ApplicationFindingsInformationAPIService) GetFindingsUsingGETExecute(r 
 	}
 	if r.severityGte != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "severity_gte", r.severityGte, "form", "")
+	}
+	if r.size != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "size", r.size, "form", "")
 	}
 	if r.violatesPolicy != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "violates_policy", r.violatesPolicy, "form", "")

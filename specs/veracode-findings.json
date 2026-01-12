@@ -274,6 +274,12 @@
           },
           {
             "$ref": "#/components/parameters/PolicyViolation"
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
           }
         ],
         "responses": {
