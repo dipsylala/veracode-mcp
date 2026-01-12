@@ -37,7 +37,13 @@ func (t *HTTPTransport) Start(addr string) error {
 	http.HandleFunc("/health", t.handleHealth)
 
 	log.Printf("HTTP server listening on %s", addr)
-	return http.ListenAndServe(addr, nil)
+	server := &http.Server{
+		Addr:         addr,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+	return server.ListenAndServe()
 }
 
 // handleSSE establishes Server-Sent Events connection
@@ -73,7 +79,10 @@ func (t *HTTPTransport) handleSSE(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Send client ID
-	fmt.Fprintf(w, "event: endpoint\ndata: /message?sessionId=%s\n\n", client.id)
+	if _, err := fmt.Fprintf(w, "event: endpoint\ndata: /message?sessionId=%s\n\n", client.id); err != nil {
+		log.Printf("Failed to send client ID: %v", err)
+		return
+	}
 	flusher.Flush()
 
 	// Keep connection alive and send messages
@@ -90,11 +99,17 @@ func (t *HTTPTransport) handleSSE(w http.ResponseWriter, r *http.Request) {
 				log.Printf("Failed to marshal message: %v", err)
 				continue
 			}
-			fmt.Fprintf(w, "data: %s\n\n", data)
+			if _, err := fmt.Fprintf(w, "data: %s\n\n", data); err != nil {
+				log.Printf("Failed to write message: %v", err)
+				return
+			}
 			flusher.Flush()
 		case <-ticker.C:
 			// Send keep-alive ping
-			fmt.Fprintf(w, ": ping\n\n")
+			if _, err := fmt.Fprintf(w, ": ping\n\n"); err != nil {
+				log.Printf("Failed to send ping: %v", err)
+				return
+			}
 			flusher.Flush()
 		}
 	}
@@ -143,5 +158,7 @@ func (t *HTTPTransport) handleMessage(w http.ResponseWriter, r *http.Request) {
 // handleHealth provides a simple health check endpoint
 func (t *HTTPTransport) handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"status": "ok"}); err != nil {
+		log.Printf("Failed to encode health response: %v", err)
+	}
 }

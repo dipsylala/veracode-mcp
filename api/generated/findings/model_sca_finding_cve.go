@@ -28,8 +28,8 @@ type ScaFindingCve struct {
 	// The assigned severity of this vulnerability.
 	Severity *int32 `json:"severity,omitempty"`
 	// The assigned vector for this vulnerability.
-	Vector *string `json:"vector,omitempty"`
-	Cvss3 *ScaFindingCveCvss3 `json:"cvss3,omitempty"`
+	Vector         *string                   `json:"vector,omitempty"`
+	Cvss3          *ScaFindingCveCvss3       `json:"cvss3,omitempty"`
 	Exploitability *ScaFindingExploitability `json:"exploitability,omitempty"`
 }
 
@@ -275,7 +275,7 @@ func (o *ScaFindingCve) SetExploitability(v ScaFindingExploitability) {
 }
 
 func (o ScaFindingCve) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -343,5 +343,3 @@ func (v *NullableScaFindingCve) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

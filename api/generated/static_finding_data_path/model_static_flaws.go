@@ -22,7 +22,7 @@ type StaticFlaws struct {
 	IssueSummary *IssueSummary `json:"issue_summary,omitempty"`
 	// Call stacks.
 	DataPaths []DataPaths `json:"data_paths,omitempty"`
-	Links []Link `json:"_links,omitempty"`
+	Links     []Link      `json:"_links,omitempty"`
 }
 
 // NewStaticFlaws instantiates a new StaticFlaws object
@@ -139,7 +139,7 @@ func (o *StaticFlaws) SetLinks(v []Link) {
 }
 
 func (o StaticFlaws) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -195,5 +195,3 @@ func (v *NullableStaticFlaws) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

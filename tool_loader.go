@@ -1,10 +1,13 @@
 package main
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
-	"os"
 )
+
+//go:embed tools.json
+var toolsJSON []byte
 
 // ToolDefinition represents a tool definition from JSON
 type ToolDefinition struct {
@@ -36,15 +39,10 @@ type ToolRegistry struct {
 	Tools []ToolDefinition `json:"tools"`
 }
 
-// LoadToolDefinitions loads tool definitions from a JSON file
-func LoadToolDefinitions(filepath string) (*ToolRegistry, error) {
-	data, err := os.ReadFile(filepath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read tools file: %w", err)
-	}
-
+// LoadToolDefinitions loads tool definitions from the embedded JSON file
+func LoadToolDefinitions() (*ToolRegistry, error) {
 	var registry ToolRegistry
-	if err := json.Unmarshal(data, &registry); err != nil {
+	if err := json.Unmarshal(toolsJSON, &registry); err != nil {
 		return nil, fmt.Errorf("failed to parse tools JSON: %w", err)
 	}
 

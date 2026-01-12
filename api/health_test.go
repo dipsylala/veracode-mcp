@@ -98,7 +98,7 @@ func TestCheckHealth_WithCancelledContext(t *testing.T) {
 	cancel()
 
 	// Try to call health check with cancelled context
-	status, err := client.CheckHealth(ctx)
+	status, _ := client.CheckHealth(ctx)
 
 	// Should get a status indicating failure (not an error, as per the implementation)
 	if status == nil {
@@ -178,7 +178,7 @@ func TestCheckHealth_WithoutAuthorization(t *testing.T) {
 	defer cancel()
 
 	// Call health check
-	status, err := client.CheckHealth(ctx)
+	status, _ := client.CheckHealth(ctx)
 
 	// Should get a status (not nil)
 	if status == nil {

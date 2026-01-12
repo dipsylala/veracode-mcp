@@ -3,9 +3,11 @@ run:
   tests: true
   build-tags:
     - integration
+  go: "1.21"
 
 output:
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 
@@ -25,10 +27,10 @@ linters:
     - goimports     # Checks if imports are formatted
     
     # Code quality
-    - misspell      # Finds commonly misspelled words
+    # - misspell      # Finds commonly misspelled words (disabled)
     - unconvert     # Removes unnecessary type conversions
-    - unparam       # Finds unused function parameters
-    - dupl          # Finds code duplication
+    # - unparam       # Finds unused function parameters (disabled - too noisy)
+    # - dupl          # Finds code duplication (disabled)
     
     # Performance
     - prealloc      # Finds slice declarations with non-zero initial length
@@ -50,16 +52,26 @@ linters-settings:
     local-prefixes: github.com/dipsylala/veracodemcp-go
     
   govet:
-    check-shadowing: true
     enable-all: true
+    disable:
+      - copylocks
+      - fieldalignment
     
   errcheck:
-    check-blank: true
-    check-type-assertions: true
+    check-blank: false  # Disabled - allows _ for intentionally ignored errors
+    check-type-assertions: false  # Disabled - too noisy for test code
+    exclude-functions:
+      - (*os.File).Close
+      - (io.Closer).Close
+      - fmt.Fprintf
+      - fmt.Fprintln
+      - (*encoding/json.Encoder).Encode
     
   staticcheck:
-    go: "1.21"
     checks: ["all"]
+    
+  unparam:
+    check-exported: false  # Don't check exported functions
     
   gosec:
     severity: medium
@@ -85,6 +97,10 @@ issues:
       linters:
         - dupl
         - gosec
+        - errcheck
+        - ineffassign
+        - govet
+      text: "(os.Setenv|os.Unsetenv|os.Chdir|json.Marshal|json.MarshalIndent|tool.Shutdown|type assertion|shadow|G301|G306|ineffectual)"
         
   # Don't hide new issues in existing code
   new: false

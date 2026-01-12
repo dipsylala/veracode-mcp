@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
+	"strings"
 
 	applications "github.com/dipsylala/veracodemcp-go/api/generated/applications"
 )
@@ -16,6 +18,13 @@ func (c *VeracodeClient) GetApplication(ctx context.Context, applicationGUID str
 	authCtx := c.GetAuthContext(ctx)
 
 	app, httpResp, err := c.applicationsClient.ApplicationInformationAPIAPI.GetApplicationUsingGET(authCtx, applicationGUID).Execute()
+	if httpResp != nil && httpResp.Body != nil {
+		defer func() {
+			if closeErr := httpResp.Body.Close(); closeErr != nil {
+				log.Printf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
 
 	if err != nil {
 		if httpResp != nil {
@@ -40,6 +49,13 @@ func (c *VeracodeClient) GetApplicationByName(ctx context.Context, name string) 
 	resp, httpResp, err := c.applicationsClient.ApplicationInformationAPIAPI.GetApplicationsUsingGET(authCtx).
 		Name(name).
 		Execute()
+	if httpResp != nil && httpResp.Body != nil {
+		defer func() {
+			if closeErr := httpResp.Body.Close(); closeErr != nil {
+				log.Printf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
 
 	if err != nil {
 		if httpResp != nil {
@@ -52,7 +68,25 @@ func (c *VeracodeClient) GetApplicationByName(ctx context.Context, name string) 
 		return nil, fmt.Errorf("application not found: %s", name)
 	}
 
+	// If multiple results returned (substring search), find exact match (case-insensitive)
+	if len(resp.Embedded.Applications) > 1 {
+		for _, app := range resp.Embedded.Applications {
+			if app.Profile != nil && app.Profile.Name != nil {
+				if equalFoldStrings(*app.Profile.Name, name) {
+					return &app, nil
+				}
+			}
+		}
+		// No exact match found
+		return nil, fmt.Errorf("no exact match found for application: %s (found %d partial matches)", name, len(resp.Embedded.Applications))
+	}
+
 	return &resp.Embedded.Applications[0], nil
+}
+
+// equalFoldStrings compares two strings case-insensitively
+func equalFoldStrings(a, b string) bool {
+	return len(a) == len(b) && strings.EqualFold(a, b)
 }
 
 // ListApplications retrieves a paginated list of applications
@@ -73,6 +107,13 @@ func (c *VeracodeClient) ListApplications(ctx context.Context, page, size int) (
 	}
 
 	resp, httpResp, err := req.Execute()
+	if httpResp != nil && httpResp.Body != nil {
+		defer func() {
+			if closeErr := httpResp.Body.Close(); closeErr != nil {
+				log.Printf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
 
 	if err != nil {
 		if httpResp != nil {

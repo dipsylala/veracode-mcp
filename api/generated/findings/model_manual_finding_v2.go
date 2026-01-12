@@ -21,8 +21,8 @@ var _ MappedNullable = &ManualFindingV2{}
 type ManualFindingV2 struct {
 	Cwe *StaticFindingCwe `json:"cwe,omitempty"`
 	// The CVSS associated with the finding.
-	Cvss *string `json:"cvss,omitempty"`
-	Severity *int32 `json:"severity,omitempty"`
+	Cvss     *string `json:"cvss,omitempty"`
+	Severity *int32  `json:"severity,omitempty"`
 	// Attack category, which contains subcategories, such as abuse of functionality, spoofing, probabilistic techniques, exploitation of authentication, resource depletion, exploitation of privilege/trust, injection, data structure attacks, data leakage attacks, resource manipulation, time and state attacks.
 	CapecId *string `json:"capec_id,omitempty"`
 	// Description of the cause of the finding.
@@ -411,7 +411,7 @@ func (o *ManualFindingV2) SetSeverityDesc(v string) {
 }
 
 func (o ManualFindingV2) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -491,5 +491,3 @@ func (v *NullableManualFindingV2) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

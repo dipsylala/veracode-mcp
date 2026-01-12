@@ -29,9 +29,9 @@ function Write-Error {
     Write-Host "  ✗ $Message" -ForegroundColor Red
 }
 
-Write-Host "`n╔════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "`n╔═══════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host "║   Veracode MCP Server Build Script    ║" -ForegroundColor Cyan
-Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "╚═══════════════════════════════════════╝" -ForegroundColor Cyan
 
 # 1. Format code
 if (-not $Quick) {
@@ -118,7 +118,7 @@ if ($Quick) {
 Write-Host "`nRun with:" -ForegroundColor Cyan
 Write-Host "  .\dist\mcp-server.exe -mode stdio" -ForegroundColor White
 Write-Host "`nBuild options:" -ForegroundColor Gray
-Write-Host "  .\build-enhanced.ps1          # Full build with all checks" -ForegroundColor Gray
-Write-Host "  .\build-enhanced.ps1 -Quick   # Fast build, skip checks" -ForegroundColor Gray
-Write-Host "  .\build-enhanced.ps1 -NoTest  # Build without running tests" -ForegroundColor Gray
-Write-Host "  .\build-enhanced.ps1 -Verbose # Show detailed test output" -ForegroundColor Gray
+Write-Host "  .\build.ps1          # Full build with all checks" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -Quick   # Fast build, skip checks" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -NoTest  # Build without running tests" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -Verbose # Show detailed test output" -ForegroundColor Gray

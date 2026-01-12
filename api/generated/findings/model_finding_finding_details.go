@@ -19,9 +19,9 @@ import (
 // FindingFindingDetails - Structured data about the finding.
 type FindingFindingDetails struct {
 	DynamicFinding *DynamicFinding
-	ManualFinding *ManualFinding
-	ScaFinding *ScaFinding
-	StaticFinding *StaticFinding
+	ManualFinding  *ManualFinding
+	ScaFinding     *ScaFinding
+	StaticFinding  *StaticFinding
 }
 
 // DynamicFindingAsFindingFindingDetails is a convenience function that returns DynamicFinding wrapped in FindingFindingDetails
@@ -51,7 +51,6 @@ func StaticFindingAsFindingFindingDetails(v *StaticFinding) FindingFindingDetail
 		StaticFinding: v,
 	}
 }
-
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
@@ -162,7 +161,7 @@ func (src FindingFindingDetails) MarshalJSON() ([]byte, error) {
 }
 
 // Get the actual instance
-func (obj *FindingFindingDetails) GetActualInstance() (interface{}) {
+func (obj *FindingFindingDetails) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
@@ -187,7 +186,7 @@ func (obj *FindingFindingDetails) GetActualInstance() (interface{}) {
 }
 
 // Get the actual instance value
-func (obj FindingFindingDetails) GetActualInstanceValue() (interface{}) {
+func (obj FindingFindingDetails) GetActualInstanceValue() interface{} {
 	if obj.DynamicFinding != nil {
 		return *obj.DynamicFinding
 	}
@@ -243,5 +242,3 @@ func (v *NullableFindingFindingDetails) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

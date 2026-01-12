@@ -21,9 +21,9 @@ var _ MappedNullable = &Sandbox{}
 // Sandbox struct for Sandbox
 type Sandbox struct {
 	ApplicationGuid *string `json:"application_guid,omitempty"`
-	AutoRecreate *bool `json:"auto_recreate,omitempty"`
+	AutoRecreate    *bool   `json:"auto_recreate,omitempty"`
 	// The date and time when the sandbox was created. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
-	Created *time.Time `json:"created,omitempty"`
+	Created      *time.Time        `json:"created,omitempty"`
 	CustomFields []CustomNameValue `json:"custom_fields,omitempty"`
 	// Unique identifier (UUID).
 	Guid *string `json:"guid,omitempty"`
@@ -32,9 +32,9 @@ type Sandbox struct {
 	// The date and time when the sandbox was modified. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
 	Modified *time.Time `json:"modified,omitempty"`
 	// The sandbox name
-	Name *string `json:"name,omitempty"`
-	OrganizationId *int32 `json:"organization_id,omitempty"`
-	OwnerUsername *string `json:"owner_username,omitempty"`
+	Name           *string `json:"name,omitempty"`
+	OrganizationId *int32  `json:"organization_id,omitempty"`
+	OwnerUsername  *string `json:"owner_username,omitempty"`
 }
 
 // NewSandbox instantiates a new Sandbox object
@@ -375,7 +375,7 @@ func (o *Sandbox) SetOwnerUsername(v string) {
 }
 
 func (o Sandbox) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -452,5 +452,3 @@ func (v *NullableSandbox) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

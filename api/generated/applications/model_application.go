@@ -24,18 +24,18 @@ type Application struct {
 	AppProfileUrl *string `json:"app_profile_url,omitempty"`
 	// The date and time when the application was created. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
 	Created *time.Time `json:"created,omitempty"`
-	Guid *string `json:"guid,omitempty"`
-	Id *int32 `json:"id,omitempty"`
+	Guid    *string    `json:"guid,omitempty"`
+	Id      *int32     `json:"id,omitempty"`
 	// Date and time of the last completed scan for this application. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
 	LastCompletedScanDate *time.Time `json:"last_completed_scan_date,omitempty"`
 	// The date and time when the application was modified. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
-	Modified *time.Time `json:"modified,omitempty"`
-	Oid *int32 `json:"oid,omitempty"`
-	OrganizationId *int32 `json:"organization_id,omitempty"`
-	Profile *ApplicationProfile `json:"profile,omitempty"`
+	Modified       *time.Time          `json:"modified,omitempty"`
+	Oid            *int32              `json:"oid,omitempty"`
+	OrganizationId *int32              `json:"organization_id,omitempty"`
+	Profile        *ApplicationProfile `json:"profile,omitempty"`
 	// Unique path to the latest results.
-	ResultsUrl *string `json:"results_url,omitempty"`
-	Scans []ApplicationScan `json:"scans,omitempty"`
+	ResultsUrl *string           `json:"results_url,omitempty"`
+	Scans      []ApplicationScan `json:"scans,omitempty"`
 }
 
 // NewApplication instantiates a new Application object
@@ -408,7 +408,7 @@ func (o *Application) SetScans(v []ApplicationScan) {
 }
 
 func (o Application) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -488,5 +488,3 @@ func (v *NullableApplication) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

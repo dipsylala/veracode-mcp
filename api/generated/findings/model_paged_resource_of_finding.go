@@ -20,8 +20,8 @@ var _ MappedNullable = &PagedResourceOfFinding{}
 // PagedResourceOfFinding struct for PagedResourceOfFinding
 type PagedResourceOfFinding struct {
 	Embedded *EmbeddedFinding `json:"_embedded,omitempty"`
-	Link *Link `json:"_link,omitempty"`
-	Page *PageMetadata `json:"page,omitempty"`
+	Link     *Link            `json:"_link,omitempty"`
+	Page     *PageMetadata    `json:"page,omitempty"`
 }
 
 // NewPagedResourceOfFinding instantiates a new PagedResourceOfFinding object
@@ -138,7 +138,7 @@ func (o *PagedResourceOfFinding) SetPage(v PageMetadata) {
 }
 
 func (o PagedResourceOfFinding) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -194,5 +194,3 @@ func (v *NullablePagedResourceOfFinding) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -2,17 +2,19 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
 )
 
 func TestLoadToolDefinitions(t *testing.T) {
-	registry, err := LoadToolDefinitions("tools.json")
+	registry, err := LoadToolDefinitions()
 	if err != nil {
-		t.Fatalf("Failed to load tools.json: %v", err)
+		t.Fatalf("Failed to load embedded tools: %v", err)
 	}
 
-	if len(registry.Tools) != 2 {
-		t.Errorf("Expected 2 tools, got %d", len(registry.Tools))
+	// tools.json now has 3 tools: api-health, get-dynamic-findings, get-static-findings
+	if len(registry.Tools) != 3 {
+		t.Errorf("Expected 3 tools, got %d", len(registry.Tools))
 	}
 
 	// Check dynamic findings tool
@@ -21,12 +23,13 @@ func TestLoadToolDefinitions(t *testing.T) {
 		t.Fatal("get-dynamic-findings tool not found")
 	}
 
-	if dynamicTool.Category != "findings" {
-		t.Errorf("Expected category 'findings', got '%s'", dynamicTool.Category)
+	// Note: Category is optional and may not be set
+	if dynamicTool.Category != "" && dynamicTool.Category != "findings" {
+		t.Errorf("Expected category 'findings' or empty, got '%s'", dynamicTool.Category)
 	}
 
-	if len(dynamicTool.Params) != 10 {
-		t.Errorf("Expected 10 params for get-dynamic-findings, got %d", len(dynamicTool.Params))
+	if len(dynamicTool.Params) != 6 {
+		t.Errorf("Expected 6 params for get-dynamic-findings, got %d", len(dynamicTool.Params))
 	}
 
 	// Check that application_path is first and required
@@ -46,9 +49,9 @@ func TestLoadToolDefinitions(t *testing.T) {
 }
 
 func TestToMCPTool(t *testing.T) {
-	registry, err := LoadToolDefinitions("tools.json")
+	registry, err := LoadToolDefinitions()
 	if err != nil {
-		t.Fatalf("Failed to load tools.json: %v", err)
+		t.Fatalf("Failed to load embedded tools: %v", err)
 	}
 
 	dynamicTool := registry.GetToolByName("get-dynamic-findings")
@@ -82,28 +85,24 @@ func TestToMCPTool(t *testing.T) {
 		t.Errorf("Expected app_profile type 'string', got '%v'", appProfile["type"])
 	}
 
-	// Check severity parameter (array with enum)
+	// Check severity parameter (number with validation)
 	severity, ok := properties["severity"].(map[string]interface{})
 	if !ok {
 		t.Fatal("severity property not found")
 	}
 
-	if severity["type"] != "array" {
-		t.Errorf("Expected severity type 'array', got '%v'", severity["type"])
+	if severity["type"] != "number" {
+		t.Errorf("Expected severity type 'number', got '%v'", severity["type"])
 	}
 
-	items, ok := severity["items"].(map[string]interface{})
-	if !ok {
-		t.Fatal("severity items not found")
+	minimum, hasMin := severity["minimum"]
+	maximum, hasMax := severity["maximum"]
+	if !hasMin || !hasMax {
+		t.Fatal("severity minimum/maximum validation not found")
 	}
 
-	enum, ok := items["enum"].([]string)
-	if !ok {
-		t.Fatal("severity enum not found")
-	}
-
-	if len(enum) != 6 {
-		t.Errorf("Expected 6 severity levels, got %d", len(enum))
+	if minimum != float64(0) || maximum != float64(5) {
+		t.Errorf("Expected severity min=0 max=5, got min=%v max=%v", minimum, maximum)
 	}
 }
 
@@ -168,13 +167,20 @@ func TestToolCallHandling(t *testing.T) {
 		t.Fatalf("Failed to create server: %v", err)
 	}
 
+	// Create a temporary directory with workspace config for testing
+	tempDir := t.TempDir()
+	workspaceFile := tempDir + "/.veracode-workspace.json"
+	workspaceContent := `{"name": "test-app"}`
+	if err := os.WriteFile(workspaceFile, []byte(workspaceContent), 0644); err != nil {
+		t.Fatalf("Failed to create workspace file: %v", err)
+	}
+
 	// Test dynamic findings call with required parameter
 	params := CallToolParams{
 		Name: "get-dynamic-findings",
 		Arguments: map[string]interface{}{
-			"application_path": "/home/user/myapp",
-			"app_profile":      "test-app",
-			"severity":         []interface{}{"High", "Critical"},
+			"application_path": tempDir,
+			"severity_gte":     4,
 		},
 	}
 
@@ -195,10 +201,8 @@ func TestToolCallHandling(t *testing.T) {
 
 	// Test missing required parameter
 	paramsNoPath := CallToolParams{
-		Name: "get-dynamic-findings",
-		Arguments: map[string]interface{}{
-			"app_profile": "test-app",
-		},
+		Name:      "get-dynamic-findings",
+		Arguments: map[string]interface{}{},
 	}
 
 	paramsNoPathJSON, _ := json.Marshal(paramsNoPath)

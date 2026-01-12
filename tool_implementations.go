@@ -52,7 +52,9 @@ func (r *ToolImplRegistry) GetAll() []tools.ToolImplementation {
 // ShutdownAll calls Shutdown on all tool implementations
 func (r *ToolImplRegistry) ShutdownAll() {
 	for _, tool := range r.tools {
-		_ = tool.Shutdown() // Ignore errors during shutdown
+		if err := tool.Shutdown(); err != nil {
+			log.Printf("Error shutting down tool: %v", err)
+		}
 	}
 }
 

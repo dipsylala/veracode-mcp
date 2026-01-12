@@ -44,7 +44,9 @@ func (t *StdioTransport) Start() error {
 		var req JSONRPCRequest
 		if err := json.Unmarshal(line, &req); err != nil {
 			log.Printf("Failed to parse JSON-RPC request: %v", err)
-			t.sendError(nil, -32700, "Parse error", nil)
+			if sendErr := t.sendError(nil, -32700, "Parse error", nil); sendErr != nil {
+				log.Printf("Failed to send parse error: %v", sendErr)
+			}
 			continue
 		}
 
@@ -54,7 +56,9 @@ func (t *StdioTransport) Start() error {
 
 func (t *StdioTransport) handleRequest(req *JSONRPCRequest) {
 	resp := t.server.HandleRequest(req)
-	t.sendResponse(resp)
+	if err := t.sendResponse(resp); err != nil {
+		log.Printf("Failed to send response: %v", err)
+	}
 }
 
 func (t *StdioTransport) sendResponse(resp *JSONRPCResponse) error {

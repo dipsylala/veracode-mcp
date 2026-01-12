@@ -19,7 +19,7 @@ type MCPServer struct {
 
 func NewMCPServer() (*MCPServer, error) {
 	// Create registries
-	toolRegistry, err := LoadToolDefinitions("tools.json")
+	toolRegistry, err := LoadToolDefinitions()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load tool definitions: %w", err)
 	}
@@ -240,7 +240,14 @@ func convertToCallToolResult(result interface{}) *CallToolResult {
 	}
 
 	// Default: convert result to JSON string
-	jsonBytes, _ := json.Marshal(result)
+	jsonBytes, err := json.Marshal(result)
+	if err != nil {
+		log.Printf("Failed to marshal result: %v", err)
+		return &CallToolResult{
+			Content: []Content{{Type: "text", Text: fmt.Sprintf("Error: %v", err)}},
+			IsError: true,
+		}
+	}
 	return &CallToolResult{
 		Content: []Content{{Type: "text", Text: string(jsonBytes)}},
 	}

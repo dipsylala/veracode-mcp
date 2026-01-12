@@ -20,51 +20,27 @@
           "name": "app_profile",
           "type": "string",
           "isRequired": false,
-          "description": "Application Profile GUID or name to get findings for. If not provided, will automatically check .veracode-workspace.json for the default profile. RECOMMENDED: Call get-workspace-profile first to check if a default exists before calling this tool without app_profile."
-        },
-        {
-          "name": "sandbox",
-          "type": "string",
-          "isRequired": false,
-          "description": "Sandbox GUID or name to get findings from. If not specified, returns findings from policy scan (production). Use this to get findings from development/testing sandbox environments."
+          "description": "Application Profile name to get findings for. If not provided, will automatically read from .veracode-workspace.json in the application directory."
         },
         {
           "name": "severity",
-          "type": "array",
-          "itemType": "string",
-          "isRequired": false,
-          "allowedValues": ["Very High", "High", "Medium", "Low", "Very Low", "Informational"],
-          "description": "Filter findings by severity levels. Example: [\"Very High\", \"High\"] for critical findings only."
-        },
-        {
-          "name": "status",
-          "type": "array",
-          "itemType": "string",
-          "isRequired": false,
-          "allowedValues": ["NEW", "OPEN", "FIXED", "CANNOT_REPRODUCE", "ACCEPTED", "FALSE_POSITIVE", "MITIGATED"],
-          "description": "Filter findings by remediation status (filtered in MCP Server after API fetch - Veracode API does not support status filtering). Example: [\"NEW\", \"OPEN\"] for unresolved findings. Note: Pagination counts may be affected."
-        },
-        {
-          "name": "cwe_ids",
-          "type": "array",
-          "itemType": "string",
-          "isRequired": false,
-          "description": "Filter findings by specific CWE IDs. Example: [\"79\", \"89\"] for XSS and SQL injection."
-        },
-        {
-          "name": "violates_policy",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Filter by policy violation status. Set to true to show ONLY findings that violate policy and MUST be fixed before the scan will pass. Set to false to show findings that do not violate policy. Critical for prioritization and compliance workflows."
-        },
-        {
-          "name": "page",
           "type": "number",
           "isRequired": false,
           "validation": {
-            "min": 0
+            "min": 0,
+            "max": 5
           },
-          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0."
+          "description": "Filter findings with severity equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+        },
+        {
+          "name": "severity_gte",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 5
+          },
+          "description": "Filter findings with severity greater than or equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
         },
         {
           "name": "size",
@@ -74,19 +50,23 @@
             "min": 1,
             "max": 500
           },
-          "description": "Number of findings per page (1-500). Default is 100. Use smaller values for faster responses."
+          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
         },
         {
-          "name": "include_mitigations",
-          "type": "boolean",
+          "name": "page",
+          "type": "number",
           "isRequired": false,
-          "description": "Include mitigations (proposed/approved/rejected comments) for findings. Default is false. Mitigations represent risk-lowering measures, not complete remediation."
+          "validation": {
+            "min": 0,
+            "max": 500
+          },
+          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
         }
       ]
     },
     {
       "name": "get-static-findings",
-      "description": "Get source code vulnerabilities from STATIC analysis scans.\n\nReturns: XSS, SQL injection, crypto issues, race conditions, buffer overflows, unsafe functions\nIncludes: CWE ID, file path, line number, severity, status\nRelated: get-dynamic-findings (runtime)\n\nDisplay as table: | Flaw ID | Severity | CWE | Status | File:Line | Description |",
+      "description": "Get source code vulnerabilities from STATIC analysis scans. Calls Veracode API to retrieve real scan findings.\n\nReturns: XSS, SQL injection, crypto issues, race conditions, buffer overflows, unsafe functions\nIncludes: CWE ID, file path, line number, severity, status, policy violations\nRelated: get-dynamic-findings (runtime)\n\nDisplay as table: | Flaw ID | Severity | CWE | Status | File:Line | Description |",
       "params": [
         {
           "name": "application_path",
@@ -95,48 +75,30 @@
           "description": "Argument for the *ABSOLUTE PATH* to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-project` on linux/macOS or, on Windows `C:\\\\a\\my-project`."
         },
         {
-          "name": "sandbox",
+          "name": "app_profile",
           "type": "string",
           "isRequired": false,
-          "description": "Sandbox GUID or name to get findings from. If not specified, returns findings from policy scan (production). Use this to get findings from development/testing sandbox environments."
+          "description": "Application Profile name to get findings for. If not provided, will automatically read from .veracode-workspace.json in the application directory. The tool will lookup the application GUID by name using the Veracode API."
         },
         {
           "name": "severity",
-          "type": "array",
-          "itemType": "string",
-          "isRequired": false,
-          "allowedValues": ["Very High", "High", "Medium", "Low", "Very Low", "Informational"],
-          "description": "Filter findings by severity levels. Example: [\"Very High\", \"High\"] for critical findings only."
-        },
-        {
-          "name": "status",
-          "type": "array",
-          "itemType": "string",
-          "isRequired": false,
-          "allowedValues": ["NEW", "OPEN", "FIXED", "CANNOT_REPRODUCE", "ACCEPTED", "FALSE_POSITIVE", "MITIGATED"],
-          "description": "Filter findings by remediation status (filtered in MCP Server after API fetch - Veracode API does not support status filtering). Example: [\"NEW\", \"OPEN\"] for unresolved findings. Note: Pagination counts may be affected."
-        },
-        {
-          "name": "cwe_ids",
-          "type": "array",
-          "itemType": "string",
-          "isRequired": false,
-          "description": "Filter findings by specific CWE IDs. Example: [\"79\", \"89\"] for XSS and SQL injection."
-        },
-        {
-          "name": "violates_policy",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Filter by policy violation status. Set to true to show ONLY findings that violate policy and MUST be fixed before the scan will pass. Set to false to show findings that do not violate policy. Critical for prioritization and compliance workflows."
-        },
-        {
-          "name": "page",
           "type": "number",
           "isRequired": false,
           "validation": {
-            "min": 0
+            "min": 0,
+            "max": 5
           },
-          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0."
+          "description": "Filter findings with severity equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+        },        
+        {
+          "name": "severity_gte",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 5
+          },
+          "description": "Filter findings with severity greater than or equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
         },
         {
           "name": "size",
@@ -146,13 +108,17 @@
             "min": 1,
             "max": 500
           },
-          "description": "Number of findings per page (1-500). Default is 100. Use smaller values for faster responses."
+          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
         },
         {
-          "name": "include_mitigations",
-          "type": "boolean",
+          "name": "page",
+          "type": "number",
           "isRequired": false,
-          "description": "Include mitigations (proposed/approved/rejected comments) for findings. Default is false. Mitigations represent risk-lowering measures, not complete remediation."
+          "validation": {
+            "min": 0,
+            "max": 500
+          },
+          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
         }
       ]
     }

@@ -21,8 +21,8 @@ var _ MappedNullable = &DynamicFinding{}
 type DynamicFinding struct {
 	Cwe *StaticFindingCwe `json:"cwe,omitempty"`
 	// The CVSS associated with the finding.
-	Cvss *string `json:"cvss,omitempty"`
-	Severity *int32 `json:"severity,omitempty"`
+	Cvss     *string `json:"cvss,omitempty"`
+	Severity *int32  `json:"severity,omitempty"`
 	// URL or some input parameter.
 	AttackVector *string `json:"attack_vector,omitempty"`
 	// The hostname of the URL that contains the vulnerability.
@@ -32,7 +32,7 @@ type DynamicFinding struct {
 	// The URI path.
 	Path *string `json:"path,omitempty"`
 	// The type of attack sent.
-	Plugin *string `json:"plugin,omitempty"`
+	Plugin          *string                       `json:"plugin,omitempty"`
 	FindingCategory *StaticFindingFindingCategory `json:"finding_category,omitempty"`
 	// The URL of the location where the finding exists.
 	URL *string `json:"URL,omitempty"`
@@ -444,7 +444,7 @@ func (o *DynamicFinding) SetDiscoveredByVsa(v string) {
 }
 
 func (o DynamicFinding) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -527,5 +527,3 @@ func (v *NullableDynamicFinding) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

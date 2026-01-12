@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
 )
 
 // HealthStatus represents the result of a health check
@@ -27,7 +28,11 @@ func (c *VeracodeClient) CheckHealth(ctx context.Context) (*HealthStatus, error)
 			StatusCode: 0,
 		}, nil // Return nil error so tools can handle gracefully
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Failed to close response body: %v", closeErr)
+		}
+	}()
 
 	// Parse response
 	statusCode := resp.StatusCode

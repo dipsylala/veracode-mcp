@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
 
 	findings "github.com/dipsylala/veracodemcp-go/api/generated/findings"
 )
@@ -11,7 +12,8 @@ import (
 type FindingsRequest struct {
 	AppProfile         string   `json:"app_profile"`
 	Sandbox            string   `json:"sandbox,omitempty"`
-	Severity           []string `json:"severity,omitempty"`
+	Severity           *int32   `json:"severity,omitempty"`     // Filter for exact severity value (0-5)
+	SeverityGte        *int32   `json:"severity_gte,omitempty"` // Filter for severity >= value (0-5)
 	Status             []string `json:"status,omitempty"`
 	CWEIDs             []string `json:"cwe_ids,omitempty"`
 	ViolatesPolicy     *bool    `json:"violates_policy,omitempty"`
@@ -67,10 +69,20 @@ func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsReq
 		cweInts := make([]int32, len(req.CWEIDs))
 		for i, cwe := range req.CWEIDs {
 			var cweInt int32
-			fmt.Sscanf(cwe, "%d", &cweInt)
+			_, _ = fmt.Sscanf(cwe, "%d", &cweInt) // nolint:errcheck
 			cweInts[i] = cweInt
 		}
 		apiReq = apiReq.Cwe(cweInts)
+	}
+
+	// Add severity filter (exact match)
+	if req.Severity != nil {
+		apiReq = apiReq.Severity(*req.Severity)
+	}
+
+	// Add severity filter (greater than or equal)
+	if req.SeverityGte != nil {
+		apiReq = apiReq.SeverityGte(*req.SeverityGte)
 	}
 
 	// Add policy violation filter
@@ -80,6 +92,13 @@ func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsReq
 
 	// Call the Findings API
 	resp, httpResp, err := apiReq.Execute()
+	if httpResp != nil && httpResp.Body != nil {
+		defer func() {
+			if closeErr := httpResp.Body.Close(); closeErr != nil {
+				log.Printf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
 
 	if err != nil {
 		if httpResp != nil {
@@ -129,10 +148,20 @@ func (c *VeracodeClient) GetStaticFindings(ctx context.Context, req FindingsRequ
 		cweInts := make([]int32, len(req.CWEIDs))
 		for i, cwe := range req.CWEIDs {
 			var cweInt int32
-			fmt.Sscanf(cwe, "%d", &cweInt)
+			_, _ = fmt.Sscanf(cwe, "%d", &cweInt) // nolint:errcheck
 			cweInts[i] = cweInt
 		}
 		apiReq = apiReq.Cwe(cweInts)
+	}
+
+	// Add severity filter (exact match)
+	if req.Severity != nil {
+		apiReq = apiReq.Severity(*req.Severity)
+	}
+
+	// Add severity filter (greater than or equal)
+	if req.SeverityGte != nil {
+		apiReq = apiReq.SeverityGte(*req.SeverityGte)
 	}
 
 	// Add policy violation filter
@@ -142,6 +171,13 @@ func (c *VeracodeClient) GetStaticFindings(ctx context.Context, req FindingsRequ
 
 	// Call the Findings API
 	resp, httpResp, err := apiReq.Execute()
+	if httpResp != nil && httpResp.Body != nil {
+		defer func() {
+			if closeErr := httpResp.Body.Close(); closeErr != nil {
+				log.Printf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
 
 	if err != nil {
 		if httpResp != nil {
@@ -213,22 +249,10 @@ func convertFindings(apiFindings []findings.Finding, scanType string) []Finding 
 		}
 
 		// Extract scan-type-specific fields
-		if scanType == "STATIC" {
-			// Static findings have file paths and line numbers
-			if apiFinding.FindingDetails != nil {
-				// Extract from StaticFinding details
-				// TODO: Type assert to StaticFinding and extract FilePath, LineNumber
-				// finding.FilePath = ...
-				// finding.LineNumber = ...
-			}
-		} else if scanType == "DYNAMIC" {
-			// Dynamic findings have URLs
-			if apiFinding.FindingDetails != nil {
-				// Extract from DynamicFinding details
-				// TODO: Type assert to DynamicFinding and extract URL
-				// finding.URL = ...
-			}
-		}
+		// TODO: Properly handle the OneOfFindingFindingDetails polymorphic type
+		// Static findings should extract: finding.FilePath, finding.LineNumber
+		// Dynamic findings should extract: finding.URL
+		_ = scanType // Used for future implementation
 
 		result = append(result, finding)
 	}
@@ -241,20 +265,6 @@ func applyFilters(findings []Finding, req FindingsRequest) []Finding {
 	result := make([]Finding, 0, len(findings))
 
 	for _, finding := range findings {
-		// Filter by severity if specified
-		if len(req.Severity) > 0 {
-			matchesSeverity := false
-			for _, sev := range req.Severity {
-				if finding.Severity == sev {
-					matchesSeverity = true
-					break
-				}
-			}
-			if !matchesSeverity {
-				continue
-			}
-		}
-
 		// Filter by status if specified
 		if len(req.Status) > 0 {
 			matchesStatus := false

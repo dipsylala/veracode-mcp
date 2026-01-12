@@ -61,7 +61,7 @@ func GetCredentials() (apiID, apiSecret, baseURL string, err error) {
 
 // readConfigFile reads and parses the veracode.yml configuration file
 func readConfigFile(path string) (string, string, string, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) // nolint:gosec // Intentional file read from user config
 	if err != nil {
 		return "", "", "", err
 	}

@@ -20,7 +20,7 @@ var _ MappedNullable = &BusinessOwner{}
 // BusinessOwner struct for BusinessOwner
 type BusinessOwner struct {
 	Email *string `json:"email,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Name  *string `json:"name,omitempty"`
 }
 
 // NewBusinessOwner instantiates a new BusinessOwner object
@@ -105,7 +105,7 @@ func (o *BusinessOwner) SetName(v string) {
 }
 
 func (o BusinessOwner) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -158,5 +158,3 @@ func (v *NullableBusinessOwner) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -2,8 +2,12 @@ package tools
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+
+	"github.com/dipsylala/veracodemcp-go/api"
+	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
 // Auto-register this tool when the package is imported
@@ -57,61 +61,253 @@ func (t *StaticFindingsTool) Shutdown() error {
 	return nil
 }
 
+// StaticFindingsRequest represents the parsed parameters for get-static-findings
+type StaticFindingsRequest struct {
+	ApplicationPath string `json:"application_path"`
+	AppProfile      string `json:"app_profile,omitempty"`
+	Sandbox         string `json:"sandbox,omitempty"`
+	Size            int    `json:"size,omitempty"`
+	Page            int    `json:"page,omitempty"`
+	Severity        *int32 `json:"severity,omitempty"`
+	SeverityGte     *int32 `json:"severity_gte,omitempty"`
+}
+
+// parseStaticFindingsRequest extracts and validates parameters from the raw args map
+func parseStaticFindingsRequest(args map[string]interface{}) (*StaticFindingsRequest, error) {
+	// Set defaults
+	req := &StaticFindingsRequest{
+		Size: 50,
+		Page: 0,
+	}
+
+	// Use JSON marshaling to automatically map args to struct
+	jsonData, err := json.Marshal(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal arguments: %w", err)
+	}
+
+	if err := json.Unmarshal(jsonData, req); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal arguments: %w", err)
+	}
+
+	// Validate required fields
+	if req.ApplicationPath == "" {
+		return nil, fmt.Errorf("application_path is required and must be an absolute path")
+	}
+
+	return req, nil
+}
+
 func (t *StaticFindingsTool) handleGetStaticFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
-	// Extract application_path (required)
-	appPath, ok := args["application_path"].(string)
-	if !ok || appPath == "" {
+	// Parse and validate request parameters
+	req, err := parseStaticFindingsRequest(args)
+	if err != nil {
 		return map[string]interface{}{
-			"error": "application_path is required and must be an absolute path",
+			"error": err.Error(),
 		}, nil
 	}
 
-	// Extract optional parameters
-	appProfile, _ := args["app_profile"].(string)
-	sandbox, _ := args["sandbox"].(string)
+	// Step 1: Retrieve application profile name
+	appProfile := req.AppProfile
+	hasAppProfile := appProfile != ""
+	if !hasAppProfile {
+		// Fall back to workspace config if app_profile not provided
+		appProfile, err = workspace.FindWorkspaceConfig(req.ApplicationPath)
+		if err != nil {
+			return map[string]interface{}{
+				"error": fmt.Sprintf("Failed to find workspace configuration: %v", err),
+			}, nil
+		}
+	}
 
-	// Build response
+	// Step 2: Create API client
+	client, err := api.NewVeracodeClient()
+	if err != nil {
+		responseText := fmt.Sprintf(`Static Findings Analysis - Error
+========================
+
+Application Path: %s
+App Profile: %s
+Error: Failed to create API client
+
+%v
+
+Please ensure VERACODE_API_ID and VERACODE_API_KEY environment variables are set with valid credentials.`,
+			req.ApplicationPath,
+			appProfile,
+			err,
+		)
+
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": responseText,
+			}},
+		}, nil
+	}
+
+	// Step 3: Get application GUID using the profile name
+	application, err := client.GetApplicationByName(ctx, appProfile)
+	if err != nil {
+		appProfileSource := "from workspace config"
+		if hasAppProfile {
+			appProfileSource = "from parameter (overriding workspace)"
+		}
+
+		responseText := fmt.Sprintf(`Static Findings Analysis - Error
+========================
+
+Application Path: %s
+App Profile: %s (%s)
+Error: Failed to lookup application
+
+%v
+
+Please verify:
+- The application name exists in Veracode platform
+- API credentials have sufficient permissions
+- The application name matches exactly (case-insensitive)`,
+			req.ApplicationPath,
+			appProfile,
+			appProfileSource,
+			err,
+		)
+
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": responseText,
+			}},
+		}, nil
+	}
+
+	applicationGUID := "unknown"
+	if application.Guid != nil {
+		applicationGUID = *application.Guid
+	}
+
+	// Step 4: Build the findings request
+	findingsReq := api.FindingsRequest{
+		AppProfile:  applicationGUID,
+		Sandbox:     req.Sandbox,
+		Size:        req.Size,
+		Page:        req.Page,
+		Severity:    req.Severity,
+		SeverityGte: req.SeverityGte,
+	}
+
+	// Step 5: Call the API to get static findings
+	findingsResp, err := client.GetStaticFindings(ctx, findingsReq)
+	if err != nil {
+		responseText := fmt.Sprintf(`Static Findings Analysis - Error
+========================
+
+Application Path: %s
+App Profile: %s
+Application GUID: %s
+Error: Failed to retrieve static findings
+
+%v
+
+Please verify:
+- The application has been scanned
+- API credentials have access to view findings
+- The sandbox name is correct (if specified)`,
+			req.ApplicationPath,
+			appProfile,
+			applicationGUID,
+			err,
+		)
+
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": responseText,
+			}},
+		}, nil
+	}
+
+	// Step 6: Format and return the response
+	return formatStaticFindingsResponse(req.ApplicationPath, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
+}
+
+// formatStaticFindingsResponse formats the findings API response into an MCP tool response
+func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+	if findings == nil || len(findings.Findings) == 0 {
+		responseText := fmt.Sprintf(`Static Findings Analysis
+========================
+
+Application Path: %s
+App Profile: %s
+Application GUID: %s
+Sandbox: %s
+
+Status: ✓ No static findings found
+
+The application has been scanned and no security vulnerabilities were detected in the source code.`,
+			appPath,
+			appProfile,
+			applicationGUID,
+			valueOrDefault(sandbox, "policy scan (production)"),
+		)
+
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": responseText,
+			}},
+		}
+	}
+
+	// Build findings summary
 	responseText := fmt.Sprintf(`Static Findings Analysis
 ========================
 
 Application Path: %s
 App Profile: %s
+Application GUID: %s
 Sandbox: %s
 
-Status: Ready to scan for source code vulnerabilities
+Total Findings: %d (showing %d)
 
-This tool would:
-1. Validate the application path exists
-2. Check for .veracode-workspace.json in the directory
-3. Connect to Veracode API using credentials
-4. Fetch STATIC scan findings for the application
-5. Filter by: %v
-6. Return findings with file paths and line numbers
-7. Generate clickable VS Code links for each finding
-
-Finding types detected:
-- XSS (Cross-site Scripting)
-- SQL Injection
-- Cryptographic Issues
-- Race Conditions
-- Buffer Overflows
-- Unsafe Function Usage
-
-Next steps:
-- Implement Veracode API client
-- Add authentication handling
-- Process and transform findings
-- Generate workspace file links`,
+`,
 		appPath,
-		valueOrDefault(appProfile, "auto-detect from workspace"),
+		appProfile,
+		applicationGUID,
 		valueOrDefault(sandbox, "policy scan (production)"),
-		args,
+		findings.TotalCount,
+		len(findings.Findings),
 	)
+
+	// Add individual findings
+	for i, finding := range findings.Findings {
+		responseText += fmt.Sprintf("Finding #%d\n", i+1)
+		responseText += "-----------\n"
+		responseText += fmt.Sprintf("ID: %s\n", finding.ID)
+		responseText += fmt.Sprintf("Severity: %s\n", finding.Severity)
+		responseText += fmt.Sprintf("CWE: %s\n", finding.CWE)
+		responseText += fmt.Sprintf("Status: %s\n", finding.Status)
+		responseText += fmt.Sprintf("Description: %s\n", finding.Description)
+
+		if finding.FilePath != "" {
+			responseText += fmt.Sprintf("File: %s", finding.FilePath)
+			if finding.LineNumber > 0 {
+				responseText += fmt.Sprintf(":%d", finding.LineNumber)
+			}
+			responseText += "\n"
+		}
+
+		if finding.ViolatesPolicy {
+			responseText += "⚠️  VIOLATES POLICY\n"
+		}
+
+		responseText += "\n"
+	}
 
 	return map[string]interface{}{
 		"content": []map[string]string{{
 			"type": "text",
 			"text": responseText,
 		}},
-	}, nil
+	}
 }
