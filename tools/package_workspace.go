@@ -219,9 +219,10 @@ veracode %s
 
 	// Customize next steps for packaging context
 	nextSteps := cliInfo.NextSteps
-	if exitCode == 0 {
+	switch exitCode {
+	case 0:
 		nextSteps = fmt.Sprintf("Next steps:\n- Review packaging results in: %s\n- Upload the packaged artifact to Veracode\n- Submit for security scanning", outputDir)
-	} else if exitCode == 3 {
+	case 3:
 		nextSteps = fmt.Sprintf("Next steps:\n- Review packaging results in: %s\n- Check policy violations\n- Address policy issues before submission", outputDir)
 	}
 
