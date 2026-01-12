@@ -207,69 +207,107 @@ func convertToCallToolResult(result interface{}) *CallToolResult {
 		return ctr
 	}
 
-	// If it's a map, look for common response patterns
+	// If it's a map, try to convert it
 	if resultMap, ok := result.(map[string]interface{}); ok {
-		// Check for error field
-		if errMsg, hasErr := resultMap["error"]; hasErr {
-			return &CallToolResult{
-				Content: []Content{{Type: "text", Text: fmt.Sprintf("%v", errMsg)}},
-				IsError: true,
-			}
-		}
-
-		// Check for content field
-		if content, hasContent := resultMap["content"]; hasContent {
-			// Try []map[string]interface{} first (for resources)
-			if contentList, ok := content.([]map[string]interface{}); ok {
-				contents := make([]Content, len(contentList))
-				for i, c := range contentList {
-					cont := Content{}
-					if typ, ok := c["type"].(string); ok {
-						cont.Type = typ
-					}
-					if text, ok := c["text"].(string); ok {
-						cont.Text = text
-					}
-					// Handle resource field
-					if resource, ok := c["resource"].(map[string]interface{}); ok {
-						cont.Resource = &ResourceContents{}
-						if uri, ok := resource["uri"].(string); ok {
-							cont.Resource.URI = uri
-						}
-						if mimeType, ok := resource["mimeType"].(string); ok {
-							cont.Resource.MimeType = mimeType
-						}
-						if text, ok := resource["text"].(string); ok {
-							cont.Resource.Text = text
-						}
-					}
-					contents[i] = cont
-				}
-				return &CallToolResult{Content: contents}
-			}
-
-			// Fallback to []map[string]string (for simple text content)
-			if contentList, ok := content.([]map[string]string); ok {
-				contents := make([]Content, len(contentList))
-				for i, c := range contentList {
-					contents[i] = Content{
-						Type: c["type"],
-						Text: c["text"],
-					}
-				}
-				return &CallToolResult{Content: contents}
-			}
-		}
-
-		// If we have text field, use it
-		if text, ok := resultMap["text"].(string); ok {
-			return &CallToolResult{
-				Content: []Content{{Type: "text", Text: text}},
-			}
-		}
+		return convertMapToCallToolResult(resultMap)
 	}
 
 	// Default: convert result to JSON string
+	return marshalResultAsJSON(result)
+}
+
+// convertMapToCallToolResult handles map[string]interface{} results
+func convertMapToCallToolResult(resultMap map[string]interface{}) *CallToolResult {
+	// Check for error field
+	if errMsg, hasErr := resultMap["error"]; hasErr {
+		return &CallToolResult{
+			Content: []Content{{Type: "text", Text: fmt.Sprintf("%v", errMsg)}},
+			IsError: true,
+		}
+	}
+
+	// Check for content field
+	if content, hasContent := resultMap["content"]; hasContent {
+		if contents := convertContentField(content); contents != nil {
+			return &CallToolResult{Content: contents}
+		}
+	}
+
+	// If we have text field, use it
+	if text, ok := resultMap["text"].(string); ok {
+		return &CallToolResult{
+			Content: []Content{{Type: "text", Text: text}},
+		}
+	}
+
+	// Fallback to JSON
+	return marshalResultAsJSON(resultMap)
+}
+
+// convertContentField converts various content field formats to []Content
+func convertContentField(content interface{}) []Content {
+	// Try []map[string]interface{} first (for resources)
+	if contentList, ok := content.([]map[string]interface{}); ok {
+		return convertDetailedContentList(contentList)
+	}
+
+	// Fallback to []map[string]string (for simple text content)
+	if contentList, ok := content.([]map[string]string); ok {
+		return convertSimpleContentList(contentList)
+	}
+
+	return nil
+}
+
+// convertDetailedContentList converts []map[string]interface{} to []Content
+func convertDetailedContentList(contentList []map[string]interface{}) []Content {
+	contents := make([]Content, len(contentList))
+	for i, c := range contentList {
+		cont := Content{}
+		if typ, ok := c["type"].(string); ok {
+			cont.Type = typ
+		}
+		if text, ok := c["text"].(string); ok {
+			cont.Text = text
+		}
+		// Handle resource field
+		if resource, ok := c["resource"].(map[string]interface{}); ok {
+			cont.Resource = convertResourceField(resource)
+		}
+		contents[i] = cont
+	}
+	return contents
+}
+
+// convertResourceField converts a resource map to ResourceContents
+func convertResourceField(resource map[string]interface{}) *ResourceContents {
+	rc := &ResourceContents{}
+	if uri, ok := resource["uri"].(string); ok {
+		rc.URI = uri
+	}
+	if mimeType, ok := resource["mimeType"].(string); ok {
+		rc.MimeType = mimeType
+	}
+	if text, ok := resource["text"].(string); ok {
+		rc.Text = text
+	}
+	return rc
+}
+
+// convertSimpleContentList converts []map[string]string to []Content
+func convertSimpleContentList(contentList []map[string]string) []Content {
+	contents := make([]Content, len(contentList))
+	for i, c := range contentList {
+		contents[i] = Content{
+			Type: c["type"],
+			Text: c["text"],
+		}
+	}
+	return contents
+}
+
+// marshalResultAsJSON converts any result to JSON string format
+func marshalResultAsJSON(result interface{}) *CallToolResult {
 	jsonBytes, err := json.Marshal(result)
 	if err != nil {
 		log.Printf("Failed to marshal result: %v", err)

@@ -24,6 +24,17 @@ func TestStaticFindings_DebugRawResponse(t *testing.T) {
 		t.Skipf("Skipping test: %v", err)
 	}
 
+	// Make authenticated API request
+	bodyBytes := makeAuthenticatedRequest(t, apiID, apiSecret, baseURL)
+
+	// Save and log responses
+	saveAndLogResponses(t, bodyBytes)
+
+	// Parse and analyze findings structure
+	analyzeEmbeddedFindings(t, bodyBytes)
+}
+
+func makeAuthenticatedRequest(t *testing.T, apiID, apiSecret, baseURL string) []byte {
 	// Construct the URL manually
 	url := baseURL + "/appsec/v2/applications/" + testAppID + "/findings?scan_type=STATIC&size=1"
 
@@ -65,6 +76,10 @@ func TestStaticFindings_DebugRawResponse(t *testing.T) {
 		t.Fatalf("Failed to read response body: %v", err)
 	}
 
+	return bodyBytes
+}
+
+func saveAndLogResponses(t *testing.T, bodyBytes []byte) {
 	// Write raw response to file
 	rawOutputFile := "findings_api_response_raw.json"
 	if err := os.WriteFile(rawOutputFile, bodyBytes, 0644); err != nil {
@@ -94,7 +109,9 @@ func TestStaticFindings_DebugRawResponse(t *testing.T) {
 		t.Logf("%s", string(prettyBytes))
 		t.Logf("=== END PRETTY JSON ===\n")
 	}
+}
 
+func analyzeEmbeddedFindings(t *testing.T, bodyBytes []byte) {
 	// Parse to see the structure
 	var response map[string]interface{}
 	if err := json.Unmarshal(bodyBytes, &response); err != nil {
@@ -102,30 +119,45 @@ func TestStaticFindings_DebugRawResponse(t *testing.T) {
 	}
 
 	// Look for embedded findings
-	if embedded, ok := response["_embedded"].(map[string]interface{}); ok {
-		if findings, ok := embedded["findings"].([]interface{}); ok {
-			t.Logf("Found %d findings", len(findings))
-			if len(findings) > 0 {
-				firstFinding := findings[0].(map[string]interface{})
-				t.Logf("\n=== FIRST FINDING ===")
-				firstFindingBytes, _ := json.MarshalIndent(firstFinding, "", "  ")
-				t.Logf("%s", string(firstFindingBytes))
-				t.Logf("=== END FIRST FINDING ===\n")
+	embedded, ok := response["_embedded"].(map[string]interface{})
+	if !ok {
+		return
+	}
 
-				// Check for finding_details field
-				if details, ok := firstFinding["finding_details"].(map[string]interface{}); ok {
-					t.Logf("\n=== FINDING_DETAILS ===")
-					detailsBytes, _ := json.MarshalIndent(details, "", "  ")
-					t.Logf("%s", string(detailsBytes))
-					t.Logf("=== END FINDING_DETAILS ===\n")
+	findings, ok := embedded["findings"].([]interface{})
+	if !ok {
+		return
+	}
 
-					// Log all field names in finding_details
-					t.Logf("Fields in finding_details:")
-					for k := range details {
-						t.Logf("  - %s", k)
-					}
-				}
-			}
-		}
+	t.Logf("Found %d findings", len(findings))
+	if len(findings) == 0 {
+		return
+	}
+
+	logFirstFindingDetails(t, findings[0])
+}
+
+func logFirstFindingDetails(t *testing.T, finding interface{}) {
+	firstFinding := finding.(map[string]interface{})
+	t.Logf("\n=== FIRST FINDING ===")
+	firstFindingBytes, _ := json.MarshalIndent(firstFinding, "", "  ")
+	t.Logf("%s", string(firstFindingBytes))
+	t.Logf("=== END FIRST FINDING ===\n")
+
+	// Check for finding_details field
+	details, ok := firstFinding["finding_details"].(map[string]interface{})
+	if !ok {
+		return
+	}
+
+	t.Logf("\n=== FINDING_DETAILS ===")
+	detailsBytes, _ := json.MarshalIndent(details, "", "  ")
+	t.Logf("%s", string(detailsBytes))
+	t.Logf("=== END FINDING_DETAILS ===\n")
+
+	// Log all field names in finding_details
+	t.Logf("Fields in finding_details:")
+	for k := range details {
+		t.Logf("  - %s", k)
 	}
 }

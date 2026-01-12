@@ -289,56 +289,9 @@ func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox 
 	// Process each finding
 	if findings != nil && len(findings.Findings) > 0 {
 		for _, finding := range findings.Findings {
-			// Transform severity
-			var severityNum int32
-			if finding.Severity != "" {
-				_, _ = fmt.Sscanf(finding.Severity, "%d", &severityNum)
-			}
-			transformedSeverity := TransformSeverity(&severityNum)
-
-			// Clean and extract references from description
-			cleanedDesc, references := TransformDescription(finding.Description, "STATIC")
-
-			mcpFinding := MCPFinding{
-				FlawID:           finding.ID,
-				ScanType:         "STATIC",
-				Status:           finding.Status,
-				MitigationStatus: "NONE", // TODO: Extract from API when available
-				ViolatesPolicy:   finding.ViolatesPolicy,
-				Severity:         string(transformedSeverity),
-				SeverityScore:    severityNum,
-				WeaknessType:     finding.CWE,
-				WeaknessName:     finding.CWE, // TODO: Map CWE to name
-				Description:      cleanedDesc,
-				References:       references,
-				FilePath:         finding.FilePath,
-				LineNumber:       finding.LineNumber,
-			}
-
+			mcpFinding := processStaticFinding(finding)
 			response.Findings = append(response.Findings, mcpFinding)
-
-			// Update summary counts
-			response.Summary.TotalFindings++
-			if finding.Status == "OPEN" || finding.Status == "NEW" {
-				response.Summary.OpenFindings++
-			}
-			if finding.ViolatesPolicy {
-				response.Summary.PolicyViolations++
-			}
-
-			// Count by severity
-			severityKey := strings.ToLower(string(transformedSeverity))
-			response.Summary.BySeverity[severityKey]++
-
-			// Count by scan type
-			response.Summary.ByScanType["static"]++
-
-			// Count by status
-			statusKey := strings.ToLower(finding.Status)
-			if statusKey == "new" {
-				statusKey = "open"
-			}
-			response.Summary.ByStatus[statusKey]++
+			updateStaticSummaryCounters(&response.Summary, mcpFinding)
 		}
 	}
 
@@ -365,4 +318,60 @@ func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox 
 			},
 		}},
 	}
+}
+
+// processStaticFinding transforms a single API finding into an MCP finding
+func processStaticFinding(finding api.Finding) MCPFinding {
+	// Transform severity
+	var severityNum int32
+	if finding.Severity != "" {
+		_, _ = fmt.Sscanf(finding.Severity, "%d", &severityNum)
+	}
+	transformedSeverity := TransformSeverity(&severityNum)
+
+	// Clean and extract references from description
+	cleanedDesc, references := TransformDescription(finding.Description, "STATIC")
+
+	return MCPFinding{
+		FlawID:           finding.ID,
+		ScanType:         "STATIC",
+		Status:           finding.Status,
+		MitigationStatus: "NONE", // TODO: Extract from API when available
+		ViolatesPolicy:   finding.ViolatesPolicy,
+		Severity:         string(transformedSeverity),
+		SeverityScore:    severityNum,
+		WeaknessType:     finding.CWE,
+		WeaknessName:     finding.CWE, // TODO: Map CWE to name
+		Description:      cleanedDesc,
+		References:       references,
+		FilePath:         finding.FilePath,
+		LineNumber:       finding.LineNumber,
+	}
+}
+
+// updateStaticSummaryCounters updates the response summary based on a static finding
+func updateStaticSummaryCounters(summary *MCPFindingsSummary, finding MCPFinding) {
+	summary.TotalFindings++
+
+	if finding.Status == "OPEN" || finding.Status == "NEW" {
+		summary.OpenFindings++
+	}
+
+	if finding.ViolatesPolicy {
+		summary.PolicyViolations++
+	}
+
+	// Count by severity
+	severityKey := strings.ToLower(finding.Severity)
+	summary.BySeverity[severityKey]++
+
+	// Count by scan type
+	summary.ByScanType["static"]++
+
+	// Count by status
+	statusKey := strings.ToLower(finding.Status)
+	if statusKey == "new" {
+		statusKey = "open"
+	}
+	summary.ByStatus[statusKey]++
 }

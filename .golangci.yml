@@ -31,6 +31,7 @@ linters:
     - unconvert     # Removes unnecessary type conversions
     # - unparam       # Finds unused function parameters (disabled - too noisy)
     # - dupl          # Finds code duplication (disabled)
+    - gocyclo       # Finds complex functions
     
     # Performance
     - prealloc      # Finds slice declarations with non-zero initial length
@@ -79,6 +80,9 @@ linters-settings:
     
   dupl:
     threshold: 100
+    
+  gocyclo:
+    min-complexity: 15  # Default is 30, lowering for better code quality
     
   misspell:
     locale: US

@@ -121,6 +121,30 @@
           "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
         }
       ]
+    },
+    {
+      "name": "package-workspace",
+      "description": "Package the current workspace for Veracode security scanning.",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "Argument for the *ABSOLUTE PATH* to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-project` on linux/macOS or, on Windows `C:\\\\a\\my-project`."
+        },
+        {
+          "name": "verbose",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Enable verbose/debug output from Veracode CLI. Creates a timestamped log file with detailed output."
+        },
+        {
+          "name": "logToFile",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Write detailed output to a log file in ./.veracode-packaging"
+        }
+      ]
     }
   ]
 }

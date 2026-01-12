@@ -290,115 +290,9 @@ func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, 
 	// Process each finding
 	if findings != nil && len(findings.Findings) > 0 {
 		for _, finding := range findings.Findings {
-			// Transform severity
-			var severityNum int32
-			if finding.Severity != "" {
-				_, _ = fmt.Sscanf(finding.Severity, "%d", &severityNum)
-			}
-			transformedSeverity := TransformSeverity(&severityNum)
-
-			// Transform status (OPEN/CLOSED/UNKNOWN)
-			// Create a minimal FindingStatus for transformation
-			// Note: The API simplified Finding doesn't include full FindingStatus,
-			// so we work with the status string directly
-			status := finding.Status
-			if status == "" {
-				status = "OPEN" // Default
-			}
-
-			// Normalize status
-			var transformedStatus FindingStatus
-			switch strings.ToUpper(status) {
-			case "OPEN", "NEW":
-				transformedStatus = StatusOpen
-			case "CLOSED":
-				transformedStatus = StatusClosed
-			default:
-				transformedStatus = StatusUnknown
-			}
-
-			// Extract mitigation status from mitigations if available
-			mitigationStatus := MitigationNone
-			if len(finding.Mitigations) > 0 {
-				// Get the latest mitigation status
-				latestStatus := strings.ToUpper(finding.Mitigations[len(finding.Mitigations)-1].Status)
-				switch latestStatus {
-				case "PROPOSED":
-					mitigationStatus = MitigationProposed
-				case "APPROVED":
-					mitigationStatus = MitigationApproved
-				case "REJECTED":
-					mitigationStatus = MitigationRejected
-				default:
-					mitigationStatus = MitigationNone
-				}
-			}
-
-			// Determine policy violation using business rule:
-			// Only CLOSED + APPROVED findings don't violate policy
-			violatesPolicyValue := finding.ViolatesPolicy
-			violatesPolicy := DeterminesPolicyViolation(
-				transformedStatus,
-				mitigationStatus,
-				&violatesPolicyValue,
-			)
-
-			// Clean and extract references from description (DAST may have base64)
-			cleanedDesc, references := TransformDescription(finding.Description, "DAST")
-
-			// Parse CWE for weakness type/name
-			var cweID int32
-			weaknessType := finding.CWE
-			weaknessName := finding.CWE
-			if finding.CWE != "" {
-				// Try to extract numeric CWE ID
-				if strings.HasPrefix(strings.ToUpper(finding.CWE), "CWE-") {
-					_, _ = fmt.Sscanf(finding.CWE, "CWE-%d", &cweID)
-					weaknessType = TransformWeaknessType(&cweID)
-				}
-				// TODO: Map CWE ID to name using a lookup table
-			}
-
-			mcpFinding := MCPFinding{
-				FlawID:           finding.ID,
-				ScanType:         "DAST",
-				Status:           string(transformedStatus),
-				MitigationStatus: string(mitigationStatus),
-				ViolatesPolicy:   violatesPolicy,
-				Severity:         string(transformedSeverity),
-				SeverityScore:    severityNum,
-				WeaknessType:     weaknessType,
-				WeaknessName:     weaknessName,
-				Description:      cleanedDesc,
-				References:       references,
-				URL:              finding.URL,
-			}
-
+			mcpFinding := processDynamicFinding(finding)
 			response.Findings = append(response.Findings, mcpFinding)
-
-			// Update summary counts
-			response.Summary.TotalFindings++
-			if transformedStatus == StatusOpen {
-				response.Summary.OpenFindings++
-			}
-			if violatesPolicy {
-				response.Summary.PolicyViolations++
-			}
-
-			// Count by severity
-			severityKey := strings.ToLower(string(transformedSeverity))
-			response.Summary.BySeverity[severityKey]++
-
-			// Count by scan type
-			response.Summary.ByScanType["dast"]++
-
-			// Count by status
-			statusKey := strings.ToLower(string(transformedStatus))
-			response.Summary.ByStatus[statusKey]++
-
-			// Count by mitigation status
-			mitigationKey := strings.ToLower(string(mitigationStatus))
-			response.Summary.ByMitigation[mitigationKey]++
+			updateSummaryCounters(&response.Summary, mcpFinding)
 		}
 	}
 
@@ -425,4 +319,113 @@ func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, 
 			},
 		}},
 	}
+}
+
+// processDynamicFinding transforms a single API finding into an MCP finding
+func processDynamicFinding(finding api.Finding) MCPFinding {
+	// Transform severity
+	var severityNum int32
+	if finding.Severity != "" {
+		_, _ = fmt.Sscanf(finding.Severity, "%d", &severityNum)
+	}
+	transformedSeverity := TransformSeverity(&severityNum)
+
+	// Transform status (OPEN/CLOSED/UNKNOWN)
+	status := finding.Status
+	if status == "" {
+		status = "OPEN" // Default
+	}
+
+	// Normalize status
+	var transformedStatus FindingStatus
+	switch strings.ToUpper(status) {
+	case "OPEN", "NEW":
+		transformedStatus = StatusOpen
+	case "CLOSED":
+		transformedStatus = StatusClosed
+	default:
+		transformedStatus = StatusUnknown
+	}
+
+	// Extract mitigation status from mitigations if available
+	mitigationStatus := MitigationNone
+	if len(finding.Mitigations) > 0 {
+		// Get the latest mitigation status
+		latestStatus := strings.ToUpper(finding.Mitigations[len(finding.Mitigations)-1].Status)
+		switch latestStatus {
+		case "PROPOSED":
+			mitigationStatus = MitigationProposed
+		case "APPROVED":
+			mitigationStatus = MitigationApproved
+		case "REJECTED":
+			mitigationStatus = MitigationRejected
+		default:
+			mitigationStatus = MitigationNone
+		}
+	}
+
+	// Determine policy violation using business rule
+	violatesPolicyValue := finding.ViolatesPolicy
+	violatesPolicy := DeterminesPolicyViolation(
+		transformedStatus,
+		mitigationStatus,
+		&violatesPolicyValue,
+	)
+
+	// Clean and extract references from description
+	cleanedDesc, references := TransformDescription(finding.Description, "DAST")
+
+	// Parse CWE for weakness type/name
+	var cweID int32
+	weaknessType := finding.CWE
+	weaknessName := finding.CWE
+	if finding.CWE != "" {
+		if strings.HasPrefix(strings.ToUpper(finding.CWE), "CWE-") {
+			_, _ = fmt.Sscanf(finding.CWE, "CWE-%d", &cweID)
+			weaknessType = TransformWeaknessType(&cweID)
+		}
+	}
+
+	return MCPFinding{
+		FlawID:           finding.ID,
+		ScanType:         "DAST",
+		Status:           string(transformedStatus),
+		MitigationStatus: string(mitigationStatus),
+		ViolatesPolicy:   violatesPolicy,
+		Severity:         string(transformedSeverity),
+		SeverityScore:    severityNum,
+		WeaknessType:     weaknessType,
+		WeaknessName:     weaknessName,
+		Description:      cleanedDesc,
+		References:       references,
+		URL:              finding.URL,
+	}
+}
+
+// updateSummaryCounters updates the response summary based on a finding
+func updateSummaryCounters(summary *MCPFindingsSummary, finding MCPFinding) {
+	summary.TotalFindings++
+
+	if finding.Status == string(StatusOpen) {
+		summary.OpenFindings++
+	}
+
+	if finding.ViolatesPolicy {
+		summary.PolicyViolations++
+	}
+
+	// Count by severity
+	severityKey := strings.ToLower(finding.Severity)
+	summary.BySeverity[severityKey]++
+
+	// Count by scan type
+	summary.ByScanType["dast"]++
+
+	// Count by status
+	statusKey := strings.ToLower(finding.Status)
+	summary.ByStatus[statusKey]++
+
+	// Count by mitigation status
+	mitigationKey := strings.ToLower(finding.MitigationStatus)
+	summary.ByMitigation[mitigationKey]++
 }

@@ -282,23 +282,31 @@ func TestMCPToolCall_DynamicFindings(t *testing.T) {
 		t.Fatalf("get-dynamic-findings tool call returned error: %v", resp.Error)
 	}
 
-	// Parse the result
-	resultJSON, _ := json.Marshal(resp.Result)
+	// Parse and validate the response
+	callResult := parseToolCallResult(t, resp.Result)
+	responseText := extractResponseText(t, callResult)
+	validateFindingsResponse(t, responseText)
+}
+
+func parseToolCallResult(t *testing.T, result interface{}) CallToolResult {
+	resultJSON, _ := json.Marshal(result)
 	var callResult CallToolResult
 	if err := json.Unmarshal(resultJSON, &callResult); err != nil {
 		t.Fatalf("Failed to parse tool call result: %v", err)
 	}
 
-	// Verify response
 	if callResult.IsError {
 		t.Errorf("Tool call returned error: %s", callResult.Content[0].Text)
 	}
 
 	if len(callResult.Content) == 0 {
-		t.Fatal("No content returned from get-dynamic-findings")
+		t.Fatal("No content returned from tool")
 	}
 
-	// Get the JSON text from the resource
+	return callResult
+}
+
+func extractResponseText(t *testing.T, callResult CallToolResult) string {
 	var responseText string
 	if callResult.Content[0].Resource != nil {
 		responseText = callResult.Content[0].Resource.Text
@@ -306,13 +314,17 @@ func TestMCPToolCall_DynamicFindings(t *testing.T) {
 		responseText = callResult.Content[0].Text
 	}
 
-	t.Logf("Dynamic Findings Response (first 500 chars): %s", truncate(responseText, 500))
+	t.Logf("Findings Response (first 500 chars): %s", truncate(responseText, 500))
 
 	// Check if response is the graceful fallback (when credentials are invalid)
 	if len(responseText) > 0 && (responseText[0] != '{' && responseText[0] != '[') {
 		t.Skip("Skipping test - received fallback response (credentials may be invalid)")
 	}
 
+	return responseText
+}
+
+func validateFindingsResponse(t *testing.T, responseText string) {
 	// Response should be JSON with MCPFindingsResponse structure
 	var findingsData map[string]interface{}
 	if err := json.Unmarshal([]byte(responseText), &findingsData); err != nil {
@@ -381,37 +393,14 @@ func TestMCPToolCall_StaticFindings(t *testing.T) {
 		t.Fatalf("get-static-findings tool call returned error: %v", resp.Error)
 	}
 
-	// Parse the result
-	resultJSON, _ := json.Marshal(resp.Result)
-	var callResult CallToolResult
-	if err := json.Unmarshal(resultJSON, &callResult); err != nil {
-		t.Fatalf("Failed to parse tool call result: %v", err)
-	}
+	// Parse and validate the response
+	callResult := parseToolCallResult(t, resp.Result)
+	responseText := extractResponseText(t, callResult)
+	findingsData := parseStaticFindingsResponse(t, responseText)
+	verifyStaticFindingStructure(t, findingsData)
+}
 
-	// Verify response
-	if callResult.IsError {
-		t.Errorf("Tool call returned error: %s", callResult.Content[0].Text)
-	}
-
-	if len(callResult.Content) == 0 {
-		t.Fatal("No content returned from get-static-findings")
-	}
-
-	// Get the JSON text from the resource
-	var responseText string
-	if callResult.Content[0].Resource != nil {
-		responseText = callResult.Content[0].Resource.Text
-	} else {
-		responseText = callResult.Content[0].Text
-	}
-
-	t.Logf("Static Findings Response (first 500 chars): %s", truncate(responseText, 500))
-
-	// Check if response is the graceful fallback (when credentials are invalid)
-	if len(responseText) > 0 && (responseText[0] != '{' && responseText[0] != '[') {
-		t.Skip("Skipping test - received fallback response (credentials may be invalid)")
-	}
-
+func parseStaticFindingsResponse(t *testing.T, responseText string) map[string]interface{} {
 	// Response should be JSON with MCPFindingsResponse structure
 	var findingsData map[string]interface{}
 	if err := json.Unmarshal([]byte(responseText), &findingsData); err != nil {
@@ -431,38 +420,47 @@ func TestMCPToolCall_StaticFindings(t *testing.T) {
 		t.Error("Response should contain 'summary' field")
 	}
 
+	return findingsData
+}
+
+func verifyStaticFindingStructure(t *testing.T, findingsData map[string]interface{}) {
 	// Check findings structure
-	if findings, ok := findingsData["findings"].([]interface{}); ok {
-		t.Logf("Retrieved %d static findings", len(findings))
+	findings, ok := findingsData["findings"].([]interface{})
+	if !ok {
+		return
+	}
 
-		// Verify findings have expected MCPFinding structure
-		if len(findings) > 0 {
-			finding := findings[0].(map[string]interface{})
+	t.Logf("Retrieved %d static findings", len(findings))
 
-			// Check for key MCPFinding fields
-			if _, hasFlawID := finding["flaw_id"]; !hasFlawID {
-				t.Error("Finding should have 'flaw_id' field")
-			}
+	// Verify findings have expected MCPFinding structure
+	if len(findings) == 0 {
+		return
+	}
 
-			if _, hasSeverity := finding["severity"]; !hasSeverity {
-				t.Error("Finding should have 'severity' field")
-			}
+	finding := findings[0].(map[string]interface{})
 
-			if _, hasScanType := finding["scan_type"]; !hasScanType {
-				t.Error("Finding should have 'scan_type' field")
-			}
+	// Check for key MCPFinding fields
+	if _, hasFlawID := finding["flaw_id"]; !hasFlawID {
+		t.Error("Finding should have 'flaw_id' field")
+	}
 
-			if severity, ok := finding["severity"]; ok {
-				t.Logf("Severity: %v", severity)
-			}
+	if _, hasSeverity := finding["severity"]; !hasSeverity {
+		t.Error("Finding should have 'severity' field")
+	}
 
-			if severityScore, ok := finding["severity_score"]; ok {
-				t.Logf("Severity score type: %T, value: %v", severityScore, severityScore)
-				// Severity score should be a number (float64 in JSON unmarshaling)
-				if _, isNumber := severityScore.(float64); !isNumber {
-					t.Errorf("Severity score should be a number, got %T", severityScore)
-				}
-			}
+	if _, hasScanType := finding["scan_type"]; !hasScanType {
+		t.Error("Finding should have 'scan_type' field")
+	}
+
+	if severity, ok := finding["severity"]; ok {
+		t.Logf("Severity: %v", severity)
+	}
+
+	if severityScore, ok := finding["severity_score"]; ok {
+		t.Logf("Severity score type: %T, value: %v", severityScore, severityScore)
+		// Severity score should be a number (float64 in JSON unmarshaling)
+		if _, isNumber := severityScore.(float64); !isNumber {
+			t.Errorf("Severity score should be a number, got %T", severityScore)
 		}
 	}
 
