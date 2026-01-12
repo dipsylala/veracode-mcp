@@ -12,9 +12,9 @@ func TestLoadToolDefinitions(t *testing.T) {
 		t.Fatalf("Failed to load embedded tools: %v", err)
 	}
 
-	// tools.json now has 6 tools: api-health, get-dynamic-findings, get-static-findings, get-sca-findings, package-workspace, pipeline-static-scan
-	if len(registry.Tools) != 6 {
-		t.Errorf("Expected 6 tools, got %d", len(registry.Tools))
+	// tools.json now has 9 tools: api-health, get-dynamic-findings, get-static-findings, get-sca-findings, package-workspace, pipeline-static-scan, pipeline-status, pipeline-results, pipeline-detailed-results
+	if len(registry.Tools) != 9 {
+		t.Errorf("Expected 9 tools, got %d", len(registry.Tools))
 	}
 
 	// Check dynamic findings tool

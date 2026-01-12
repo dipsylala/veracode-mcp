@@ -1,7 +1,6 @@
 package tools
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -110,6 +109,14 @@ func (t *PipelineScanTool) handlePipelineScan(ctx context.Context, args map[stri
 		}, nil
 	}
 
+	// Clean up any existing files in the pipeline directory before starting a new scan
+	err = cleanupPipelineDirectory(outputDir)
+	if err != nil {
+		return map[string]interface{}{
+			"error": fmt.Sprintf("Failed to cleanup pipeline directory: %v", err),
+		}, nil
+	}
+
 	// Determine which file to scan
 	var scanTarget string
 	if req.Filename != "" {
@@ -142,6 +149,7 @@ func (t *PipelineScanTool) handlePipelineScan(ctx context.Context, args map[stri
 
 	// Build pipeline scan command
 	resultsFile := filepath.Join(outputDir, fmt.Sprintf("results-%s.json", time.Now().Format("20060102-150405")))
+	logFile := filepath.Join(outputDir, fmt.Sprintf("scan-%s.log", time.Now().Format("20060102-150405")))
 
 	cmdArgs := []string{
 		"static",
@@ -158,25 +166,70 @@ func (t *PipelineScanTool) handlePipelineScan(ctx context.Context, args map[stri
 	// #nosec G204 -- veracode command is hardcoded, only arguments are user-controlled and validated
 	cmd := exec.CommandContext(ctx, "veracode", cmdArgs...)
 
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	// Execute the command
-	startTime := time.Now()
-	err = cmd.Run()
-	duration := time.Since(startTime)
-
-	// Extract exit code
-	exitCode := 0
+	// Create log file for stdout/stderr
+	// #nosec G304 -- logFile is constructed from validated outputDir and timestamp, not user input
+	logFileHandle, err := os.Create(logFile)
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			exitCode = exitErr.ExitCode()
-		}
+		return map[string]interface{}{
+			"error": fmt.Sprintf("Failed to create log file: %v", err),
+		}, nil
+	}
+	defer logFileHandle.Close()
+
+	// Redirect stdout and stderr to log file
+	cmd.Stdout = logFileHandle
+	cmd.Stderr = logFileHandle
+
+	// Start the command asynchronously
+	err = cmd.Start()
+	if err != nil {
+		return map[string]interface{}{
+			"error": fmt.Sprintf("Failed to start pipeline scan: %v", err),
+		}, nil
 	}
 
-	// Build response
-	return buildPipelineScanResponse(req, scanTarget, resultsFile, exitCode, duration, stdout, stderr), nil
+	// Write PID info to file for status checking (includes PID, results file, log file)
+	pidFile := filepath.Join(outputDir, "pipeline.pid")
+	pidInfo := fmt.Sprintf("{\"pid\":%d,\"results_file\":\"%s\",\"log_file\":\"%s\"}",
+		cmd.Process.Pid,
+		filepath.ToSlash(resultsFile),
+		filepath.ToSlash(logFile))
+	// #nosec G306 -- PID file needs to be readable by status checker, contains process info
+	err = os.WriteFile(pidFile, []byte(pidInfo), 0644)
+	if err != nil {
+		// Kill the process if we can't write PID
+		_ = cmd.Process.Kill()
+		return map[string]interface{}{
+			"error": fmt.Sprintf("Failed to write PID file: %v", err),
+		}, nil
+	}
+
+	// Return immediately with scan started status
+	responseText := fmt.Sprintf(`Veracode Pipeline Static Scan - Started
+============================
+
+Application Path: %s
+Scan Target: %s
+Results File: %s
+Log File: %s
+
+Command executed:
+veracode static scan %s --results-file %s
+
+✓ Pipeline scan started successfully in background
+
+Next steps:
+- Use pipeline-status tool to check scan progress
+- Results will be available in: %s
+- Log output will be in: %s
+`, req.ApplicationPath, scanTarget, resultsFile, logFile, scanTarget, resultsFile, resultsFile, logFile)
+
+	return map[string]interface{}{
+		"content": []map[string]string{{
+			"type": "text",
+			"text": responseText,
+		}},
+	}, nil
 }
 
 // findLargestFile finds the largest file in the specified directory
@@ -218,65 +271,27 @@ func findLargestFile(dir string) (string, error) {
 	return largestFile, nil
 }
 
-// buildPipelineScanResponse constructs the response based on command execution results
-func buildPipelineScanResponse(req *PipelineScanRequest, scanTarget string, resultsFile string, exitCode int, duration time.Duration, stdout, stderr bytes.Buffer) map[string]interface{} {
-	// Interpret the exit code
-	cliInfo := InterpretVeracodeExitCode(exitCode)
-
-	// Build base response information
-	baseInfo := fmt.Sprintf(`Veracode Pipeline Static Scan
-============================
-
-Application Path: %s
-Scan Target: %s
-Results File: %s
-Duration: %v
-Exit Code: %d
-
-Command executed:
-veracode static scan %s --results-file %s
-
-`, req.ApplicationPath, scanTarget, resultsFile, duration, exitCode, scanTarget, resultsFile)
-
-	// Customize next steps for pipeline scan context
-	nextSteps := cliInfo.NextSteps
-	switch exitCode {
-	case 0:
-		nextSteps = fmt.Sprintf("Next steps:\n- Review scan results in: %s\n- Analyze identified vulnerabilities\n- Integrate findings into your development workflow", resultsFile)
-	case 3:
-		nextSteps = fmt.Sprintf("Next steps:\n- Review scan results in: %s\n- Check policy violations\n- Address critical vulnerabilities before deployment", resultsFile)
-	case 4:
-		nextSteps = "Next steps:\n- Review warnings in scan output\n- Verify build artifacts are available\n- Check if source files were properly compiled"
+// cleanupPipelineDirectory removes all files from the pipeline directory before starting a new scan
+func cleanupPipelineDirectory(outputDir string) error {
+	// Read directory contents
+	entries, err := os.ReadDir(outputDir)
+	if err != nil {
+		// If directory doesn't exist or can't be read, that's fine
+		return nil
 	}
 
-	responseText := baseInfo + fmt.Sprintf("%s %s\n\n", cliInfo.Icon, cliInfo.Message)
+	// Remove all files in the directory
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
 
-	if stdout.Len() > 0 {
-		responseText += fmt.Sprintf("\nOutput:\n%s\n", stdout.String())
-	}
-
-	if stderr.Len() > 0 {
-		responseText += fmt.Sprintf("\nError output:\n%s\n", stderr.String())
-	}
-
-	responseText += fmt.Sprintf("\n%s", nextSteps)
-
-	// Check if results file was created
-	if _, err := os.Stat(resultsFile); err == nil {
-		responseText += fmt.Sprintf("\n\n✓ Results file created successfully: %s", resultsFile)
-	}
-
-	// Return as error for truly failing exit codes, but as content for warnings
-	if exitCode > 0 && !cliInfo.IsWarning {
-		return map[string]interface{}{
-			"error": responseText,
+		filePath := filepath.Join(outputDir, entry.Name())
+		if err := os.Remove(filePath); err != nil {
+			// Log the error but continue with other files
+			log.Printf("Warning: Failed to remove file %s: %v", filePath, err)
 		}
 	}
 
-	return map[string]interface{}{
-		"content": []map[string]string{{
-			"type": "text",
-			"text": responseText,
-		}},
-	}
+	return nil
 }
