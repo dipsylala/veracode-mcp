@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const PipelineScanToolName = "pipeline-static-scan"
+const PipelineScanToolName = "pipeline-scan"
 
 // Auto-register this tool when the package is imported
 func init() {
@@ -19,7 +19,7 @@ func init() {
 	})
 }
 
-// PipelineScanTool provides the pipeline-static-scan tool
+// PipelineScanTool provides the pipeline-scan tool
 type PipelineScanTool struct{}
 
 // NewPipelineScanTool creates a new pipeline scan tool
@@ -46,7 +46,7 @@ func (t *PipelineScanTool) Shutdown() error {
 	return nil
 }
 
-// PipelineScanRequest represents the parsed parameters for pipeline-static-scan
+// PipelineScanRequest represents the parsed parameters for pipeline-scan
 type PipelineScanRequest struct {
 	ApplicationPath string
 	Filename        string

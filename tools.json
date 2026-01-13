@@ -229,7 +229,7 @@
       ]
     },
     {
-      "name": "pipeline-static-scan",
+      "name": "pipeline-scan",
       "description": "Perform a local SAST scan of the current workspace using Veracode's Pipeline Scanner",
       "params": [
         {
