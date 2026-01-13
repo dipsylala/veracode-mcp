@@ -25,7 +25,7 @@ func TestGetStaticFlawDetails_Integration(t *testing.T) {
 
 	// MCPVerademo app GUID
 	appGUID := "f4e74197-1e26-42c4-ab4b-245870c93280"
-	
+
 	// Known static flaw ID from MCPVerademo
 	flawID := "6"
 
@@ -34,7 +34,7 @@ func TestGetStaticFlawDetails_Integration(t *testing.T) {
 		AppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGet(authCtx, appGUID, flawID)
 
 	staticFlaw, resp, err := req.Execute()
-	
+
 	if err != nil {
 		t.Fatalf("Failed to get static flaw details: %v", err)
 	}
@@ -57,7 +57,7 @@ func TestGetStaticFlawDetails_Integration(t *testing.T) {
 	}
 
 	flaw := staticFlaw.StaticFlaws[0]
-	
+
 	// Verify some basic fields exist
 	if flaw.IssueSummary == nil {
 		t.Fatal("IssueSummary is nil")
