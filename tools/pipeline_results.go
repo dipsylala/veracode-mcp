@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -304,16 +305,21 @@ func processPipelineFinding(flaw PipelineFlaw) MCPFinding {
 	// Clean up the display text (remove HTML tags)
 	cleanDesc := CleanDescription(flaw.DisplayText)
 
+	if flaw.Severity > math.MaxInt32 {
+		flaw.Severity = math.MaxInt32
+	}
+
 	finding := MCPFinding{
 		FlawID:         fmt.Sprintf("%d", flaw.IssueID),
 		ScanType:       "STATIC",
 		Severity:       transformPipelineSeverity(flaw.Severity),
-		SeverityScore:  int32(flaw.Severity),
+		SeverityScore:  int32(flaw.Severity), // #nosec G115 - validated above
 		CweId:          cweID,
 		Description:    cleanDesc,
 		Status:         "open",                          // Pipeline findings are always open
 		ViolatesPolicy: false,                           // Pipeline scanner doesn't provide this per-finding
 		FirstFound:     time.Now().Format(time.RFC3339), // Pipeline scans don't track this
+		FilePath:       flaw.Files.SourceFile.File,
 		LineNumber:     flaw.Files.SourceFile.Line,
 	}
 
