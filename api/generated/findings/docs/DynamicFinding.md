@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 **FindingCategory** | Pointer to [**StaticFindingFindingCategory**](StaticFindingFindingCategory.md) |  | [optional] 
 **URL** | Pointer to **string** | The URL of the location where the finding exists. | [optional] 
 **VulnerableParameter** | Pointer to **string** | The parameter that contains a vulnerability. | [optional] 
-**DiscoveredByVsa** | Pointer to **string** | Whether the finding was discovered by Virtual Scan Appliance. | [optional] 
+**DiscoveredByVsa** | Pointer to **int32** | Whether the finding was discovered by Virtual Scan Appliance. | [optional] 
 
 ## Methods
 
@@ -313,20 +313,20 @@ HasVulnerableParameter returns a boolean if a field has been set.
 
 ### GetDiscoveredByVsa
 
-`func (o *DynamicFinding) GetDiscoveredByVsa() string`
+`func (o *DynamicFinding) GetDiscoveredByVsa() int32`
 
 GetDiscoveredByVsa returns the DiscoveredByVsa field if non-nil, zero value otherwise.
 
 ### GetDiscoveredByVsaOk
 
-`func (o *DynamicFinding) GetDiscoveredByVsaOk() (*string, bool)`
+`func (o *DynamicFinding) GetDiscoveredByVsaOk() (*int32, bool)`
 
 GetDiscoveredByVsaOk returns a tuple with the DiscoveredByVsa field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDiscoveredByVsa
 
-`func (o *DynamicFinding) SetDiscoveredByVsa(v string)`
+`func (o *DynamicFinding) SetDiscoveredByVsa(v int32)`
 
 SetDiscoveredByVsa sets DiscoveredByVsa field to given value.
 

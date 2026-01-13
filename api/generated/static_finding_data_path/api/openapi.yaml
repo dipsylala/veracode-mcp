@@ -113,9 +113,7 @@ components:
           type: string
         name:
           description: ID of the application.
-          format: int32
-          readOnly: true
-          type: integer
+          type: string
         build_id:
           description: ID of the build.
           format: int32
@@ -163,10 +161,6 @@ components:
           description: Call stacks.
           items:
             $ref: "#/components/schemas/DataPaths"
-          type: array
-        _links:
-          items:
-            $ref: "#/components/schemas/Link"
           type: array
       type: object
     DataPaths:

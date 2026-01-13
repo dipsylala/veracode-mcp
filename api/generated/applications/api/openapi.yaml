@@ -1412,15 +1412,6 @@ components:
       title: EmbeddedSandbox
       type: object
     Link:
-      example:
-        hreflang: hreflang
-        templated: true
-        rel: rel
-        href: href
-        media: media
-        deprecation: deprecation
-        title: title
-        type: type
       properties:
         deprecation:
           type: string
@@ -1681,15 +1672,6 @@ components:
             oid: 6
             results_url: results_url
             app_profile_url: app_profile_url
-        _links:
-          hreflang: hreflang
-          templated: true
-          rel: rel
-          href: href
-          media: media
-          deprecation: deprecation
-          title: title
-          type: type
         page:
           number: 4
           size: 7
@@ -1698,8 +1680,6 @@ components:
       properties:
         _embedded:
           $ref: "#/components/schemas/EmbeddedApplication"
-        _links:
-          $ref: "#/components/schemas/Link"
         page:
           $ref: "#/components/schemas/PageMetadata"
       title: PagedResourceOfApplication
@@ -1736,15 +1716,6 @@ components:
             auto_recreate: true
             id: 0
             application_guid: application_guid
-        _links:
-          hreflang: hreflang
-          templated: true
-          rel: rel
-          href: href
-          media: media
-          deprecation: deprecation
-          title: title
-          type: type
         page:
           number: 4
           size: 7
@@ -1753,8 +1724,6 @@ components:
       properties:
         _embedded:
           $ref: "#/components/schemas/EmbeddedSandbox"
-        _links:
-          $ref: "#/components/schemas/Link"
         page:
           $ref: "#/components/schemas/PageMetadata"
       title: PagedResourceOfSandbox

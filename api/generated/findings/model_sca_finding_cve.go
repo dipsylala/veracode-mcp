@@ -26,7 +26,7 @@ type ScaFindingCve struct {
 	// A link to the CVE in the NVD or other database.
 	Href *string `json:"href,omitempty"`
 	// The assigned severity of this vulnerability.
-	Severity *int32 `json:"severity,omitempty"`
+	Severity *string `json:"severity,omitempty"`
 	// The assigned vector for this vulnerability.
 	Vector         *string                   `json:"vector,omitempty"`
 	Cvss3          *ScaFindingCveCvss3       `json:"cvss3,omitempty"`
@@ -147,9 +147,9 @@ func (o *ScaFindingCve) SetHref(v string) {
 }
 
 // GetSeverity returns the Severity field value if set, zero value otherwise.
-func (o *ScaFindingCve) GetSeverity() int32 {
+func (o *ScaFindingCve) GetSeverity() string {
 	if o == nil || IsNil(o.Severity) {
-		var ret int32
+		var ret string
 		return ret
 	}
 	return *o.Severity
@@ -157,7 +157,7 @@ func (o *ScaFindingCve) GetSeverity() int32 {
 
 // GetSeverityOk returns a tuple with the Severity field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ScaFindingCve) GetSeverityOk() (*int32, bool) {
+func (o *ScaFindingCve) GetSeverityOk() (*string, bool) {
 	if o == nil || IsNil(o.Severity) {
 		return nil, false
 	}
@@ -173,8 +173,8 @@ func (o *ScaFindingCve) HasSeverity() bool {
 	return false
 }
 
-// SetSeverity gets a reference to the given int32 and assigns it to the Severity field.
-func (o *ScaFindingCve) SetSeverity(v int32) {
+// SetSeverity gets a reference to the given string and assigns it to the Severity field.
+func (o *ScaFindingCve) SetSeverity(v string) {
 	o.Severity = &v
 }
 

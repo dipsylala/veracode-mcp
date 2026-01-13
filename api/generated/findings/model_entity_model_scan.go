@@ -39,8 +39,7 @@ type EntityModelScan struct {
 	// Current scan status.
 	Status *string `json:"status,omitempty"`
 	// Scan type.
-	ScanType *string          `json:"scanType,omitempty"`
-	Links    *map[string]Link `json:"_links,omitempty"`
+	ScanType *string `json:"scanType,omitempty"`
 }
 
 // NewEntityModelScan instantiates a new EntityModelScan object
@@ -380,38 +379,6 @@ func (o *EntityModelScan) SetScanType(v string) {
 	o.ScanType = &v
 }
 
-// GetLinks returns the Links field value if set, zero value otherwise.
-func (o *EntityModelScan) GetLinks() map[string]Link {
-	if o == nil || IsNil(o.Links) {
-		var ret map[string]Link
-		return ret
-	}
-	return *o.Links
-}
-
-// GetLinksOk returns a tuple with the Links field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *EntityModelScan) GetLinksOk() (*map[string]Link, bool) {
-	if o == nil || IsNil(o.Links) {
-		return nil, false
-	}
-	return o.Links, true
-}
-
-// HasLinks returns a boolean if a field has been set.
-func (o *EntityModelScan) HasLinks() bool {
-	if o != nil && !IsNil(o.Links) {
-		return true
-	}
-
-	return false
-}
-
-// SetLinks gets a reference to the given map[string]Link and assigns it to the Links field.
-func (o *EntityModelScan) SetLinks(v map[string]Link) {
-	o.Links = &v
-}
-
 func (o EntityModelScan) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -451,9 +418,6 @@ func (o EntityModelScan) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.ScanType) {
 		toSerialize["scanType"] = o.ScanType
-	}
-	if !IsNil(o.Links) {
-		toSerialize["_links"] = o.Links
 	}
 	return toSerialize, nil
 }

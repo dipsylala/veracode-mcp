@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **Name** | Pointer to **string** | The identifier for this vulnerability. While typically a CVE, this field can also identify non-CVE assigned vulnerabilities, such as SRCCLR-SID-23134. | [optional] 
 **Cvss** | Pointer to **float32** | The Common Vulnerability Scoring System score for this CVE. | [optional] 
 **Href** | Pointer to **string** | A link to the CVE in the NVD or other database. | [optional] 
-**Severity** | Pointer to **int32** | The assigned severity of this vulnerability. | [optional] 
+**Severity** | Pointer to **string** | The assigned severity of this vulnerability. | [optional] 
 **Vector** | Pointer to **string** | The assigned vector for this vulnerability. | [optional] 
 **Cvss3** | Pointer to [**ScaFindingCveCvss3**](ScaFindingCveCvss3.md) |  | [optional] 
 **Exploitability** | Pointer to [**ScaFindingExploitability**](ScaFindingExploitability.md) |  | [optional] 
@@ -108,20 +108,20 @@ HasHref returns a boolean if a field has been set.
 
 ### GetSeverity
 
-`func (o *ScaFindingCve) GetSeverity() int32`
+`func (o *ScaFindingCve) GetSeverity() string`
 
 GetSeverity returns the Severity field if non-nil, zero value otherwise.
 
 ### GetSeverityOk
 
-`func (o *ScaFindingCve) GetSeverityOk() (*int32, bool)`
+`func (o *ScaFindingCve) GetSeverityOk() (*string, bool)`
 
 GetSeverityOk returns a tuple with the Severity field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSeverity
 
-`func (o *ScaFindingCve) SetSeverity(v int32)`
+`func (o *ScaFindingCve) SetSeverity(v string)`
 
 SetSeverity sets Severity field to given value.
 

@@ -38,14 +38,14 @@ type ApiGetFindingsUsingGETRequest struct {
 	includeExpDate  *bool
 	mitigatedAfter  *time.Time
 	new             *bool
-	page            *int32
 	scaDepMode      *string
 	scaScanMode     *string
 	scanType        *[]string
 	severity        *int32
 	severityGte     *int32
-	size            *int32
 	violatesPolicy  *bool
+	page            *int32
+	size            *int32
 }
 
 // Context type, which filters results to show only the findings of this specific context type. The findings status parameter is relative to this context parameter.
@@ -108,12 +108,6 @@ func (r ApiGetFindingsUsingGETRequest) New(new bool) ApiGetFindingsUsingGETReque
 	return r
 }
 
-// Page number. The default is 0.
-func (r ApiGetFindingsUsingGETRequest) Page(page int32) ApiGetFindingsUsingGETRequest {
-	r.page = &page
-	return r
-}
-
 // Return all findings with the specified SCA dependency mode. Only valid for the SCA scan type.
 func (r ApiGetFindingsUsingGETRequest) ScaDepMode(scaDepMode string) ApiGetFindingsUsingGETRequest {
 	r.scaDepMode = &scaDepMode
@@ -144,15 +138,21 @@ func (r ApiGetFindingsUsingGETRequest) SeverityGte(severityGte int32) ApiGetFind
 	return r
 }
 
-// Page size (0-500). The default is 100.
-func (r ApiGetFindingsUsingGETRequest) Size(size int32) ApiGetFindingsUsingGETRequest {
-	r.size = &size
-	return r
-}
-
 // Use this flag to filter the results based on whether the results violate the policy associated with the application. True means the results negatively impact the policy and should be fixed. Not valid for the SCA scan type.
 func (r ApiGetFindingsUsingGETRequest) ViolatesPolicy(violatesPolicy bool) ApiGetFindingsUsingGETRequest {
 	r.violatesPolicy = &violatesPolicy
+	return r
+}
+
+// Page number. The default is 0.
+func (r ApiGetFindingsUsingGETRequest) Page(page int32) ApiGetFindingsUsingGETRequest {
+	r.page = &page
+	return r
+}
+
+// Page size (0-500). The default is 100.
+func (r ApiGetFindingsUsingGETRequest) Size(size int32) ApiGetFindingsUsingGETRequest {
+	r.size = &size
 	return r
 }
 
@@ -246,9 +246,6 @@ func (a *ApplicationFindingsInformationAPIService) GetFindingsUsingGETExecute(r 
 	if r.new != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "new", r.new, "form", "")
 	}
-	if r.page != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
-	}
 	if r.scaDepMode != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "sca_dep_mode", r.scaDepMode, "form", "")
 	}
@@ -272,11 +269,14 @@ func (a *ApplicationFindingsInformationAPIService) GetFindingsUsingGETExecute(r 
 	if r.severityGte != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "severity_gte", r.severityGte, "form", "")
 	}
-	if r.size != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "size", r.size, "form", "")
-	}
 	if r.violatesPolicy != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "violates_policy", r.violatesPolicy, "form", "")
+	}
+	if r.page != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
+	}
+	if r.size != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "size", r.size, "form", "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

@@ -1304,9 +1304,7 @@
         "_embedded": {
           "$ref": "#/definitions/EmbeddedApplication"
         },
-        "_links": {
-          "$ref": "#/definitions/Link"
-        },
+        
         "page": {
           "$ref": "#/definitions/PageMetadata"
         }
@@ -1319,9 +1317,7 @@
         "_embedded": {
           "$ref": "#/definitions/EmbeddedSandbox"
         },
-        "_links": {
-          "$ref": "#/definitions/Link"
-        },
+        
         "page": {
           "$ref": "#/definitions/PageMetadata"
         }

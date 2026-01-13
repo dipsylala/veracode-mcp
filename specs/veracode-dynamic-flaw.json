@@ -129,20 +129,8 @@
             "type": "string",
             "description": "Error code.",
             "readOnly": true
-          },
-          "_links": {
-            "type": "object",
-            "readOnly": true,
-            "properties": {
-              "help": {
-                "$ref": "#/components/schemas/Link"
-              }
-            },
-            "required": [
-              "help"
-            ]
           }
-        }
+          }
       },
       "IssueSummary": {
         "type": "object",
@@ -208,20 +196,8 @@
           },
           "dynamic_flaw_info": {
             "$ref": "#/components/schemas/DynamicSpecificFlawInfo"
-          },
-          "_links": {
-            "type": "object",
-            "readOnly": true,
-            "properties": {
-              "help": {
-                "$ref": "#/components/schemas/Link"
-              }
-            },
-            "required": [
-              "help"
-            ]
           }
-        }
+          }
       },
       "DynamicSpecificFlawInfo": {
         "type": "object",

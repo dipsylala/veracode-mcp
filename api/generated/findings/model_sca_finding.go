@@ -38,7 +38,7 @@ type ScaFinding struct {
 	// The list of component paths containing this vulnerability.
 	ComponentPathS []ScaFindingComponentPathSInner `json:"component_path(s),omitempty"`
 	// Displays metadata values, such as the SCA scan mode and dependency mode.
-	Metadata *string `json:"metadata,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // NewScaFinding instantiates a new ScaFinding object
@@ -379,19 +379,19 @@ func (o *ScaFinding) SetComponentPathS(v []ScaFindingComponentPathSInner) {
 }
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
-func (o *ScaFinding) GetMetadata() string {
+func (o *ScaFinding) GetMetadata() map[string]interface{} {
 	if o == nil || IsNil(o.Metadata) {
-		var ret string
+		var ret map[string]interface{}
 		return ret
 	}
-	return *o.Metadata
+	return o.Metadata
 }
 
 // GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ScaFinding) GetMetadataOk() (*string, bool) {
+func (o *ScaFinding) GetMetadataOk() (map[string]interface{}, bool) {
 	if o == nil || IsNil(o.Metadata) {
-		return nil, false
+		return map[string]interface{}{}, false
 	}
 	return o.Metadata, true
 }
@@ -405,9 +405,9 @@ func (o *ScaFinding) HasMetadata() bool {
 	return false
 }
 
-// SetMetadata gets a reference to the given string and assigns it to the Metadata field.
-func (o *ScaFinding) SetMetadata(v string) {
-	o.Metadata = &v
+// SetMetadata gets a reference to the given map[string]interface{} and assigns it to the Metadata field.
+func (o *ScaFinding) SetMetadata(v map[string]interface{}) {
+	o.Metadata = v
 }
 
 func (o ScaFinding) MarshalJSON() ([]byte, error) {

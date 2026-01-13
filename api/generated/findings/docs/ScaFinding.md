@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 **ComponentFilename** | Pointer to **string** | The component filename. | [optional] 
 **Language** | Pointer to **string** | The coding language. | [optional] 
 **ComponentPathS** | Pointer to [**[]ScaFindingComponentPathSInner**](ScaFindingComponentPathSInner.md) | The list of component paths containing this vulnerability. | [optional] 
-**Metadata** | Pointer to **string** | Displays metadata values, such as the SCA scan mode and dependency mode. | [optional] 
+**Metadata** | Pointer to **map[string]interface{}** | Displays metadata values, such as the SCA scan mode and dependency mode. | [optional] 
 
 ## Methods
 
@@ -287,20 +287,20 @@ HasComponentPathS returns a boolean if a field has been set.
 
 ### GetMetadata
 
-`func (o *ScaFinding) GetMetadata() string`
+`func (o *ScaFinding) GetMetadata() map[string]interface{}`
 
 GetMetadata returns the Metadata field if non-nil, zero value otherwise.
 
 ### GetMetadataOk
 
-`func (o *ScaFinding) GetMetadataOk() (*string, bool)`
+`func (o *ScaFinding) GetMetadataOk() (*map[string]interface{}, bool)`
 
 GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetMetadata
 
-`func (o *ScaFinding) SetMetadata(v string)`
+`func (o *ScaFinding) SetMetadata(v map[string]interface{})`
 
 SetMetadata sets Metadata field to given value.
 

@@ -70,10 +70,6 @@ paths:
 components:
   schemas:
     Link:
-      example:
-        templated: true
-        name: name
-        href: href
       properties:
         href:
           description: Endpoint for the current request.
@@ -90,11 +86,6 @@ components:
     Error:
       example:
         code: code
-        _links:
-          help:
-            templated: true
-            name: name
-            href: href
         message: message
       properties:
         message:
@@ -105,8 +96,6 @@ components:
           description: Error code.
           readOnly: true
           type: string
-        _links:
-          $ref: "#/components/schemas/Error__links"
       type: object
     IssueSummary:
       example:
@@ -188,11 +177,6 @@ components:
               injected_value: ""
           response:
             raw_bytes: MjAwIE9LXHJcblNlcnZlcjogU29tZXRoaW5nQ29vbDEuMFxyXG5cclxuPGh0bWw+PGgxPkhlbGxvIFdvcmxkPC9oMT48L2h0bWw+Cg
-        _links:
-          help:
-            templated: true
-            name: name
-            href: href
         issue_summary:
           app_guid: 1234xcc_ffggd4543_4trcf
           issue_id: 7
@@ -217,8 +201,6 @@ components:
           $ref: "#/components/schemas/IssueSummary"
         dynamic_flaw_info:
           $ref: "#/components/schemas/DynamicSpecificFlawInfo"
-        _links:
-          $ref: "#/components/schemas/Error__links"
       type: object
     DynamicSpecificFlawInfo:
       example:
@@ -354,17 +336,4 @@ components:
           description: Base64-encoded raw HTTP response payload.
           readOnly: true
           type: string
-      type: object
-    Error__links:
-      example:
-        help:
-          templated: true
-          name: name
-          href: href
-      properties:
-        help:
-          $ref: "#/components/schemas/Link"
-      readOnly: true
-      required:
-      - help
       type: object

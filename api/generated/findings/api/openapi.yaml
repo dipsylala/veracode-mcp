@@ -397,6 +397,26 @@ paths:
         schema:
           type: boolean
         style: form
+      - allowEmptyValue: false
+        description: Page number. The default is 0.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Page size (0-500). The default is 100.
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
       responses:
         "200":
           content:
@@ -1494,7 +1514,7 @@ components:
           type: string
         discovered_by_vsa:
           description: Whether the finding was discovered by Virtual Scan Appliance.
-          type: string
+          type: integer
       type: object
     ManualFindingV2:
       properties:
@@ -1576,7 +1596,7 @@ components:
         metadata:
           description: "Displays metadata values, such as the SCA scan mode and dependency\
             \ mode."
-          type: string
+          type: object
       type: object
     ScaFindingCwe:
       properties:
@@ -1610,7 +1630,8 @@ components:
           type: string
         severity:
           description: The assigned severity of this vulnerability.
-          type: integer
+          example: High
+          type: string
         vector:
           description: The assigned vector for this vulnerability.
           example: AV:N/AC:L/Au:N/C:N/I:N/A:C
@@ -2072,16 +2093,6 @@ components:
     EntityModelScan:
       example:
         submitted: 2000-01-23T04:56:07.000+00:00
-        _links:
-          key:
-            hreflang: hreflang
-            templated: true
-            rel: rel
-            href: href
-            media: media
-            deprecation: deprecation
-            title: title
-            type: type
         created: 2000-01-23T04:56:07.000+00:00
         name: name
         id: 1
@@ -2149,10 +2160,6 @@ components:
         scanType:
           description: Scan type.
           type: string
-        _links:
-          additionalProperties:
-            $ref: "#/components/schemas/Link"
-          type: object
       type: object
     EmbeddedScan:
       example:
@@ -2779,16 +2786,6 @@ components:
         _embedded:
           scans:
           - submitted: 2000-01-23T04:56:07.000+00:00
-            _links:
-              key:
-                hreflang: hreflang
-                templated: true
-                rel: rel
-                href: href
-                media: media
-                deprecation: deprecation
-                title: title
-                type: type
             created: 2000-01-23T04:56:07.000+00:00
             name: name
             id: 1
@@ -2799,16 +2796,6 @@ components:
             applicationId: 5
             status: incomplete
           - submitted: 2000-01-23T04:56:07.000+00:00
-            _links:
-              key:
-                hreflang: hreflang
-                templated: true
-                rel: rel
-                href: href
-                media: media
-                deprecation: deprecation
-                title: title
-                type: type
             created: 2000-01-23T04:56:07.000+00:00
             name: name
             id: 1
@@ -2818,16 +2805,6 @@ components:
             scanType: scanType
             applicationId: 5
             status: incomplete
-        _links:
-          key:
-            hreflang: hreflang
-            templated: true
-            rel: rel
-            href: href
-            media: media
-            deprecation: deprecation
-            title: title
-            type: type
         page:
           number: 6
           size: 1
@@ -2836,10 +2813,6 @@ components:
       properties:
         _embedded:
           $ref: "#/components/schemas/PagedModelEntityModelScan__embedded"
-        _links:
-          additionalProperties:
-            $ref: "#/components/schemas/Link"
-          type: object
         page:
           $ref: "#/components/schemas/PageMetadata"
       type: object
@@ -3027,16 +3000,6 @@ components:
             - data
             format: format
             description: description
-        _links:
-          key:
-            hreflang: hreflang
-            templated: true
-            rel: rel
-            href: href
-            media: media
-            deprecation: deprecation
-            title: title
-            type: type
         scanId: 6
         count: 7
         externalId: 1
@@ -3158,10 +3121,6 @@ components:
           items:
             $ref: "#/components/schemas/Appendix"
           type: array
-        _links:
-          additionalProperties:
-            $ref: "#/components/schemas/Link"
-          type: object
       type: object
     PagedModelEntityModelManualFinding:
       example:
@@ -3200,16 +3159,6 @@ components:
                 - data
                 format: format
                 description: description
-            _links:
-              key:
-                hreflang: hreflang
-                templated: true
-                rel: rel
-                href: href
-                media: media
-                deprecation: deprecation
-                title: title
-                type: type
             scanId: 6
             count: 7
             externalId: 1
@@ -3298,16 +3247,6 @@ components:
                 - data
                 format: format
                 description: description
-            _links:
-              key:
-                hreflang: hreflang
-                templated: true
-                rel: rel
-                href: href
-                media: media
-                deprecation: deprecation
-                title: title
-                type: type
             scanId: 6
             count: 7
             externalId: 1
@@ -3363,16 +3302,6 @@ components:
             exploitability: 4
             cvss: 9.965781217890562
             matchedId: 9
-        _links:
-          key:
-            hreflang: hreflang
-            templated: true
-            rel: rel
-            href: href
-            media: media
-            deprecation: deprecation
-            title: title
-            type: type
         page:
           number: 6
           size: 1
@@ -3381,10 +3310,6 @@ components:
       properties:
         _embedded:
           $ref: "#/components/schemas/PagedModelEntityModelManualFinding__embedded"
-        _links:
-          additionalProperties:
-            $ref: "#/components/schemas/Link"
-          type: object
         page:
           $ref: "#/components/schemas/PageMetadata"
       type: object
@@ -3535,7 +3460,8 @@ components:
           type: number
         severity:
           description: The assigned CVSS v3 severity for this vulnerability.
-          type: integer
+          example: High
+          type: string
         vector:
           description: The assigned CVSS v3 vector for this vulnerability.
           example: AV:N/AC:L/Au:N/C:N/I:N/A:C
@@ -3553,16 +3479,6 @@ components:
       example:
         scans:
         - submitted: 2000-01-23T04:56:07.000+00:00
-          _links:
-            key:
-              hreflang: hreflang
-              templated: true
-              rel: rel
-              href: href
-              media: media
-              deprecation: deprecation
-              title: title
-              type: type
           created: 2000-01-23T04:56:07.000+00:00
           name: name
           id: 1
@@ -3573,16 +3489,6 @@ components:
           applicationId: 5
           status: incomplete
         - submitted: 2000-01-23T04:56:07.000+00:00
-          _links:
-            key:
-              hreflang: hreflang
-              templated: true
-              rel: rel
-              href: href
-              media: media
-              deprecation: deprecation
-              title: title
-              type: type
           created: 2000-01-23T04:56:07.000+00:00
           name: name
           id: 1
@@ -3634,16 +3540,6 @@ components:
               - data
               format: format
               description: description
-          _links:
-            key:
-              hreflang: hreflang
-              templated: true
-              rel: rel
-              href: href
-              media: media
-              deprecation: deprecation
-              title: title
-              type: type
           scanId: 6
           count: 7
           externalId: 1
@@ -3732,16 +3628,6 @@ components:
               - data
               format: format
               description: description
-          _links:
-            key:
-              hreflang: hreflang
-              templated: true
-              rel: rel
-              href: href
-              media: media
-              deprecation: deprecation
-              title: title
-              type: type
           scanId: 6
           count: 7
           externalId: 1

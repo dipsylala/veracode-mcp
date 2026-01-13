@@ -187,61 +187,74 @@ $findingDetailsFile = "api/generated/findings/model_finding_finding_details.go"
 if (Test-Path $findingDetailsFile) {
     $content = Get-Content -Path $findingDetailsFile -Raw
     
-    # Remove unused validator import
-    $content = $content -replace 'import \(\s+"encoding/json"\s+"fmt"\s+"gopkg.in/validator.v2"\s+\)', 'import ($([char]10)	"encoding/json"$([char]10)	"fmt"$([char]10))'
+    # Remove unused validator import if present (no longer generated, but kept for compatibility)
+    $newlineChar = [char]10
+    $tabChar = [char]9
+    $importReplacement = "import ($newlineChar$tabChar`"encoding/json`"$newlineChar)"
+    $content = $content -replace 'import \(\s+"encoding/json"\s+"fmt"\s+"gopkg.in/validator.v2"\s+\)', $importReplacement
+    $content = $content -replace 'import \(\s+"encoding/json"\s+"fmt"\s+\)', $importReplacement
     
     # Replace strict oneOf validation with lenient unmarshaling
-    $oldPattern = '(?s)// Unmarshal JSON data into one of the pointers in the struct\s+func \(dst \*FindingFindingDetails\) UnmarshalJSON\(data \[\]byte\) error \{.*?return fmt\.Errorf\("data failed to match schemas in oneOf\(FindingFindingDetails\)"\)\s+\}'
+    # The generated code may have an extra closing brace after the function, so we need to handle that
+    $oldPattern = '(?s)// Unmarshal JSON data into one of the pointers in the struct\s+func \(dst \*FindingFindingDetails\) UnmarshalJSON\(data \[\]byte\) error \{.*?return fmt\.Errorf\("data failed to match schemas in oneOf\(FindingFindingDetails\)"\)\s+\}\s*\}'
     
     $newCode = @'
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
-	var err error
-	// PATCHED: Removed strict validation and match counting to handle API responses
-	// that may not perfectly conform to the OpenAPI spec oneOf constraints
+	// PATCHED: Use field-based detection to determine the correct finding type
+	// Check for distinctive fields to identify the finding type, then unmarshal once to the correct type
 	
-	// try to unmarshal data into DynamicFinding
-	err = json.Unmarshal(data, &dst.DynamicFinding)
-	if err == nil {
-		jsonDynamicFinding, _ := json.Marshal(dst.DynamicFinding)
-		if string(jsonDynamicFinding) != "{}" {
-			return nil // Successfully unmarshaled as DynamicFinding
-		}
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
 	}
-	dst.DynamicFinding = nil
-
-	// try to unmarshal data into ManualFinding
-	err = json.Unmarshal(data, &dst.ManualFinding)
-	if err == nil {
-		jsonManualFinding, _ := json.Marshal(dst.ManualFinding)
-		if string(jsonManualFinding) != "{}" {
-			return nil // Successfully unmarshaled as ManualFinding
-		}
+	
+	// StaticFinding has unique fields: module, procedure, file_line_number, relative_location
+	// DynamicFinding has unique fields: hostname, port, path, plugin, URL, vulnerable_parameter
+	// ScaFinding has unique fields: component_filename, component_id, version, licenses
+	// ManualFinding - currently not distinguished, use as fallback
+	
+	// Check for SCA-specific fields (most distinctive)
+	if _, hasComponent := raw["component_filename"]; hasComponent {
+		return json.Unmarshal(data, &dst.ScaFinding)
 	}
-	dst.ManualFinding = nil
-
-	// try to unmarshal data into ScaFinding
-	err = json.Unmarshal(data, &dst.ScaFinding)
-	if err == nil {
-		jsonScaFinding, _ := json.Marshal(dst.ScaFinding)
-		if string(jsonScaFinding) != "{}" {
-			return nil // Successfully unmarshaled as ScaFinding
-		}
+	if _, hasComponentId := raw["component_id"]; hasComponentId {
+		return json.Unmarshal(data, &dst.ScaFinding)
 	}
-	dst.ScaFinding = nil
-
-	// try to unmarshal data into StaticFinding
-	err = json.Unmarshal(data, &dst.StaticFinding)
-	if err == nil {
-		jsonStaticFinding, _ := json.Marshal(dst.StaticFinding)
-		if string(jsonStaticFinding) != "{}" {
-			return nil // Successfully unmarshaled as StaticFinding
-		}
+	if _, hasLicenses := raw["licenses"]; hasLicenses {
+		return json.Unmarshal(data, &dst.ScaFinding)
 	}
-	dst.StaticFinding = nil
-
-	// No match found
-	return fmt.Errorf("data failed to match schemas in oneOf(FindingFindingDetails)")
+	
+	// Check for Static-specific fields
+	if _, hasModule := raw["module"]; hasModule {
+		return json.Unmarshal(data, &dst.StaticFinding)
+	}
+	if _, hasProcedure := raw["procedure"]; hasProcedure {
+		return json.Unmarshal(data, &dst.StaticFinding)
+	}
+	if _, hasRelativeLocation := raw["relative_location"]; hasRelativeLocation {
+		return json.Unmarshal(data, &dst.StaticFinding)
+	}
+	if _, hasFileLineNumber := raw["file_line_number"]; hasFileLineNumber {
+		return json.Unmarshal(data, &dst.StaticFinding)
+	}
+	
+	// Check for Dynamic-specific fields
+	if _, hasURL := raw["URL"]; hasURL {
+		return json.Unmarshal(data, &dst.DynamicFinding)
+	}
+	if _, hasHostname := raw["hostname"]; hasHostname {
+		return json.Unmarshal(data, &dst.DynamicFinding)
+	}
+	if _, hasPlugin := raw["plugin"]; hasPlugin {
+		return json.Unmarshal(data, &dst.DynamicFinding)
+	}
+	if _, hasVulnParam := raw["vulnerable_parameter"]; hasVulnParam {
+		return json.Unmarshal(data, &dst.DynamicFinding)
+	}
+	
+	// If no distinctive fields found, try ManualFinding
+	return json.Unmarshal(data, &dst.ManualFinding)
 }
 '@
     

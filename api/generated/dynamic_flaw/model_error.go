@@ -22,8 +22,7 @@ type Error struct {
 	// Error message.
 	Message *string `json:"message,omitempty"`
 	// Error code.
-	Code  *string     `json:"code,omitempty"`
-	Links *ErrorLinks `json:"_links,omitempty"`
+	Code *string `json:"code,omitempty"`
 }
 
 // NewError instantiates a new Error object
@@ -107,38 +106,6 @@ func (o *Error) SetCode(v string) {
 	o.Code = &v
 }
 
-// GetLinks returns the Links field value if set, zero value otherwise.
-func (o *Error) GetLinks() ErrorLinks {
-	if o == nil || IsNil(o.Links) {
-		var ret ErrorLinks
-		return ret
-	}
-	return *o.Links
-}
-
-// GetLinksOk returns a tuple with the Links field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Error) GetLinksOk() (*ErrorLinks, bool) {
-	if o == nil || IsNil(o.Links) {
-		return nil, false
-	}
-	return o.Links, true
-}
-
-// HasLinks returns a boolean if a field has been set.
-func (o *Error) HasLinks() bool {
-	if o != nil && !IsNil(o.Links) {
-		return true
-	}
-
-	return false
-}
-
-// SetLinks gets a reference to the given ErrorLinks and assigns it to the Links field.
-func (o *Error) SetLinks(v ErrorLinks) {
-	o.Links = &v
-}
-
 func (o Error) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -154,9 +121,6 @@ func (o Error) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Code) {
 		toSerialize["code"] = o.Code
-	}
-	if !IsNil(o.Links) {
-		toSerialize["_links"] = o.Links
 	}
 	return toSerialize, nil
 }

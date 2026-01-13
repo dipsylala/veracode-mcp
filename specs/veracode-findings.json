@@ -274,14 +274,12 @@
           },
           {
             "$ref": "#/components/parameters/PolicyViolation"
-          },
-          {
-            "$ref": "#/components/parameters/Page"
-          },
-          {
-            "$ref": "#/components/parameters/Size"
           }
-        ],
+        ,{
+            "$ref": "#/components/parameters/Page"
+          },{
+            "$ref": "#/components/parameters/Size"
+          }],
         "responses": {
           "200": {
             "description": "You have successfully submitted your request.",
@@ -1329,7 +1327,7 @@
             "description": "The parameter that contains a vulnerability."
           },
           "discovered_by_vsa": {
-            "type": "string",
+            "type": "integer",
             "description": "Whether the finding was discovered by Virtual Scan Appliance."
           }
         }
@@ -1449,7 +1447,7 @@
             "description": "The list of component paths containing this vulnerability."
           },
           "metadata": {
-            "type": "string",
+            "type": "object",
             "description": "Displays metadata values, such as the SCA scan mode and dependency mode."
           }
         }
@@ -1492,7 +1490,7 @@
             "example": "http://nvd.nist.gov/vuln/detail/CVE-2016-2515\""
           },
           "severity": {
-            "type": "integer",
+            "type": "string",
             "description": "The assigned severity of this vulnerability.",
             "example": "High"
           },
@@ -1510,7 +1508,7 @@
                 "example": 7.5
               },
               "severity": {
-                "type": "integer",
+                "type": "string",
                 "description": "The assigned CVSS v3 severity for this vulnerability.",
                 "example": "High"
               },
@@ -1837,11 +1835,8 @@
           "scanType": {
             "type": "string",
             "description": "Scan type."
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
           }
-        }
+          }
       },
       "EmbeddedScan": {
         "type": "object",
@@ -1995,9 +1990,7 @@
               }
             }
           },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          },
+          
           "page": {
             "$ref": "#/components/schemas/PageMetadata"
           }
@@ -2194,11 +2187,8 @@
             "items": {
               "$ref": "#/components/schemas/Appendix"
             }
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
           }
-        }
+          }
       },
       "PagedModelEntityModelManualFinding": {
         "type": "object",
@@ -2214,9 +2204,7 @@
               }
             }
           },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          },
+          
           "page": {
             "$ref": "#/components/schemas/PageMetadata"
           }

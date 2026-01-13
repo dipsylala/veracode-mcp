@@ -5,7 +5,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Embedded** | Pointer to [**EmbeddedApplication**](EmbeddedApplication.md) |  | [optional] 
-**Links** | Pointer to [**Link**](Link.md) |  | [optional] 
 **Page** | Pointer to [**PageMetadata**](PageMetadata.md) |  | [optional] 
 
 ## Methods
@@ -51,31 +50,6 @@ SetEmbedded sets Embedded field to given value.
 `func (o *PagedResourceOfApplication) HasEmbedded() bool`
 
 HasEmbedded returns a boolean if a field has been set.
-
-### GetLinks
-
-`func (o *PagedResourceOfApplication) GetLinks() Link`
-
-GetLinks returns the Links field if non-nil, zero value otherwise.
-
-### GetLinksOk
-
-`func (o *PagedResourceOfApplication) GetLinksOk() (*Link, bool)`
-
-GetLinksOk returns a tuple with the Links field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetLinks
-
-`func (o *PagedResourceOfApplication) SetLinks(v Link)`
-
-SetLinks sets Links field to given value.
-
-### HasLinks
-
-`func (o *PagedResourceOfApplication) HasLinks() bool`
-
-HasLinks returns a boolean if a field has been set.
 
 ### GetPage
 

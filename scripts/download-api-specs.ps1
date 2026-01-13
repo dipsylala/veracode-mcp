@@ -99,6 +99,28 @@ foreach ($spec in $specs) {
         # Save to file
         $content | Set-Content -Path $spec.File -Encoding UTF8
         
+        # Remove _links properties from all specs (not needed for client generation)
+        if ($Verbose) {
+            Write-Host "    Removing _links properties..." -ForegroundColor Gray
+        }
+        
+        $specContent = Get-Content -Path $spec.File -Raw
+        
+        # Remove "_links" property and its value, handling various patterns:
+        # 1. "_links": { ... } with nested objects
+        # 2. "_links": [ ... ] with arrays
+        # Need to handle nested braces/brackets carefully
+        
+        # Match "_links": followed by either array or object, with proper nesting
+        # This regex handles nested structures up to 3 levels deep
+        $pattern = '"_links"\s*:\s*(?:\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}|\[(?:[^\[\]]|\[(?:[^\[\]]|\[[^\[\]]*\])*\])*\])\s*,?'
+        $specContent = $specContent -replace $pattern, ''
+        
+        # Clean up trailing commas before closing braces
+        $specContent = $specContent -replace ',(\s*[}\]])', '$1'
+        
+        $specContent | Set-Content -Path $spec.File -Encoding UTF8 -NoNewline
+        
         # Apply spec-specific fixes
         if ($spec.File -eq "specs/veracode-findings.json") {
             if ($Verbose) {
@@ -132,10 +154,43 @@ foreach ($spec in $specs) {
             $categoryObject = '"type": "object", "properties": { "id": { "type": "integer", "format": "int32" }, "name": { "type": "string" }, "href": { "type": "string" } }'
             $specContent = $specContent -replace '("finding_category":\s*\{[^}]*)"type":\s*"string"', ('$1' + $categoryObject)
             
+            # Add Page and Size parameters to findings endpoint (missing from SwaggerHub spec)
+            $specContent = $specContent -replace '(\{\s*"\$ref":\s*"#/components/parameters/PolicyViolation"\s*\}\s*)\](\s*,\s*"responses")', ('$1,{' + "`n" + '            "$ref": "#/components/parameters/Page"' + "`n" + '          },{' + "`n" + '            "$ref": "#/components/parameters/Size"' + "`n" + '          }]$2')
+            
+            # Fix discovered_by_vsa: API returns number (0/1), not string or boolean
+            $specContent = $specContent -replace '("discovered_by_vsa":\s*\{[^}]*)"type":\s*"string"', '$1"type": "integer"'
+            
+            # Fix metadata: API returns object, not string
+            $specContent = $specContent -replace '("metadata":\s*\{[^}]*)"type":\s*"string"([^}]*"description":[^}]*\})', '$1"type": "object"$2'
+            
+            # Fix CVE severity: API returns string, not integer
+            $specContent = $specContent -replace '("ScaFindingCve"[\s\S]*?"severity":\s*\{[^}]*)"type":\s*"integer"', '$1"type": "string"'
+            
+            # Fix CVSS3 severity: API also returns string like "Very High" for CVSS3 severity
+            $specContent = $specContent -replace '("cvss3"[\s\S]{0,500}?"severity":\s*\{[^}]*)"type":\s*"integer"', '$1"type": "string"'
+            
             $specContent | Set-Content -Path $spec.File -Encoding UTF8 -NoNewline
             
             if ($Verbose) {
                 Write-Host "    Applied spec fixes to StaticFinding and DynamicFinding schemas" -ForegroundColor Gray
+            }
+        }
+        
+        # Apply fixes to Static Finding Data Path API spec
+        if ($spec.File -eq "specs/veracode-static-finding-data-path.json") {
+            if ($Verbose) {
+                Write-Host "    Applying fixes to Static Finding Data Path API spec..." -ForegroundColor Gray
+            }
+            
+            $specContent = Get-Content -Path $spec.File -Raw
+            
+            # Fix IssueSummary.name: API returns string (application name), not int32
+            $specContent = $specContent -replace '("IssueSummary"[\s\S]{0,500}?"name":\s*\{[^}]*)"type":\s*"integer"[^}]*"format":\s*"int32"', '$1"type": "string"'
+            
+            $specContent | Set-Content -Path $spec.File -Encoding UTF8 -NoNewline
+            
+            if ($Verbose) {
+                Write-Host "    Applied spec fixes to Static Finding Data Path API" -ForegroundColor Gray
             }
         }
         
