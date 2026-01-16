@@ -19,7 +19,7 @@ var _ MappedNullable = &Source{}
 
 // Source Object representation of the source of a manual finding.
 type Source struct {
-	Id *int64 `json:"id,omitempty"`
+	Id     *int64 `json:"id,omitempty"`
 	ScanId *int32 `json:"scanId,omitempty"`
 	// Unique indentifier for the attack category which contains subcategories as (abuse of functionality, spoofing, probabilistic techniques, exploitation of authentication, resource depletion, exploitation of privilege/trust, injection, data structure attacks, data leakage attacks, resource manipulation, and time and state attacks).
 	CapecId *int32 `json:"capecId,omitempty"`
@@ -38,7 +38,7 @@ type Source struct {
 	// Description of the severity of the manual finding.
 	SeverityDesc *string `json:"severityDesc,omitempty"`
 	// Review note of the manual finding.
-	Note *string `json:"note,omitempty"`
+	Note          *string    `json:"note,omitempty"`
 	AppendixViews []Appendix `json:"appendix_views,omitempty"`
 }
 
@@ -444,7 +444,7 @@ func (o *Source) SetAppendixViews(v []Appendix) {
 }
 
 func (o Source) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -527,5 +527,3 @@ func (v *NullableSource) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

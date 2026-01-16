@@ -17,9 +17,9 @@ import (
 // FindingFindingDetails - Structured data about the finding.
 type FindingFindingDetails struct {
 	DynamicFinding *DynamicFinding
-	ManualFinding *ManualFinding
-	ScaFinding *ScaFinding
-	StaticFinding *StaticFinding
+	ManualFinding  *ManualFinding
+	ScaFinding     *ScaFinding
+	StaticFinding  *StaticFinding
 }
 
 // DynamicFindingAsFindingFindingDetails is a convenience function that returns DynamicFinding wrapped in FindingFindingDetails
@@ -50,22 +50,21 @@ func StaticFindingAsFindingFindingDetails(v *StaticFinding) FindingFindingDetail
 	}
 }
 
-
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
 	// PATCHED: Use field-based detection to determine the correct finding type
 	// Check for distinctive fields to identify the finding type, then unmarshal once to the correct type
-	
+
 	var raw map[string]interface{}
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
-	
+
 	// StaticFinding has unique fields: module, procedure, file_line_number, relative_location
 	// DynamicFinding has unique fields: hostname, port, path, plugin, URL, vulnerable_parameter
 	// ScaFinding has unique fields: component_filename, component_id, version, licenses
 	// ManualFinding - currently not distinguished, use as fallback
-	
+
 	// Check for SCA-specific fields (most distinctive)
 	if _, hasComponent := raw["component_filename"]; hasComponent {
 		return json.Unmarshal(data, &dst.ScaFinding)
@@ -76,7 +75,7 @@ func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
 	if _, hasLicenses := raw["licenses"]; hasLicenses {
 		return json.Unmarshal(data, &dst.ScaFinding)
 	}
-	
+
 	// Check for Static-specific fields
 	if _, hasModule := raw["module"]; hasModule {
 		return json.Unmarshal(data, &dst.StaticFinding)
@@ -90,7 +89,7 @@ func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
 	if _, hasFileLineNumber := raw["file_line_number"]; hasFileLineNumber {
 		return json.Unmarshal(data, &dst.StaticFinding)
 	}
-	
+
 	// Check for Dynamic-specific fields
 	if _, hasURL := raw["URL"]; hasURL {
 		return json.Unmarshal(data, &dst.DynamicFinding)
@@ -104,7 +103,7 @@ func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
 	if _, hasVulnParam := raw["vulnerable_parameter"]; hasVulnParam {
 		return json.Unmarshal(data, &dst.DynamicFinding)
 	}
-	
+
 	// If no distinctive fields found, try ManualFinding
 	return json.Unmarshal(data, &dst.ManualFinding)
 }
@@ -131,7 +130,7 @@ func (src FindingFindingDetails) MarshalJSON() ([]byte, error) {
 }
 
 // Get the actual instance
-func (obj *FindingFindingDetails) GetActualInstance() (interface{}) {
+func (obj *FindingFindingDetails) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
@@ -156,7 +155,7 @@ func (obj *FindingFindingDetails) GetActualInstance() (interface{}) {
 }
 
 // Get the actual instance value
-func (obj FindingFindingDetails) GetActualInstanceValue() (interface{}) {
+func (obj FindingFindingDetails) GetActualInstanceValue() interface{} {
 	if obj.DynamicFinding != nil {
 		return *obj.DynamicFinding
 	}
@@ -212,5 +211,3 @@ func (v *NullableFindingFindingDetails) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

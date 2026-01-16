@@ -2,7 +2,7 @@
 
 This package provides a clean interface to Veracode APIs, organized in three layers:
 
-```
+```text
 api/
 ├── client.go           # Client orchestrator (manages all API clients)
 ├── helpers/            # Business logic wrappers
@@ -28,6 +28,7 @@ api/
 ### client.go (Orchestrator)
 
 Manages all API clients and authentication:
+
 - `NewVeracodeClient()` - Creates client with all 4 API clients initialized
 - `GetAuthContext()` - Adds Veracode HMAC authentication to requests
 - `IsConfigured()` - Checks if credentials are set

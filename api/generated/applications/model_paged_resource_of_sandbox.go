@@ -20,7 +20,7 @@ var _ MappedNullable = &PagedResourceOfSandbox{}
 // PagedResourceOfSandbox struct for PagedResourceOfSandbox
 type PagedResourceOfSandbox struct {
 	Embedded *EmbeddedSandbox `json:"_embedded,omitempty"`
-	Page *PageMetadata `json:"page,omitempty"`
+	Page     *PageMetadata    `json:"page,omitempty"`
 }
 
 // NewPagedResourceOfSandbox instantiates a new PagedResourceOfSandbox object
@@ -105,7 +105,7 @@ func (o *PagedResourceOfSandbox) SetPage(v PageMetadata) {
 }
 
 func (o PagedResourceOfSandbox) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -158,5 +158,3 @@ func (v *NullablePagedResourceOfSandbox) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

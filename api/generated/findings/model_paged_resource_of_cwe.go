@@ -19,9 +19,9 @@ var _ MappedNullable = &PagedResourceOfCwe{}
 
 // PagedResourceOfCwe struct for PagedResourceOfCwe
 type PagedResourceOfCwe struct {
-	Embedded *EmbeddedCwe `json:"_embedded,omitempty"`
-	Link *Link `json:"_link,omitempty"`
-	Page *PageMetadata `json:"page,omitempty"`
+	Embedded *EmbeddedCwe  `json:"_embedded,omitempty"`
+	Link     *Link         `json:"_link,omitempty"`
+	Page     *PageMetadata `json:"page,omitempty"`
 }
 
 // NewPagedResourceOfCwe instantiates a new PagedResourceOfCwe object
@@ -138,7 +138,7 @@ func (o *PagedResourceOfCwe) SetPage(v PageMetadata) {
 }
 
 func (o PagedResourceOfCwe) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -194,5 +194,3 @@ func (v *NullablePagedResourceOfCwe) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -1,7 +1,7 @@
 /*
 Veracode Healthcheck API Specification
 
-Veracode Healthcheck API Documentation   This API is only available in the Veracode Commercial Region  
+Veracode Healthcheck API Documentation   This API is only available in the Veracode Commercial Region
 
 API version: 1.0
 */
@@ -18,12 +18,11 @@ import (
 	"net/url"
 )
 
-
 // HealthcheckAPIsAPIService HealthcheckAPIsAPI service
 type HealthcheckAPIsAPIService service
 
 type ApiHealthcheckStatusGetRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *HealthcheckAPIsAPIService
 }
 
@@ -36,22 +35,22 @@ HealthcheckStatusGet checkStatus
 
 Returns 200 to verify that authentication services are operational.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiHealthcheckStatusGetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiHealthcheckStatusGetRequest
 */
 func (a *HealthcheckAPIsAPIService) HealthcheckStatusGet(ctx context.Context) ApiHealthcheckStatusGetRequest {
 	return ApiHealthcheckStatusGetRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
 func (a *HealthcheckAPIsAPIService) HealthcheckStatusGetExecute(r ApiHealthcheckStatusGetRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
+		localVarHTTPMethod = http.MethodGet
+		localVarPostBody   interface{}
+		formFiles          []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "HealthcheckAPIsAPIService.HealthcheckStatusGet")

@@ -7,10 +7,19 @@ import (
 	"os"
 )
 
+// version can be set at build time with -ldflags="-X main.version=x.y.z"
+var version = "dev"
+
 func main() {
+	showVersion := flag.Bool("version", false, "Display version information")
 	mode := flag.String("mode", "stdio", "Server mode: stdio or http")
 	addr := flag.String("addr", ":8080", "HTTP server address (only for http mode)")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("veracode-mcp-server version %s\n", version)
+		os.Exit(0)
+	}
 
 	server, err := NewMCPServer()
 	if err != nil {

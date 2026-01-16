@@ -19,7 +19,7 @@ var _ MappedNullable = &DynamicFlaw{}
 
 // DynamicFlaw struct for DynamicFlaw
 type DynamicFlaw struct {
-	IssueSummary *IssueSummary `json:"issue_summary,omitempty"`
+	IssueSummary    *IssueSummary            `json:"issue_summary,omitempty"`
 	DynamicFlawInfo *DynamicSpecificFlawInfo `json:"dynamic_flaw_info,omitempty"`
 }
 
@@ -105,7 +105,7 @@ func (o *DynamicFlaw) SetDynamicFlawInfo(v DynamicSpecificFlawInfo) {
 }
 
 func (o DynamicFlaw) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -158,5 +158,3 @@ func (v *NullableDynamicFlaw) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

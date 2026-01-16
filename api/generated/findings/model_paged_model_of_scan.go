@@ -20,8 +20,8 @@ var _ MappedNullable = &PagedModelOfScan{}
 // PagedModelOfScan struct for PagedModelOfScan
 type PagedModelOfScan struct {
 	Embedded *EmbeddedScan `json:"__embedded,omitempty"`
-	Link *Link `json:"__link,omitempty"`
-	Page *PageMetadata `json:"_page,omitempty"`
+	Link     *Link         `json:"__link,omitempty"`
+	Page     *PageMetadata `json:"_page,omitempty"`
 }
 
 // NewPagedModelOfScan instantiates a new PagedModelOfScan object
@@ -138,7 +138,7 @@ func (o *PagedModelOfScan) SetPage(v PageMetadata) {
 }
 
 func (o PagedModelOfScan) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -194,5 +194,3 @@ func (v *NullablePagedModelOfScan) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

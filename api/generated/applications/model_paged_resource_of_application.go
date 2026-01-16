@@ -20,7 +20,7 @@ var _ MappedNullable = &PagedResourceOfApplication{}
 // PagedResourceOfApplication struct for PagedResourceOfApplication
 type PagedResourceOfApplication struct {
 	Embedded *EmbeddedApplication `json:"_embedded,omitempty"`
-	Page *PageMetadata `json:"page,omitempty"`
+	Page     *PageMetadata        `json:"page,omitempty"`
 }
 
 // NewPagedResourceOfApplication instantiates a new PagedResourceOfApplication object
@@ -105,7 +105,7 @@ func (o *PagedResourceOfApplication) SetPage(v PageMetadata) {
 }
 
 func (o PagedResourceOfApplication) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -158,5 +158,3 @@ func (v *NullablePagedResourceOfApplication) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-
