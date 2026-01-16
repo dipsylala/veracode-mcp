@@ -116,7 +116,8 @@ func (s *MCPServer) HandleRequest(req *JSONRPCRequest) *JSONRPCResponse {
 
 	case "notifications/initialized":
 		// Client confirms initialization - no response needed for notifications
-		return &JSONRPCResponse{JSONRPC: "2.0"}
+		log.Println("Client sent initialized notification")
+		return nil // Don't send a response for notifications
 
 	default:
 		resp.Error = &RPCError{
@@ -135,10 +136,16 @@ func (s *MCPServer) handleInitialize(params json.RawMessage) (*InitializeResult,
 	}
 
 	s.initialized = true
-	log.Printf("Initialized by client: %s %s", initParams.ClientInfo.Name, initParams.ClientInfo.Version)
+	log.Printf("Initialized by client: %s %s (protocol: %s)", initParams.ClientInfo.Name, initParams.ClientInfo.Version, initParams.ProtocolVersion)
+
+	// Use the protocol version requested by the client if we support it
+	protocolVersion := "2024-11-05"
+	if initParams.ProtocolVersion == "2024-11-05" || initParams.ProtocolVersion >= "2024-11-05" {
+		protocolVersion = initParams.ProtocolVersion
+	}
 
 	return &InitializeResult{
-		ProtocolVersion: "2024-11-05",
+		ProtocolVersion: protocolVersion,
 		Capabilities:    s.capabilities,
 		ServerInfo: Implementation{
 			Name:    "veracode-mcp-server",
