@@ -1,7 +1,7 @@
 /*
 Veracode Healthcheck API Specification
 
-Veracode Healthcheck API Documentation   This API is only available in the Veracode Commercial Region
+Veracode Healthcheck API Documentation   This API is only available in the Veracode Commercial Region  
 
 API version: 1.0
 */

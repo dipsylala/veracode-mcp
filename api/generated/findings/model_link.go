@@ -20,13 +20,13 @@ var _ MappedNullable = &Link{}
 // Link struct for Link
 type Link struct {
 	Deprecation *string `json:"deprecation,omitempty"`
-	Href        *string `json:"href,omitempty"`
-	Hreflang    *string `json:"hreflang,omitempty"`
-	Media       *string `json:"media,omitempty"`
-	Rel         *string `json:"rel,omitempty"`
-	Templated   *bool   `json:"templated,omitempty"`
-	Title       *string `json:"title,omitempty"`
-	Type        *string `json:"type,omitempty"`
+	Href *string `json:"href,omitempty"`
+	Hreflang *string `json:"hreflang,omitempty"`
+	Media *string `json:"media,omitempty"`
+	Rel *string `json:"rel,omitempty"`
+	Templated *bool `json:"templated,omitempty"`
+	Title *string `json:"title,omitempty"`
+	Type *string `json:"type,omitempty"`
 }
 
 // NewLink instantiates a new Link object
@@ -303,7 +303,7 @@ func (o *Link) SetType(v string) {
 }
 
 func (o Link) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -374,3 +374,5 @@ func (v *NullableLink) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

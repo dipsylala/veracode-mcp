@@ -19,14 +19,15 @@ import (
 	"strings"
 )
 
+
 // DefaultAPIService DefaultAPI service
 type DefaultAPIService service
 
 type ApiAppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *DefaultAPIService
-	appGuid    string
-	issueId    string
+	appGuid string
+	issueId string
 }
 
 func (r ApiAppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetRequest) Execute() (*DynamicFlaw, *http.Response, error) {
@@ -38,29 +39,28 @@ AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGet Returns information
 
 Returns detailed information about a single dynamic flaw, including the CWE, description, recommendation, and associated HTTP requests.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param appGuid GUID for the application.
-	@param issueId Unique issue ID for the scanned application.
-	@return ApiAppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param appGuid GUID for the application.
+ @param issueId Unique issue ID for the scanned application.
+ @return ApiAppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetRequest
 */
 func (a *DefaultAPIService) AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGet(ctx context.Context, appGuid string, issueId string) ApiAppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetRequest {
 	return ApiAppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetRequest{
 		ApiService: a,
-		ctx:        ctx,
-		appGuid:    appGuid,
-		issueId:    issueId,
+		ctx: ctx,
+		appGuid: appGuid,
+		issueId: issueId,
 	}
 }
 
 // Execute executes the request
-//
-//	@return DynamicFlaw
+//  @return DynamicFlaw
 func (a *DefaultAPIService) AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetExecute(r ApiAppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGetRequest) (*DynamicFlaw, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *DynamicFlaw
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *DynamicFlaw
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFlawInfoGet")
@@ -122,8 +122,8 @@ func (a *DefaultAPIService) AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFla
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -133,8 +133,8 @@ func (a *DefaultAPIService) AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFla
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 504 {
@@ -144,8 +144,8 @@ func (a *DefaultAPIService) AppsecV2ApplicationsAppGuidFindingsIssueIdDynamicFla
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

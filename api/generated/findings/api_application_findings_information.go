@@ -16,36 +16,37 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strings"
 	"time"
+	"reflect"
 )
+
 
 // ApplicationFindingsInformationAPIService ApplicationFindingsInformationAPI service
 type ApplicationFindingsInformationAPIService service
 
 type ApiGetFindingsUsingGETRequest struct {
-	ctx             context.Context
-	ApiService      *ApplicationFindingsInformationAPIService
+	ctx context.Context
+	ApiService *ApplicationFindingsInformationAPIService
 	applicationGuid string
-	context         *string
-	cve             *string
-	cvss            *float64
-	cvssGte         *float64
-	cwe             *[]int32
+	context *string
+	cve *string
+	cvss *float64
+	cvssGte *float64
+	cwe *[]int32
 	findingCategory *[]int32
-	includeAnnot    *bool
-	includeExpDate  *bool
-	mitigatedAfter  *time.Time
-	new             *bool
-	scaDepMode      *string
-	scaScanMode     *string
-	scanType        *[]string
-	severity        *int32
-	severityGte     *int32
-	violatesPolicy  *bool
-	page            *int32
-	size            *int32
+	includeAnnot *bool
+	includeExpDate *bool
+	mitigatedAfter *time.Time
+	new *bool
+	scaDepMode *string
+	scaScanMode *string
+	scanType *[]string
+	severity *int32
+	severityGte *int32
+	violatesPolicy *bool
+	page *int32
+	size *int32
 }
 
 // Context type, which filters results to show only the findings of this specific context type. The findings status parameter is relative to this context parameter.
@@ -165,27 +166,26 @@ GetFindingsUsingGET getFindings
 
 Returns findings information from Veracode scans.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param applicationGuid The application identifier.
-	@return ApiGetFindingsUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param applicationGuid The application identifier.
+ @return ApiGetFindingsUsingGETRequest
 */
 func (a *ApplicationFindingsInformationAPIService) GetFindingsUsingGET(ctx context.Context, applicationGuid string) ApiGetFindingsUsingGETRequest {
 	return ApiGetFindingsUsingGETRequest{
-		ApiService:      a,
-		ctx:             ctx,
+		ApiService: a,
+		ctx: ctx,
 		applicationGuid: applicationGuid,
 	}
 }
 
 // Execute executes the request
-//
-//	@return PagedResourceOfFinding
+//  @return PagedResourceOfFinding
 func (a *ApplicationFindingsInformationAPIService) GetFindingsUsingGETExecute(r ApiGetFindingsUsingGETRequest) (*PagedResourceOfFinding, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PagedResourceOfFinding
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PagedResourceOfFinding
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApplicationFindingsInformationAPIService.GetFindingsUsingGET")

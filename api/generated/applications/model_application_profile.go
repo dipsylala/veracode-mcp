@@ -19,22 +19,22 @@ var _ MappedNullable = &ApplicationProfile{}
 
 // ApplicationProfile struct for ApplicationProfile
 type ApplicationProfile struct {
-	ArcherAppName       *string               `json:"archer_app_name,omitempty"`
-	BusinessCriticality *string               `json:"business_criticality,omitempty"`
-	BusinessOwners      []BusinessOwner       `json:"business_owners,omitempty"`
-	BusinessUnit        *BusinessUnit         `json:"business_unit,omitempty"`
-	CustomFieldValues   []AppCustomFieldValue `json:"custom_field_values,omitempty"`
-	CustomFields        []CustomNameValue     `json:"custom_fields,omitempty"`
+	ArcherAppName *string `json:"archer_app_name,omitempty"`
+	BusinessCriticality *string `json:"business_criticality,omitempty"`
+	BusinessOwners []BusinessOwner `json:"business_owners,omitempty"`
+	BusinessUnit *BusinessUnit `json:"business_unit,omitempty"`
+	CustomFieldValues []AppCustomFieldValue `json:"custom_field_values,omitempty"`
+	CustomFields []CustomNameValue `json:"custom_fields,omitempty"`
 	// Alias for the Customer Managed Encryption Key.
 	CustomKmsAlias *string `json:"custom_kms_alias,omitempty"`
-	Description    *string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	// The URL of the Git repository associated with the application. Veracode includes findings from the Git repository in the reporting for this application.
-	GitRepoUrl *string              `json:"git_repo_url,omitempty"`
-	Name       *string              `json:"name,omitempty"`
-	Policies   []AppPolicy          `json:"policies,omitempty"`
-	Settings   *ApplicationSettings `json:"settings,omitempty"`
-	Tags       *string              `json:"tags,omitempty"`
-	Teams      []AppTeam            `json:"teams,omitempty"`
+	GitRepoUrl *string `json:"git_repo_url,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Policies []AppPolicy `json:"policies,omitempty"`
+	Settings *ApplicationSettings `json:"settings,omitempty"`
+	Tags *string `json:"tags,omitempty"`
+	Teams []AppTeam `json:"teams,omitempty"`
 }
 
 // NewApplicationProfile instantiates a new ApplicationProfile object
@@ -503,7 +503,7 @@ func (o *ApplicationProfile) SetTeams(v []AppTeam) {
 }
 
 func (o ApplicationProfile) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -592,3 +592,5 @@ func (v *NullableApplicationProfile) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

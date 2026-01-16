@@ -19,10 +19,10 @@ var _ MappedNullable = &PageMetadata{}
 
 // PageMetadata struct for PageMetadata
 type PageMetadata struct {
-	Number        *int64 `json:"number,omitempty"`
-	Size          *int64 `json:"size,omitempty"`
+	Number *int64 `json:"number,omitempty"`
+	Size *int64 `json:"size,omitempty"`
 	TotalElements *int64 `json:"total_elements,omitempty"`
-	TotalPages    *int64 `json:"total_pages,omitempty"`
+	TotalPages *int64 `json:"total_pages,omitempty"`
 }
 
 // NewPageMetadata instantiates a new PageMetadata object
@@ -171,7 +171,7 @@ func (o *PageMetadata) SetTotalPages(v int64) {
 }
 
 func (o PageMetadata) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -230,3 +230,5 @@ func (v *NullablePageMetadata) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

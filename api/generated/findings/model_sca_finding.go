@@ -26,7 +26,7 @@ type ScaFinding struct {
 	ComponentId *string `json:"component_id,omitempty"`
 	// Displays all licenses found for a component with the specified risk rating.
 	Licenses []ScaFindingLicensesInner `json:"licenses,omitempty"`
-	Cve      *ScaFindingCve            `json:"cve,omitempty"`
+	Cve *ScaFindingCve `json:"cve,omitempty"`
 	// The version of the third-party component.
 	Version *string `json:"version,omitempty"`
 	// The product ID containing the vulnerability.
@@ -411,7 +411,7 @@ func (o *ScaFinding) SetMetadata(v map[string]interface{}) {
 }
 
 func (o ScaFinding) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -491,3 +491,5 @@ func (v *NullableScaFinding) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

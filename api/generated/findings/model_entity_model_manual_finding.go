@@ -42,13 +42,13 @@ type EntityModelManualFinding struct {
 	Cvss *float64 `json:"cvss,omitempty"`
 	// Resolution of the finding.
 	Resolution *string `json:"resolution,omitempty"`
-	State      *string `json:"state,omitempty"`
+	State *string `json:"state,omitempty"`
 	// Date the scan finding was found.
-	Date   *time.Time `json:"date,omitempty"`
-	Source *Source    `json:"source,omitempty"`
+	Date *time.Time `json:"date,omitempty"`
+	Source *Source `json:"source,omitempty"`
 	// Identifier that matches this finding.
-	MatchedId *int64     `json:"matchedId,omitempty"`
-	Appendix  []Appendix `json:"appendix,omitempty"`
+	MatchedId *int64 `json:"matchedId,omitempty"`
+	Appendix []Appendix `json:"appendix,omitempty"`
 }
 
 // NewEntityModelManualFinding instantiates a new EntityModelManualFinding object
@@ -581,7 +581,7 @@ func (o *EntityModelManualFinding) SetAppendix(v []Appendix) {
 }
 
 func (o EntityModelManualFinding) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -676,3 +676,5 @@ func (v *NullableEntityModelManualFinding) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

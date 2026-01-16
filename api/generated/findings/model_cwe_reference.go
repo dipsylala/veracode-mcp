@@ -20,7 +20,7 @@ var _ MappedNullable = &CWEReference{}
 // CWEReference struct for CWEReference
 type CWEReference struct {
 	Name *string `json:"name,omitempty"`
-	Url  *string `json:"url,omitempty"`
+	Url *string `json:"url,omitempty"`
 }
 
 // NewCWEReference instantiates a new CWEReference object
@@ -105,7 +105,7 @@ func (o *CWEReference) SetUrl(v string) {
 }
 
 func (o CWEReference) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -158,3 +158,5 @@ func (v *NullableCWEReference) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

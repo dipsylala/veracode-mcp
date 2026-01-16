@@ -22,10 +22,10 @@ var _ MappedNullable = &AppCustomFieldValue{}
 type AppCustomFieldValue struct {
 	AppCustomFieldName *AppCustomFieldName `json:"app_custom_field_name,omitempty"`
 	// The date and time when the application was created. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
-	Created     *time.Time `json:"created,omitempty"`
-	FieldNameId *int32     `json:"field_name_id,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
+	FieldNameId *int32 `json:"field_name_id,omitempty"`
 	// Unique identifier of the category.
-	Id    *int32  `json:"id,omitempty"`
+	Id *int32 `json:"id,omitempty"`
 	Value *string `json:"value,omitempty"`
 }
 
@@ -207,7 +207,7 @@ func (o *AppCustomFieldValue) SetValue(v string) {
 }
 
 func (o AppCustomFieldValue) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -269,3 +269,5 @@ func (v *NullableAppCustomFieldValue) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

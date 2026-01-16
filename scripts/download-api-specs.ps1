@@ -194,6 +194,24 @@ foreach ($spec in $specs) {
             }
         }
         
+        # Apply fixes to Dynamic Flaw API spec
+        if ($spec.File -eq "specs/veracode-dynamic-flaw.json") {
+            if ($Verbose) {
+                Write-Host "    Applying fixes to Dynamic Flaw API spec..." -ForegroundColor Gray
+            }
+            
+            $specContent = Get-Content -Path $spec.File -Raw
+            
+            # Fix Request.port: API returns string (like "443"), not integer
+            $specContent = $specContent -replace '("port":\s*\{[^}]*)"type":\s*"integer"', '$1"type": "string"'
+            
+            $specContent | Set-Content -Path $spec.File -Encoding UTF8 -NoNewline
+            
+            if ($Verbose) {
+                Write-Host "    Applied spec fixes to Dynamic Flaw API" -ForegroundColor Gray
+            }
+        }
+        
         # Verify file was created
         if (Test-Path $spec.File) {
             $fileSize = (Get-Item $spec.File).Length

@@ -48,28 +48,20 @@ func TestGetStaticFlawDetails_Integration(t *testing.T) {
 	}
 
 	// Verify the response structure
-	if staticFlaw.StaticFlaws == nil {
-		t.Fatal("StaticFlaws is nil")
-	}
-
-	if len(staticFlaw.StaticFlaws) == 0 {
-		t.Fatal("StaticFlaws array is empty")
-	}
-
-	flaw := staticFlaw.StaticFlaws[0]
-
-	// Verify some basic fields exist
-	if flaw.IssueSummary == nil {
+	if staticFlaw.IssueSummary == nil {
 		t.Fatal("IssueSummary is nil")
 	}
 
-	if flaw.IssueSummary.Name == nil || *flaw.IssueSummary.Name == "" {
+	if staticFlaw.IssueSummary.Name == nil || *staticFlaw.IssueSummary.Name == "" {
 		t.Fatal("IssueSummary.Name is empty")
 	}
 
 	t.Logf("✓ Successfully retrieved static flaw details for ID %s", flawID)
-	t.Logf("  Application: %s", *flaw.IssueSummary.Name)
-	if flaw.IssueSummary.Description != nil {
-		t.Logf("  Description: %.100s...", *flaw.IssueSummary.Description)
+	t.Logf("  Application: %s", *staticFlaw.IssueSummary.Name)
+	if staticFlaw.IssueSummary.IssueId != nil {
+		t.Logf("  Issue ID: %d", *staticFlaw.IssueSummary.IssueId)
+	}
+	if staticFlaw.DataPaths != nil {
+		t.Logf("  Data paths: %d", len(staticFlaw.DataPaths))
 	}
 }

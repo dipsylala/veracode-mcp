@@ -19,14 +19,15 @@ import (
 	"strings"
 )
 
+
 // SandboxInformationAPIAPIService SandboxInformationAPIAPI service
 type SandboxInformationAPIAPIService service
 
 type ApiCreateSandboxUsingPOSTRequest struct {
-	ctx             context.Context
-	ApiService      *SandboxInformationAPIAPIService
+	ctx context.Context
+	ApiService *SandboxInformationAPIAPIService
 	applicationGuid string
-	sandbox         *Sandbox
+	sandbox *Sandbox
 }
 
 // The sandbox object to create.
@@ -44,27 +45,26 @@ CreateSandboxUsingPOST createSandbox
 
 Creates sandbox and returns the created sandbox details and links to associated resources.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param applicationGuid The application GUID.
-	@return ApiCreateSandboxUsingPOSTRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param applicationGuid The application GUID.
+ @return ApiCreateSandboxUsingPOSTRequest
 */
 func (a *SandboxInformationAPIAPIService) CreateSandboxUsingPOST(ctx context.Context, applicationGuid string) ApiCreateSandboxUsingPOSTRequest {
 	return ApiCreateSandboxUsingPOSTRequest{
-		ApiService:      a,
-		ctx:             ctx,
+		ApiService: a,
+		ctx: ctx,
 		applicationGuid: applicationGuid,
 	}
 }
 
 // Execute executes the request
-//
-//	@return Sandbox
+//  @return Sandbox
 func (a *SandboxInformationAPIAPIService) CreateSandboxUsingPOSTExecute(r ApiCreateSandboxUsingPOSTRequest) (*Sandbox, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Sandbox
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Sandbox
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SandboxInformationAPIAPIService.CreateSandboxUsingPOST")
@@ -139,10 +139,10 @@ func (a *SandboxInformationAPIAPIService) CreateSandboxUsingPOSTExecute(r ApiCre
 }
 
 type ApiGetSandboxUsingGETRequest struct {
-	ctx             context.Context
-	ApiService      *SandboxInformationAPIAPIService
+	ctx context.Context
+	ApiService *SandboxInformationAPIAPIService
 	applicationGuid string
-	sandboxGuid     string
+	sandboxGuid string
 }
 
 func (r ApiGetSandboxUsingGETRequest) Execute() (*Sandbox, *http.Response, error) {
@@ -154,29 +154,28 @@ GetSandboxUsingGET getSandbox
 
 Returns sandbox information and links to associated resources.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param applicationGuid The application GUID.
-	@param sandboxGuid The sandbox GUID
-	@return ApiGetSandboxUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param applicationGuid The application GUID.
+ @param sandboxGuid The sandbox GUID
+ @return ApiGetSandboxUsingGETRequest
 */
 func (a *SandboxInformationAPIAPIService) GetSandboxUsingGET(ctx context.Context, applicationGuid string, sandboxGuid string) ApiGetSandboxUsingGETRequest {
 	return ApiGetSandboxUsingGETRequest{
-		ApiService:      a,
-		ctx:             ctx,
+		ApiService: a,
+		ctx: ctx,
 		applicationGuid: applicationGuid,
-		sandboxGuid:     sandboxGuid,
+		sandboxGuid: sandboxGuid,
 	}
 }
 
 // Execute executes the request
-//
-//	@return Sandbox
+//  @return Sandbox
 func (a *SandboxInformationAPIAPIService) GetSandboxUsingGETExecute(r ApiGetSandboxUsingGETRequest) (*Sandbox, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Sandbox
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Sandbox
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SandboxInformationAPIAPIService.GetSandboxUsingGET")
@@ -247,11 +246,11 @@ func (a *SandboxInformationAPIAPIService) GetSandboxUsingGETExecute(r ApiGetSand
 }
 
 type ApiGetSandboxesUsingGETRequest struct {
-	ctx             context.Context
-	ApiService      *SandboxInformationAPIAPIService
+	ctx context.Context
+	ApiService *SandboxInformationAPIAPIService
 	applicationGuid string
-	page            *int32
-	size            *int32
+	page *int32
+	size *int32
 }
 
 // Page number. Defaults to 0.
@@ -275,27 +274,26 @@ GetSandboxesUsingGET getSandboxes
 
 Sandboxes provide the ability to scan applications and measure the results against the policy rules without affecting the policy compliance of the entire application.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param applicationGuid The application GUID.
-	@return ApiGetSandboxesUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param applicationGuid The application GUID.
+ @return ApiGetSandboxesUsingGETRequest
 */
 func (a *SandboxInformationAPIAPIService) GetSandboxesUsingGET(ctx context.Context, applicationGuid string) ApiGetSandboxesUsingGETRequest {
 	return ApiGetSandboxesUsingGETRequest{
-		ApiService:      a,
-		ctx:             ctx,
+		ApiService: a,
+		ctx: ctx,
 		applicationGuid: applicationGuid,
 	}
 }
 
 // Execute executes the request
-//
-//	@return PagedResourceOfSandbox
+//  @return PagedResourceOfSandbox
 func (a *SandboxInformationAPIAPIService) GetSandboxesUsingGETExecute(r ApiGetSandboxesUsingGETRequest) (*PagedResourceOfSandbox, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PagedResourceOfSandbox
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PagedResourceOfSandbox
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SandboxInformationAPIAPIService.GetSandboxesUsingGET")

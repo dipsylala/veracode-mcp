@@ -31,9 +31,9 @@ type Finding struct {
 	// Number of times a finding occurs in an application, often referred to as prevalence.
 	Count *int32 `json:"count,omitempty"`
 	// The detailed description of the finding.
-	Description    *string                `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	FindingDetails *FindingFindingDetails `json:"finding_details,omitempty"`
-	FindingStatus  *FindingStatus         `json:"finding_status,omitempty"`
+	FindingStatus *FindingStatus `json:"finding_status,omitempty"`
 	// The date on which a grace period expires for the finding. Veracode calculates this date based on the last date a finding was opened (First Found or Last Reopened date), and based on the grace period provided in the security policy assigned to the application. This date only applies to findings that impact policy compliance. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
 	GracePeriodExpiresDate *time.Time `json:"grace_period_expires_date,omitempty"`
 	// Unique ID within the context of this application.
@@ -446,7 +446,7 @@ func (o *Finding) SetViolatesPolicy(v bool) {
 }
 
 func (o Finding) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -529,3 +529,5 @@ func (v *NullableFinding) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

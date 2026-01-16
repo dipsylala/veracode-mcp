@@ -19,14 +19,15 @@ import (
 	"strings"
 )
 
+
 // CWEAPIInformationAPIService CWEAPIInformationAPI service
 type CWEAPIInformationAPIService service
 
 type ApiGetCategoriesUsingGETRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *CWEAPIInformationAPIService
-	page       *int32
-	size       *int32
+	page *int32
+	size *int32
 }
 
 // Page number. The default is 0.
@@ -50,25 +51,24 @@ GetCategoriesUsingGET getCategories
 
 Returns a list of CWE categories.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiGetCategoriesUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetCategoriesUsingGETRequest
 */
 func (a *CWEAPIInformationAPIService) GetCategoriesUsingGET(ctx context.Context) ApiGetCategoriesUsingGETRequest {
 	return ApiGetCategoriesUsingGETRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//
-//	@return PagedResourceOfCategory
+//  @return PagedResourceOfCategory
 func (a *CWEAPIInformationAPIService) GetCategoriesUsingGETExecute(r ApiGetCategoriesUsingGETRequest) (*PagedResourceOfCategory, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PagedResourceOfCategory
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PagedResourceOfCategory
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CWEAPIInformationAPIService.GetCategoriesUsingGET")
@@ -143,9 +143,9 @@ func (a *CWEAPIInformationAPIService) GetCategoriesUsingGETExecute(r ApiGetCateg
 }
 
 type ApiGetCategoryUsingGETRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *CWEAPIInformationAPIService
-	category   int32
+	category int32
 }
 
 func (r ApiGetCategoryUsingGETRequest) Execute() (*Category, *http.Response, error) {
@@ -157,27 +157,26 @@ GetCategoryUsingGET getCategory
 
 Returns CWE Category information and links to associated resources.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param category The CWE category identifier.
-	@return ApiGetCategoryUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param category The CWE category identifier.
+ @return ApiGetCategoryUsingGETRequest
 */
 func (a *CWEAPIInformationAPIService) GetCategoryUsingGET(ctx context.Context, category int32) ApiGetCategoryUsingGETRequest {
 	return ApiGetCategoryUsingGETRequest{
 		ApiService: a,
-		ctx:        ctx,
-		category:   category,
+		ctx: ctx,
+		category: category,
 	}
 }
 
 // Execute executes the request
-//
-//	@return Category
+//  @return Category
 func (a *CWEAPIInformationAPIService) GetCategoryUsingGETExecute(r ApiGetCategoryUsingGETRequest) (*Category, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Category
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Category
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CWEAPIInformationAPIService.GetCategoryUsingGET")
@@ -247,9 +246,9 @@ func (a *CWEAPIInformationAPIService) GetCategoryUsingGETExecute(r ApiGetCategor
 }
 
 type ApiGetCweUsingGETRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *CWEAPIInformationAPIService
-	cwe        int32
+	cwe int32
 }
 
 func (r ApiGetCweUsingGETRequest) Execute() (*CweDetail, *http.Response, error) {
@@ -261,27 +260,26 @@ GetCweUsingGET getCwe
 
 Returns CWE information and links to associated resources.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param cwe The CWE ID.
-	@return ApiGetCweUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param cwe The CWE ID.
+ @return ApiGetCweUsingGETRequest
 */
 func (a *CWEAPIInformationAPIService) GetCweUsingGET(ctx context.Context, cwe int32) ApiGetCweUsingGETRequest {
 	return ApiGetCweUsingGETRequest{
 		ApiService: a,
-		ctx:        ctx,
-		cwe:        cwe,
+		ctx: ctx,
+		cwe: cwe,
 	}
 }
 
 // Execute executes the request
-//
-//	@return CweDetail
+//  @return CweDetail
 func (a *CWEAPIInformationAPIService) GetCweUsingGETExecute(r ApiGetCweUsingGETRequest) (*CweDetail, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *CweDetail
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *CweDetail
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CWEAPIInformationAPIService.GetCweUsingGET")
@@ -351,10 +349,10 @@ func (a *CWEAPIInformationAPIService) GetCweUsingGETExecute(r ApiGetCweUsingGETR
 }
 
 type ApiGetCwesUsingGETRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *CWEAPIInformationAPIService
-	page       *int32
-	size       *int32
+	page *int32
+	size *int32
 }
 
 // Page number. The default is 0.
@@ -378,25 +376,24 @@ GetCwesUsingGET getCwes
 
 Returns a list of CWEs.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiGetCwesUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetCwesUsingGETRequest
 */
 func (a *CWEAPIInformationAPIService) GetCwesUsingGET(ctx context.Context) ApiGetCwesUsingGETRequest {
 	return ApiGetCwesUsingGETRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//
-//	@return PagedResourceOfCwe
+//  @return PagedResourceOfCwe
 func (a *CWEAPIInformationAPIService) GetCwesUsingGETExecute(r ApiGetCwesUsingGETRequest) (*PagedResourceOfCwe, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PagedResourceOfCwe
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PagedResourceOfCwe
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CWEAPIInformationAPIService.GetCwesUsingGET")

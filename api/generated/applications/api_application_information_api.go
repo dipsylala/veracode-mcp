@@ -16,17 +16,18 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strings"
 	"time"
+	"reflect"
 )
+
 
 // ApplicationInformationAPIAPIService ApplicationInformationAPIAPI service
 type ApplicationInformationAPIAPIService service
 
 type ApiCreateApplicationUsingPOSTRequest struct {
-	ctx         context.Context
-	ApiService  *ApplicationInformationAPIAPIService
+	ctx context.Context
+	ApiService *ApplicationInformationAPIAPIService
 	application *Application
 }
 
@@ -45,25 +46,24 @@ CreateApplicationUsingPOST createApplication
 
 Creates a new application and links it to associated resources such as policies and sandboxes.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiCreateApplicationUsingPOSTRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreateApplicationUsingPOSTRequest
 */
 func (a *ApplicationInformationAPIAPIService) CreateApplicationUsingPOST(ctx context.Context) ApiCreateApplicationUsingPOSTRequest {
 	return ApiCreateApplicationUsingPOSTRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//
-//	@return Application
+//  @return Application
 func (a *ApplicationInformationAPIAPIService) CreateApplicationUsingPOSTExecute(r ApiCreateApplicationUsingPOSTRequest) (*Application, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Application
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Application
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApplicationInformationAPIAPIService.CreateApplicationUsingPOST")
@@ -128,8 +128,8 @@ func (a *ApplicationInformationAPIAPIService) CreateApplicationUsingPOSTExecute(
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
@@ -148,8 +148,8 @@ func (a *ApplicationInformationAPIAPIService) CreateApplicationUsingPOSTExecute(
 }
 
 type ApiDeleteApplicationUsingDELETERequest struct {
-	ctx             context.Context
-	ApiService      *ApplicationInformationAPIAPIService
+	ctx context.Context
+	ApiService *ApplicationInformationAPIAPIService
 	applicationGuid string
 }
 
@@ -160,27 +160,26 @@ func (r ApiDeleteApplicationUsingDELETERequest) Execute() (map[string]interface{
 /*
 DeleteApplicationUsingDELETE deleteApplication
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param applicationGuid The application GUID.
-	@return ApiDeleteApplicationUsingDELETERequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param applicationGuid The application GUID.
+ @return ApiDeleteApplicationUsingDELETERequest
 */
 func (a *ApplicationInformationAPIAPIService) DeleteApplicationUsingDELETE(ctx context.Context, applicationGuid string) ApiDeleteApplicationUsingDELETERequest {
 	return ApiDeleteApplicationUsingDELETERequest{
-		ApiService:      a,
-		ctx:             ctx,
+		ApiService: a,
+		ctx: ctx,
 		applicationGuid: applicationGuid,
 	}
 }
 
 // Execute executes the request
-//
-//	@return map[string]interface{}
+//  @return map[string]interface{}
 func (a *ApplicationInformationAPIAPIService) DeleteApplicationUsingDELETEExecute(r ApiDeleteApplicationUsingDELETERequest) (map[string]interface{}, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodDelete
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue map[string]interface{}
+		localVarHTTPMethod   = http.MethodDelete
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  map[string]interface{}
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApplicationInformationAPIAPIService.DeleteApplicationUsingDELETE")
@@ -241,8 +240,8 @@ func (a *ApplicationInformationAPIAPIService) DeleteApplicationUsingDELETEExecut
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
@@ -261,8 +260,8 @@ func (a *ApplicationInformationAPIAPIService) DeleteApplicationUsingDELETEExecut
 }
 
 type ApiGetApplicationUsingGETRequest struct {
-	ctx             context.Context
-	ApiService      *ApplicationInformationAPIAPIService
+	ctx context.Context
+	ApiService *ApplicationInformationAPIAPIService
 	applicationGuid string
 }
 
@@ -275,27 +274,26 @@ GetApplicationUsingGET getApplication
 
 Returns application information and links to associated resources.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param applicationGuid The application GUID.
-	@return ApiGetApplicationUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param applicationGuid The application GUID.
+ @return ApiGetApplicationUsingGETRequest
 */
 func (a *ApplicationInformationAPIAPIService) GetApplicationUsingGET(ctx context.Context, applicationGuid string) ApiGetApplicationUsingGETRequest {
 	return ApiGetApplicationUsingGETRequest{
-		ApiService:      a,
-		ctx:             ctx,
+		ApiService: a,
+		ctx: ctx,
 		applicationGuid: applicationGuid,
 	}
 }
 
 // Execute executes the request
-//
-//	@return Application
+//  @return Application
 func (a *ApplicationInformationAPIAPIService) GetApplicationUsingGETExecute(r ApiGetApplicationUsingGETRequest) (*Application, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Application
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Application
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApplicationInformationAPIAPIService.GetApplicationUsingGET")
@@ -365,25 +363,25 @@ func (a *ApplicationInformationAPIAPIService) GetApplicationUsingGETExecute(r Ap
 }
 
 type ApiGetApplicationsUsingGETRequest struct {
-	ctx                          context.Context
-	ApiService                   *ApplicationInformationAPIAPIService
-	businessUnit                 *string
-	customFieldNames             *[]string
-	customFieldValues            *[]string
-	legacyId                     *int32
-	modifiedAfter                *time.Time
-	name                         *string
-	page                         *int32
-	policy                       *string
-	policyCompliance             *string
+	ctx context.Context
+	ApiService *ApplicationInformationAPIAPIService
+	businessUnit *string
+	customFieldNames *[]string
+	customFieldValues *[]string
+	legacyId *int32
+	modifiedAfter *time.Time
+	name *string
+	page *int32
+	policy *string
+	policyCompliance *string
 	policyComplianceCheckedAfter *time.Time
-	policyGuid                   *string
-	scanStatus                   *[]string
-	scanType                     *string
-	size                         *int32
-	sortByCustomFieldName        *string
-	tag                          *string
-	team                         *string
+	policyGuid *string
+	scanStatus *[]string
+	scanType *string
+	size *int32
+	sortByCustomFieldName *string
+	tag *string
+	team *string
 }
 
 // Business unit.
@@ -497,25 +495,24 @@ GetApplicationsUsingGET getApplications
 
 Returns a list of applications. Each applications has links to sandboxes, findings, and policies. The policy is associated with an application in the application profile and in other associations via parameters such as App_Team.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiGetApplicationsUsingGETRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetApplicationsUsingGETRequest
 */
 func (a *ApplicationInformationAPIAPIService) GetApplicationsUsingGET(ctx context.Context) ApiGetApplicationsUsingGETRequest {
 	return ApiGetApplicationsUsingGETRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//
-//	@return PagedResourceOfApplication
+//  @return PagedResourceOfApplication
 func (a *ApplicationInformationAPIAPIService) GetApplicationsUsingGETExecute(r ApiGetApplicationsUsingGETRequest) (*PagedResourceOfApplication, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PagedResourceOfApplication
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PagedResourceOfApplication
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApplicationInformationAPIAPIService.GetApplicationsUsingGET")
@@ -659,12 +656,12 @@ func (a *ApplicationInformationAPIAPIService) GetApplicationsUsingGETExecute(r A
 }
 
 type ApiUpdateApplicationUsingPUTRequest struct {
-	ctx             context.Context
-	ApiService      *ApplicationInformationAPIAPIService
+	ctx context.Context
+	ApiService *ApplicationInformationAPIAPIService
 	applicationGuid string
-	application     *Application
-	method          *string
-	policyGuid      *string
+	application *Application
+	method *string
+	policyGuid *string
 }
 
 // The Application object being updated.
@@ -692,27 +689,26 @@ func (r ApiUpdateApplicationUsingPUTRequest) Execute() (*Application, *http.Resp
 /*
 UpdateApplicationUsingPUT Updates an application
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param applicationGuid The application GUID.
-	@return ApiUpdateApplicationUsingPUTRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param applicationGuid The application GUID.
+ @return ApiUpdateApplicationUsingPUTRequest
 */
 func (a *ApplicationInformationAPIAPIService) UpdateApplicationUsingPUT(ctx context.Context, applicationGuid string) ApiUpdateApplicationUsingPUTRequest {
 	return ApiUpdateApplicationUsingPUTRequest{
-		ApiService:      a,
-		ctx:             ctx,
+		ApiService: a,
+		ctx: ctx,
 		applicationGuid: applicationGuid,
 	}
 }
 
 // Execute executes the request
-//
-//	@return Application
+//  @return Application
 func (a *ApplicationInformationAPIAPIService) UpdateApplicationUsingPUTExecute(r ApiUpdateApplicationUsingPUTRequest) (*Application, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPut
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Application
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Application
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApplicationInformationAPIAPIService.UpdateApplicationUsingPUT")

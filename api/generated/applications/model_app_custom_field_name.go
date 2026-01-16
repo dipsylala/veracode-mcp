@@ -25,10 +25,10 @@ type AppCustomFieldName struct {
 	// Unique identifier of the category.
 	Id *int32 `json:"id,omitempty"`
 	// The date and time when the application was modified. The date/time format is per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z.
-	Modified       *time.Time `json:"modified,omitempty"`
-	Name           *string    `json:"name,omitempty"`
-	OrganizationId *int32     `json:"organization_id,omitempty"`
-	SortOrder      *int32     `json:"sort_order,omitempty"`
+	Modified *time.Time `json:"modified,omitempty"`
+	Name *string `json:"name,omitempty"`
+	OrganizationId *int32 `json:"organization_id,omitempty"`
+	SortOrder *int32 `json:"sort_order,omitempty"`
 }
 
 // NewAppCustomFieldName instantiates a new AppCustomFieldName object
@@ -241,7 +241,7 @@ func (o *AppCustomFieldName) SetSortOrder(v int32) {
 }
 
 func (o AppCustomFieldName) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -306,3 +306,5 @@ func (v *NullableAppCustomFieldName) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

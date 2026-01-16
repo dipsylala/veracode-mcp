@@ -19,7 +19,7 @@ var _ MappedNullable = &DynamicSpecificFlawInfo{}
 
 // DynamicSpecificFlawInfo struct for DynamicSpecificFlawInfo
 type DynamicSpecificFlawInfo struct {
-	Request  *Request  `json:"request,omitempty"`
+	Request *Request `json:"request,omitempty"`
 	Response *Response `json:"response,omitempty"`
 }
 
@@ -105,7 +105,7 @@ func (o *DynamicSpecificFlawInfo) SetResponse(v Response) {
 }
 
 func (o DynamicSpecificFlawInfo) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -158,3 +158,5 @@ func (v *NullableDynamicSpecificFlawInfo) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

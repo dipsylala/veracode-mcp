@@ -19,8 +19,8 @@ var _ MappedNullable = &AppPolicy{}
 
 // AppPolicy struct for AppPolicy
 type AppPolicy struct {
-	Guid      *string `json:"guid,omitempty"`
-	IsDefault *bool   `json:"is_default,omitempty"`
+	Guid *string `json:"guid,omitempty"`
+	IsDefault *bool `json:"is_default,omitempty"`
 	// The policy name.
 	Name *string `json:"name,omitempty"`
 	// The policy compliance status.
@@ -173,7 +173,7 @@ func (o *AppPolicy) SetPolicyComplianceStatus(v string) {
 }
 
 func (o AppPolicy) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -232,3 +232,5 @@ func (v *NullableAppPolicy) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

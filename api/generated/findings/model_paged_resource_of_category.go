@@ -20,8 +20,8 @@ var _ MappedNullable = &PagedResourceOfCategory{}
 // PagedResourceOfCategory struct for PagedResourceOfCategory
 type PagedResourceOfCategory struct {
 	Embedded *EmbeddedCategory `json:"_embedded,omitempty"`
-	Link     *Link             `json:"_link,omitempty"`
-	Page     *PageMetadata     `json:"page,omitempty"`
+	Link *Link `json:"_link,omitempty"`
+	Page *PageMetadata `json:"page,omitempty"`
 }
 
 // NewPagedResourceOfCategory instantiates a new PagedResourceOfCategory object
@@ -138,7 +138,7 @@ func (o *PagedResourceOfCategory) SetPage(v PageMetadata) {
 }
 
 func (o PagedResourceOfCategory) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -194,3 +194,5 @@ func (v *NullablePagedResourceOfCategory) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

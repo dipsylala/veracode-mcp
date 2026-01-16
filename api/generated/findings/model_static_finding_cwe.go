@@ -19,7 +19,7 @@ var _ MappedNullable = &StaticFindingCwe{}
 
 // StaticFindingCwe struct for StaticFindingCwe
 type StaticFindingCwe struct {
-	Id   *int32  `json:"id,omitempty"`
+	Id *int32 `json:"id,omitempty"`
 	Name *string `json:"name,omitempty"`
 	Href *string `json:"href,omitempty"`
 }
@@ -138,7 +138,7 @@ func (o *StaticFindingCwe) SetHref(v string) {
 }
 
 func (o StaticFindingCwe) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -194,3 +194,5 @@ func (v *NullableStaticFindingCwe) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

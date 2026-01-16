@@ -26,7 +26,7 @@ type Request struct {
 	// True if this is a secure HTTPS request, false if HTTP.
 	Secure *bool `json:"secure,omitempty"`
 	// TCP port to which this request was made.
-	Port *int32 `json:"port,omitempty"`
+	Port *string `json:"port,omitempty"`
 	// Protocol associated with this request. Typically, HTTP.
 	Protocol *string `json:"protocol,omitempty"`
 	// HTTP method of the request (GET, POST, PUT, PATCH, etc.). Can include custom methods.
@@ -157,9 +157,9 @@ func (o *Request) SetSecure(v bool) {
 }
 
 // GetPort returns the Port field value if set, zero value otherwise.
-func (o *Request) GetPort() int32 {
+func (o *Request) GetPort() string {
 	if o == nil || IsNil(o.Port) {
-		var ret int32
+		var ret string
 		return ret
 	}
 	return *o.Port
@@ -167,7 +167,7 @@ func (o *Request) GetPort() int32 {
 
 // GetPortOk returns a tuple with the Port field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Request) GetPortOk() (*int32, bool) {
+func (o *Request) GetPortOk() (*string, bool) {
 	if o == nil || IsNil(o.Port) {
 		return nil, false
 	}
@@ -183,8 +183,8 @@ func (o *Request) HasPort() bool {
 	return false
 }
 
-// SetPort gets a reference to the given int32 and assigns it to the Port field.
-func (o *Request) SetPort(v int32) {
+// SetPort gets a reference to the given string and assigns it to the Port field.
+func (o *Request) SetPort(v string) {
 	o.Port = &v
 }
 
@@ -413,7 +413,7 @@ func (o *Request) SetAttackVectors(v []AttackVector) {
 }
 
 func (o Request) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -493,3 +493,5 @@ func (v *NullableRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

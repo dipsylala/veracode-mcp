@@ -19,15 +19,16 @@ import (
 	"strings"
 )
 
+
 // StaticFlawDataPathsInformationAPIService StaticFlawDataPathsInformationAPI service
 type StaticFlawDataPathsInformationAPIService service
 
 type ApiAppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGetRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *StaticFlawDataPathsInformationAPIService
-	appGuid    string
-	issueId    string
-	context    *string
+	appGuid string
+	issueId string
+	context *string
 }
 
 // If specified, the ID of the development sandbox to which this finding belongs.
@@ -45,29 +46,28 @@ AppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGet Returns information 
 
 Returns detailed data path information on a static analysis finding, including module name, filepath, function name, and code line numbers.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param appGuid GUID for the application.
-	@param issueId Flaw ID of the finding.
-	@return ApiAppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGetRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param appGuid GUID for the application.
+ @param issueId Flaw ID of the finding.
+ @return ApiAppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGetRequest
 */
 func (a *StaticFlawDataPathsInformationAPIService) AppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGet(ctx context.Context, appGuid string, issueId string) ApiAppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGetRequest {
 	return ApiAppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGetRequest{
 		ApiService: a,
-		ctx:        ctx,
-		appGuid:    appGuid,
-		issueId:    issueId,
+		ctx: ctx,
+		appGuid: appGuid,
+		issueId: issueId,
 	}
 }
 
 // Execute executes the request
-//
-//	@return StaticFlaws
+//  @return StaticFlaws
 func (a *StaticFlawDataPathsInformationAPIService) AppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGetExecute(r ApiAppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGetRequest) (*StaticFlaws, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *StaticFlaws
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *StaticFlaws
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "StaticFlawDataPathsInformationAPIService.AppsecV2ApplicationsAppGuidFindingsIssueIdStaticFlawInfoGet")
@@ -132,8 +132,8 @@ func (a *StaticFlawDataPathsInformationAPIService) AppsecV2ApplicationsAppGuidFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -143,8 +143,8 @@ func (a *StaticFlawDataPathsInformationAPIService) AppsecV2ApplicationsAppGuidFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

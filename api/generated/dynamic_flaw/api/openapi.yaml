@@ -264,7 +264,7 @@ components:
         port:
           description: TCP port to which this request was made.
           readOnly: true
-          type: integer
+          type: string
         protocol:
           description: "Protocol associated with this request. Typically, HTTP."
           readOnly: true

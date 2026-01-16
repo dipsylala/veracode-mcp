@@ -281,7 +281,7 @@
             "readOnly": true
           },
           "port": {
-            "type": "integer",
+            "type": "string",
             "description": "TCP port to which this request was made.",
             "readOnly": true
           },

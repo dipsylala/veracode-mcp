@@ -19,13 +19,14 @@ import (
 	"strings"
 )
 
+
 // ManualScansInformationAPIService ManualScansInformationAPI service
 type ManualScansInformationAPIService service
 
 type ApiGetManualFindingRequest struct {
-	ctx              context.Context
-	ApiService       *ManualScansInformationAPIService
-	finding          int64
+	ctx context.Context
+	ApiService *ManualScansInformationAPIService
+	finding int64
 	includeArtifacts *bool
 }
 
@@ -44,27 +45,26 @@ GetManualFinding getFinding
 
 Returns manual testing finding information and links to associated resources.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param finding The manual finding identifier.
-	@return ApiGetManualFindingRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param finding The manual finding identifier.
+ @return ApiGetManualFindingRequest
 */
 func (a *ManualScansInformationAPIService) GetManualFinding(ctx context.Context, finding int64) ApiGetManualFindingRequest {
 	return ApiGetManualFindingRequest{
 		ApiService: a,
-		ctx:        ctx,
-		finding:    finding,
+		ctx: ctx,
+		finding: finding,
 	}
 }
 
 // Execute executes the request
-//
-//	@return ManualFinding
+//  @return ManualFinding
 func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManualFindingRequest) (*ManualFinding, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *ManualFinding
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *ManualFinding
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ManualScansInformationAPIService.GetManualFinding")
@@ -128,8 +128,8 @@ func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManua
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -139,8 +139,8 @@ func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManua
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -150,8 +150,8 @@ func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManua
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -161,8 +161,8 @@ func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManua
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
@@ -172,8 +172,8 @@ func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManua
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -183,8 +183,8 @@ func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManua
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -202,9 +202,9 @@ func (a *ManualScansInformationAPIService) GetManualFindingExecute(r ApiGetManua
 }
 
 type ApiGetManualScanRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ManualScansInformationAPIService
-	scan       int32
+	scan int32
 }
 
 func (r ApiGetManualScanRequest) Execute() (*Scan, *http.Response, error) {
@@ -216,27 +216,26 @@ GetManualScan get a Manual Scan
 
 Returns manual scan information and links to associated resources.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param scan The manual scan ID.
-	@return ApiGetManualScanRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param scan The manual scan ID.
+ @return ApiGetManualScanRequest
 */
 func (a *ManualScansInformationAPIService) GetManualScan(ctx context.Context, scan int32) ApiGetManualScanRequest {
 	return ApiGetManualScanRequest{
 		ApiService: a,
-		ctx:        ctx,
-		scan:       scan,
+		ctx: ctx,
+		scan: scan,
 	}
 }
 
 // Execute executes the request
-//
-//	@return Scan
+//  @return Scan
 func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualScanRequest) (*Scan, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Scan
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Scan
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ManualScansInformationAPIService.GetManualScan")
@@ -297,8 +296,8 @@ func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualSc
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -308,8 +307,8 @@ func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualSc
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -319,8 +318,8 @@ func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualSc
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -330,8 +329,8 @@ func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualSc
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
@@ -341,8 +340,8 @@ func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualSc
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -352,8 +351,8 @@ func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualSc
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -371,11 +370,11 @@ func (a *ManualScansInformationAPIService) GetManualScanExecute(r ApiGetManualSc
 }
 
 type ApiGetManualScansRequest struct {
-	ctx         context.Context
-	ApiService  *ManualScansInformationAPIService
+	ctx context.Context
+	ApiService *ManualScansInformationAPIService
 	application *string
-	page        *int32
-	size        *int32
+	page *int32
+	size *int32
 }
 
 // The application GUID.
@@ -405,25 +404,24 @@ GetManualScans Get Manual Scans
 
 Returns a list of pointers to the manual scans performed on the application.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiGetManualScansRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetManualScansRequest
 */
 func (a *ManualScansInformationAPIService) GetManualScans(ctx context.Context) ApiGetManualScansRequest {
 	return ApiGetManualScansRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//
-//	@return PagedModelOfScan
+//  @return PagedModelOfScan
 func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualScansRequest) (*PagedModelOfScan, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PagedModelOfScan
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PagedModelOfScan
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ManualScansInformationAPIService.GetManualScans")
@@ -493,8 +491,8 @@ func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualS
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -504,8 +502,8 @@ func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualS
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -515,8 +513,8 @@ func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualS
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -526,8 +524,8 @@ func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualS
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
@@ -537,8 +535,8 @@ func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualS
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -548,8 +546,8 @@ func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualS
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -567,9 +565,9 @@ func (a *ManualScansInformationAPIService) GetManualScansExecute(r ApiGetManualS
 }
 
 type ApiGetScanFindingsRequest struct {
-	ctx              context.Context
-	ApiService       *ManualScansInformationAPIService
-	scanId           int32
+	ctx context.Context
+	ApiService *ManualScansInformationAPIService
+	scanId int32
 	includeArtifacts *bool
 }
 
@@ -588,27 +586,26 @@ GetScanFindings getFindings
 
 Returns findings information from Veracode scans.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param scanId The manual scan identifier.
-	@return ApiGetScanFindingsRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param scanId The manual scan identifier.
+ @return ApiGetScanFindingsRequest
 */
 func (a *ManualScansInformationAPIService) GetScanFindings(ctx context.Context, scanId int32) ApiGetScanFindingsRequest {
 	return ApiGetScanFindingsRequest{
 		ApiService: a,
-		ctx:        ctx,
-		scanId:     scanId,
+		ctx: ctx,
+		scanId: scanId,
 	}
 }
 
 // Execute executes the request
-//
-//	@return PagedModelOfManualFinding
+//  @return PagedModelOfManualFinding
 func (a *ManualScansInformationAPIService) GetScanFindingsExecute(r ApiGetScanFindingsRequest) (*PagedModelOfManualFinding, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PagedModelOfManualFinding
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PagedModelOfManualFinding
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ManualScansInformationAPIService.GetScanFindings")
@@ -672,8 +669,8 @@ func (a *ManualScansInformationAPIService) GetScanFindingsExecute(r ApiGetScanFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -683,8 +680,8 @@ func (a *ManualScansInformationAPIService) GetScanFindingsExecute(r ApiGetScanFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -694,8 +691,8 @@ func (a *ManualScansInformationAPIService) GetScanFindingsExecute(r ApiGetScanFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -705,8 +702,8 @@ func (a *ManualScansInformationAPIService) GetScanFindingsExecute(r ApiGetScanFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
@@ -716,8 +713,8 @@ func (a *ManualScansInformationAPIService) GetScanFindingsExecute(r ApiGetScanFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -727,8 +724,8 @@ func (a *ManualScansInformationAPIService) GetScanFindingsExecute(r ApiGetScanFi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

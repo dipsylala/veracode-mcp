@@ -21,8 +21,8 @@ var _ MappedNullable = &StaticFinding{}
 type StaticFinding struct {
 	Cwe *StaticFindingCwe `json:"cwe,omitempty"`
 	// The CVSS associated with the finding.
-	Cvss     *string `json:"cvss,omitempty"`
-	Severity *int32  `json:"severity,omitempty"`
+	Cvss *string `json:"cvss,omitempty"`
+	Severity *int32 `json:"severity,omitempty"`
 	// The likelihood that this finding could be exploited by an attacker. Values: -2: Very Unlikely, -1: Unlikely, 0: Neutral, 1: Likely, 2: Very Likely.
 	Exploitability *int32 `json:"exploitability,omitempty"`
 	// The function or class where the finding exists.
@@ -32,7 +32,7 @@ type StaticFinding struct {
 	// The name of the file where the finding exists.
 	FileName *string `json:"file_name,omitempty"`
 	// The path to the file where the finding exists.
-	FilePath        *string                       `json:"file_path,omitempty"`
+	FilePath *string `json:"file_path,omitempty"`
 	FindingCategory *StaticFindingFindingCategory `json:"finding_category,omitempty"`
 	// The name of the module where the finding exists.
 	Module *string `json:"module,omitempty"`
@@ -444,7 +444,7 @@ func (o *StaticFinding) SetRelativeLocation(v int32) {
 }
 
 func (o StaticFinding) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -527,3 +527,5 @@ func (v *NullableStaticFinding) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+
