@@ -161,33 +161,10 @@ func TestScaFindingsResponseJSON(t *testing.T) {
 	t.Log("Successfully verified license information in JSON round-trip")
 }
 
-// TestScaFindingsIntegrationWithLicenses verifies end-to-end license inclusion from API to MCP
-func TestScaFindingsIntegrationWithLicenses(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
-	}
+// extractMCPResponseFromResult extracts the MCP response JSON from the tool result
+func extractMCPResponseFromResult(t *testing.T, result interface{}) *MCPFindingsResponse {
+	t.Helper()
 
-	tool := NewScaFindingsTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	// Call the handler with test parameters
-	args := map[string]interface{}{
-		"application_path": "c:\\test\\path",
-		"app_profile":      "f4e74197-1e26-42c4-ab4b-245870c93280", // MCPVerademo GUID
-		"size":             5,
-		"page":             0,
-	}
-
-	ctx := context.Background()
-	result, err := tool.handleGetScaFindings(ctx, args)
-	if err != nil {
-		t.Fatalf("Handler returned error: %v", err)
-	}
-
-	// Check if result contains content
 	resultMap, ok := result.(map[string]interface{})
 	if !ok {
 		t.Fatalf("Result is not a map: %T", result)
@@ -237,14 +214,18 @@ func TestScaFindingsIntegrationWithLicenses(t *testing.T) {
 		t.Fatalf("Failed to unmarshal MCP response JSON: %v", err)
 	}
 
-	t.Logf("Retrieved %d SCA findings", len(mcpResponse.Findings))
+	return &mcpResponse
+}
 
-	// Check if any findings have license information
+// countAndLogLicenseFindings counts findings with licenses and logs the first one
+func countAndLogLicenseFindings(t *testing.T, findings []MCPFinding) int {
+	t.Helper()
+
 	foundWithLicenses := 0
-	for i, finding := range mcpResponse.Findings {
+	for _, finding := range findings {
 		if finding.Component != nil && len(finding.Component.Licenses) > 0 {
 			foundWithLicenses++
-			if i == 0 { // Log details for first finding with licenses
+			if foundWithLicenses == 1 { // Log details for first finding with licenses
 				t.Logf("Finding with licenses:")
 				t.Logf("  Component: %s v%s", finding.Component.Name, finding.Component.Version)
 				t.Logf("  Licenses: %d", len(finding.Component.Licenses))
@@ -254,6 +235,40 @@ func TestScaFindingsIntegrationWithLicenses(t *testing.T) {
 			}
 		}
 	}
+
+	return foundWithLicenses
+}
+
+// TestScaFindingsIntegrationWithLicenses verifies end-to-end license inclusion from API to MCP
+func TestScaFindingsIntegrationWithLicenses(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	tool := NewScaFindingsTool()
+	if err := tool.Initialize(); err != nil {
+		t.Fatalf("Failed to initialize tool: %v", err)
+	}
+	defer tool.Shutdown()
+
+	// Call the handler with test parameters
+	args := map[string]interface{}{
+		"application_path": "c:\\test\\path",
+		"app_profile":      "f4e74197-1e26-42c4-ab4b-245870c93280", // MCPVerademo GUID
+		"size":             5,
+		"page":             0,
+	}
+
+	ctx := context.Background()
+	result, err := tool.handleGetScaFindings(ctx, args)
+	if err != nil {
+		t.Fatalf("Handler returned error: %v", err)
+	}
+
+	mcpResponse := extractMCPResponseFromResult(t, result)
+	t.Logf("Retrieved %d SCA findings", len(mcpResponse.Findings))
+
+	foundWithLicenses := countAndLogLicenseFindings(t, mcpResponse.Findings)
 
 	if foundWithLicenses > 0 {
 		t.Logf("Found %d findings with license information", foundWithLicenses)
