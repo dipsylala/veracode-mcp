@@ -20,7 +20,6 @@ var _ MappedNullable = &PagedResourceOfSandbox{}
 // PagedResourceOfSandbox struct for PagedResourceOfSandbox
 type PagedResourceOfSandbox struct {
 	Embedded *EmbeddedSandbox `json:"_embedded,omitempty"`
-	Links    *Link            `json:"_links,omitempty"`
 	Page     *PageMetadata    `json:"page,omitempty"`
 }
 
@@ -73,38 +72,6 @@ func (o *PagedResourceOfSandbox) SetEmbedded(v EmbeddedSandbox) {
 	o.Embedded = &v
 }
 
-// GetLinks returns the Links field value if set, zero value otherwise.
-func (o *PagedResourceOfSandbox) GetLinks() Link {
-	if o == nil || IsNil(o.Links) {
-		var ret Link
-		return ret
-	}
-	return *o.Links
-}
-
-// GetLinksOk returns a tuple with the Links field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *PagedResourceOfSandbox) GetLinksOk() (*Link, bool) {
-	if o == nil || IsNil(o.Links) {
-		return nil, false
-	}
-	return o.Links, true
-}
-
-// HasLinks returns a boolean if a field has been set.
-func (o *PagedResourceOfSandbox) HasLinks() bool {
-	if o != nil && !IsNil(o.Links) {
-		return true
-	}
-
-	return false
-}
-
-// SetLinks gets a reference to the given Link and assigns it to the Links field.
-func (o *PagedResourceOfSandbox) SetLinks(v Link) {
-	o.Links = &v
-}
-
 // GetPage returns the Page field value if set, zero value otherwise.
 func (o *PagedResourceOfSandbox) GetPage() PageMetadata {
 	if o == nil || IsNil(o.Page) {
@@ -149,9 +116,6 @@ func (o PagedResourceOfSandbox) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Embedded) {
 		toSerialize["_embedded"] = o.Embedded
-	}
-	if !IsNil(o.Links) {
-		toSerialize["_links"] = o.Links
 	}
 	if !IsNil(o.Page) {
 		toSerialize["page"] = o.Page

@@ -142,7 +142,7 @@ func (s *MCPServer) handleInitialize(params json.RawMessage) (*InitializeResult,
 		Capabilities:    s.capabilities,
 		ServerInfo: Implementation{
 			Name:    "veracode-mcp-server",
-			Version: "0.1.0",
+			Version: version,
 		},
 	}, nil
 }

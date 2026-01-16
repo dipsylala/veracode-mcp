@@ -6,7 +6,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Message** | Pointer to **string** | Error message. | [optional] [readonly] 
 **Code** | Pointer to **string** | Error code. | [optional] [readonly] 
-**Links** | Pointer to [**ErrorLinks**](ErrorLinks.md) |  | [optional] 
 
 ## Methods
 
@@ -76,31 +75,6 @@ SetCode sets Code field to given value.
 `func (o *Error) HasCode() bool`
 
 HasCode returns a boolean if a field has been set.
-
-### GetLinks
-
-`func (o *Error) GetLinks() ErrorLinks`
-
-GetLinks returns the Links field if non-nil, zero value otherwise.
-
-### GetLinksOk
-
-`func (o *Error) GetLinksOk() (*ErrorLinks, bool)`
-
-GetLinksOk returns a tuple with the Links field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetLinks
-
-`func (o *Error) SetLinks(v ErrorLinks)`
-
-SetLinks sets Links field to given value.
-
-### HasLinks
-
-`func (o *Error) HasLinks() bool`
-
-HasLinks returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

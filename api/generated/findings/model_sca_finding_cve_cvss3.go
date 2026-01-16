@@ -22,7 +22,7 @@ type ScaFindingCveCvss3 struct {
 	// The assigned CVSS v3 score for this vulnerability.
 	Score *float32 `json:"score,omitempty"`
 	// The assigned CVSS v3 severity for this vulnerability.
-	Severity *int32 `json:"severity,omitempty"`
+	Severity *string `json:"severity,omitempty"`
 	// The assigned CVSS v3 vector for this vulnerability.
 	Vector *string `json:"vector,omitempty"`
 }
@@ -77,9 +77,9 @@ func (o *ScaFindingCveCvss3) SetScore(v float32) {
 }
 
 // GetSeverity returns the Severity field value if set, zero value otherwise.
-func (o *ScaFindingCveCvss3) GetSeverity() int32 {
+func (o *ScaFindingCveCvss3) GetSeverity() string {
 	if o == nil || IsNil(o.Severity) {
-		var ret int32
+		var ret string
 		return ret
 	}
 	return *o.Severity
@@ -87,7 +87,7 @@ func (o *ScaFindingCveCvss3) GetSeverity() int32 {
 
 // GetSeverityOk returns a tuple with the Severity field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ScaFindingCveCvss3) GetSeverityOk() (*int32, bool) {
+func (o *ScaFindingCveCvss3) GetSeverityOk() (*string, bool) {
 	if o == nil || IsNil(o.Severity) {
 		return nil, false
 	}
@@ -103,8 +103,8 @@ func (o *ScaFindingCveCvss3) HasSeverity() bool {
 	return false
 }
 
-// SetSeverity gets a reference to the given int32 and assigns it to the Severity field.
-func (o *ScaFindingCveCvss3) SetSeverity(v int32) {
+// SetSeverity gets a reference to the given string and assigns it to the Severity field.
+func (o *ScaFindingCveCvss3) SetSeverity(v string) {
 	o.Severity = &v
 }
 

@@ -47,9 +47,8 @@ type EntityModelManualFinding struct {
 	Date   *time.Time `json:"date,omitempty"`
 	Source *Source    `json:"source,omitempty"`
 	// Identifier that matches this finding.
-	MatchedId *int64           `json:"matchedId,omitempty"`
-	Appendix  []Appendix       `json:"appendix,omitempty"`
-	Links     *map[string]Link `json:"_links,omitempty"`
+	MatchedId *int64     `json:"matchedId,omitempty"`
+	Appendix  []Appendix `json:"appendix,omitempty"`
 }
 
 // NewEntityModelManualFinding instantiates a new EntityModelManualFinding object
@@ -581,38 +580,6 @@ func (o *EntityModelManualFinding) SetAppendix(v []Appendix) {
 	o.Appendix = v
 }
 
-// GetLinks returns the Links field value if set, zero value otherwise.
-func (o *EntityModelManualFinding) GetLinks() map[string]Link {
-	if o == nil || IsNil(o.Links) {
-		var ret map[string]Link
-		return ret
-	}
-	return *o.Links
-}
-
-// GetLinksOk returns a tuple with the Links field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *EntityModelManualFinding) GetLinksOk() (*map[string]Link, bool) {
-	if o == nil || IsNil(o.Links) {
-		return nil, false
-	}
-	return o.Links, true
-}
-
-// HasLinks returns a boolean if a field has been set.
-func (o *EntityModelManualFinding) HasLinks() bool {
-	if o != nil && !IsNil(o.Links) {
-		return true
-	}
-
-	return false
-}
-
-// SetLinks gets a reference to the given map[string]Link and assigns it to the Links field.
-func (o *EntityModelManualFinding) SetLinks(v map[string]Link) {
-	o.Links = &v
-}
-
 func (o EntityModelManualFinding) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -670,9 +637,6 @@ func (o EntityModelManualFinding) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Appendix) {
 		toSerialize["appendix"] = o.Appendix
-	}
-	if !IsNil(o.Links) {
-		toSerialize["_links"] = o.Links
 	}
 	return toSerialize, nil
 }

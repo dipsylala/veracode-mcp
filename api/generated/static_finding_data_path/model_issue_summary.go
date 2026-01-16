@@ -21,7 +21,7 @@ var _ MappedNullable = &IssueSummary{}
 type IssueSummary struct {
 	// GUID for the application.
 	AppGuid *string `json:"app_guid,omitempty"`
-	// Name of the application. PATCHED: Changed from int32 to string to match actual API response.
+	// ID of the application.
 	Name *string `json:"name,omitempty"`
 	// ID of the build.
 	BuildId *int32 `json:"build_id,omitempty"`

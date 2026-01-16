@@ -20,7 +20,6 @@ var _ MappedNullable = &PagedModelEntityModelManualFinding{}
 // PagedModelEntityModelManualFinding struct for PagedModelEntityModelManualFinding
 type PagedModelEntityModelManualFinding struct {
 	Embedded *PagedModelEntityModelManualFindingEmbedded `json:"_embedded,omitempty"`
-	Links    *map[string]Link                            `json:"_links,omitempty"`
 	Page     *PageMetadata                               `json:"page,omitempty"`
 }
 
@@ -73,38 +72,6 @@ func (o *PagedModelEntityModelManualFinding) SetEmbedded(v PagedModelEntityModel
 	o.Embedded = &v
 }
 
-// GetLinks returns the Links field value if set, zero value otherwise.
-func (o *PagedModelEntityModelManualFinding) GetLinks() map[string]Link {
-	if o == nil || IsNil(o.Links) {
-		var ret map[string]Link
-		return ret
-	}
-	return *o.Links
-}
-
-// GetLinksOk returns a tuple with the Links field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *PagedModelEntityModelManualFinding) GetLinksOk() (*map[string]Link, bool) {
-	if o == nil || IsNil(o.Links) {
-		return nil, false
-	}
-	return o.Links, true
-}
-
-// HasLinks returns a boolean if a field has been set.
-func (o *PagedModelEntityModelManualFinding) HasLinks() bool {
-	if o != nil && !IsNil(o.Links) {
-		return true
-	}
-
-	return false
-}
-
-// SetLinks gets a reference to the given map[string]Link and assigns it to the Links field.
-func (o *PagedModelEntityModelManualFinding) SetLinks(v map[string]Link) {
-	o.Links = &v
-}
-
 // GetPage returns the Page field value if set, zero value otherwise.
 func (o *PagedModelEntityModelManualFinding) GetPage() PageMetadata {
 	if o == nil || IsNil(o.Page) {
@@ -149,9 +116,6 @@ func (o PagedModelEntityModelManualFinding) ToMap() (map[string]interface{}, err
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Embedded) {
 		toSerialize["_embedded"] = o.Embedded
-	}
-	if !IsNil(o.Links) {
-		toSerialize["_links"] = o.Links
 	}
 	if !IsNil(o.Page) {
 		toSerialize["page"] = o.Page

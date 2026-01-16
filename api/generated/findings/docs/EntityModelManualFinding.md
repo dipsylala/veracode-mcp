@@ -20,7 +20,6 @@ Name | Type | Description | Notes
 **Source** | Pointer to [**Source**](Source.md) |  | [optional] 
 **MatchedId** | Pointer to **int64** | Identifier that matches this finding. | [optional] 
 **Appendix** | Pointer to [**[]Appendix**](Appendix.md) |  | [optional] 
-**Links** | Pointer to [**map[string]Link**](Link.md) |  | [optional] 
 
 ## Methods
 
@@ -440,31 +439,6 @@ SetAppendix sets Appendix field to given value.
 `func (o *EntityModelManualFinding) HasAppendix() bool`
 
 HasAppendix returns a boolean if a field has been set.
-
-### GetLinks
-
-`func (o *EntityModelManualFinding) GetLinks() map[string]Link`
-
-GetLinks returns the Links field if non-nil, zero value otherwise.
-
-### GetLinksOk
-
-`func (o *EntityModelManualFinding) GetLinksOk() (*map[string]Link, bool)`
-
-GetLinksOk returns a tuple with the Links field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetLinks
-
-`func (o *EntityModelManualFinding) SetLinks(v map[string]Link)`
-
-SetLinks sets Links field to given value.
-
-### HasLinks
-
-`func (o *EntityModelManualFinding) HasLinks() bool`
-
-HasLinks returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

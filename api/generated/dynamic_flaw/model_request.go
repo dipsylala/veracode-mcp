@@ -25,7 +25,7 @@ type Request struct {
 	RawBytes *string `json:"raw_bytes,omitempty"`
 	// True if this is a secure HTTPS request, false if HTTP.
 	Secure *bool `json:"secure,omitempty"`
-	// TCP port to which this request was made. PATCHED: Changed from int32 to string to match actual API response.
+	// TCP port to which this request was made.
 	Port *string `json:"port,omitempty"`
 	// Protocol associated with this request. Typically, HTTP.
 	Protocol *string `json:"protocol,omitempty"`

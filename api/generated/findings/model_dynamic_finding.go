@@ -39,7 +39,7 @@ type DynamicFinding struct {
 	// The parameter that contains a vulnerability.
 	VulnerableParameter *string `json:"vulnerable_parameter,omitempty"`
 	// Whether the finding was discovered by Virtual Scan Appliance.
-	DiscoveredByVsa *string `json:"discovered_by_vsa,omitempty"`
+	DiscoveredByVsa *int32 `json:"discovered_by_vsa,omitempty"`
 }
 
 // NewDynamicFinding instantiates a new DynamicFinding object
@@ -412,9 +412,9 @@ func (o *DynamicFinding) SetVulnerableParameter(v string) {
 }
 
 // GetDiscoveredByVsa returns the DiscoveredByVsa field value if set, zero value otherwise.
-func (o *DynamicFinding) GetDiscoveredByVsa() string {
+func (o *DynamicFinding) GetDiscoveredByVsa() int32 {
 	if o == nil || IsNil(o.DiscoveredByVsa) {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.DiscoveredByVsa
@@ -422,7 +422,7 @@ func (o *DynamicFinding) GetDiscoveredByVsa() string {
 
 // GetDiscoveredByVsaOk returns a tuple with the DiscoveredByVsa field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DynamicFinding) GetDiscoveredByVsaOk() (*string, bool) {
+func (o *DynamicFinding) GetDiscoveredByVsaOk() (*int32, bool) {
 	if o == nil || IsNil(o.DiscoveredByVsa) {
 		return nil, false
 	}
@@ -438,8 +438,8 @@ func (o *DynamicFinding) HasDiscoveredByVsa() bool {
 	return false
 }
 
-// SetDiscoveredByVsa gets a reference to the given string and assigns it to the DiscoveredByVsa field.
-func (o *DynamicFinding) SetDiscoveredByVsa(v string) {
+// SetDiscoveredByVsa gets a reference to the given int32 and assigns it to the DiscoveredByVsa field.
+func (o *DynamicFinding) SetDiscoveredByVsa(v int32) {
 	o.DiscoveredByVsa = &v
 }
 

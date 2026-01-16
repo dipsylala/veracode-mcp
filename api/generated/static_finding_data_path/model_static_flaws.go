@@ -22,8 +22,6 @@ type StaticFlaws struct {
 	IssueSummary *IssueSummary `json:"issue_summary,omitempty"`
 	// Call stacks.
 	DataPaths []DataPaths `json:"data_paths,omitempty"`
-	// PATCHED: Changed from []Link to map[string]interface{} to support object-based _links from API
-	Links map[string]interface{} `json:"_links,omitempty"`
 }
 
 // NewStaticFlaws instantiates a new StaticFlaws object
@@ -107,38 +105,6 @@ func (o *StaticFlaws) SetDataPaths(v []DataPaths) {
 	o.DataPaths = v
 }
 
-// GetLinks returns the Links field value if set, zero value otherwise.
-func (o *StaticFlaws) GetLinks() map[string]interface{} {
-	if o == nil || IsNil(o.Links) {
-		var ret map[string]interface{}
-		return ret
-	}
-	return o.Links
-}
-
-// GetLinksOk returns a tuple with the Links field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *StaticFlaws) GetLinksOk() (map[string]interface{}, bool) {
-	if o == nil || IsNil(o.Links) {
-		return nil, false
-	}
-	return o.Links, true
-}
-
-// HasLinks returns a boolean if a field has been set.
-func (o *StaticFlaws) HasLinks() bool {
-	if o != nil && !IsNil(o.Links) {
-		return true
-	}
-
-	return false
-}
-
-// SetLinks gets a reference to the given map and assigns it to the Links field.
-func (o *StaticFlaws) SetLinks(v map[string]interface{}) {
-	o.Links = v
-}
-
 func (o StaticFlaws) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,7 +121,6 @@ func (o StaticFlaws) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DataPaths) {
 		toSerialize["data_paths"] = o.DataPaths
 	}
-	// PATCHED: Exclude _links from response - not needed by users
 	return toSerialize, nil
 }
 

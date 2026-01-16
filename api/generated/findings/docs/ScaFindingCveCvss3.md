@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Score** | Pointer to **float32** | The assigned CVSS v3 score for this vulnerability. | [optional] 
-**Severity** | Pointer to **int32** | The assigned CVSS v3 severity for this vulnerability. | [optional] 
+**Severity** | Pointer to **string** | The assigned CVSS v3 severity for this vulnerability. | [optional] 
 **Vector** | Pointer to **string** | The assigned CVSS v3 vector for this vulnerability. | [optional] 
 
 ## Methods
@@ -54,20 +54,20 @@ HasScore returns a boolean if a field has been set.
 
 ### GetSeverity
 
-`func (o *ScaFindingCveCvss3) GetSeverity() int32`
+`func (o *ScaFindingCveCvss3) GetSeverity() string`
 
 GetSeverity returns the Severity field if non-nil, zero value otherwise.
 
 ### GetSeverityOk
 
-`func (o *ScaFindingCveCvss3) GetSeverityOk() (*int32, bool)`
+`func (o *ScaFindingCveCvss3) GetSeverityOk() (*string, bool)`
 
 GetSeverityOk returns a tuple with the Severity field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSeverity
 
-`func (o *ScaFindingCveCvss3) SetSeverity(v int32)`
+`func (o *ScaFindingCveCvss3) SetSeverity(v string)`
 
 SetSeverity sets Severity field to given value.
 

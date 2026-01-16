@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **AppGuid** | Pointer to **string** | GUID for the application. | [optional] [readonly] 
-**Name** | Pointer to **int32** | ID of the application. | [optional] [readonly] 
+**Name** | Pointer to **string** | ID of the application. | [optional] 
 **BuildId** | Pointer to **int32** | ID of the build. | [optional] [readonly] 
 **IssueId** | Pointer to **int32** | Flaw or issues ID of the finding. | [optional] [readonly] 
 **Context** | Pointer to **string** | GUID of the specified sandbox. | [optional] [readonly] 
@@ -56,20 +56,20 @@ HasAppGuid returns a boolean if a field has been set.
 
 ### GetName
 
-`func (o *IssueSummary) GetName() int32`
+`func (o *IssueSummary) GetName() string`
 
 GetName returns the Name field if non-nil, zero value otherwise.
 
 ### GetNameOk
 
-`func (o *IssueSummary) GetNameOk() (*int32, bool)`
+`func (o *IssueSummary) GetNameOk() (*string, bool)`
 
 GetNameOk returns a tuple with the Name field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetName
 
-`func (o *IssueSummary) SetName(v int32)`
+`func (o *IssueSummary) SetName(v string)`
 
 SetName sets Name field to given value.
 

@@ -5,7 +5,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Embedded** | Pointer to [**PagedModelEntityModelScanEmbedded**](PagedModelEntityModelScanEmbedded.md) |  | [optional] 
-**Links** | Pointer to [**map[string]Link**](Link.md) |  | [optional] 
 **Page** | Pointer to [**PageMetadata**](PageMetadata.md) |  | [optional] 
 
 ## Methods
@@ -51,31 +50,6 @@ SetEmbedded sets Embedded field to given value.
 `func (o *PagedModelEntityModelScan) HasEmbedded() bool`
 
 HasEmbedded returns a boolean if a field has been set.
-
-### GetLinks
-
-`func (o *PagedModelEntityModelScan) GetLinks() map[string]Link`
-
-GetLinks returns the Links field if non-nil, zero value otherwise.
-
-### GetLinksOk
-
-`func (o *PagedModelEntityModelScan) GetLinksOk() (*map[string]Link, bool)`
-
-GetLinksOk returns a tuple with the Links field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetLinks
-
-`func (o *PagedModelEntityModelScan) SetLinks(v map[string]Link)`
-
-SetLinks sets Links field to given value.
-
-### HasLinks
-
-`func (o *PagedModelEntityModelScan) HasLinks() bool`
-
-HasLinks returns a boolean if a field has been set.
 
 ### GetPage
 

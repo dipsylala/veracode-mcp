@@ -150,9 +150,7 @@
             "description": "GUID for the application."
           },
           "name": {
-            "type": "integer",
-            "readOnly": true,
-            "format": "int32",
+            "type": "string",
             "description": "ID of the application."
           },
           "build_id": {
@@ -186,14 +184,8 @@
             "items": {
               "$ref": "#/components/schemas/DataPaths"
             }
-          },
-          "_links": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Link"
-            }
           }
-        },
+          },
         "example": {
           "issue_summary": {
             "app_guid": "12345678-abcdefgh",

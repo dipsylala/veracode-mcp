@@ -87,7 +87,6 @@ Class | Method | HTTP request | Description
  - [DynamicFlaw](docs/DynamicFlaw.md)
  - [DynamicSpecificFlawInfo](docs/DynamicSpecificFlawInfo.md)
  - [Error](docs/Error.md)
- - [ErrorLinks](docs/ErrorLinks.md)
  - [IssueSummary](docs/IssueSummary.md)
  - [Link](docs/Link.md)
  - [Request](docs/Request.md)

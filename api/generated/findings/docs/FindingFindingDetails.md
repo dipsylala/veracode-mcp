@@ -22,7 +22,7 @@ Name | Type | Description | Notes
 **Plugin** | Pointer to **string** | The type of attack sent. | [optional] 
 **URL** | Pointer to **string** | The URL of the location where the finding exists. | [optional] 
 **VulnerableParameter** | Pointer to **string** | The parameter that contains a vulnerability. | [optional] 
-**DiscoveredByVsa** | Pointer to **string** | Whether the finding was discovered by Virtual Scan Appliance. | [optional] 
+**DiscoveredByVsa** | Pointer to **int32** | Whether the finding was discovered by Virtual Scan Appliance. | [optional] 
 **Id** | Pointer to **int64** | Unique identifier (Long). | [optional] 
 **ExternalId** | Pointer to **int64** | Alternative identifier of application finding that is unique to this application. | [optional] 
 **ScanId** | Pointer to **int32** | Scan identifier of this finding. | [optional] 
@@ -43,7 +43,7 @@ Name | Type | Description | Notes
 **ComponentFilename** | Pointer to **string** | The component filename. | [optional] 
 **Language** | Pointer to **string** | The coding language. | [optional] 
 **ComponentPathS** | Pointer to [**[]ScaFindingComponentPathSInner**](ScaFindingComponentPathSInner.md) | The list of component paths containing this vulnerability. | [optional] 
-**Metadata** | Pointer to **string** | Displays metadata values, such as the SCA scan mode and dependency mode. | [optional] 
+**Metadata** | Pointer to **map[string]interface{}** | Displays metadata values, such as the SCA scan mode and dependency mode. | [optional] 
 
 ## Methods
 
@@ -516,20 +516,20 @@ HasVulnerableParameter returns a boolean if a field has been set.
 
 ### GetDiscoveredByVsa
 
-`func (o *FindingFindingDetails) GetDiscoveredByVsa() string`
+`func (o *FindingFindingDetails) GetDiscoveredByVsa() int32`
 
 GetDiscoveredByVsa returns the DiscoveredByVsa field if non-nil, zero value otherwise.
 
 ### GetDiscoveredByVsaOk
 
-`func (o *FindingFindingDetails) GetDiscoveredByVsaOk() (*string, bool)`
+`func (o *FindingFindingDetails) GetDiscoveredByVsaOk() (*int32, bool)`
 
 GetDiscoveredByVsaOk returns a tuple with the DiscoveredByVsa field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDiscoveredByVsa
 
-`func (o *FindingFindingDetails) SetDiscoveredByVsa(v string)`
+`func (o *FindingFindingDetails) SetDiscoveredByVsa(v int32)`
 
 SetDiscoveredByVsa sets DiscoveredByVsa field to given value.
 
@@ -1041,20 +1041,20 @@ HasComponentPathS returns a boolean if a field has been set.
 
 ### GetMetadata
 
-`func (o *FindingFindingDetails) GetMetadata() string`
+`func (o *FindingFindingDetails) GetMetadata() map[string]interface{}`
 
 GetMetadata returns the Metadata field if non-nil, zero value otherwise.
 
 ### GetMetadataOk
 
-`func (o *FindingFindingDetails) GetMetadataOk() (*string, bool)`
+`func (o *FindingFindingDetails) GetMetadataOk() (*map[string]interface{}, bool)`
 
 GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetMetadata
 
-`func (o *FindingFindingDetails) SetMetadata(v string)`
+`func (o *FindingFindingDetails) SetMetadata(v map[string]interface{})`
 
 SetMetadata sets Metadata field to given value.
 

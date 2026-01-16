@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **Url** | Pointer to **string** | URL associated with this request. | [optional] 
 **RawBytes** | Pointer to **string** | Base64-encoded raw HTTP request payload. | [optional] [readonly] 
 **Secure** | Pointer to **bool** | True if this is a secure HTTPS request, false if HTTP. | [optional] [readonly] 
-**Port** | Pointer to **int32** | TCP port to which this request was made. | [optional] [readonly] 
+**Port** | Pointer to **string** | TCP port to which this request was made. | [optional] [readonly] 
 **Protocol** | Pointer to **string** | Protocol associated with this request. Typically, HTTP. | [optional] [readonly] 
 **Method** | Pointer to **string** | HTTP method of the request (GET, POST, PUT, PATCH, etc.). Can include custom methods. | [optional] [readonly] 
 **Path** | Pointer to **string** | Path of the URL associated with this request. For example, no scheme, hostname, port, or parameter information. | [optional] [readonly] 
@@ -112,20 +112,20 @@ HasSecure returns a boolean if a field has been set.
 
 ### GetPort
 
-`func (o *Request) GetPort() int32`
+`func (o *Request) GetPort() string`
 
 GetPort returns the Port field if non-nil, zero value otherwise.
 
 ### GetPortOk
 
-`func (o *Request) GetPortOk() (*int32, bool)`
+`func (o *Request) GetPortOk() (*string, bool)`
 
 GetPortOk returns a tuple with the Port field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetPort
 
-`func (o *Request) SetPort(v int32)`
+`func (o *Request) SetPort(v string)`
 
 SetPort sets Port field to given value.
 
