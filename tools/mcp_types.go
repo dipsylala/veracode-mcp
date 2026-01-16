@@ -68,9 +68,16 @@ type MCPFinding struct {
 
 // MCPComponent represents SCA component information
 type MCPComponent struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
-	Library string `json:"library,omitempty"`
+	Name     string       `json:"name"`
+	Version  string       `json:"version"`
+	Library  string       `json:"library,omitempty"`
+	Licenses []MCPLicense `json:"licenses,omitempty"`
+}
+
+// MCPLicense represents license information for a component
+type MCPLicense struct {
+	LicenseID  string `json:"license_id"`
+	RiskRating string `json:"risk_rating,omitempty"`
 }
 
 // MCPVulnerability represents SCA vulnerability information

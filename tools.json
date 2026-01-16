@@ -148,7 +148,7 @@
     },
     {
       "name": "get-sca-findings",
-      "description": "Get third-party library vulnerabilities from SCA (Software Composition Analysis) scans.\n\nReturns: Vulnerable dependencies, outdated libraries, license issues, known CVEs in open source components\nIncludes: CWE ID, CVE ID, component name/version, CVSS score, severity, status\nRelated: get-static-findings (source code), get-dynamic-findings (runtime)\n\nDisplay as table: | Flaw ID | Severity | CWE | CVE | Component | Version | Description |",
+      "description": "Get third-party library vulnerabilities from SCA (Software Composition Analysis) scans.\n\nReturns: Vulnerable dependencies, outdated libraries, license issues, known CVEs in open source components\nIncludes: CWE ID, CVE ID, component name/version, CVSS score, severity, status\nRelated: get-static-findings (source code), get-dynamic-findings (runtime)\n\nDisplay as table: | Severity | CWE | CVE | Component | Version | Description |",
       "params": [
         {
           "name": "application_path",

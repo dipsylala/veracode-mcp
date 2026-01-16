@@ -377,11 +377,24 @@ func processScaFinding(finding api.Finding) MCPFinding {
 
 	// Add SCA-specific component information if available
 	if finding.ComponentFilename != "" || finding.ComponentVersion != "" {
-		mcpFinding.Component = &MCPComponent{
+		component := &MCPComponent{
 			Name:    finding.ComponentFilename,
 			Version: finding.ComponentVersion,
 			Library: finding.ComponentFilename,
 		}
+
+		// Add license information if available
+		if len(finding.Licenses) > 0 {
+			component.Licenses = make([]MCPLicense, 0, len(finding.Licenses))
+			for _, lic := range finding.Licenses {
+				component.Licenses = append(component.Licenses, MCPLicense{
+					LicenseID:  lic.LicenseID,
+					RiskRating: lic.RiskRating,
+				})
+			}
+		}
+
+		mcpFinding.Component = component
 	}
 
 	// Add vulnerability information if available

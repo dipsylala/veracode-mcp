@@ -164,6 +164,13 @@ type Finding struct {
 	ComponentFilename string                 `json:"component_filename,omitempty"` // SCA only
 	ComponentVersion  string                 `json:"component_version,omitempty"`  // SCA only
 	CVE               string                 `json:"cve,omitempty"`                // SCA only
+	Licenses          []License              `json:"licenses,omitempty"`           // SCA only
+}
+
+// License represents SCA component license information
+type License struct {
+	LicenseID  string `json:"license_id"`
+	RiskRating string `json:"risk_rating,omitempty"`
 }
 
 // Mitigation represents a proposed fix or risk acceptance
@@ -450,6 +457,21 @@ func extractScaFindingDetails(finding *Finding, scaDetails *findings.ScaFinding)
 	// Extract CVE information if available
 	if scaDetails.Cve != nil && scaDetails.Cve.Name != nil {
 		finding.CVE = *scaDetails.Cve.Name
+	}
+
+	// Extract license information
+	if len(scaDetails.Licenses) > 0 {
+		finding.Licenses = make([]License, 0, len(scaDetails.Licenses))
+		for _, lic := range scaDetails.Licenses {
+			license := License{}
+			if lic.LicenseId != nil {
+				license.LicenseID = *lic.LicenseId
+			}
+			if lic.RiskRating != nil {
+				license.RiskRating = *lic.RiskRating
+			}
+			finding.Licenses = append(finding.Licenses, license)
+		}
 	}
 }
 
