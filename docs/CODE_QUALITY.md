@@ -224,8 +224,8 @@ For GitHub Actions:
 
 ## Benefits
 
-✅ **Catch bugs early** - Before they reach production  
-✅ **Consistent style** - Entire codebase looks uniform  
-✅ **Better performance** - Identifies inefficiencies  
-✅ **Security** - Detects common vulnerabilities  
-✅ **Maintainability** - Cleaner, more readable code  
+- **Catch bugs early** - Before they reach production  
+- **Consistent style** - Entire codebase looks uniform  
+- **Better performance** - Identifies inefficiencies  
+- **Security** - Detects common vulnerabilities  
+- **Maintainability** - Cleaner, more readable code  

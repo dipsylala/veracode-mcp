@@ -40,11 +40,20 @@ func buildFindingsAPIRequest(client *VeracodeClient, ctx context.Context, req Fi
 		ScanType([]string{scanType})
 
 	// Add pagination parameters
+
+	if req.Page > math.MaxInt32 {
+		req.Page = math.MaxInt32
+	}
+
+	if req.Size > math.MaxInt32 {
+		req.Size = math.MaxInt32
+	}
+
 	if req.Page >= 0 {
-		apiReq = apiReq.Page(int32(req.Page))
+		apiReq = apiReq.Page(int32(req.Page)) // #nosec G115 - validated above
 	}
 	if req.Size > 0 {
-		apiReq = apiReq.Size(int32(req.Size))
+		apiReq = apiReq.Size(int32(req.Size)) // #nosec G115 - validated above
 	}
 
 	// Add CWE filter if provided

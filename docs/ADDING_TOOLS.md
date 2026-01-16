@@ -4,12 +4,28 @@ This guide shows how to add new tools to the Veracode MCP server using the auto-
 
 ## Overview
 
-The tool system uses **auto-registration** - tools register themselves on import using `init()` functions. You only need to:
-1. Create a new file in `tools/`
-2. Implement the `ToolImplementation` interface
-3. Register it in `init()`
+The tool system uses **auto-registration** - tools register themselves on import using `init()` functions. This provides a clean plugin-style architecture where each tool is a self-contained, independently developed module.
 
-That's it! No manual registration needed.
+**To add a new tool, you only need to:**
+1. Define the tool in `tools.json` (optional, for rich LLM-friendly descriptions)
+2. Create a new file in `tools/`
+3. Implement the `ToolImplementation` interface
+4. Register it in the `init()` function
+
+That's it! No manual registration needed in the core server code.
+
+## Architectural Benefits
+
+This auto-registration pattern provides:
+
+✅ **Separation of Concerns** - Each tool focuses on one specific capability  
+✅ **Open/Closed Principle** - Open for extension (add tools), closed for modification (core unchanged)  
+✅ **Independent Development** - Add features without touching core server code  
+✅ **Easy Testing** - Test tools in isolation  
+✅ **Type Safety** - Full Go type checking on parameters and responses  
+✅ **Self-Documenting** - Schema and description defined in code  
+✅ **Thread-Safe** - Registry handles concurrent access automatically  
+✅ **Modular Organization** - Each tool is a separate file with clear boundaries
 
 ## Step-by-Step Guide
 
@@ -249,6 +265,122 @@ Test using the MCP Inspector or your LLM client.
 ✅ **Self-documenting** - Schema and description in code, not separate JSON  
 ✅ **Thread-safe** - Registry handles concurrent access automatically  
 ✅ **Testable** - Each tool is independently testable  
+
+## Best Practices
+
+### Parameter Validation
+
+Always validate required parameters thoroughly:
+
+```go
+func (t *YourTool) Handle(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+    // Check required string parameters
+    param1, ok := params["param1"].(string)
+    if !ok || param1 == "" {
+        return errorResponse("param1 is required and must be a non-empty string"), nil
+    }
+    
+    // Validate enum values
+    status, ok := params["status"].(string)
+    if ok && !isValidStatus(status) {
+        return errorResponse("status must be one of: Open, Closed, Mitigated"), nil
+    }
+    
+    // Validate numeric ranges
+    if pageSize, ok := params["page_size"].(float64); ok {
+        if pageSize < 1 || pageSize > 100 {
+            return errorResponse("page_size must be between 1 and 100"), nil
+        }
+    }
+}
+```
+
+### Error Handling
+
+**Always return errors as tool results (not Go errors)** so LLMs can see and interpret them:
+
+```go
+// ❌ BAD - LLM won't see this error
+if err != nil {
+    return nil, fmt.Errorf("failed to fetch data: %w", err)
+}
+
+// ✅ GOOD - LLM sees the error and can reason about it
+if err != nil {
+    return errorResponse(fmt.Sprintf("Failed to fetch data: %v", err)), nil
+}
+
+// ✅ BETTER - Provide actionable context
+if err != nil {
+    return errorResponse(fmt.Sprintf(
+        "Failed to connect to Veracode API: %v. "+
+        "Please check your credentials in ~/.veracode/veracode.yml", 
+        err)), nil
+}
+```
+
+### Resource Management
+
+Use initialization patterns for expensive resources:
+
+```go
+type YourTool struct {
+    client *api.VeracodeClient
+}
+
+func NewYourTool() *YourTool {
+    return &YourTool{}
+}
+
+func (t *YourTool) Initialize() error {
+    client, err := api.NewVeracodeClient()
+    if err != nil {
+        return fmt.Errorf("failed to initialize API client: %w", err)
+    }
+    t.client = client
+    return nil
+}
+
+func (t *YourTool) Shutdown() error {
+    // Clean up resources if needed
+    return nil
+}
+```
+
+### Structured Output
+
+Return well-formatted, readable results that LLMs can parse:
+
+```go
+func formatFindings(findings []Finding) map[string]interface{} {
+    return map[string]interface{}{
+        "success": true,
+        "summary": map[string]interface{}{
+            "total":    len(findings),
+            "critical": countBySeverity(findings, "Critical"),
+            "high":     countBySeverity(findings, "High"),
+        },
+        "findings": findings,
+        "message": fmt.Sprintf("Found %d security findings", len(findings)),
+    }
+}
+```
+
+For text output, use clear formatting:
+
+```go
+result := fmt.Sprintf(`Security Scan Results
+======================
+
+Status: Complete
+Total Findings: %d
+Critical: %d
+High: %d
+Medium: %d
+
+Top Issues:
+%s`, total, critical, high, medium, formatTopIssues(findings))
+```
 
 ## Advanced Patterns
 
