@@ -22,7 +22,7 @@ func main() {
 	// Setup logging based on flags
 	if *logFile != "" {
 		// Write logs to specified file
-		f, err := os.OpenFile(*logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		f, err := os.OpenFile(*logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to open log file %s: %v\n", *logFile, err)
 			os.Exit(1)
