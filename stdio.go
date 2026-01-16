@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sync"
 )
@@ -43,10 +42,8 @@ func (t *StdioTransport) Start() error {
 
 		var req JSONRPCRequest
 		if err := json.Unmarshal(line, &req); err != nil {
-			log.Printf("Failed to parse JSON-RPC request: %v", err)
-			if sendErr := t.sendError(nil, -32700, "Parse error", nil); sendErr != nil {
-				log.Printf("Failed to send parse error: %v", sendErr)
-			}
+			// Send parse error without logging to avoid stdio interference
+			_ = t.sendError(nil, -32700, "Parse error", nil)
 			continue
 		}
 
@@ -56,9 +53,7 @@ func (t *StdioTransport) Start() error {
 
 func (t *StdioTransport) handleRequest(req *JSONRPCRequest) {
 	resp := t.server.HandleRequest(req)
-	if err := t.sendResponse(resp); err != nil {
-		log.Printf("Failed to send response: %v", err)
-	}
+	_ = t.sendResponse(resp)
 }
 
 func (t *StdioTransport) sendResponse(resp *JSONRPCResponse) error {

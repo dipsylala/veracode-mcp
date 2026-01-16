@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -10,7 +11,13 @@ import (
 func main() {
 	mode := flag.String("mode", "stdio", "Server mode: stdio or http")
 	addr := flag.String("addr", ":8080", "HTTP server address (only for http mode)")
+	quiet := flag.Bool("quiet", false, "Suppress startup logging (recommended for stdio mode with MCP clients)")
 	flag.Parse()
+
+	// Disable logging if quiet mode is enabled
+	if *quiet {
+		log.SetOutput(io.Discard)
+	}
 
 	server, err := NewMCPServer()
 	if err != nil {

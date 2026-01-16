@@ -197,3 +197,53 @@ func (c *VeracodeClient) StaticFindingDataPathClient() *static_finding_data_path
 func (c *VeracodeClient) DynamicFlawClient() *dynamic_flaw.APIClient {
 	return c.dynamicFlawClient
 }
+
+// RawGet performs a raw GET request to the specified endpoint
+func (c *VeracodeClient) RawGet(ctx context.Context, endpoint string) (string, error) {
+	if !c.IsConfigured() {
+		return "", fmt.Errorf("API credentials not configured")
+	}
+
+	// Create HTTP client with HMAC authentication
+	httpClient := newHMACHTTPClient(c.apiID, c.apiKey)
+
+	// Build the full URL
+	fullURL := c.baseURL + endpoint
+
+	// Create the request
+	req, err := http.NewRequestWithContext(ctx, "GET", fullURL, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Execute the request
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body := make([]byte, 0)
+	buf := make([]byte, 1024)
+	for {
+		n, err := resp.Body.Read(buf)
+		if n > 0 {
+			body = append(body, buf[:n]...)
+		}
+		if err != nil {
+			break
+		}
+	}
+
+	// Check status code
+	if resp.StatusCode != http.StatusOK {
+		bodyStr := string(body)
+		if len(bodyStr) == 0 {
+			bodyStr = "(empty response)"
+		}
+		return bodyStr, fmt.Errorf("API returned status %d: %s", resp.StatusCode, bodyStr)
+	}
+
+	return string(body), nil
+}
