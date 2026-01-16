@@ -293,6 +293,30 @@
           "description": "The flaw ID for which to retrieve detailed information."
         }
       ]
+    },
+        {
+      "name": "run-sca-scan",
+      "description": "Run Software Composition Analysis (SCA) scan on a directory to identify vulnerable dependencies, license issues, and outdated packages. get-local-sca-results tool will read the relevant results",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+        }
+      ]
+    },
+    {
+      "name": "get-local-sca-results",
+      "description": "Gets the results of a local SCA scan on a directory to identify vulnerable dependencies, license issues, and outdated packages. Executes 'veracode scan' CLI and returns results with vulnerability details, CVSS/EPSS scores, and fix recommendations.",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+        }
+      ]
     }
   ]
 }
