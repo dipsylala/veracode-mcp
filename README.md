@@ -14,8 +14,8 @@ A Model Context Protocol (MCP) server implementation in Go that provides Veracod
   - JSON-RPC 2.0 message handling
   - Tool invocation capabilities
   - Resource access
-  - Protocol version negotiation (2024-11-05)
-
+  - Protocol version negotiation (supports 2024-11-05 and newer including 2025-06-18)
+  
 - **Veracode Integration**
   - Dynamic (DAST) findings
   - Static (SAST) findings
@@ -90,6 +90,28 @@ See [credentials/README.md](credentials/README.md) for detailed information.
 
 ## Usage
 
+### Command Line Options
+
+```bash
+.\dist\veracode-mcp.exe [options]
+
+# Basic usage (silent mode, no logging)
+.\dist\veracode-mcp.exe
+
+# With debug logging to file (recommended for troubleshooting)
+.\dist\veracode-mcp.exe -log veracode-mcp.log
+
+# With verbose logging to stderr
+.\dist\veracode-mcp.exe -verbose
+```
+
+**Important:** When using stdio mode with MCP clients (like VS Code or Codex), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.     Enable verbose logging to stderr (disabled by default)
+  -log string
+        Log file path for debugging (recommended for stdio mode)
+  -version
+        Display version information
+```
+
 ### Stdio Mode (Default)
 
 The stdio mode is ideal for local integrations where the MCP server runs as a subprocess:
@@ -99,7 +121,34 @@ The stdio mode is ideal for local integrations where the MCP server runs as a su
 ```
 
 Or simply:
-```bash
+```bMCP Client Configuration
+
+**VS Code / Codex:**
+
+Add to your MCP client configuration (e.g., `~/.codex/config.toml`):
+
+```toml
+[mcp_servers.Veracode]
+command = "/path/to/veracode-mcp.exe"
+args = ["-log", "/path/to/veracode-mcp.log"]  # Optional but recommended for debugging
+```
+
+**Claude Desktop:**
+
+Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "veracode": {
+      "command": "/path/to/veracode-mcp.exe",
+      "args": ["-log", "/path/to/veracode-mcp.log"]
+    }
+  }
+}
+```
+
+### ash
 .\dist\veracode-mcp.exe
 ```
 
@@ -141,12 +190,18 @@ The HTTP server provides these endpoints:
 ### Tool Architecture
 
 The server uses an **auto-registration architecture** where tools register themselves on import:
+ (supports protocol versions >= 2024-11-05)
+- `notifications/initialized` - Client initialization confirmation (properly handled as notification per JSON-RPC 2.0 spec)
+- `tools/list` - List available tools (loaded from tools.json)
+- `tools/call` - Execute a tool with validated parameters
+- `resources/list` - List available resources
+- `resources/read` - Read resource content
 
-**Key Components:**
-
-1. **Tool Definitions** (`tools.json`)
-   - Tool metadata (name, description, parameters)
-   - Parameter types, validation rules, and constraints
+**Protocol Compatibility:**
+- Automatically negotiates protocol version with client
+- Tested with Codex (protocol 2025-06-18) and VS Code MCP clients
+- Strict JSON-RPC 2.0 compliance (notifications receive no response)
+- Buffered stdio transport with explicit flushing for reliable communic
    - Rich descriptions optimized for LLM consumption
    - Enum values and allowed ranges
 
