@@ -197,17 +197,18 @@ func formatPipelineResultsSummary(response *MCPFindingsResponse, resultsFile str
 	return fmt.Sprintf(`Pipeline Scan Results for %s
 Results File: %s
 Total Findings: %d
-Severity: Critical=%d, High=%d, Medium=%d, Low=%d, Info=%d
+Severity: Very High=%d, High=%d, Medium=%d, Low=%d, Very Low=%d, Info=%d
 
 View the interactive UI below for detailed analysis.`,
 		response.Application.Name,
 		resultsFile,
 		response.Summary.TotalFindings,
-		response.Summary.BySeverity["critical"],
+		response.Summary.BySeverity["very high"],
 		response.Summary.BySeverity["high"],
 		response.Summary.BySeverity["medium"],
 		response.Summary.BySeverity["low"],
-		response.Summary.BySeverity["informational"])
+		response.Summary.BySeverity["very low"],
+		response.Summary.BySeverity["info"])
 }
 
 // formatPipelineResultsResponse formats the pipeline results into an MCP response
@@ -220,11 +221,12 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 		},
 		Summary: MCPFindingsSummary{
 			BySeverity: map[string]int{
-				"critical":      0,
-				"high":          0,
-				"medium":        0,
-				"low":           0,
-				"informational": 0,
+				"very high": 0,
+				"high":      0,
+				"medium":    0,
+				"low":       0,
+				"very low":  0,
+				"info":      0,
 			},
 			ByStatus: map[string]int{
 				"open": len(results.Findings), // All pipeline findings are "open"

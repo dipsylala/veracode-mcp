@@ -101,6 +101,9 @@ interface DynamicFindingsViewProps {
 function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
   const { application, summary, findings } = data;
 
+  // Define severity order (5 to 0)
+  const severityOrder = ['Very High', 'High', 'Medium', 'Low', 'Very Low', 'Info'];
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -122,11 +125,11 @@ function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
         </div>
 
         <div className={styles.severityBreakdown}>
-          {Object.entries(summary.by_severity).map(([severity, count]) => {
-            const numCount = count as number;
-            return numCount > 0 && (
-              <div key={severity} className={`${styles.severityItem} ${styles[severity]}`}>
-                <strong>{numCount}</strong> {severity}
+          {severityOrder.map((severity) => {
+            const count = summary.by_severity[severity] as number || 0;
+            return count > 0 && (
+              <div key={severity} className={`${styles.severityItem} ${styles[severity.toLowerCase().replace(' ', '')]}`}>
+                <strong>{count}</strong> {severity}
               </div>
             );
           })}
@@ -176,7 +179,7 @@ function FindingRow({ finding }: FindingRowProps) {
         </td>
         <td>{finding.flaw_id}</td>
         <td className={styles.severityCell}>
-          <span className={`${styles.severityBadge} ${styles[finding.severity.toLowerCase()]}`}>
+          <span className={`${styles.severityBadge} ${styles[finding.severity.toLowerCase().replace(' ', '')]}`}>
             {finding.severity}
           </span>
         </td>

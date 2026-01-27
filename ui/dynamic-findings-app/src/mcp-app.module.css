@@ -53,6 +53,11 @@
   background: var(--color-background-secondary, #f5f5f5);
 }
 
+.severityItem.veryhigh {
+  background: #fee;
+  color: #c00;
+}
+
 .severityItem.critical {
   background: #fee;
   color: #c00;
@@ -73,7 +78,12 @@
   color: #660;
 }
 
-.severityItem.informational {
+.severityItem.verylow {
+  background: #ffe;
+  color: #880;
+}
+
+.severityItem.info {
   background: #eef;
   color: #66f;
 }
@@ -188,6 +198,11 @@
   text-transform: uppercase;
 }
 
+.severityBadge.veryhigh {
+  background: #fee;
+  color: #c00;
+}
+
 .severityBadge.critical {
   background: #fee;
   color: #c00;
@@ -208,7 +223,12 @@
   color: #660;
 }
 
-.severityBadge.informational {
+.severityBadge.verylow {
+  background: #ffe;
+  color: #880;
+}
+
+.severityBadge.info {
   background: #eef;
   color: #66f;
 }

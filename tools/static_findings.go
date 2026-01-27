@@ -263,11 +263,12 @@ func formatStaticFindingsResponse(ctx context.Context, appPath, appProfile, appl
 		},
 		Summary: MCPFindingsSummary{
 			BySeverity: map[string]int{
-				"critical":      0,
-				"high":          0,
-				"medium":        0,
-				"low":           0,
-				"informational": 0,
+				"very high": 0,
+				"high":      0,
+				"medium":    0,
+				"low":       0,
+				"very low":  0,
+				"info":      0,
 			},
 			ByStatus: map[string]int{
 				"open":   0,

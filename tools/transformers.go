@@ -16,10 +16,12 @@ type SeverityLevel string
 
 const (
 	SeverityCritical      SeverityLevel = "CRITICAL"
+	SeverityVeryHigh      SeverityLevel = "VERY HIGH"
 	SeverityHigh          SeverityLevel = "HIGH"
 	SeverityMedium        SeverityLevel = "MEDIUM"
 	SeverityLow           SeverityLevel = "LOW"
-	SeverityInformational SeverityLevel = "INFORMATIONAL"
+	SeverityVeryLow       SeverityLevel = "VERY LOW"
+	SeverityInformational SeverityLevel = "INFO"
 )
 
 // FindingStatus represents the status of a finding
@@ -49,14 +51,16 @@ func TransformSeverity(severity *int32) SeverityLevel {
 
 	switch *severity {
 	case 5:
-		return SeverityCritical
+		return SeverityVeryHigh
 	case 4:
 		return SeverityHigh
 	case 3:
 		return SeverityMedium
 	case 2:
 		return SeverityLow
-	case 1, 0:
+	case 1:
+		return SeverityVeryLow
+	case 0:
 		return SeverityInformational
 	default:
 		return SeverityInformational
@@ -289,11 +293,12 @@ func GenerateSummary(findings []api.Finding) FindingsSummary {
 	summary := FindingsSummary{
 		TotalFindings: len(findings),
 		BySeverity: map[string]int{
-			"critical":      0,
-			"high":          0,
-			"medium":        0,
-			"low":           0,
-			"informational": 0,
+			"very high": 0,
+			"high":      0,
+			"medium":    0,
+			"low":       0,
+			"very low":  0,
+			"info":      0,
 		},
 		ByScanType: map[string]int{
 			"static": 0,

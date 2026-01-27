@@ -92,7 +92,7 @@ func (t *YourTool) GetInputSchema() interface{} {
                 "description": "Filter by severity levels",
                 "items": map[string]interface{}{
                     "type": "string",
-                    "enum": []string{"Critical", "High", "Medium", "Low"},
+                    "enum": []string{"Very High", "High", "Medium", "Very Low", "Low", "Info"},
                 },
             },
         },

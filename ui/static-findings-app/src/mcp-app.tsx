@@ -101,6 +101,9 @@ interface StaticFindingsViewProps {
 function StaticFindingsView({ data }: StaticFindingsViewProps) {
   const { application, summary, findings } = data;
 
+  // Define severity order (5 to 0)
+  const severityOrder = ['Very High', 'High', 'Medium', 'Low', 'Very Low', 'Info'];
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -122,11 +125,11 @@ function StaticFindingsView({ data }: StaticFindingsViewProps) {
         </div>
 
         <div className={styles.severityBreakdown}>
-          {Object.entries(summary.by_severity).map(([severity, count]) => {
-            const numCount = count as number;
-            return numCount > 0 && (
-              <div key={severity} className={`${styles.severityItem} ${styles[severity]}`}>
-                <strong>{numCount}</strong> {severity}
+          {severityOrder.map((severity) => {
+            const count = summary.by_severity[severity] as number || 0;
+            return count > 0 && (
+              <div key={severity} className={`${styles.severityItem} ${styles[severity.toLowerCase().replace(' ', '')]}`}>
+                <strong>{count}</strong> {severity}
               </div>
             );
           })}
@@ -144,8 +147,8 @@ function StaticFindingsView({ data }: StaticFindingsViewProps) {
                 <th>Flaw ID</th>
                 <th className={styles.severityHeader}>Severity</th>
                 <th>CWE</th>
-                <th>Module</th>
-                <th>File</th>
+                <th className={styles.moduleCell}>Module</th>
+                <th className={styles.fileCell}>File</th>
                 <th>Status</th>
                 <th>Mitigation</th>
               </tr>
@@ -177,7 +180,7 @@ function FindingRow({ finding }: FindingRowProps) {
         </td>
         <td>{finding.flaw_id}</td>
         <td className={styles.severityCell}>
-          <span className={`${styles.severityBadge} ${styles[finding.severity.toLowerCase()]}`}>
+          <span className={`${styles.severityBadge} ${styles[finding.severity.toLowerCase().replace(' ', '')]}`}>
             {finding.severity}
           </span>
         </td>
@@ -191,8 +194,8 @@ function FindingRow({ finding }: FindingRowProps) {
             {finding.cwe_id}
           </a>
         </td>
-        <td>{finding.module || '-'}</td>
-        <td>
+        <td className={styles.moduleCell} title={finding.module || undefined}>{finding.module || '-'}</td>
+        <td className={styles.fileCell} title={finding.file_path ? `${finding.file_path}${finding.line_number ? `:${finding.line_number}` : ''}` : undefined}>
           <div className={styles.filePath}>
             {finding.file_path || '-'}{finding.file_path && finding.line_number ? `:${finding.line_number}` : ''}
           </div>
