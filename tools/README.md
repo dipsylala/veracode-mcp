@@ -167,6 +167,10 @@ return nil, fmt.Errorf("critical error: %w", err)
 - `registry.go` - Auto-registration system
 - `dynamic_findings.go` - DAST tool example
 - `static_findings.go` - SAST tool example
+- `package_workspace.go` - Workspace packaging tool
+- `run_sca_scan.go` - SCA scan tool
+- `get_local_sca_results.go` - SCA results parser
+- `pipeline_scan.go` - Pipeline scan tool
 - `README.md` - This file
 
 ## Checklist for New Tool

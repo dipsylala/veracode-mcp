@@ -64,13 +64,7 @@ func LoadAllTools(registry *ToolImplRegistry, handlerRegistry *ToolHandlerRegist
 	allTools := tools.GetAllTools()
 
 	for _, regTool := range allTools {
-		// Initialize the tool
-		if err := regTool.Impl.Initialize(); err != nil {
-			log.Printf("Failed to initialize tool %s: %v", regTool.Name, err)
-			continue
-		}
-
-		// Register the tool in the implementation registry
+		// Register the tool in the implementation registry (this also initializes it)
 		if err := registry.Register(regTool.Name, regTool.Impl); err != nil {
 			log.Printf("Failed to register tool %s: %v", regTool.Name, err)
 			continue
