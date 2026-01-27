@@ -51,13 +51,14 @@ func (t *StaticFindingsTool) Shutdown() error {
 
 // StaticFindingsRequest represents the parsed parameters for get-static-findings
 type StaticFindingsRequest struct {
-	ApplicationPath string `json:"application_path"`
-	AppProfile      string `json:"app_profile,omitempty"`
-	Sandbox         string `json:"sandbox,omitempty"`
-	Size            int    `json:"size,omitempty"`
-	Page            int    `json:"page,omitempty"`
-	Severity        *int32 `json:"severity,omitempty"`
-	SeverityGte     *int32 `json:"severity_gte,omitempty"`
+	ApplicationPath string   `json:"application_path"`
+	AppProfile      string   `json:"app_profile,omitempty"`
+	Sandbox         string   `json:"sandbox,omitempty"`
+	Size            int      `json:"size,omitempty"`
+	Page            int      `json:"page,omitempty"`
+	Severity        *int32   `json:"severity,omitempty"`
+	SeverityGte     *int32   `json:"severity_gte,omitempty"`
+	CWEIDs          []string `json:"cwe_ids,omitempty"`
 }
 
 // parseStaticFindingsRequest extracts and validates parameters from the raw args map
@@ -68,7 +69,27 @@ func parseStaticFindingsRequest(args map[string]interface{}) (*StaticFindingsReq
 		Page: 0,
 	}
 
-	// Use JSON marshaling to automatically map args to struct
+	// Extract cwe_ids separately since they may come as numbers
+	if cweIdsRaw, ok := args["cwe_ids"]; ok {
+		if cweArray, ok := cweIdsRaw.([]interface{}); ok {
+			req.CWEIDs = make([]string, len(cweArray))
+			for i, cwe := range cweArray {
+				switch v := cwe.(type) {
+				case float64:
+					req.CWEIDs[i] = fmt.Sprintf("%.0f", v)
+				case int:
+					req.CWEIDs[i] = fmt.Sprintf("%d", v)
+				case string:
+					req.CWEIDs[i] = v
+				default:
+					req.CWEIDs[i] = fmt.Sprintf("%v", v)
+				}
+			}
+		}
+		delete(args, "cwe_ids") // Remove to avoid unmarshaling conflict
+	}
+
+	// Use JSON marshaling to automatically map remaining args to struct
 	jsonData, err := json.Marshal(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal arguments: %w", err)
@@ -194,6 +215,7 @@ Please verify:
 		Page:        req.Page,
 		Severity:    req.Severity,
 		SeverityGte: req.SeverityGte,
+		CWEIDs:      req.CWEIDs,
 	}
 
 	// Step 5: Call the API to get static findings
@@ -352,6 +374,9 @@ func processStaticFinding(finding api.Finding) MCPFinding {
 		References:       references,
 		FilePath:         finding.FilePath,
 		LineNumber:       finding.LineNumber,
+		Module:           finding.Module,
+		Procedure:        finding.Procedure,
+		AttackVector:     finding.AttackVector,
 		Mitigations:      convertMitigations(finding.Mitigations),
 	}
 }

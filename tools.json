@@ -7,8 +7,8 @@
       "params": []
     },
     {
-      "name": "get-dynamic-findings",
-      "description": "Get runtime vulnerabilities from DYNAMIC analysis scans.\n\nReturns: Auth/session flaws, authorization bypasses, misconfigurations, CSRF, clickjacking, missing headers\nIncludes: CWE ID, URL, HTTP details, attack vectors, severity, status\nRelated: get-static-findings (source code)\n\nDisplay as table: | Flaw ID | Severity | CWE | Status | URL | Description |",
+      "name": "dynamic-findings",
+      "description": "Get runtime vulnerabilities from DYNAMIC analysis scans.\n\nReturns: Auth/session flaws, authorization bypasses, misconfigurations, CSRF, clickjacking, missing headers\nIncludes: CWE ID, URL, HTTP details, attack vectors, severity, status\nRelated: static-findings (source code)\n\nDisplay as table: | Flaw ID | Severity | CWE | Status | URL | Description |",
       "params": [
         {
           "name": "application_path",
@@ -41,6 +41,12 @@
             "max": 5
           },
           "description": "Filter findings with severity greater than or equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+        },
+        {
+          "name": "cwe_ids",
+          "type": "array",
+          "isRequired": false,
+          "description": "Filter findings by CWE IDs. Provide one or more CWE IDs as numbers without the 'CWE-' prefix. Example: [89, 79] for SQL Injection and XSS. Can be combined with severity filters."
         },
         {
           "name": "size",
@@ -99,6 +105,12 @@
             "max": 5
           },
           "description": "Filter findings with severity greater than or equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+        },
+        {
+          "name": "cwe_ids",
+          "type": "array",
+          "isRequired": false,
+          "description": "Filter findings by CWE IDs. Provide one or more CWE IDs as numbers without the 'CWE-' prefix. Example: [89, 79] for SQL Injection and XSS. Can be combined with severity filters."
         },
         {
           "name": "size",

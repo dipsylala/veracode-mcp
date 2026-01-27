@@ -14,6 +14,9 @@ var pipelineResultsHTML string
 //go:embed ui/static-findings-app/dist/mcp-app.html
 var staticFindingsHTML string
 
+//go:embed ui/dynamic-findings-app/dist/mcp-app.html
+var dynamicFindingsHTML string
+
 // MCPServer represents the core MCP server
 type MCPServer struct {
 	initialized     bool
@@ -443,6 +446,12 @@ func (s *MCPServer) handleListResources() *ListResourcesResult {
 				Description: "Interactive UI for static analysis findings",
 				MimeType:    "text/html;profile=mcp-app",
 			},
+			{
+				URI:         "ui://dynamic-findings/app.html",
+				Name:        "Dynamic Findings UI",
+				Description: "Interactive UI for dynamic analysis findings",
+				MimeType:    "text/html;profile=mcp-app",
+			},
 		},
 	}
 }
@@ -493,6 +502,24 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 					URI:      readParams.URI,
 					MimeType: "text/html;profile=mcp-app",
 					Text:     staticFindingsHTML,
+					Meta: map[string]interface{}{
+						"ui": map[string]interface{}{
+							"permissions": map[string]interface{}{},
+						},
+					},
+				},
+			},
+		}, nil
+
+	case "ui://dynamic-findings/app.html":
+		// Return the embedded UI HTML with metadata
+		log.Printf("Serving dynamic findings UI - HTML length: %d bytes", len(dynamicFindingsHTML))
+		return &ReadResourceResult{
+			Contents: []ResourceContents{
+				{
+					URI:      readParams.URI,
+					MimeType: "text/html;profile=mcp-app",
+					Text:     dynamicFindingsHTML,
 					Meta: map[string]interface{}{
 						"ui": map[string]interface{}{
 							"permissions": map[string]interface{}{},

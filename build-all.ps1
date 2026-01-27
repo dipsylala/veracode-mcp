@@ -86,6 +86,45 @@ if (-not $SkipUI) {
     }
     
     Pop-Location
+    
+    # Build Dynamic Findings UI
+    Write-Host "`nBuilding Dynamic Findings UI..." -ForegroundColor Yellow
+    
+    $dynamicUIPath = Join-Path $PSScriptRoot "ui\dynamic-findings-app"
+    
+    if (-not (Test-Path $dynamicUIPath)) {
+        Write-Host "Error: Dynamic Findings UI directory not found at $dynamicUIPath" -ForegroundColor Red
+        exit 1
+    }
+    
+    Push-Location $dynamicUIPath
+    
+    try {
+        # Install dependencies if node_modules doesn't exist
+        if (-not (Test-Path "node_modules")) {
+            Write-Host "Installing UI dependencies..." -ForegroundColor Yellow
+            npm install
+            if ($LASTEXITCODE -ne 0) {
+                throw "npm install failed"
+            }
+        }
+        
+        # Build UI
+        Write-Host "Building Dynamic Findings UI..." -ForegroundColor Yellow
+        npm run build
+        if ($LASTEXITCODE -ne 0) {
+            throw "Dynamic Findings UI build failed"
+        }
+        
+        Write-Host "Dynamic Findings UI built successfully!" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Error building Dynamic Findings UI: $_" -ForegroundColor Red
+        Pop-Location
+        exit 1
+    }
+    
+    Pop-Location
 }
 
 # Exit if UI-only build

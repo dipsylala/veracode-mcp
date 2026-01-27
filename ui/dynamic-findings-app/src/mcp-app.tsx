@@ -9,12 +9,12 @@ import { createRoot } from "react-dom/client";
 import type { MCPFindingsResponse, MCPFinding, MCPMitigation } from "./types";
 import styles from "./mcp-app.module.css";
 
-function StaticFindingsApp() {
+function DynamicFindingsApp() {
   const [resultsData, setResultsData] = useState<MCPFindingsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { app, error: appError } = useApp({
-    appInfo: { name: "Static Findings", version: "1.0.0" },
+    appInfo: { name: "Dynamic Findings", version: "1.0.0" },
     capabilities: {},
     onAppCreated: (app) => {
       app.ontoolinput = async (input) => {
@@ -91,20 +91,20 @@ function StaticFindingsApp() {
     return <div className={styles.loading}>Loading results...</div>;
   }
 
-  return <StaticFindingsView data={resultsData} />;
+  return <DynamicFindingsView data={resultsData} />;
 }
 
-interface StaticFindingsViewProps {
+interface DynamicFindingsViewProps {
   data: MCPFindingsResponse;
 }
 
-function StaticFindingsView({ data }: StaticFindingsViewProps) {
+function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
   const { application, summary, findings } = data;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Static Findings: {application.name}</h1>
+        <h1>Dynamic Findings: {application.name}</h1>
         
         <div className={styles.summary}>
           <div className={styles.summaryItem}>
@@ -144,8 +144,7 @@ function StaticFindingsView({ data }: StaticFindingsViewProps) {
                 <th>Flaw ID</th>
                 <th className={styles.severityHeader}>Severity</th>
                 <th>CWE</th>
-                <th>Module</th>
-                <th>File</th>
+                <th>URL</th>
                 <th>Status</th>
                 <th>Mitigation</th>
               </tr>
@@ -191,10 +190,9 @@ function FindingRow({ finding }: FindingRowProps) {
             {finding.cwe_id}
           </a>
         </td>
-        <td>{finding.module || '-'}</td>
         <td>
-          <div className={styles.filePath}>
-            {finding.file_path || '-'}{finding.file_path && finding.line_number ? `:${finding.line_number}` : ''}
+          <div className={styles.url}>
+            {finding.url || '-'}
           </div>
         </td>
         <td>{finding.status}</td>
@@ -202,7 +200,7 @@ function FindingRow({ finding }: FindingRowProps) {
       </tr>
       {isExpanded && (
         <tr className={styles.expandedRow}>
-          <td colSpan={8}>
+          <td colSpan={7}>
             <div className={styles.expandedContent}>
               {finding.attack_vector && (
                 <div className={styles.expandedSection}>
@@ -237,7 +235,8 @@ function FindingRow({ finding }: FindingRowProps) {
                     </div>
                   ))}
                 </div>
-              )}            </div>
+              )}
+            </div>
           </td>
         </tr>
       )}
@@ -247,6 +246,6 @@ function FindingRow({ finding }: FindingRowProps) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <StaticFindingsApp />
+    <DynamicFindingsApp />
   </StrictMode>,
 );

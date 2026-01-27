@@ -47,7 +47,7 @@ func TestMCPServerInitialization(t *testing.T) {
 
 	expectedTools := []string{
 		"api-health",
-		"get-dynamic-findings",
+		"dynamic-findings",
 		"get-static-findings",
 	}
 
@@ -232,7 +232,7 @@ func TestMCPToolCall_APIHealth(t *testing.T) {
 	t.Logf("Health check returned %d characters", len(responseText))
 }
 
-// TestMCPToolCall_DynamicFindings tests calling get-dynamic-findings through MCP protocol
+// TestMCPToolCall_DynamicFindings tests calling dynamic-findings through MCP protocol
 func TestMCPToolCall_DynamicFindings(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping MCP integration test in short mode")
@@ -248,7 +248,7 @@ func TestMCPToolCall_DynamicFindings(t *testing.T) {
 		t.Fatalf("Failed to create MCP server: %v", err)
 	}
 
-	// Call get-dynamic-findings tool with test application GUID
+	// Call dynamic-findings tool with test application GUID
 	callParams := CallToolParams{
 		Name: "get-dynamic-findings",
 		Arguments: map[string]interface{}{

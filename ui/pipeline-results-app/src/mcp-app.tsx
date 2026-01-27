@@ -1,7 +1,12 @@
 import { useApp } from "@modelcontextprotocol/ext-apps/react";
-import { StrictMode, useState } from "react";
+import {
+  applyHostStyleVariables,
+  applyDocumentTheme,
+  type McpUiHostContext,
+} from "@modelcontextprotocol/ext-apps";
+import { StrictMode, useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import type { MCPFindingsResponse, MCPFinding } from "./types";
+import type { MCPFindingsResponse, MCPFinding, MCPMitigation } from "./types";
 import styles from "./mcp-app.module.css";
 
 function PipelineResultsApp() {
@@ -44,8 +49,12 @@ function PipelineResultsApp() {
         }
       };
 
-      app.onhostcontextchanged = (params) => {
-        console.info("Host context changed:", params);
+      app.onhostcontextchanged = (ctx: McpUiHostContext) => {
+        console.info("Host context changed:", ctx);
+        
+        // Apply host styling
+        if (ctx.theme) applyDocumentTheme(ctx.theme);
+        if (ctx.styles?.variables) applyHostStyleVariables(ctx.styles.variables);
       };
 
       app.onerror = (err) => {
@@ -54,6 +63,17 @@ function PipelineResultsApp() {
       };
     },
   });
+
+  // Apply host styles after app is connected
+  useEffect(() => {
+    if (app) {
+      const ctx = app.getHostContext();
+      if (ctx) {
+        if (ctx.theme) applyDocumentTheme(ctx.theme);
+        if (ctx.styles?.variables) applyHostStyleVariables(ctx.styles.variables);
+      }
+    }
+  }, [app]);
 
   if (appError) {
     return <div className={styles.error}><strong>ERROR:</strong> {appError.message}</div>;
@@ -120,10 +140,13 @@ function PipelineResultsView({ data }: PipelineResultsViewProps) {
           <table className={styles.table}>
             <thead>
               <tr>
+                <th className={styles.expanderHeader}></th>
+                <th>Flaw ID</th>
                 <th className={styles.severityHeader}>Severity</th>
                 <th>CWE</th>
                 <th>File</th>
                 <th>Status</th>
+                <th>Mitigation</th>
               </tr>
             </thead>
             <tbody>
@@ -148,8 +171,11 @@ function FindingRow({ finding }: FindingRowProps) {
   return (
     <>
       <tr className={styles.findingRow} onClick={() => setIsExpanded(!isExpanded)}>
-        <td className={styles.severityCell}>
+        <td className={styles.expanderCell}>
           <span className={styles.expander}>{isExpanded ? '▼' : '▶'}</span>
+        </td>
+        <td>{finding.flaw_id}</td>
+        <td className={styles.severityCell}>
           <span className={`${styles.severityBadge} ${styles[finding.severity.toLowerCase()]}`}>
             {finding.severity}
           </span>
@@ -170,15 +196,46 @@ function FindingRow({ finding }: FindingRowProps) {
           </div>
         </td>
         <td>{finding.status}</td>
+        <td>{finding.mitigation_status}</td>
       </tr>
       {isExpanded && (
         <tr className={styles.expandedRow}>
-          <td colSpan={4}>
+          <td colSpan={7}>
             <div className={styles.expandedContent}>
+              {finding.attack_vector && (
+                <div className={styles.expandedSection}>
+                  <h4 className={styles.expandedHeader}>Attack Vector</h4>
+                  <div className={styles.description}>{finding.attack_vector}</div>
+                </div>
+              )}
               <div className={styles.expandedSection}>
                 <h4 className={styles.expandedHeader}>Description</h4>
                 <div className={styles.description}>{finding.description}</div>
               </div>
+              {finding.mitigations && finding.mitigations.length > 0 && (
+                <div className={styles.expandedSection}>
+                  <h4 className={styles.expandedHeader}>Mitigations ({finding.mitigations.length})</h4>
+                  {[...finding.mitigations]
+                    .sort((a, b) => {
+                      const dateA = new Date(a.date).getTime();
+                      const dateB = new Date(b.date).getTime();
+                      return dateB - dateA; // Most recent first
+                    })
+                    .map((mitigation: MCPMitigation, idx: number) => (
+                    <div key={idx} className={styles.mitigation}>
+                      <div className={styles.mitigationHeader}>
+                        <strong>{mitigation.action}</strong>
+                        <span className={styles.mitigationMeta}>
+                          by {mitigation.submitter} on {new Date(mitigation.date).toLocaleString('en-US', { hour12: false })}
+                        </span>
+                      </div>
+                      {mitigation.comment && (
+                        <div className={styles.mitigationComment}>{mitigation.comment}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </td>
         </tr>

@@ -11,7 +11,7 @@
 }
 
 .header h1 {
-  font-size: var(--font-heading-lg-size, 24px);
+  font-size: var(--font-heading-md-size, 18px);
   font-weight: var(--font-weight-semibold, 600);
   margin-bottom: 8px;
   color: var(--color-text-primary, #000);
@@ -108,7 +108,16 @@
 }
 
 .table tbody tr:hover {
-  background: var(--color-background-hover, #f9f9f9);
+  background: var(--color-background-hover, color-mix(in srgb, var(--color-background-primary, #fff) 90%, black));
+}
+
+.expanderHeader {
+  width: 30px;
+}
+
+.expanderCell {
+  width: 30px;
+  text-align: center;
 }
 
 .severityHeader {
@@ -126,8 +135,6 @@
 
 .expander {
   display: inline-block;
-  width: 16px;
-  margin-right: 8px;
   font-size: 10px;
   color: var(--color-text-secondary, #666);
 }
@@ -245,6 +252,7 @@
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--color-border-secondary, #f0f0f0);
+  white-space: pre-wrap;
 }
 
 .error {

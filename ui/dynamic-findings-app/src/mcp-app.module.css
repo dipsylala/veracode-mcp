@@ -213,10 +213,11 @@
   color: #66f;
 }
 
-.filePath {
+.url {
   font-family: var(--font-mono, 'Courier New', monospace);
   font-size: var(--font-text-xs-size, 11px);
   color: var(--color-text-secondary, #666);
+  word-break: break-all;
 }
 
 .mitigation {

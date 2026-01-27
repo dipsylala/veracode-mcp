@@ -156,9 +156,12 @@ type Finding struct {
 	Status            string                 `json:"status"`
 	ResolutionStatus  string                 `json:"resolution_status"` // Mitigation status (PROPOSED, APPROVED, REJECTED, etc.)
 	Description       string                 `json:"description"`
-	FilePath          string                 `json:"file_path,omitempty"`   // SAST only
-	LineNumber        int                    `json:"line_number,omitempty"` // SAST only
-	URL               string                 `json:"url,omitempty"`         // DAST only
+	FilePath          string                 `json:"file_path,omitempty"`     // SAST only
+	LineNumber        int                    `json:"line_number,omitempty"`   // SAST only
+	Module            string                 `json:"module,omitempty"`        // SAST only
+	Procedure         string                 `json:"procedure,omitempty"`     // SAST only
+	AttackVector      string                 `json:"attack_vector,omitempty"` // SAST only
+	URL               string                 `json:"url,omitempty"`           // DAST only
 	ViolatesPolicy    bool                   `json:"violates_policy"`
 	Mitigations       []Mitigation           `json:"mitigations,omitempty"`
 	AdditionalInfo    map[string]interface{} `json:"additional_info,omitempty"`
@@ -360,6 +363,17 @@ func extractStaticFindingDetails(finding *Finding, staticDetails *findings.Stati
 	if staticDetails.FileLineNumber != nil {
 		finding.LineNumber = int(*staticDetails.FileLineNumber)
 	}
+
+	// Extract module and procedure
+	if staticDetails.Module != nil {
+		finding.Module = *staticDetails.Module
+	}
+	if staticDetails.Procedure != nil {
+		finding.Procedure = *staticDetails.Procedure
+	}
+	if staticDetails.AttackVector != nil {
+		finding.AttackVector = *staticDetails.AttackVector
+	}
 }
 
 // extractStaticFindingDetails extracts fields from static finding details stored in DynamicFinding
@@ -404,6 +418,11 @@ func extractDynamicFindingDetails(finding *Finding, dynamicDetails *findings.Dyn
 	// Extract URL
 	if dynamicDetails.URL != nil {
 		finding.URL = *dynamicDetails.URL
+	}
+
+	// Extract attack vector
+	if dynamicDetails.AttackVector != nil {
+		finding.AttackVector = *dynamicDetails.AttackVector
 	}
 }
 

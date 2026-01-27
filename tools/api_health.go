@@ -126,7 +126,7 @@ func (t *APIHealthTool) handleAPIHealth(ctx context.Context, args map[string]int
 	// ✓ Authentication: Configured
 	//
 	// Next steps:
-	// - Run get-dynamic-findings or get-static-findings to fetch data
+	// - Run dynamic-findings or static-findings to fetch data
 	// - Check application access permissions
 	// - Review API rate limits and quotas`, timestamp, availableIcon, healthStatus.Message, healthStatus.StatusCode),
 	//     }},

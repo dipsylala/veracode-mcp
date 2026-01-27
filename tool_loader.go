@@ -147,6 +147,16 @@ func (td *ToolDefinition) GetToolMeta() map[string]interface{} {
 		log.Printf("Returning UI metadata for static-findings: %+v", meta)
 		return meta
 	}
+	if td.Name == "dynamic-findings" {
+		meta := map[string]interface{}{
+			"ui/resourceUri": "ui://dynamic-findings/app.html",
+			"ui": map[string]interface{}{
+				"resourceUri": "ui://dynamic-findings/app.html",
+			},
+		}
+		log.Printf("Returning UI metadata for dynamic-findings: %+v", meta)
+		return meta
+	}
 	return nil
 }
 

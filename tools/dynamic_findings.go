@@ -12,7 +12,7 @@ import (
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
-const DynamicFindingsToolName = "get-dynamic-findings"
+const DynamicFindingsToolName = "dynamic-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
@@ -21,7 +21,7 @@ func init() {
 	})
 }
 
-// DynamicFindingsTool provides the get-dynamic-findings tool
+// DynamicFindingsTool provides the dynamic-findings tool
 type DynamicFindingsTool struct{}
 
 // NewDynamicFindingsTool creates a new dynamic findings tool
@@ -50,15 +50,16 @@ func (t *DynamicFindingsTool) Shutdown() error {
 	return nil
 }
 
-// DynamicFindingsRequest represents the parsed parameters for get-dynamic-findings
+// DynamicFindingsRequest represents the parsed parameters for dynamic-findings
 type DynamicFindingsRequest struct {
-	ApplicationPath string `json:"application_path"`
-	AppProfile      string `json:"app_profile,omitempty"`
-	Sandbox         string `json:"sandbox,omitempty"`
-	Size            int    `json:"size,omitempty"`
-	Page            int    `json:"page,omitempty"`
-	Severity        *int32 `json:"severity,omitempty"`
-	SeverityGte     *int32 `json:"severity_gte,omitempty"`
+	ApplicationPath string   `json:"application_path"`
+	AppProfile      string   `json:"app_profile,omitempty"`
+	Sandbox         string   `json:"sandbox,omitempty"`
+	Size            int      `json:"size,omitempty"`
+	Page            int      `json:"page,omitempty"`
+	Severity        *int32   `json:"severity,omitempty"`
+	SeverityGte     *int32   `json:"severity_gte,omitempty"`
+	CWEIDs          []string `json:"cwe_ids,omitempty"`
 }
 
 // parseDynamicFindingsRequest extracts and validates parameters from the raw args map
@@ -69,7 +70,27 @@ func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsR
 		Page: 0,
 	}
 
-	// Use JSON marshaling to automatically map args to struct
+	// Extract cwe_ids separately since they may come as numbers
+	if cweIdsRaw, ok := args["cwe_ids"]; ok {
+		if cweArray, ok := cweIdsRaw.([]interface{}); ok {
+			req.CWEIDs = make([]string, len(cweArray))
+			for i, cwe := range cweArray {
+				switch v := cwe.(type) {
+				case float64:
+					req.CWEIDs[i] = fmt.Sprintf("%.0f", v)
+				case int:
+					req.CWEIDs[i] = fmt.Sprintf("%d", v)
+				case string:
+					req.CWEIDs[i] = v
+				default:
+					req.CWEIDs[i] = fmt.Sprintf("%v", v)
+				}
+			}
+		}
+		delete(args, "cwe_ids") // Remove to avoid unmarshaling conflict
+	}
+
+	// Use JSON marshaling to automatically map remaining args to struct
 	jsonData, err := json.Marshal(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal arguments: %w", err)
@@ -195,6 +216,7 @@ Please verify:
 		Page:        req.Page,
 		Severity:    req.Severity,
 		SeverityGte: req.SeverityGte,
+		CWEIDs:      req.CWEIDs,
 	}
 
 	// Step 5: Call the API to get dynamic findings
@@ -305,16 +327,17 @@ func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, 
 		}
 	}
 
-	// Return as MCP tool response with JSON content
+	// Return MCP response with embedded JSON data.
+	// The UI is triggered by the _meta["ui/resourceUri"] in the tool definition.
+	// structuredContent is used by the MCP App to access the data as a proper object.
 	return map[string]interface{}{
-		"content": []map[string]interface{}{{
-			"type": "resource",
-			"resource": map[string]interface{}{
-				"uri":      fmt.Sprintf("veracode://findings/dynamic/%s", applicationGUID),
-				"mimeType": "application/json",
-				"text":     string(responseJSON),
+		"content": []map[string]interface{}{
+			{
+				"type": "text",
+				"text": string(responseJSON),
 			},
-		}},
+		},
+		"structuredContent": response,
 	}
 }
 
@@ -376,7 +399,27 @@ func processDynamicFinding(finding api.Finding) MCPFinding {
 		Description:      cleanedDesc,
 		References:       references,
 		URL:              finding.URL,
+		AttackVector:     finding.AttackVector,
+		Mitigations:      convertDynamicMitigations(finding.Mitigations),
 	}
+}
+
+// convertDynamicMitigations converts API mitigations to MCP mitigations
+func convertDynamicMitigations(apiMitigations []api.Mitigation) []MCPMitigation {
+	if len(apiMitigations) == 0 {
+		return nil
+	}
+
+	mitigations := make([]MCPMitigation, len(apiMitigations))
+	for i, m := range apiMitigations {
+		mitigations[i] = MCPMitigation{
+			Action:    m.Action,
+			Comment:   m.Comment,
+			Submitter: m.Submitter,
+			Date:      m.Date,
+		}
+	}
+	return mitigations
 }
 
 // updateSummaryCounters updates the response summary based on a finding

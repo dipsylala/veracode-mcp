@@ -12,7 +12,7 @@ func TestLoadToolDefinitions(t *testing.T) {
 		t.Fatalf("Failed to load embedded tools: %v", err)
 	}
 
-	// tools.json now has 12 tools: api-health, get-dynamic-findings, get-static-findings, get-finding-details, get-sca-findings, package-workspace, pipeline-scan, pipeline-status, pipeline-results, pipeline-detailed-results, run-sca-scan, get-local-sca-results
+	// tools.json now has 12 tools: api-health, dynamic-findings, static-findings, get-finding-details, get-sca-findings, package-workspace, pipeline-scan, pipeline-status, pipeline-results, pipeline-detailed-results, run-sca-scan, get-local-sca-results
 	if len(registry.Tools) != 12 {
 		t.Errorf("Expected 12 tools, got %d", len(registry.Tools))
 	}
@@ -29,7 +29,7 @@ func TestLoadToolDefinitions(t *testing.T) {
 	}
 
 	if len(dynamicTool.Params) != 6 {
-		t.Errorf("Expected 6 params for get-dynamic-findings, got %d", len(dynamicTool.Params))
+		t.Errorf("Expected 6 params for dynamic-findings, got %d", len(dynamicTool.Params))
 	}
 
 	// Check that application_path is first and required
@@ -54,15 +54,15 @@ func TestToMCPTool(t *testing.T) {
 		t.Fatalf("Failed to load embedded tools: %v", err)
 	}
 
-	dynamicTool := registry.GetToolByName("get-dynamic-findings")
+	dynamicTool := registry.GetToolByName("dynamic-findings")
 	if dynamicTool == nil {
-		t.Fatal("get-dynamic-findings tool not found")
+		t.Fatal("dynamic-findings tool not found")
 	}
 
 	mcpTool := dynamicTool.ToMCPTool()
 
-	if mcpTool.Name != "get-dynamic-findings" {
-		t.Errorf("Expected name 'get-dynamic-findings', got '%s'", mcpTool.Name)
+	if mcpTool.Name != "dynamic-findings" {
+		t.Errorf("Expected name 'dynamic-findings', got '%s'", mcpTool.Name)
 	}
 
 	// Check that input schema was generated
@@ -177,7 +177,7 @@ func TestToolCallHandling(t *testing.T) {
 
 	// Test dynamic findings call with required parameter
 	params := CallToolParams{
-		Name: "get-dynamic-findings",
+		Name: "dynamic-findings",
 		Arguments: map[string]interface{}{
 			"application_path": tempDir,
 			"severity_gte":     4,
@@ -201,7 +201,7 @@ func TestToolCallHandling(t *testing.T) {
 
 	// Test missing required parameter
 	paramsNoPath := CallToolParams{
-		Name:      "get-dynamic-findings",
+		Name:      "dynamic-findings",
 		Arguments: map[string]interface{}{},
 	}
 
