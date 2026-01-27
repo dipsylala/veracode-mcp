@@ -77,17 +77,15 @@ func (t *StdioTransport) handleRequest(req *JSONRPCRequest) {
 
 	// Only send response if one was returned (notifications return nil)
 	if resp != nil {
-		_ = t.sendResponse(resp)
-	}
+		log.Printf("=== OUTGOING RESPONSE ===")
+		log.Printf("ID: %v", resp.ID)
+		responseJSON, _ := json.MarshalIndent(resp, "", "  ")
+		log.Printf("Response:\n%s", string(responseJSON))
+		log.Printf("========================")
 
-	log.Printf("=== OUTGOING RESPONSE ===")
-	log.Printf("ID: %v", resp.ID)
-	responseJSON, _ := json.MarshalIndent(resp, "", "  ")
-	log.Printf("Response:\n%s", string(responseJSON))
-	log.Printf("========================")
-
-	if err := t.sendResponse(resp); err != nil {
-		log.Printf("Failed to send response: %v", err)
+		if err := t.sendResponse(resp); err != nil {
+			log.Printf("Failed to send response: %v", err)
+		}
 	}
 }
 
