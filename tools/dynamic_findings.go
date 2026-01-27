@@ -251,11 +251,11 @@ Please verify:
 	}
 
 	// Step 6: Format and return the response
-	return formatDynamicFindingsResponse(appProfile, applicationGUID, req.Sandbox, findingsResp), nil
+	return formatDynamicFindingsResponse(ctx, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
 }
 
 // formatDynamicFindingsResponse formats the findings API response into an MCP tool response
-func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
@@ -315,21 +315,18 @@ func formatDynamicFindingsResponse(appProfile, applicationGUID, sandbox string, 
 		}
 	}
 
-	// Marshal response to JSON string
-	responseJSON, err := json.Marshal(response)
+	// Marshal response to JSON for non-UI clients
+	responseJSON, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf("Error formatting response: %v", err),
-			}},
-			"isError": true,
-		}
+		log.Printf("Warning: Failed to marshal response to JSON: %v", err)
+		responseJSON, _ = json.Marshal(response) // Fall back to compact JSON
 	}
 
-	// Return MCP response with embedded JSON data.
-	// The UI is triggered by the _meta["ui/resourceUri"] in the tool definition.
-	// structuredContent is used by the MCP App to access the data as a proper object.
+	log.Printf("Dynamic findings: Returning %d findings (content: JSON, structuredContent: full data for UI)", len(response.Findings))
+
+	// Return MCP response with content and structured data
+	// - content: Full JSON data (for LLM and non-UI clients)
+	// - structuredContent: Full structured data (for MCP Apps UI rendering)
 	return map[string]interface{}{
 		"content": []map[string]interface{}{
 			{

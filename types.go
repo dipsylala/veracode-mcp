@@ -32,8 +32,9 @@ type InitializeParams struct {
 }
 
 type ClientCapabilities struct {
-	Roots    *RootsCapability    `json:"roots,omitempty"`
-	Sampling *SamplingCapability `json:"sampling,omitempty"`
+	Roots      *RootsCapability       `json:"roots,omitempty"`
+	Sampling   *SamplingCapability    `json:"sampling,omitempty"`
+	Extensions map[string]interface{} `json:"extensions,omitempty"`
 }
 
 type RootsCapability struct {

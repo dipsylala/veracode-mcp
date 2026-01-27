@@ -8,6 +8,26 @@ import (
 	"log"
 )
 
+// Context key for UI capability
+type contextKey string
+
+const uiCapabilityKey contextKey = "uiCapability"
+
+// WithUICapability adds UI capability information to the context
+func WithUICapability(ctx context.Context, supportsUI bool) context.Context {
+	return context.WithValue(ctx, uiCapabilityKey, supportsUI)
+}
+
+// ClientSupportsUIFromContext retrieves UI capability from context
+func ClientSupportsUIFromContext(ctx context.Context) bool {
+	if val := ctx.Value(uiCapabilityKey); val != nil {
+		if supportsUI, ok := val.(bool); ok {
+			return supportsUI
+		}
+	}
+	return false
+}
+
 //go:embed ui/pipeline-results-app/dist/mcp-app.html
 var pipelineResultsHTML string
 
@@ -19,12 +39,13 @@ var dynamicFindingsHTML string
 
 // MCPServer represents the core MCP server
 type MCPServer struct {
-	initialized     bool
-	capabilities    ServerCapabilities
-	tools           []Tool
-	toolRegistry    *ToolRegistry
-	handlerRegistry *ToolHandlerRegistry
-	implRegistry    *ToolImplRegistry
+	initialized      bool
+	clientSupportsUI bool
+	capabilities     ServerCapabilities
+	tools            []Tool
+	toolRegistry     *ToolRegistry
+	handlerRegistry  *ToolHandlerRegistry
+	implRegistry     *ToolImplRegistry
 }
 
 func NewMCPServer() (*MCPServer, error) {
@@ -100,15 +121,44 @@ func (s *MCPServer) HandleRequest(req *JSONRPCRequest) *JSONRPCResponse {
 		resp.Result = s.handleListTools()
 
 	case "tools/call":
-		log.Printf(">>> tools/call invoked")
+		log.Printf(">>> tools/call invoked (UI support: %v)", s.clientSupportsUI)
+
+		// Parse the tool name for better logging
+		var callParams CallToolParams
+		if err := json.Unmarshal(req.Params, &callParams); err == nil {
+			log.Printf(">>> Calling tool: %s", callParams.Name)
+		}
+
 		result, err := s.handleCallTool(req.Params)
 		if err != nil {
 			resp.Error = &RPCError{
 				Code:    -32603,
 				Message: err.Error(),
 			}
+			log.Printf(">>> tools/call ERROR: %v", err)
 		} else {
-			log.Printf(">>> tools/call completed successfully")
+			// Log the response structure
+			if result != nil {
+				contentCount := len(result.Content)
+				hasStructured := result.StructuredContent != nil
+				contentLen := 0
+				if contentCount > 0 && result.Content[0].Text != "" {
+					contentLen = len(result.Content[0].Text)
+				}
+				log.Printf(">>> tools/call completed: content items=%d, content[0] length=%d chars, hasStructuredContent=%v",
+					contentCount, contentLen, hasStructured)
+
+				// Log a preview of the content for debugging
+				if contentCount > 0 && contentLen > 0 {
+					previewLen := 200
+					if contentLen < previewLen {
+						previewLen = contentLen
+					}
+					log.Printf(">>> Content preview (first %d chars): %s...", previewLen, result.Content[0].Text[:previewLen])
+				}
+			} else {
+				log.Printf(">>> tools/call completed: result is nil")
+			}
 			resp.Result = result
 		}
 
@@ -150,17 +200,67 @@ func (s *MCPServer) handleInitialize(params json.RawMessage) (*InitializeResult,
 	}
 
 	s.initialized = true
-	log.Printf("Initialized by client: %s %s (protocol: %s)", initParams.ClientInfo.Name, initParams.ClientInfo.Version, initParams.ProtocolVersion)
+	log.Printf("=== CLIENT INITIALIZATION ===")
+	log.Printf("Client Name: %s", initParams.ClientInfo.Name)
+	log.Printf("Client Version: %s", initParams.ClientInfo.Version)
+	log.Printf("Protocol Version: %s", initParams.ProtocolVersion)
+
+	// Log full capabilities structure
+	capsJSON, _ := json.MarshalIndent(initParams.Capabilities, "", "  ")
+	log.Printf("Client Capabilities (raw):\n%s", string(capsJSON))
+
+	// Check for MCP Apps UI support
+	log.Printf("\n=== CHECKING FOR UI SUPPORT ===")
+	log.Printf("Extensions field present: %v", initParams.Capabilities.Extensions != nil)
+
+	if extensions := initParams.Capabilities.Extensions; extensions != nil {
+		extensionsJSON, _ := json.MarshalIndent(extensions, "", "  ")
+		log.Printf("Extensions object:\n%s", string(extensionsJSON))
+
+		// Check all keys in extensions
+		log.Printf("Extension keys found:")
+		for key := range extensions {
+			log.Printf("  - %s", key)
+		}
+
+		if uiExt, ok := extensions["io.modelcontextprotocol/ui"].(map[string]interface{}); ok {
+			log.Printf("✓ Found 'io.modelcontextprotocol/ui' extension")
+			uiExtJSON, _ := json.MarshalIndent(uiExt, "", "  ")
+			log.Printf("UI Extension content:\n%s", string(uiExtJSON))
+
+			if mimeTypes, ok := uiExt["mimeTypes"].([]interface{}); ok {
+				log.Printf("MimeTypes found: %v", mimeTypes)
+				for i, mt := range mimeTypes {
+					log.Printf("  [%d] %v (type: %T)", i, mt, mt)
+					if mtStr, ok := mt.(string); ok && mtStr == "text/html;profile=mcp-app" {
+						s.clientSupportsUI = true
+						log.Printf("✓✓✓ Client supports MCP Apps UI! ✓✓✓")
+						break
+					}
+				}
+			} else {
+				log.Printf("⚠ 'mimeTypes' field not found or not an array in UI extension")
+			}
+		} else {
+			log.Printf("⚠ 'io.modelcontextprotocol/ui' key not found in extensions")
+		}
+	} else {
+		log.Printf("⚠ No 'extensions' field in client capabilities")
+	}
+
+	if !s.clientSupportsUI {
+		log.Printf("\n❌ Client does NOT support MCP Apps UI (will use text-only mode)")
+		log.Printf("   This means full JSON will be sent to the LLM instead of brief summaries")
+	} else {
+		log.Printf("\n✓ UI mode enabled - will send brief summaries to LLM")
+	}
+	log.Printf("=== END UI SUPPORT CHECK ===\n")
 
 	// Use the protocol version requested by the client if we support it
 	protocolVersion := "2024-11-05"
 	if initParams.ProtocolVersion == "2024-11-05" || initParams.ProtocolVersion >= "2024-11-05" {
 		protocolVersion = initParams.ProtocolVersion
 	}
-
-	// Log full initialize params to check for MCP Apps support
-	paramsJSON, _ := json.MarshalIndent(initParams, "", "  ")
-	log.Printf("Full initialize params:\n%s", string(paramsJSON))
 
 	return &InitializeResult{
 		ProtocolVersion: protocolVersion,
@@ -198,6 +298,11 @@ func (s *MCPServer) handleListTools() *ListToolsResult {
 	return result
 }
 
+// ClientSupportsUI returns whether the current client supports MCP Apps UI
+func (s *MCPServer) ClientSupportsUI() bool {
+	return s.clientSupportsUI
+}
+
 func (s *MCPServer) handleCallTool(params json.RawMessage) (*CallToolResult, error) {
 	var callParams CallToolParams
 	if err := json.Unmarshal(params, &callParams); err != nil {
@@ -233,8 +338,8 @@ func (s *MCPServer) handleCallTool(params json.RawMessage) (*CallToolResult, err
 		}
 	}
 
-	// Call the handler with context
-	ctx := context.Background()
+	// Call the handler with context containing UI capability
+	ctx := WithUICapability(context.Background(), s.clientSupportsUI)
 	result, err := handler(ctx, callParams.Arguments)
 	if err != nil {
 		return &CallToolResult{

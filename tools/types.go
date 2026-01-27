@@ -2,6 +2,22 @@ package tools
 
 import "context"
 
+// Context key for UI capability
+type contextKey string
+
+const uiCapabilityKey contextKey = "uiCapability"
+
+// ClientSupportsUIFromContext retrieves UI capability from context
+// Returns true if the client supports MCP Apps UI (text/html;profile=mcp-app)
+func ClientSupportsUIFromContext(ctx context.Context) bool {
+	if val := ctx.Value(uiCapabilityKey); val != nil {
+		if supportsUI, ok := val.(bool); ok {
+			return supportsUI
+		}
+	}
+	return false
+}
+
 // ToolImplementation defines the interface that all MCP tools must implement
 type ToolImplementation interface {
 	// Initialize is called when the tool is loaded

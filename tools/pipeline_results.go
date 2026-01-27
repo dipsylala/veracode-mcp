@@ -156,7 +156,7 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 	}
 
 	// Format and return the response
-	return formatPipelineResultsResponse(req.ApplicationPath, resultsFile, &scanResults), nil
+	return formatPipelineResultsResponse(ctx, req.ApplicationPath, resultsFile, &scanResults), nil
 }
 
 // findMostRecentResultsFile finds the most recent results-*.json file in the directory
@@ -192,8 +192,26 @@ func findMostRecentResultsFile(dir string) (string, error) {
 	return resultsFiles[len(resultsFiles)-1], nil
 }
 
+// formatPipelineResultsSummary creates a brief text summary for UI-capable clients
+func formatPipelineResultsSummary(response *MCPFindingsResponse, resultsFile string) string {
+	return fmt.Sprintf(`Pipeline Scan Results for %s
+Results File: %s
+Total Findings: %d
+Severity: Critical=%d, High=%d, Medium=%d, Low=%d, Info=%d
+
+View the interactive UI below for detailed analysis.`,
+		response.Application.Name,
+		resultsFile,
+		response.Summary.TotalFindings,
+		response.Summary.BySeverity["critical"],
+		response.Summary.BySeverity["high"],
+		response.Summary.BySeverity["medium"],
+		response.Summary.BySeverity["low"],
+		response.Summary.BySeverity["informational"])
+}
+
 // formatPipelineResultsResponse formats the pipeline results into an MCP response
-func formatPipelineResultsResponse(appPath, resultsFile string, results *PipelineScanResults) map[string]interface{} {
+func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults) map[string]interface{} {
 	// Build MCP response structure similar to static findings
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
@@ -235,58 +253,18 @@ func formatPipelineResultsResponse(appPath, resultsFile string, results *Pipelin
 		}
 	}
 
-	// Marshal response to JSON string
-	responseJSON, err := json.Marshal(response)
+	// Marshal response to JSON for non-UI clients
+	responseJSON, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf("Error formatting response: %v", err),
-			}},
-		}
+		log.Printf("Warning: Failed to marshal response to JSON: %v", err)
+		responseJSON, _ = json.Marshal(response) // Fall back to compact JSON
 	}
 
-	// TEMPORARILY DISABLED: Build header with scan info
-	// Re-enable when we can detect client type (VS Code vs Claude Desktop)
-	/*
-			header := fmt.Sprintf(`Pipeline Scan Results
-		==================
+	log.Printf("Pipeline results: Returning %d findings from %s (content: JSON, structuredContent: full data for UI)", len(response.Findings), resultsFile)
 
-		Application Path: %s
-		Results File: %s
-		Scan ID: %s
-		Scan Status: %s
-		Message: %s
-		Modules Scanned: %d
-
-		Total Findings: %d
-
-		Severity Breakdown:
-		- Critical: %d
-		- High: %d
-		- Medium: %d
-		- Low: %d
-		- Informational: %d
-
-		`,
-				appPath,
-				filepath.Base(resultsFile),
-				results.ScanID,
-				results.ScanStatus,
-				results.Message,
-				len(results.Modules),
-				len(results.Findings),
-				response.Summary.BySeverity["critical"],
-				response.Summary.BySeverity["high"],
-				response.Summary.BySeverity["medium"],
-				response.Summary.BySeverity["low"],
-				response.Summary.BySeverity["informational"],
-			)
-	*/
-
-	// Return MCP response with embedded JSON data.
-	// The UI is triggered by the _meta["ui/resourceUri"] in the tool definition.
-	// structuredContent is used by the MCP App to access the data as a proper object.
+	// Return MCP response with content and structured data
+	// - content: Full JSON data (for LLM and non-UI clients)
+	// - structuredContent: Full structured data (for MCP Apps UI rendering)
 	return map[string]interface{}{
 		"content": []map[string]interface{}{
 			{

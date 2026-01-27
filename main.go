@@ -6,10 +6,40 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
+	"time"
 )
 
 // version can be set at build time with -ldflags="-X main.version=x.y.z"
 var version = "dev"
+
+// setupDebugLogging creates a debug log file for tracking initialization and capabilities
+func setupDebugLogging() (*os.File, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	logDir := filepath.Join(homeDir, ".veracode-mcp")
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		return nil, err
+	}
+
+	timestamp := time.Now().Format("20060102-150405")
+	logFile := filepath.Join(logDir, fmt.Sprintf("mcp-debug-%s.log", timestamp))
+
+	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		return nil, err
+	}
+
+	// Write startup message
+	fmt.Fprintf(f, "=== MCP SERVER STARTED AT %s ===\n", time.Now().Format(time.RFC3339))
+	fmt.Fprintf(f, "Debug log: %s\n", logFile)
+	fmt.Fprintf(f, "Check this file for capability detection details\n\n")
+
+	return f, nil
+}
 
 func main() {
 	showVersion := flag.Bool("version", false, "Display version information")
@@ -19,18 +49,37 @@ func main() {
 	logFile := flag.String("log", "", "Log file path (if not specified, logs go to stderr when verbose)")
 	flag.Parse()
 
-	// Setup logging based on flags
+	// Always create a debug log file for initialization and capability detection
+	debugLogFile, _ := setupDebugLogging()
+	if debugLogFile != nil {
+		defer debugLogFile.Close()
+		// Create a multiwriter that writes to both the debug file and the regular log destination
+		if *logFile != "" || *verbose {
+			// If we're already logging, add the debug file too
+			log.SetOutput(io.MultiWriter(log.Writer(), debugLogFile))
+		} else {
+			// If logging is disabled, only write to debug file
+			log.SetOutput(debugLogFile)
+		}
+		log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+	}
+
+	// Setup additional logging based on flags
 	if *logFile != "" {
-		// Write logs to specified file
+		// Write logs to specified file (in addition to debug file if it exists)
 		f, err := os.OpenFile(*logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to open log file %s: %v\n", *logFile, err)
 			os.Exit(1)
 		}
 		defer f.Close()
-		log.SetOutput(f)
-	} else if !*verbose {
-		// Disable logging by default if no log file and not verbose
+		if debugLogFile != nil {
+			log.SetOutput(io.MultiWriter(f, debugLogFile))
+		} else {
+			log.SetOutput(f)
+		}
+	} else if !*verbose && debugLogFile == nil {
+		// Only disable logging if no debug file and not verbose
 		log.SetOutput(io.Discard)
 	}
 	// If verbose and no log file, logging goes to stderr (default)
