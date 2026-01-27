@@ -246,53 +246,55 @@ func formatPipelineResultsResponse(appPath, resultsFile string, results *Pipelin
 		}
 	}
 
-	// Build header with scan info
-	header := fmt.Sprintf(`Pipeline Scan Results
-==================
+	// TEMPORARILY DISABLED: Build header with scan info
+	// Re-enable when we can detect client type (VS Code vs Claude Desktop)
+	/*
+			header := fmt.Sprintf(`Pipeline Scan Results
+		==================
 
-Application Path: %s
-Results File: %s
-Scan ID: %s
-Scan Status: %s
-Message: %s
-Modules Scanned: %d
+		Application Path: %s
+		Results File: %s
+		Scan ID: %s
+		Scan Status: %s
+		Message: %s
+		Modules Scanned: %d
 
-Total Findings: %d
+		Total Findings: %d
 
-Severity Breakdown:
-- Critical: %d
-- High: %d
-- Medium: %d
-- Low: %d
-- Informational: %d
+		Severity Breakdown:
+		- Critical: %d
+		- High: %d
+		- Medium: %d
+		- Low: %d
+		- Informational: %d
 
-`,
-		appPath,
-		filepath.Base(resultsFile),
-		results.ScanID,
-		results.ScanStatus,
-		results.Message,
-		len(results.Modules),
-		len(results.Findings),
-		response.Summary.BySeverity["critical"],
-		response.Summary.BySeverity["high"],
-		response.Summary.BySeverity["medium"],
-		response.Summary.BySeverity["low"],
-		response.Summary.BySeverity["informational"],
-	)
+		`,
+				appPath,
+				filepath.Base(resultsFile),
+				results.ScanID,
+				results.ScanStatus,
+				results.Message,
+				len(results.Modules),
+				len(results.Findings),
+				response.Summary.BySeverity["critical"],
+				response.Summary.BySeverity["high"],
+				response.Summary.BySeverity["medium"],
+				response.Summary.BySeverity["low"],
+				response.Summary.BySeverity["informational"],
+			)
+	*/
 
-	// Return MCP response with both text header and JSON data
+	// Return MCP response with embedded JSON data.
+	// The UI is triggered by the _meta["ui/resourceUri"] in the tool definition.
+	// structuredContent is used by the MCP App to access the data as a proper object.
 	return map[string]interface{}{
 		"content": []map[string]interface{}{
-			{
-				"type": "text",
-				"text": header,
-			},
 			{
 				"type": "text",
 				"text": string(responseJSON),
 			},
 		},
+		"structuredContent": response,
 	}
 }
 

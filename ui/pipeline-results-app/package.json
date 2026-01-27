@@ -1,0 +1,26 @@
+{
+  "name": "veracode-pipeline-results-app",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP App for Veracode Pipeline Results",
+  "license": "MIT",
+  "scripts": {
+    "build": "cross-env INPUT=mcp-app.html vite build",
+    "watch": "cross-env INPUT=mcp-app.html vite build --watch",
+    "dev": "cross-env NODE_ENV=development npm run watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "cross-env": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vite-plugin-singlefile": "latest"
+  }
+}

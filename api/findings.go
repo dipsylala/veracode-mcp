@@ -37,7 +37,8 @@ func safeInt64ToInt(val int64) int {
 // buildFindingsAPIRequest creates a configured API request with common parameters
 func buildFindingsAPIRequest(client *VeracodeClient, ctx context.Context, req FindingsRequest, scanType string) findings.ApiGetFindingsUsingGETRequest {
 	apiReq := client.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(ctx, req.AppProfile).
-		ScanType([]string{scanType})
+		ScanType([]string{scanType}).
+		IncludeAnnot(true)
 
 	// Add pagination parameters
 
@@ -168,9 +169,10 @@ type Finding struct {
 
 // Mitigation represents a proposed fix or risk acceptance
 type Mitigation struct {
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
+	Action    string `json:"action"`
+	Comment   string `json:"comment"`
+	Submitter string `json:"submitter"`
+	Date      string `json:"date"`
 }
 
 // FindingsResponse represents a paginated list of findings
@@ -302,6 +304,27 @@ func extractBasicFields(finding *Finding, apiFinding *findings.Finding) {
 		}
 		if apiFinding.FindingStatus.ResolutionStatus != nil {
 			finding.ResolutionStatus = *apiFinding.FindingStatus.ResolutionStatus
+		}
+	}
+
+	// Extract annotations (mitigations)
+	if apiFinding.Annotations != nil && len(apiFinding.Annotations) > 0 {
+		finding.Mitigations = make([]Mitigation, 0, len(apiFinding.Annotations))
+		for _, annotation := range apiFinding.Annotations {
+			mitigation := Mitigation{}
+			if annotation.Action != nil {
+				mitigation.Action = *annotation.Action
+			}
+			if annotation.Comment != nil {
+				mitigation.Comment = *annotation.Comment
+			}
+			if annotation.UserName != nil {
+				mitigation.Submitter = *annotation.UserName
+			}
+			if annotation.Created != nil {
+				mitigation.Date = annotation.Created.Format("2006-01-02T15:04:05Z")
+			}
+			finding.Mitigations = append(finding.Mitigations, mitigation)
 		}
 	}
 }

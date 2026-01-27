@@ -34,6 +34,11 @@ dist/
 mcp-server
 mcp-server.exe
 
+# UI dependencies and build artifacts
+ui/*/node_modules/
+ui/*/dist/
+ui/*/.vite/
+
 # Environment files
 .env
 .env.local

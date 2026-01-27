@@ -65,8 +65,8 @@
       ]
     },
     {
-      "name": "get-static-findings",
-      "description": "Get source code vulnerabilities from STATIC analysis scans. Calls Veracode API to retrieve real scan findings.\n\nReturns: XSS, SQL injection, crypto issues, race conditions, buffer overflows, unsafe functions\nIncludes: CWE ID, file path, line number, severity, status, policy violations\nRelated: get-dynamic-findings (runtime)\n\nDisplay as table: | Flaw ID | Severity | CWE | Status | File:Line | Description |",
+      "name": "static-findings",
+      "description": "Get source code vulnerabilities from STATIC analysis scans. Calls Veracode API to retrieve real scan findings. Returns interactive UI with findings.\n\nReturns: XSS, SQL injection, crypto issues, race conditions, buffer overflows, unsafe functions\nIncludes: CWE ID, file path, line number, severity, status, policy violations\nRelated: get-dynamic-findings (runtime)",
       "params": [
         {
           "name": "application_path",
@@ -266,7 +266,7 @@
     },
     {
       "name": "pipeline-results",
-      "description": "Get the results of the completed pipeline scan",
+      "description": "Get the results of the completed pipeline scan. Returns interactive UI with findings.",
       "params": [
         {
           "name": "application_path",

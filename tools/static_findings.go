@@ -12,7 +12,7 @@ import (
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
-const StaticFindingsToolName = "get-static-findings"
+const StaticFindingsToolName = "static-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
@@ -304,16 +304,17 @@ func formatStaticFindingsResponse(appPath, appProfile, applicationGUID, sandbox 
 		}
 	}
 
-	// Return as MCP tool response with JSON content
+	// Return MCP response with embedded JSON data.
+	// The UI is triggered by the _meta["ui/resourceUri"] in the tool definition.
+	// structuredContent is used by the MCP App to access the data as a proper object.
 	return map[string]interface{}{
-		"content": []map[string]interface{}{{
-			"type": "resource",
-			"resource": map[string]interface{}{
-				"uri":      fmt.Sprintf("veracode://findings/static/%s", applicationGUID),
-				"mimeType": "application/json",
-				"text":     string(responseJSON),
+		"content": []map[string]interface{}{
+			{
+				"type": "text",
+				"text": string(responseJSON),
 			},
-		}},
+		},
+		"structuredContent": response,
 	}
 }
 
@@ -351,7 +352,26 @@ func processStaticFinding(finding api.Finding) MCPFinding {
 		References:       references,
 		FilePath:         finding.FilePath,
 		LineNumber:       finding.LineNumber,
+		Mitigations:      convertMitigations(finding.Mitigations),
 	}
+}
+
+// convertMitigations converts API mitigations to MCP mitigations
+func convertMitigations(apiMitigations []api.Mitigation) []MCPMitigation {
+	if len(apiMitigations) == 0 {
+		return nil
+	}
+
+	mitigations := make([]MCPMitigation, len(apiMitigations))
+	for i, m := range apiMitigations {
+		mitigations[i] = MCPMitigation{
+			Action:    m.Action,
+			Comment:   m.Comment,
+			Submitter: m.Submitter,
+			Date:      m.Date,
+		}
+	}
+	return mitigations
 }
 
 // updateStaticSummaryCounters updates the response summary based on a static finding

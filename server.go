@@ -2,10 +2,17 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"log"
 )
+
+//go:embed ui/pipeline-results-app/dist/mcp-app.html
+var pipelineResultsHTML string
+
+//go:embed ui/static-findings-app/dist/mcp-app.html
+var staticFindingsHTML string
 
 // MCPServer represents the core MCP server
 type MCPServer struct {
@@ -90,6 +97,7 @@ func (s *MCPServer) HandleRequest(req *JSONRPCRequest) *JSONRPCResponse {
 		resp.Result = s.handleListTools()
 
 	case "tools/call":
+		log.Printf(">>> tools/call invoked")
 		result, err := s.handleCallTool(req.Params)
 		if err != nil {
 			resp.Error = &RPCError{
@@ -97,13 +105,16 @@ func (s *MCPServer) HandleRequest(req *JSONRPCRequest) *JSONRPCResponse {
 				Message: err.Error(),
 			}
 		} else {
+			log.Printf(">>> tools/call completed successfully")
 			resp.Result = result
 		}
 
 	case "resources/list":
+		log.Printf(">>> resources/list called - returning UI resource")
 		resp.Result = s.handleListResources()
 
 	case "resources/read":
+		log.Printf(">>> resources/read called - this should load the UI HTML!")
 		result, err := s.handleReadResource(req.Params)
 		if err != nil {
 			resp.Error = &RPCError{
@@ -137,6 +148,10 @@ func (s *MCPServer) handleInitialize(params json.RawMessage) (*InitializeResult,
 	s.initialized = true
 	log.Printf("Initialized by client: %s %s", initParams.ClientInfo.Name, initParams.ClientInfo.Version)
 
+	// Log full initialize params to check for MCP Apps support
+	paramsJSON, _ := json.MarshalIndent(initParams, "", "  ")
+	log.Printf("Full initialize params:\n%s", string(paramsJSON))
+
 	return &InitializeResult{
 		ProtocolVersion: "2024-11-05",
 		Capabilities:    s.capabilities,
@@ -148,9 +163,29 @@ func (s *MCPServer) handleInitialize(params json.RawMessage) (*InitializeResult,
 }
 
 func (s *MCPServer) handleListTools() *ListToolsResult {
-	return &ListToolsResult{
+	result := &ListToolsResult{
 		Tools: s.tools,
 	}
+
+	// Debug: log metadata for UI tools
+	for _, tool := range result.Tools {
+		if tool.Name == "pipeline-results" || tool.Name == "get-static-findings" {
+			if tool.Meta != nil {
+				flatUri, _ := tool.Meta["ui/resourceUri"].(string)
+				nestedUI, _ := tool.Meta["ui"].(map[string]interface{})
+				var nestedUri string
+				if nestedUI != nil {
+					nestedUri, _ = nestedUI["resourceUri"].(string)
+				}
+				log.Printf("%s tool has UI metadata: flat='%s', nested='%s', full=%+v",
+					tool.Name, flatUri, nestedUri, tool.Meta)
+			} else {
+				log.Printf("WARNING: %s tool has NO UI metadata!", tool.Name)
+			}
+		}
+	}
+
+	return result
 }
 
 func (s *MCPServer) handleCallTool(params json.RawMessage) (*CallToolResult, error) {
@@ -160,8 +195,10 @@ func (s *MCPServer) handleCallTool(params json.RawMessage) (*CallToolResult, err
 	}
 
 	// Look up the handler in the registry
+	log.Printf("Looking for handler for tool: %s", callParams.Name)
 	handler, exists := s.handlerRegistry.GetHandler(callParams.Name)
 	if !exists {
+		log.Printf("Handler not found! Registered handlers: %+v", s.handlerRegistry)
 		return &CallToolResult{
 			Content: []Content{{
 				Type: "text",
@@ -226,11 +263,35 @@ func convertMapToCallToolResult(resultMap map[string]interface{}) *CallToolResul
 		}
 	}
 
+	result := &CallToolResult{}
+
 	// Check for content field
 	if content, hasContent := resultMap["content"]; hasContent {
 		if contents := convertContentField(content); contents != nil {
-			return &CallToolResult{Content: contents}
+			result.Content = contents
 		}
+	}
+
+	// Check for structuredContent field (for MCP Apps)
+	if structuredContent, hasStructured := resultMap["structuredContent"]; hasStructured {
+		// Try direct assignment first (if already map[string]interface{})
+		if sc, ok := structuredContent.(map[string]interface{}); ok {
+			result.StructuredContent = sc
+		} else {
+			// Convert struct to map[string]interface{} via JSON
+			scJSON, err := json.Marshal(structuredContent)
+			if err == nil {
+				var scMap map[string]interface{}
+				if err := json.Unmarshal(scJSON, &scMap); err == nil {
+					result.StructuredContent = scMap
+				}
+			}
+		}
+	}
+
+	// If we have content or structuredContent, return the result
+	if len(result.Content) > 0 || result.StructuredContent != nil {
+		return result
 	}
 
 	// If we have text field, use it
@@ -363,6 +424,18 @@ func (s *MCPServer) handleListResources() *ListResourcesResult {
 				Description: "A simple example resource",
 				MimeType:    "text/plain",
 			},
+			{
+				URI:         "ui://pipeline-results/app.html",
+				Name:        "Pipeline Results UI",
+				Description: "Interactive UI for pipeline scan results",
+				MimeType:    "text/html;profile=mcp-app",
+			},
+			{
+				URI:         "ui://static-findings/app.html",
+				Name:        "Static Findings UI",
+				Description: "Interactive UI for static analysis findings",
+				MimeType:    "text/html;profile=mcp-app",
+			},
 		},
 	}
 }
@@ -373,6 +446,8 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 		return nil, fmt.Errorf("invalid read resource params: %w", err)
 	}
 
+	log.Printf("Reading resource: %s", readParams.URI)
+
 	switch readParams.URI {
 	case "resource://example/hello":
 		return &ReadResourceResult{
@@ -381,6 +456,41 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 					URI:      readParams.URI,
 					MimeType: "text/plain",
 					Text:     "Hello from MCP resource!",
+				},
+			},
+		}, nil
+
+	case "ui://pipeline-results/app.html":
+		// Return the embedded UI HTML with metadata
+		return &ReadResourceResult{
+			Contents: []ResourceContents{
+				{
+					URI:      readParams.URI,
+					MimeType: "text/html;profile=mcp-app",
+					Text:     pipelineResultsHTML,
+					Meta: map[string]interface{}{
+						"ui": map[string]interface{}{
+							"permissions": map[string]interface{}{},
+						},
+					},
+				},
+			},
+		}, nil
+
+	case "ui://static-findings/app.html":
+		// Return the embedded UI HTML with metadata
+		log.Printf("Serving static findings UI - HTML length: %d bytes", len(staticFindingsHTML))
+		return &ReadResourceResult{
+			Contents: []ResourceContents{
+				{
+					URI:      readParams.URI,
+					MimeType: "text/html;profile=mcp-app",
+					Text:     staticFindingsHTML,
+					Meta: map[string]interface{}{
+						"ui": map[string]interface{}{
+							"permissions": map[string]interface{}{},
+						},
+					},
 				},
 			},
 		}, nil

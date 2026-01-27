@@ -77,6 +77,7 @@ type Tool struct {
 	Name        string                 `json:"name"`
 	Description string                 `json:"description,omitempty"`
 	InputSchema map[string]interface{} `json:"inputSchema"`
+	Meta        map[string]interface{} `json:"_meta,omitempty"`
 }
 
 type ListToolsResult struct {
@@ -89,8 +90,9 @@ type CallToolParams struct {
 }
 
 type CallToolResult struct {
-	Content []Content `json:"content"`
-	IsError bool      `json:"isError,omitempty"`
+	Content           []Content              `json:"content"`
+	IsError           bool                   `json:"isError,omitempty"`
+	StructuredContent map[string]interface{} `json:"structuredContent,omitempty"`
 }
 
 type Content struct {
@@ -120,7 +122,8 @@ type ReadResourceResult struct {
 }
 
 type ResourceContents struct {
-	URI      string `json:"uri"`
-	MimeType string `json:"mimeType,omitempty"`
-	Text     string `json:"text,omitempty"`
+	URI      string                 `json:"uri"`
+	MimeType string                 `json:"mimeType,omitempty"`
+	Text     string                 `json:"text,omitempty"`
+	Meta     map[string]interface{} `json:"_meta,omitempty"`
 }

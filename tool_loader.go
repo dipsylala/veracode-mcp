@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 //go:embed tools.json
@@ -113,7 +114,40 @@ func (td *ToolDefinition) ToMCPTool() Tool {
 		Name:        td.Name,
 		Description: td.Description,
 		InputSchema: inputSchema,
+		Meta:        td.GetToolMeta(),
 	}
+}
+
+// GetToolMeta returns tool metadata including UI configuration if applicable
+func (td *ToolDefinition) GetToolMeta() map[string]interface{} {
+	// Add UI metadata for tools with interactive UIs
+	// Provide BOTH formats for maximum compatibility:
+	// - Flat key "ui/resourceUri" (MCP Apps legacy format)
+	// - Nested "ui.resourceUri" (MCP Apps current format)
+
+	log.Printf("GetToolMeta called for tool: %s", td.Name)
+
+	if td.Name == "pipeline-results" {
+		meta := map[string]interface{}{
+			"ui/resourceUri": "ui://pipeline-results/app.html",
+			"ui": map[string]interface{}{
+				"resourceUri": "ui://pipeline-results/app.html",
+			},
+		}
+		log.Printf("Returning UI metadata for pipeline-results: %+v", meta)
+		return meta
+	}
+	if td.Name == "static-findings" {
+		meta := map[string]interface{}{
+			"ui/resourceUri": "ui://static-findings/app.html",
+			"ui": map[string]interface{}{
+				"resourceUri": "ui://static-findings/app.html",
+			},
+		}
+		log.Printf("Returning UI metadata for static-findings: %+v", meta)
+		return meta
+	}
+	return nil
 }
 
 // GetToolByName finds a tool definition by name

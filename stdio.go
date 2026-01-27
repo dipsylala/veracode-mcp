@@ -55,7 +55,22 @@ func (t *StdioTransport) Start() error {
 }
 
 func (t *StdioTransport) handleRequest(req *JSONRPCRequest) {
+	log.Printf("=== INCOMING REQUEST ===")
+	log.Printf("Method: %s (ID: %v)", req.Method, req.ID)
+	if req.Params != nil {
+		paramsJSON, _ := json.MarshalIndent(req.Params, "", "  ")
+		log.Printf("Params:\n%s", string(paramsJSON))
+	}
+	log.Printf("========================")
+
 	resp := t.server.HandleRequest(req)
+
+	log.Printf("=== OUTGOING RESPONSE ===")
+	log.Printf("ID: %v", resp.ID)
+	responseJSON, _ := json.MarshalIndent(resp, "", "  ")
+	log.Printf("Response:\n%s", string(responseJSON))
+	log.Printf("========================")
+
 	if err := t.sendResponse(resp); err != nil {
 		log.Printf("Failed to send response: %v", err)
 	}
