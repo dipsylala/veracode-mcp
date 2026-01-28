@@ -66,12 +66,56 @@ func TestParsePipelineScanRequest_WithFilename(t *testing.T) {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
 
-	if req.Filename != "myapp.zip" {
-		t.Errorf("Expected filename 'myapp.zip', got '%s'", req.Filename)
+	// When just a filename is provided, it should prepend .veracode_packaging
+	expectedFilename := filepath.Join("/path/to/app", ".veracode_packaging", "myapp.zip")
+	if req.Filename != expectedFilename {
+		t.Errorf("Expected filename '%s', got '%s'", expectedFilename, req.Filename)
 	}
 
 	if req.Verbose {
 		t.Errorf("Expected verbose to be false, got true")
+	}
+}
+
+func TestParsePipelineScanRequest_WithFullPath(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"filename":         "/custom/path/myapp.zip",
+	}
+
+	req, err := parsePipelineScanRequest(args)
+	if err != nil {
+		t.Fatalf("Failed to parse request: %v", err)
+	}
+
+	if req.ApplicationPath != "/path/to/app" {
+		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
+	}
+
+	// When a full path is provided, it should be used as-is
+	if req.Filename != "/custom/path/myapp.zip" {
+		t.Errorf("Expected filename '/custom/path/myapp.zip', got '%s'", req.Filename)
+	}
+}
+
+func TestParsePipelineScanRequest_WithRelativePath(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"filename":         "custom/dir/myapp.zip",
+	}
+
+	req, err := parsePipelineScanRequest(args)
+	if err != nil {
+		t.Fatalf("Failed to parse request: %v", err)
+	}
+
+	if req.ApplicationPath != "/path/to/app" {
+		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
+	}
+
+	// When a relative path is provided, it should be used as-is
+	if req.Filename != "custom/dir/myapp.zip" {
+		t.Errorf("Expected filename 'custom/dir/myapp.zip', got '%s'", req.Filename)
 	}
 }
 
@@ -111,8 +155,10 @@ func TestParsePipelineScanRequest_AllParameters(t *testing.T) {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
 
-	if req.Filename != "myapp.zip" {
-		t.Errorf("Expected filename 'myapp.zip', got '%s'", req.Filename)
+	// When just a filename is provided, it should prepend .veracode_packaging
+	expectedFilename := filepath.Join("/path/to/app", ".veracode_packaging", "myapp.zip")
+	if req.Filename != expectedFilename {
+		t.Errorf("Expected filename '%s', got '%s'", expectedFilename, req.Filename)
 	}
 
 	if !req.Verbose {

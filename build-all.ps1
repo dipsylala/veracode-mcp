@@ -32,7 +32,6 @@ if (-not $SkipUI) {
         }
         
         # Build UI
-        Write-Host "Building Pipeline Results UI..." -ForegroundColor Yellow
         npm run build
         if ($LASTEXITCODE -ne 0) {
             throw "Pipeline UI build failed"
@@ -71,7 +70,6 @@ if (-not $SkipUI) {
         }
         
         # Build UI
-        Write-Host "Building Static Findings UI..." -ForegroundColor Yellow
         npm run build
         if ($LASTEXITCODE -ne 0) {
             throw "Static Findings UI build failed"
@@ -110,7 +108,6 @@ if (-not $SkipUI) {
         }
         
         # Build UI
-        Write-Host "Building Dynamic Findings UI..." -ForegroundColor Yellow
         npm run build
         if ($LASTEXITCODE -ne 0) {
             throw "Dynamic Findings UI build failed"

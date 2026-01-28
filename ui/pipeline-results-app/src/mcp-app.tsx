@@ -9,6 +9,11 @@ import { createRoot } from "react-dom/client";
 import type { MCPFindingsResponse, MCPFinding, MCPMitigation } from "./types";
 import styles from "./mcp-app.module.css";
 
+// Normalize severity names for CSS class names (remove spaces)
+function normalizeSeverity(severity: string): string {
+  return severity.toLowerCase().replace(/\s+/g, '');
+}
+
 function PipelineResultsApp() {
   const [resultsData, setResultsData] = useState<MCPFindingsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -122,14 +127,15 @@ function PipelineResultsView({ data }: PipelineResultsViewProps) {
         </div>
 
         <div className={styles.severityBreakdown}>
-          {Object.entries(summary.by_severity).map(([severity, count]) => {
-            const numCount = count as number;
-            return numCount > 0 && (
-              <div key={severity} className={`${styles.severityItem} ${styles[severity]}`}>
-                <strong>{numCount}</strong> {severity}
-              </div>
-            );
-          })}
+          {['very high', 'high', 'medium', 'low', 'very low', 'info']
+            .map(severity => {
+              const count = summary.by_severity[severity] as number;
+              return count > 0 && (
+                <div key={severity} className={`${styles.severityItem} ${styles[normalizeSeverity(severity)]}`}>
+                  <strong>{count}</strong> {severity}
+                </div>
+              );
+            })}
         </div>
       </div>
 
@@ -176,7 +182,7 @@ function FindingRow({ finding }: FindingRowProps) {
         </td>
         <td>{finding.flaw_id}</td>
         <td className={styles.severityCell}>
-          <span className={`${styles.severityBadge} ${styles[finding.severity.toLowerCase()]}`}>
+          <span className={`${styles.severityBadge} ${styles[normalizeSeverity(finding.severity)]}`}>
             {finding.severity}
           </span>
         </td>

@@ -255,6 +255,15 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 		}
 	}
 
+	// Sort findings by severity (most severe first), then by Flaw ID for consistent ordering
+	sort.Slice(response.Findings, func(i, j int) bool {
+		if response.Findings[i].SeverityScore != response.Findings[j].SeverityScore {
+			return response.Findings[i].SeverityScore > response.Findings[j].SeverityScore
+		}
+		// Secondary sort by Flaw ID for consistent ordering when severities are equal
+		return response.Findings[i].FlawID < response.Findings[j].FlawID
+	})
+
 	// Marshal response to JSON for non-UI clients
 	responseJSON, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
@@ -317,16 +326,18 @@ func processPipelineFinding(flaw PipelineFlaw) MCPFinding {
 func transformPipelineSeverity(severity int) string {
 	switch severity {
 	case 5:
-		return "critical"
+		return "very high"
 	case 4:
 		return "high"
 	case 3:
 		return "medium"
 	case 2:
 		return "low"
-	case 1, 0:
-		return "informational"
+	case 1:
+		return "very low"
+	case 0:
+		return "info"
 	default:
-		return "informational"
+		return "info"
 	}
 }

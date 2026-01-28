@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/dipsylala/veracodemcp-go/api"
 )
 
 const APIHealthToolName = "api-health"
@@ -67,100 +69,67 @@ func (t *APIHealthTool) handleAPIHealth(ctx context.Context, args map[string]int
 	timestamp := time.Now().Format(time.RFC3339)
 
 	// Try to create API client (will check credentials)
-	// Uncomment when api package is imported:
-	// client, err := api.NewVeracodeClient()
-	// if err != nil {
-	//     return map[string]interface{}{
-	//         "content": []map[string]string{{
-	//             "type": "text",
-	//             "text": fmt.Sprintf(`Veracode API Health Check
-	// ========================
-	//
-	// Timestamp: %s
-	//
-	// ❌ Authentication: Not configured
-	// Error: %v
-	//
-	// Required environment variables:
-	// - VERACODE_API_ID
-	// - VERACODE_API_KEY
-	//
-	// Please set these variables and try again.`, timestamp, err),
-	//         }},
-	//     }, nil
-	// }
-	//
-	// // Perform actual health check
-	// healthStatus, err := client.CheckHealth(ctx)
-	// if err != nil {
-	//     return map[string]interface{}{
-	//         "content": []map[string]string{{
-	//             "type": "text",
-	//             "text": fmt.Sprintf(`Veracode API Health Check
-	// ========================
-	//
-	// Timestamp: %s
-	//
-	// ❌ Health check failed: %v`, timestamp, err),
-	//         }},
-	//     }, nil
-	// }
-	//
-	// availableIcon := "✓"
-	// if !healthStatus.Available {
-	//     availableIcon = "❌"
-	// }
-	//
-	// return map[string]interface{}{
-	//     "content": []map[string]string{{
-	//         "type": "text",
-	//         "text": fmt.Sprintf(`Veracode API Health Check
-	// ========================
-	//
-	// Timestamp: %s
-	//
-	// %s Veracode API (api.veracode.com)
-	// Status: %s
-	// HTTP Status: %d
-	//
-	// ✓ Authentication: Configured
-	//
-	// Next steps:
-	// - Run dynamic-findings or static-findings to fetch data
-	// - Check application access permissions
-	// - Review API rate limits and quotas`, timestamp, availableIcon, healthStatus.Message, healthStatus.StatusCode),
-	//     }},
-	// }, nil
-
-	// TEMPORARY: Placeholder until api package is imported
-	responseText := fmt.Sprintf(`Veracode API Health Check
+	client, err := api.NewVeracodeClient()
+	if err != nil {
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": fmt.Sprintf(`Veracode API Health Check
 ========================
 
 Timestamp: %s
 
-API Endpoints Status:
-✓ Platform API (api.veracode.com) - Available
-✓ Results API (analysiscenter.veracode.com) - Available
-✓ Upload API (analysiscenter.veracode.com) - Available
-✓ Findings API (api.veracode.com/appsec/v2) - Available
+❌ Authentication: Not configured
+Error: %v
 
-Authentication: Not configured
-- Set VERACODE_API_ID and VERACODE_API_KEY environment variables
+Required credentials:
+- ~/.veracode/veracode.yml with key-id and key-secret
+- OR environment variables VERACODE_API_ID and VERACODE_API_KEY
 
-Note: To enable actual API health checks, uncomment the api package import
-and implementation in tools/api_health.go
+Please configure credentials and try again.`, timestamp, err),
+			}},
+		}, nil
+	}
 
-Next steps:
-- Configure API credentials
-- Uncomment api package usage in this file
-- Test authenticated requests
-- Check rate limits and quotas
-- Verify application access permissions`, timestamp)
+	// Perform actual health check
+	healthStatus, err := client.CheckHealth(ctx)
+	if err != nil {
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": fmt.Sprintf(`Veracode API Health Check
+========================
+
+Timestamp: %s
+
+❌ Health check failed: %v`, timestamp, err),
+			}},
+		}, nil
+	}
+
+	availableIcon := "✓"
+	if !healthStatus.Available {
+		availableIcon = "❌"
+	}
 
 	return map[string]interface{}{
 		"content": []map[string]string{{
 			"type": "text",
-			"text": responseText,
+			"text": fmt.Sprintf(`Veracode API Health Check
+========================
+
+Timestamp: %s
+
+%s Veracode API (api.veracode.com)
+Status: %s
+HTTP Status: %d
+
+✓ Authentication: Configured
+
+Next steps:
+- Run dynamic-findings or static-findings to fetch data
+- Check application access permissions
+- Review API rate limits and quotas`, timestamp, availableIcon, healthStatus.Message, healthStatus.StatusCode),
 		}},
 	}, nil
 }

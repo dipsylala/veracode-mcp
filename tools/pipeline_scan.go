@@ -64,9 +64,16 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 	}
 	req.ApplicationPath = appPath
 
-	// Extract filename (optional)
-	if filename, ok := args["filename"].(string); ok {
-		req.Filename = filename
+	// Extract filename (optional) - if just a filename (no path), look in .veracode_packaging
+	if filename, ok := args["filename"].(string); ok && filename != "" {
+		// Check if filename is just a name (no directory separators)
+		if filepath.Base(filename) == filename {
+			// Just a filename - prepend .veracode_packaging directory
+			req.Filename = filepath.Join(appPath, ".veracode_packaging", filename)
+		} else {
+			// Full or relative path - use as-is
+			req.Filename = filename
+		}
 	}
 
 	// Extract verbose (optional)
@@ -120,12 +127,8 @@ func (t *PipelineScanTool) handlePipelineScan(ctx context.Context, args map[stri
 	// Determine which file to scan
 	var scanTarget string
 	if req.Filename != "" {
-		// Use the provided filename
+		// Use the provided filename (already resolved in parsePipelineScanRequest)
 		scanTarget = req.Filename
-		// If it's not an absolute path, assume it's in the application path
-		if !filepath.IsAbs(scanTarget) {
-			scanTarget = filepath.Join(req.ApplicationPath, scanTarget)
-		}
 
 		// Validate the file exists
 		var fileInfo os.FileInfo

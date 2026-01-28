@@ -58,11 +58,6 @@
   color: #c00;
 }
 
-.severityItem.critical {
-  background: #fee;
-  color: #c00;
-}
-
 .severityItem.high {
   background: #fed;
   color: #c50;
@@ -199,11 +194,6 @@
 }
 
 .severityBadge.veryhigh {
-  background: #fee;
-  color: #c00;
-}
-
-.severityBadge.critical {
   background: #fee;
   color: #c00;
 }

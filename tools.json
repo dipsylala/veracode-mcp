@@ -227,6 +227,12 @@
           "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
+          "name": "filename",
+          "type": "string",
+          "isRequired": false,
+          "description": "Optional output filename for the packaged artifact. If just a filename (no path) is provided, it will be created in the .veracode-packaging directory. If a full path is provided, it will be used as-is."
+        },
+        {
           "name": "verbose",
           "type": "boolean",
           "isRequired": false,
@@ -254,7 +260,7 @@
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "The file upon which to perform a pipeline scan. If not provided, the tool will scan the largest file in the .veracode-packaging folder"
+          "description": "The file upon which to perform a pipeline scan. If just a filename (no path) is provided, it will look in the .veracode_packaging folder. If a full or relative path is provided, it will be used as-is. If not provided, the tool will scan the largest file in the .veracode_packaging folder"
         },
         {
           "name": "verbose",
