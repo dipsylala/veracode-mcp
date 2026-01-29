@@ -18,9 +18,9 @@ func TestLoadToolDefinitions(t *testing.T) {
 	}
 
 	// Check dynamic findings tool
-	dynamicTool := registry.GetToolByName("get-dynamic-findings")
+	dynamicTool := registry.GetToolByName("dynamic-findings")
 	if dynamicTool == nil {
-		t.Fatal("get-dynamic-findings tool not found")
+		t.Fatal("dynamic-findings tool not found")
 	}
 
 	// Note: Category is optional and may not be set
@@ -28,8 +28,8 @@ func TestLoadToolDefinitions(t *testing.T) {
 		t.Errorf("Expected category 'findings' or empty, got '%s'", dynamicTool.Category)
 	}
 
-	if len(dynamicTool.Params) != 6 {
-		t.Errorf("Expected 6 params for dynamic-findings, got %d", len(dynamicTool.Params))
+	if len(dynamicTool.Params) != 7 {
+		t.Errorf("Expected 7 params for dynamic-findings, got %d", len(dynamicTool.Params))
 	}
 
 	// Check that application_path is first and required
@@ -42,9 +42,9 @@ func TestLoadToolDefinitions(t *testing.T) {
 	}
 
 	// Check static findings tool
-	staticTool := registry.GetToolByName("get-static-findings")
+	staticTool := registry.GetToolByName("static-findings")
 	if staticTool == nil {
-		t.Fatal("get-static-findings tool not found")
+		t.Fatal("static-findings tool not found")
 	}
 }
 
@@ -144,20 +144,20 @@ func TestServerInitialization(t *testing.T) {
 	foundStatic := false
 
 	for _, tool := range result.Tools {
-		if tool.Name == "get-dynamic-findings" {
+		if tool.Name == "dynamic-findings" {
 			foundDynamic = true
 		}
-		if tool.Name == "get-static-findings" {
+		if tool.Name == "static-findings" {
 			foundStatic = true
 		}
 	}
 
 	if !foundDynamic {
-		t.Error("get-dynamic-findings not found in tools list")
+		t.Error("dynamic-findings not found in tools list")
 	}
 
 	if !foundStatic {
-		t.Error("get-static-findings not found in tools list")
+		t.Error("static-findings not found in tools list")
 	}
 }
 

@@ -1,9 +1,11 @@
 #!/usr/bin/env pwsh
-# Enhanced build script with code quality checks
+# Comprehensive build script with UI, quality checks, and tests
 
 param(
     [switch]$Quick,      # Skip quality checks
     [switch]$NoTest,     # Skip tests
+    [switch]$SkipUI,     # Skip UI builds
+    [switch]$UIOnly,     # Only build UI apps
     [switch]$Verbose     # Verbose output
 )
 
@@ -32,6 +34,62 @@ function Write-Error {
 Write-Host "`n╔═══════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host "║   Veracode MCP Server Build Script    ║" -ForegroundColor Cyan
 Write-Host "╚═══════════════════════════════════════╝" -ForegroundColor Cyan
+
+# Build UI apps if not skipped
+if (-not $SkipUI) {
+    $uiApps = @(
+        @{Name="Pipeline Results"; Path="ui\pipeline-results-app"},
+        @{Name="Static Findings"; Path="ui\static-findings-app"},
+        @{Name="Dynamic Findings"; Path="ui\dynamic-findings-app"}
+    )
+    
+    foreach ($app in $uiApps) {
+        Write-Step "Building $($app.Name) UI..."
+        
+        $appPath = Join-Path $PSScriptRoot $app.Path
+        
+        if (-not (Test-Path $appPath)) {
+            Write-Error "$($app.Name) UI directory not found at $appPath"
+            exit 1
+        }
+        
+        Push-Location $appPath
+        
+        try {
+            # Install dependencies if node_modules doesn't exist
+            if (-not (Test-Path "node_modules")) {
+                Write-Host "  Installing dependencies..." -ForegroundColor Gray
+                npm install 2>&1 | Out-Null
+                if ($LASTEXITCODE -ne 0) {
+                    throw "npm install failed"
+                }
+            }
+            
+            # Build UI
+            npm run build 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                throw "$($app.Name) UI build failed"
+            }
+            
+            Write-Success "$($app.Name) UI built successfully"
+        }
+        catch {
+            Write-Error "Failed to build $($app.Name) UI: $_"
+            Pop-Location
+            exit 1
+        }
+        
+        Pop-Location
+    }
+}
+
+# Exit if UI-only build
+if ($UIOnly) {
+    Write-Host "`n╔════════════════════════════════════════╗" -ForegroundColor Green
+    Write-Host "║         UI Build Successful! ✓         ║" -ForegroundColor Green
+    Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
+    exit 0
+}
 
 # 1. Format code
 if (-not $Quick) {
@@ -114,11 +172,16 @@ Write-Host "╚═════════════════════�
 if ($Quick) {
     Write-Warning "Quick build - skipped quality checks"
 }
+if ($SkipUI) {
+    Write-Warning "UI build skipped"
+}
 
 Write-Host "`nRun with:" -ForegroundColor Cyan
 Write-Host "  .\dist\veracode-mcp.exe -mode stdio" -ForegroundColor White
 Write-Host "`nBuild options:" -ForegroundColor Gray
-Write-Host "  .\build.ps1          # Full build with all checks" -ForegroundColor Gray
-Write-Host "  .\build.ps1 -Quick   # Fast build, skip checks" -ForegroundColor Gray
-Write-Host "  .\build.ps1 -NoTest  # Build without running tests" -ForegroundColor Gray
-Write-Host "  .\build.ps1 -Verbose # Show detailed test output" -ForegroundColor Gray
+Write-Host "  .\build.ps1           # Full build (UI + Go + quality checks)" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -Quick    # Fast build, skip quality checks" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -NoTest   # Build without running tests" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -SkipUI   # Skip UI builds, only Go server" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -UIOnly   # Only build UI apps" -ForegroundColor Gray
+Write-Host "  .\build.ps1 -Verbose  # Show detailed test output" -ForegroundColor Gray

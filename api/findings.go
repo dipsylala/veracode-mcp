@@ -318,7 +318,7 @@ func extractBasicFields(finding *Finding, apiFinding *findings.Finding) {
 	}
 
 	// Extract annotations (mitigations)
-	if apiFinding.Annotations != nil && len(apiFinding.Annotations) > 0 {
+	if len(apiFinding.Annotations) > 0 {
 		finding.Mitigations = make([]Mitigation, 0, len(apiFinding.Annotations))
 		for _, annotation := range apiFinding.Annotations {
 			mitigation := Mitigation{}

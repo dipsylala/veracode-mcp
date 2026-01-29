@@ -107,82 +107,20 @@ func (s *MCPServer) HandleRequest(req *JSONRPCRequest) *JSONRPCResponse {
 
 	switch req.Method {
 	case "initialize":
-		result, err := s.handleInitialize(req.Params)
-		if err != nil {
-			resp.Error = &RPCError{
-				Code:    -32603,
-				Message: err.Error(),
-			}
-		} else {
-			resp.Result = result
-		}
-
+		s.handleInitializeRequest(req, resp)
 	case "tools/list":
 		resp.Result = s.handleListTools()
-
 	case "tools/call":
-		log.Printf(">>> tools/call invoked (UI support: %v)", s.clientSupportsUI)
-
-		// Parse the tool name for better logging
-		var callParams CallToolParams
-		if err := json.Unmarshal(req.Params, &callParams); err == nil {
-			log.Printf(">>> Calling tool: %s", callParams.Name)
-		}
-
-		result, err := s.handleCallTool(req.Params)
-		if err != nil {
-			resp.Error = &RPCError{
-				Code:    -32603,
-				Message: err.Error(),
-			}
-			log.Printf(">>> tools/call ERROR: %v", err)
-		} else {
-			// Log the response structure
-			if result != nil {
-				contentCount := len(result.Content)
-				hasStructured := result.StructuredContent != nil
-				contentLen := 0
-				if contentCount > 0 && result.Content[0].Text != "" {
-					contentLen = len(result.Content[0].Text)
-				}
-				log.Printf(">>> tools/call completed: content items=%d, content[0] length=%d chars, hasStructuredContent=%v",
-					contentCount, contentLen, hasStructured)
-
-				// Log a preview of the content for debugging
-				if contentCount > 0 && contentLen > 0 {
-					previewLen := 200
-					if contentLen < previewLen {
-						previewLen = contentLen
-					}
-					log.Printf(">>> Content preview (first %d chars): %s...", previewLen, result.Content[0].Text[:previewLen])
-				}
-			} else {
-				log.Printf(">>> tools/call completed: result is nil")
-			}
-			resp.Result = result
-		}
-
+		s.handleToolsCallRequest(req, resp)
 	case "resources/list":
 		log.Printf(">>> resources/list called - returning UI resource")
 		resp.Result = s.handleListResources()
-
 	case "resources/read":
-		log.Printf(">>> resources/read called - this should load the UI HTML!")
-		result, err := s.handleReadResource(req.Params)
-		if err != nil {
-			resp.Error = &RPCError{
-				Code:    -32603,
-				Message: err.Error(),
-			}
-		} else {
-			resp.Result = result
-		}
-
+		s.handleResourcesReadRequest(req, resp)
 	case "notifications/initialized":
 		// Client confirms initialization - no response needed for notifications
 		log.Println("Client sent initialized notification")
 		return nil // Don't send a response for notifications
-
 	default:
 		resp.Error = &RPCError{
 			Code:    -32601,
@@ -191,6 +129,81 @@ func (s *MCPServer) HandleRequest(req *JSONRPCRequest) *JSONRPCResponse {
 	}
 
 	return resp
+}
+
+// handleInitializeRequest processes the initialize request
+func (s *MCPServer) handleInitializeRequest(req *JSONRPCRequest, resp *JSONRPCResponse) {
+	result, err := s.handleInitialize(req.Params)
+	if err != nil {
+		resp.Error = &RPCError{
+			Code:    -32603,
+			Message: err.Error(),
+		}
+	} else {
+		resp.Result = result
+	}
+}
+
+// handleToolsCallRequest processes the tools/call request
+func (s *MCPServer) handleToolsCallRequest(req *JSONRPCRequest, resp *JSONRPCResponse) {
+	log.Printf(">>> tools/call invoked (UI support: %v)", s.clientSupportsUI)
+
+	// Parse the tool name for better logging
+	var callParams CallToolParams
+	if err := json.Unmarshal(req.Params, &callParams); err == nil {
+		log.Printf(">>> Calling tool: %s", callParams.Name)
+	}
+
+	result, err := s.handleCallTool(req.Params)
+	if err != nil {
+		resp.Error = &RPCError{
+			Code:    -32603,
+			Message: err.Error(),
+		}
+		log.Printf(">>> tools/call ERROR: %v", err)
+	} else {
+		s.logToolCallResult(result)
+		resp.Result = result
+	}
+}
+
+// logToolCallResult logs details about the tool call result
+func (s *MCPServer) logToolCallResult(result *CallToolResult) {
+	if result != nil {
+		contentCount := len(result.Content)
+		hasStructured := result.StructuredContent != nil
+		contentLen := 0
+		if contentCount > 0 && result.Content[0].Text != "" {
+			contentLen = len(result.Content[0].Text)
+		}
+		log.Printf(">>> tools/call completed: content items=%d, content[0] length=%d chars, hasStructuredContent=%v",
+			contentCount, contentLen, hasStructured)
+
+		// Log a preview of the content for debugging
+		if contentCount > 0 && contentLen > 0 {
+			previewLen := 200
+			if contentLen < previewLen {
+				previewLen = contentLen
+			}
+			log.Printf(">>> Content preview (first %d chars): %s...", previewLen, result.Content[0].Text[:previewLen])
+		}
+	} else {
+		log.Printf(">>> tools/call completed: result is nil")
+	}
+}
+
+// handleResourcesReadRequest processes the resources/read request
+func (s *MCPServer) handleResourcesReadRequest(req *JSONRPCRequest, resp *JSONRPCResponse) {
+	log.Printf(">>> resources/read called - this should load the UI HTML!")
+	result, err := s.handleReadResource(req.Params)
+	if err != nil {
+		resp.Error = &RPCError{
+			Code:    -32603,
+			Message: err.Error(),
+		}
+	} else {
+		resp.Result = result
+	}
 }
 
 func (s *MCPServer) handleInitialize(params json.RawMessage) (*InitializeResult, error) {

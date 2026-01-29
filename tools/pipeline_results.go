@@ -192,25 +192,6 @@ func findMostRecentResultsFile(dir string) (string, error) {
 	return resultsFiles[len(resultsFiles)-1], nil
 }
 
-// formatPipelineResultsSummary creates a brief text summary for UI-capable clients
-func formatPipelineResultsSummary(response *MCPFindingsResponse, resultsFile string) string {
-	return fmt.Sprintf(`Pipeline Scan Results for %s
-Results File: %s
-Total Findings: %d
-Severity: Very High=%d, High=%d, Medium=%d, Low=%d, Very Low=%d, Info=%d
-
-View the interactive UI below for detailed analysis.`,
-		response.Application.Name,
-		resultsFile,
-		response.Summary.TotalFindings,
-		response.Summary.BySeverity["very high"],
-		response.Summary.BySeverity["high"],
-		response.Summary.BySeverity["medium"],
-		response.Summary.BySeverity["low"],
-		response.Summary.BySeverity["very low"],
-		response.Summary.BySeverity["info"])
-}
-
 // formatPipelineResultsResponse formats the pipeline results into an MCP response
 func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults) map[string]interface{} {
 	// Build MCP response structure similar to static findings
