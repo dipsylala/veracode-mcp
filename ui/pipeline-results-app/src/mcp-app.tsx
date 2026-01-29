@@ -147,7 +147,7 @@ function PipelineResultsView({ data }: PipelineResultsViewProps) {
             <thead>
               <tr>
                 <th className={styles.expanderHeader}></th>
-                <th>Flaw ID</th>
+                <th>Flaw</th>
                 <th className={styles.severityHeader}>Severity</th>
                 <th>CWE</th>
                 <th>File</th>

@@ -54,8 +54,8 @@ func TestLoadToolDefinitions(t *testing.T) {
 		t.Errorf("Expected category 'findings' or empty, got '%s'", dynamicTool.Category)
 	}
 
-	if len(dynamicTool.Params) != 7 {
-		t.Errorf("Expected 7 params for dynamic-findings, got %d", len(dynamicTool.Params))
+	if len(dynamicTool.Params) != 9 {
+		t.Errorf("Expected 9 params for dynamic-findings, got %d", len(dynamicTool.Params))
 	}
 
 	// Check that application_path is first and required

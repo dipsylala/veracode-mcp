@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 
 	"github.com/dipsylala/veracodemcp-go/api"
@@ -52,21 +53,23 @@ func (t *DynamicFindingsTool) Shutdown() error {
 
 // DynamicFindingsRequest represents the parsed parameters for dynamic-findings
 type DynamicFindingsRequest struct {
-	ApplicationPath string   `json:"application_path"`
-	AppProfile      string   `json:"app_profile,omitempty"`
-	Sandbox         string   `json:"sandbox,omitempty"`
-	Size            int      `json:"size,omitempty"`
-	Page            int      `json:"page,omitempty"`
-	Severity        *int32   `json:"severity,omitempty"`
-	SeverityGte     *int32   `json:"severity_gte,omitempty"`
-	CWEIDs          []string `json:"cwe_ids,omitempty"`
+	ApplicationPath    string   `json:"application_path"`
+	AppProfile         string   `json:"app_profile,omitempty"`
+	Sandbox            string   `json:"sandbox,omitempty"`
+	Size               int      `json:"size,omitempty"`
+	Page               int      `json:"page,omitempty"`
+	Severity           *int32   `json:"severity,omitempty"`
+	SeverityGte        *int32   `json:"severity_gte,omitempty"`
+	CWEIDs             []string `json:"cwe_ids,omitempty"`
+	ViolatesPolicy     *bool    `json:"violates_policy,omitempty"`
+	IncludeMitigations bool     `json:"include_mitigations,omitempty"`
 }
 
 // parseDynamicFindingsRequest extracts and validates parameters from the raw args map
 func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsRequest, error) {
 	// Set defaults
 	req := &DynamicFindingsRequest{
-		Size: 200,
+		Size: 10,
 		Page: 0,
 	}
 
@@ -210,13 +213,15 @@ Please verify:
 
 	// Step 4: Build the findings request
 	findingsReq := api.FindingsRequest{
-		AppProfile:  applicationGUID,
-		Sandbox:     req.Sandbox,
-		Size:        req.Size,
-		Page:        req.Page,
-		Severity:    req.Severity,
-		SeverityGte: req.SeverityGte,
-		CWEIDs:      req.CWEIDs,
+		AppProfile:         applicationGUID,
+		Sandbox:            req.Sandbox,
+		Size:               req.Size,
+		Page:               req.Page,
+		Severity:           req.Severity,
+		SeverityGte:        req.SeverityGte,
+		CWEIDs:             req.CWEIDs,
+		ViolatesPolicy:     req.ViolatesPolicy,
+		IncludeMitigations: req.IncludeMitigations,
 	}
 
 	// Step 5: Call the API to get dynamic findings
@@ -316,6 +321,11 @@ func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationG
 		}
 	}
 
+	// Sort findings by severity (Very High first)
+	sort.Slice(response.Findings, func(i, j int) bool {
+		return response.Findings[i].SeverityScore > response.Findings[j].SeverityScore
+	})
+
 	// Marshal response to JSON for non-UI clients
 	responseJSON, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
@@ -323,12 +333,25 @@ func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationG
 		responseJSON, _ = json.Marshal(response) // Fall back to compact JSON
 	}
 
+	// Build pagination summary for LLM
+	var paginationSummary string
+	if response.Pagination != nil {
+		paginationSummary = fmt.Sprintf("Showing %d findings on page %d of %d (Total: %d findings across all pages)\n\n",
+			len(response.Findings),
+			response.Pagination.CurrentPage+1, // Display as 1-based
+			response.Pagination.TotalPages,
+			response.Pagination.TotalElements,
+		)
+	} else {
+		paginationSummary = fmt.Sprintf("Showing %d findings\n\n", len(response.Findings))
+	}
+
 	// Build result with content
 	result := map[string]interface{}{
 		"content": []map[string]interface{}{
 			{
 				"type": "text",
-				"text": string(responseJSON),
+				"text": paginationSummary + string(responseJSON),
 			},
 		},
 	}
