@@ -48,11 +48,13 @@ Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) requir
 **Install the Veracode CLI:**
 
 *Windows (PowerShell):*
+
 ```powershell
 iex (iwr https://tools.veracode.com/veracode-cli/install.ps1)
 ```
 
 *macOS/Linux:*
+
 ```bash
 curl -fsS https://tools.veracode.com/veracode-cli/install | sh
 ```
@@ -60,6 +62,7 @@ curl -fsS https://tools.veracode.com/veracode-cli/install | sh
 **Authenticate the CLI:**
 
 After installation, configure your API credentials:
+
 ```bash
 veracode configure
 ```
@@ -73,8 +76,9 @@ For detailed installation instructions and alternative methods, see the [officia
 The server requires Veracode API credentials to access the Veracode platform. Credentials can be provided in two ways (checked in order):
 
 1. **File-based configuration** (Recommended)
-   
+
    Create `~/.veracode/veracode.yml`:
+
    ```yaml
    api:
      key-id: YOUR_API_KEY_ID
@@ -82,8 +86,9 @@ The server requires Veracode API credentials to access the Veracode platform. Cr
    ```
 
    **Setup commands:**
-   
+
    *Linux/macOS:*
+
    ```bash
    mkdir -p ~/.veracode
    cat > ~/.veracode/veracode.yml << EOF
@@ -95,6 +100,7 @@ The server requires Veracode API credentials to access the Veracode platform. Cr
    ```
 
    *Windows PowerShell:*
+
    ```powershell
    New-Item -ItemType Directory -Path "$env:USERPROFILE\.veracode" -Force
    @"
@@ -105,7 +111,7 @@ The server requires Veracode API credentials to access the Veracode platform. Cr
    ```
 
 2. **Environment variables** (Fallback)
-   
+
    ```bash
    export VERACODE_API_ID="YOUR_API_KEY_ID"
    export VERACODE_API_KEY="YOUR_API_KEY_SECRET"
@@ -135,7 +141,6 @@ See [credentials/README.md](credentials/README.md) for detailed information.
         Log file path for debugging (recommended for stdio mode)
   -version
         Display version information
-```
 
 ### Stdio Mode (Default)
 
@@ -146,7 +151,6 @@ The stdio mode is ideal for local integrations where the MCP server runs as a su
 ```
 
 Or simply:
-```bMCP Client Configuration
 
 **VS Code / Codex:**
 
@@ -173,10 +177,6 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-### ash
-.\dist\veracode-mcp.exe
-```
-
 ### HTTP Mode
 
 The HTTP mode allows remote connections via HTTP with Server-Sent Events:
@@ -186,6 +186,7 @@ The HTTP mode allows remote connections via HTTP with Server-Sent Events:
 ```
 
 The HTTP server provides these endpoints:
+
 - `GET /sse` - Establish SSE connection for receiving responses
 - `POST /message?sessionId=<id>` - Send JSON-RPC requests
 - `GET /health` - Health check endpoint
@@ -207,7 +208,7 @@ The HTTP server provides these endpoints:
   - `client.go` - Client orchestrator
   - `helpers/` - Business logic wrappers
   - `generated/` - Swagger-generated API clients
-- `tools/` - Tool implementations (auto-registered)
+- `mcp_tools/` - MCP tool implementations (auto-registered)
 - `credentials/` - Credential management
 - `hmac/` - HMAC authentication utilities
 - `docs/` - Documentation
@@ -215,7 +216,8 @@ The HTTP server provides these endpoints:
 ### Tool Architecture
 
 The server uses an **auto-registration architecture** where tools register themselves on import:
- (supports protocol versions >= 2024-11-05)
+
+- supports protocol versions >= 2024-11-05
 - `notifications/initialized` - Client initialization confirmation (properly handled as notification per JSON-RPC 2.0 spec)
 - `tools/list` - List available tools (loaded from tools.json)
 - `tools/call` - Execute a tool with validated parameters
@@ -223,24 +225,28 @@ The server uses an **auto-registration architecture** where tools register thems
 - `resources/read` - Read resource content
 
 **Protocol Compatibility:**
+
 - Automatically negotiates protocol version with client
 - Tested with Codex (protocol 2025-06-18) and VS Code MCP clients
 - Strict JSON-RPC 2.0 compliance (notifications receive no response)
 - Buffered stdio transport with explicit flushing for reliable communic
-   - Rich descriptions optimized for LLM consumption
-   - Enum values and allowed ranges
+  - Rich descriptions optimized for LLM consumption
+  - Enum values and allowed ranges
 
-2. **Tool Implementations** (`tools/*.go`)
-   - Type-safe Go implementations
-   - Self-registering via `init()` functions
-   - Lifecycle management (Initialize → RegisterHandlers → Shutdown)
+**Tool Implementations** (`mcp_tools/*.go`)
 
-3. **Registries**
-   - **ToolRegistry**: Loads tool definitions from `tools.json`
-   - **ToolHandlerRegistry**: Maps tool names to handler functions
-   - **ToolImplRegistry**: Manages tool implementation lifecycle
+- Type-safe Go implementations
+- Self-registering via `init()` functions
+- Lifecycle management (Initialize → RegisterHandlers → Shutdown)
+
+**Registries**
+
+- **ToolRegistry**: Loads tool definitions from `tools.json`
+- **ToolHandlerRegistry**: Maps tool names to handler functions
+- **ToolImplRegistry**: Manages tool implementation lifecycle
 
 **Benefits:**
+
 - ✅ No manual registration - just create the file
 - ✅ Type-safe Go implementations
 - ✅ Self-documenting via JSON schemas
@@ -304,6 +310,7 @@ The project includes a PowerShell build script with quality checks:
 ```
 
 The build script performs:
+
 1. Code formatting (`go fmt`)
 2. Static analysis (`go vet`)
 3. Linting (`golangci-lint` if available)

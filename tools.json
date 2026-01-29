@@ -14,7 +14,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
           "name": "app_profile",
@@ -67,6 +67,18 @@
             "max": 500
           },
           "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
+        },
+        {
+          "name": "violates_policy",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Filter findings by policy violation status. Set to true to return only findings that violate policy, false for non-violating findings. If omitted, returns all findings regardless of policy status."
+        },
+        {
+          "name": "include_mitigations",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Include mitigation/annotation information for findings. Default is false. Set to true to include proposed mitigations, approvals, and other annotation details."
         }
       ]
     },
@@ -78,7 +90,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
           "name": "app_profile",
@@ -131,6 +143,18 @@
             "max": 500
           },
           "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
+        },
+        {
+          "name": "violates_policy",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Filter findings by policy violation status. Set to true to return only findings that violate policy, false for non-violating findings. If omitted, returns all findings regardless of policy status."
+        },
+        {
+          "name": "include_mitigations",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Include mitigation/annotation information for findings. Default is false. Set to true to include proposed mitigations, approvals, and other annotation details."
         }
       ]
     },
@@ -142,7 +166,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
           "name": "app_profile",
@@ -166,7 +190,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
           "name": "app_profile",
@@ -224,7 +248,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
           "name": "filename",
@@ -254,7 +278,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
           "name": "filename",
@@ -278,7 +302,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         }
       ]
     },
@@ -290,7 +314,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         }
       ]
     },
@@ -302,7 +326,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         },
         {
           "name": "flaw_id",
@@ -320,7 +344,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         }
       ]
     },
@@ -332,7 +356,7 @@
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "Argument for the ABSOLUTE PATH to the application directory or workspace to scan. The path MUST be absolute and have the correct path separator. You can retrieve the absolute path by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
         }
       ]
     }

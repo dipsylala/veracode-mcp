@@ -26,14 +26,14 @@ VeracodeMCP-Go/
 
 ## How It Works
 
-1. **tools/ package** (`package tools`):
+1. **tools/ package** (`package mcp_tools`):
    - Defines `ToolImplementation` interface
    - Defines `HandlerRegistry` interface
    - Defines `ToolHandler` function type
    - Contains all tool implementations
 
 2. **main package**:
-   - Imports `github.com/dipsylala/veracodemcp-go/tools`
+   - Imports `github.com/dipsylala/veracodemcp-go/mcp_tools`
    - Implements `ToolHandlerRegistry` (satisfies `tools.HandlerRegistry`)
    - Calls `LoadAllTools()` to initialize and register tools
 
@@ -56,7 +56,7 @@ VeracodeMCP-Go/
 **Only 2 steps - tools auto-register!**
 
 1. Add JSON definition to `tools.json`
-2. Create `tools/my_tool.go` with `package tools` and `init()` function
+2. Create `mcp_tools/my_tool.go` with `package mcp_tools` and `init()` function
 
 **No other changes needed!**
 
@@ -64,7 +64,7 @@ VeracodeMCP-Go/
 
 ```go
 // tools/my_tool.go
-package tools
+package mcp_tools
 
 // Auto-register on import
 func init() {

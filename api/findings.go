@@ -38,7 +38,7 @@ func safeInt64ToInt(val int64) int {
 func buildFindingsAPIRequest(client *VeracodeClient, ctx context.Context, req FindingsRequest, scanType string) findings.ApiGetFindingsUsingGETRequest {
 	apiReq := client.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(ctx, req.AppProfile).
 		ScanType([]string{scanType}).
-		IncludeAnnot(true)
+		IncludeAnnot(req.IncludeMitigations)
 
 	// Add pagination parameters
 

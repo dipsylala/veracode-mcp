@@ -48,7 +48,7 @@
 }
 
 .severityItem {
-  padding: 8px 12px;
+  padding: 4px;
   border-radius: var(--border-radius-md, 6px);
   background: var(--color-background-secondary, #f5f5f5);
 }
@@ -100,14 +100,14 @@
   color: var(--color-text-primary, #000);
   font-weight: var(--font-weight-semibold, 600);
   text-align: left;
-  padding: 12px;
+  padding: 4px;
   border-bottom: 2px solid var(--color-border-primary, #e0e0e0);
   position: sticky;
   top: 0;
 }
 
 .table td {
-  padding: 12px;
+  padding: 4px;
   border-bottom: 1px solid var(--color-border-secondary, #f0f0f0);
   color: var(--color-text-primary, #000);
 }
@@ -191,6 +191,8 @@
   font-weight: var(--font-weight-medium, 500);
   font-size: var(--font-text-xs-size, 11px);
   text-transform: uppercase;
+  min-width: 75px;
+  text-align: center;
 }
 
 .severityBadge.veryhigh {
@@ -239,14 +241,6 @@
 
 .mitigation:last-child {
   margin-bottom: 0;
-}
-
-.mitigationHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-  gap: 12px;
 }
 
 .mitigationMeta {

@@ -26,7 +26,7 @@ Tests the core MCP server functionality:
 go test -v -run "TestLoad|TestToMCP|TestServer" -short
 ```
 
-### 2. Tool Registry Tests ([tools/registry_test.go](tools/registry_test.go))
+### 2. Tool Registry Tests ([tools/registry_test.go](mcp_tools/registry_test.go))
 
 Tests the tool registration system:
 - Tool registration and retrieval
@@ -38,7 +38,7 @@ Tests the tool registration system:
 go test -v ./tools -run "Registry"
 ```
 
-### 3. Tool Integration Tests ([tools/integration_test.go](tools/integration_test.go))
+### 3. Tool Integration Tests ([tools/integration_test.go](../tools/integration_test.go))
 
 Tests that actual tool implementations auto-register correctly:
 - Dynamic findings tool
@@ -50,126 +50,104 @@ Tests that actual tool implementations auto-register correctly:
 go test -v ./tools -run "TestActual"
 ```
 
-### 4. MCP Integration Tests ([mcp_integration_test.go](mcp_integration_test.go))
+### 4. Workspace Integration Tests ([tools/workspace_integration_test.go](../tools/workspace_integration_test.go))
 
-**End-to-end tests** that simulate MCP client interactions:
+**End-to-end tests** that simulate real workspace scenarios:
 
 #### Test Coverage
 
 | Test | Purpose | API Call |
 |------|---------|----------|
-| `TestMCPServerInitialization` | Verify server starts with all tools loaded | No |
-| `TestMCPProtocolInitialize` | Test MCP initialize handshake | No |
-| `TestMCPProtocolListTools` | Test tools/list method returns all tools | No |
-| `TestMCPToolCall_APIHealth` | Call api-health tool via MCP protocol | No |
-| `TestMCPToolCall_DynamicFindings` | Call get-dynamic-findings with real API | **Yes** |
-| `TestMCPToolCall_StaticFindings` | Call get-static-findings with real API | **Yes** |
-| `TestMCPToolCall_MissingRequiredParam` | Verify parameter validation | No |
-| `TestMCPToolCall_UnknownTool` | Verify error handling for unknown tools | No |
+| `TestWorkspaceDiscovery` | Verify workspace.json loading | No |
+| `TestWorkspaceOverride` | Test application override functionality | No |
+| `TestPipelineScanIntegration` | Test pipeline scan workflow | Yes |
+| `TestPackagingIntegration` | Test workspace packaging | Yes |
+| `TestSCAIntegration` | Test SCA scan workflow | Yes |
+| `TestMissingWorkspaceConfig` | Verify error handling for missing config | No |
+| `TestInvalidWorkspaceConfig` | Verify validation of workspace config | No |
 
-## Running MCP Integration Tests
+## Running Integration Tests
 
 ### Without API Credentials (Fast)
 
 Most tests run without requiring Veracode credentials:
 
 ```powershell
-# Run all MCP tests (skips API-dependent tests)
-go test -v -run "TestMCP" -timeout 120s
+# Run all server tests (protocol, tool loading, etc.)
+go test -v -run "TestServer" -timeout 120s
+
+# Run tools package tests (registry, integration, etc.)
+go test -v ./tools -timeout 120s
 
 # Results:
-# ✓ TestMCPServerInitialization
-# ✓ TestMCPProtocolInitialize  
-# ✓ TestMCPProtocolListTools
-# ✓ TestMCPToolCall_APIHealth
-# ⏭️ TestMCPToolCall_DynamicFindings (skipped)
-# ⏭️ TestMCPToolCall_StaticFindings (skipped)
-# ✓ TestMCPToolCall_MissingRequiredParam
-# ✓ TestMCPToolCall_UnknownTool
+# ✓ TestServerInitialization
+# ✓ TestToolLoading  
+# ✓ TestToolRegistry
+# ✓ TestWorkspaceDiscovery
+# ⏭️ TestPipelineScanIntegration (skipped without CLI)
+# ⏭️ TestSCAIntegration (skipped without CLI)
 ```
 
 ### With API Credentials (Full Integration)
 
-To test actual Veracode API calls through MCP:
+To test actual Veracode API calls and CLI integration:
 
 ```powershell
-# Set credentials (already configured in your environment)
+# Set credentials (if not already configured)
 # $env:VERACODE_API_ID = "your-api-id"
 # $env:VERACODE_API_KEY = "your-api-key"
 
-# Run all MCP integration tests including API calls
-go test -v -run "TestMCP" -timeout 120s
+# Run all tests including API/CLI dependent ones
+go test -v -timeout 300s
+go test -v ./tools -timeout 300s
 
-# All 8 tests should run (6 pass, 2 may take 30+ seconds for API calls)
+# All tests should run (some may take longer for actual API/CLI calls)
 ```
 
 ## Test Examples
 
-### Example 1: Testing MCP Protocol Handshake
+### Example 1: Testing Server Initialization
 
 ```go
 // Create server
 server, err := NewMCPServer()
 
-// Send initialize request
-req := &JSONRPCRequest{
-    JSONRPC: "2.0",
-    ID:      1,
-    Method:  "initialize",
-    Params:  initParamsJSON,
-}
-
-// Handle request
-resp := server.HandleRequest(req)
-
-// Verify protocol version and capabilities
-initResult := resp.Result.(*InitializeResult)
-assert.Equal(t, "2024-11-05", initResult.ProtocolVersion)
+// Verify tools are loaded
+tools := server.GetAvailableTools()
+assert.Contains(t, tools, "api-health")
+assert.Contains(t, tools, "static-findings")
 ```
 
-### Example 2: Testing Tool Listing
+### Example 2: Testing Tool Registry
 
 ```go
-// Request tools/list
-req := &JSONRPCRequest{
-    Method: "tools/list",
-}
+// Test tool registration
+registry := tools.NewRegistry()
+tool := NewAPIHealthTool()
 
-resp := server.HandleRequest(req)
-listResult := resp.Result.(*ListToolsResult)
+err := registry.RegisterTool("api-health", tool)
+assert.NoError(t, err)
 
-// Verify tools are present
-assert.Contains(t, listResult.Tools, "api-health")
-assert.Contains(t, listResult.Tools, "get-dynamic-findings")
+// Test retrieval
+retrieved, exists := registry.GetTool("api-health")
+assert.True(t, exists)
+assert.Equal(t, tool, retrieved)
 ```
 
-### Example 3: Testing Tool Execution with Real API
+### Example 3: Testing Workspace Discovery
 
 ```go
-// Call get-static-findings tool
-req := &JSONRPCRequest{
-    Method: "tools/call",
-    Params: CallToolParams{
-        Name: "get-static-findings",
-        Arguments: map[string]interface{}{
-            "application_guid": "65c204e5-a74c-4b68-a62a-4bfdc08e27af",
-            "size": 5,
-            "severity": []interface{}{"High", "Very High"},
-        },
-    },
+// Test workspace configuration loading
+workspace := "/path/to/test/workspace"
+config, err := LoadWorkspaceConfig(workspace)
+
+if err != nil {
+    t.Skipf("Workspace config not found: %v", err)
 }
 
-// Execute and verify
-resp := server.HandleRequest(req)
-result := resp.Result.(*CallToolResult)
-
-// Parse findings from response
-var findings map[string]interface{}
-json.Unmarshal([]byte(result.Content[0].Text), &findings)
-
-// Verify API response structure
-assert.Contains(t, findings, "page")
-assert.Contains(t, findings, "_embedded")
+// Verify configuration
+assert.NotEmpty(t, config.AppProfile)
+assert.NotEmpty(t, config.ApplicationGUID)
 ```
 
 ## What Gets Tested
@@ -241,13 +219,13 @@ Write-Host "API Key length: $($env:VERACODE_API_KEY.Length)"
 
 ```powershell
 # Test just the API health tool
-go test -v -run "TestMCPToolCall_APIHealth"
+go test -v -run "APIHealth"
 
-# Test just parameter validation
-go test -v -run "TestMCPToolCall_Missing"
+# Test just parameter validation  
+go test -v -run "Validation"
 
-# Test with real API (requires credentials)
-go test -v -run "TestMCPToolCall_Static"
+# Test with real API/CLI (requires credentials/CLI)
+go test -v ./tools -run "Integration"
 ```
 
 ## Performance
@@ -274,7 +252,7 @@ Typical test execution times:
 
 To add tests for new MCP tools:
 
-1. **Add tool implementation**: Create new file in `tools/` directory
+1. **Add tool implementation**: Create new file in `mcp_tools/` directory
 2. **Auto-registration**: Tool registers via `init()` function
 3. **Add to expected tools**: Update `mcp_integration_test.go` expectedTools list
 4. **Create specific test**: Add `TestMCPToolCall_YourNewTool()` function
@@ -282,8 +260,8 @@ To add tests for new MCP tools:
 
 ## Related Documentation
 
-- [MCP Tools README](tools/README.md) - Tool implementation guide
-- [Tool Testing Guide](tools/TESTING.md) - Detailed tool testing documentation
+- [MCP Tools README](mcp_tools/README.md) - Tool implementation guide
+- [Tool Testing Guide](mcp_tools/TESTING.md) - Detailed tool testing documentation
 - [API Integration Tests](api/README.md) - Low-level API testing
 
 ## Summary
@@ -299,5 +277,9 @@ The best way to test the MCP component is through the comprehensive integration 
 
 Run with:
 ```powershell
-go test -v -run "TestMCP" -timeout 120s
+# Run server tests
+go test -v -timeout 120s
+
+# Run tools tests  
+go test -v ./tools -timeout 120s
 ```

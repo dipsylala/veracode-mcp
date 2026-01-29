@@ -99,7 +99,7 @@ interface StaticFindingsViewProps {
 }
 
 function StaticFindingsView({ data }: StaticFindingsViewProps) {
-  const { application, summary, findings } = data;
+  const { application, summary, findings, pagination } = data;
 
   // Define severity order (5 to 0)
   const severityOrder = ['Very High', 'High', 'Medium', 'Low', 'Very Low', 'Info'];
@@ -108,6 +108,12 @@ function StaticFindingsView({ data }: StaticFindingsViewProps) {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>Static Findings: {application.name}</h1>
+        
+        {pagination && (
+          <div className={styles.paginationInfo}>
+            Showing {findings.length} findings on page {pagination.current_page + 1} of {pagination.total_pages} (Total: {pagination.total_elements} findings)
+          </div>
+        )}
         
         <div className={styles.summary}>
           <div className={styles.summaryItem}>
@@ -144,12 +150,13 @@ function StaticFindingsView({ data }: StaticFindingsViewProps) {
             <thead>
               <tr>
                 <th className={styles.expanderHeader}></th>
-                <th>Flaw ID</th>
+                <th>Flaw</th>
                 <th className={styles.severityHeader}>Severity</th>
                 <th>CWE</th>
                 <th className={styles.moduleCell}>Module</th>
                 <th className={styles.fileCell}>File</th>
                 <th>Status</th>
+                <th>Policy</th>
                 <th>Mitigation</th>
               </tr>
             </thead>
@@ -200,12 +207,34 @@ function FindingRow({ finding }: FindingRowProps) {
             {finding.file_path || '-'}{finding.file_path && finding.line_number ? `:${finding.line_number}` : ''}
           </div>
         </td>
-        <td>{finding.status}</td>
-        <td>{finding.mitigation_status}</td>
+        <td className={styles.statusCell}>
+          {finding.status === 'CLOSED' && (
+            <span className={styles.statusIconClosed} title="Closed">✓</span>
+          )}
+          {finding.status === 'NEW' && (
+            <span className={styles.statusIcon} title="New Finding">🆕</span>
+          )}
+        </td>
+        <td className={styles.policyCell}>
+          {finding.violates_policy && (
+            <span className={styles.policyViolation} title="Violates Policy">⚠️</span>
+          )}
+        </td>
+        <td className={styles.mitigationCell}>
+          {finding.mitigation_status === 'PROPOSED' && (
+            <span className={styles.mitigationIcon} title="Mitigation Proposed">⏳</span>
+          )}
+          {finding.mitigation_status === 'APPROVED' && (
+            <span className={styles.mitigationIcon} title="Mitigation Approved">👍</span>
+          )}
+          {finding.mitigation_status === 'REJECTED' && (
+            <span className={styles.mitigationIcon} title="Mitigation Rejected">👎</span>
+          )}
+        </td>
       </tr>
       {isExpanded && (
         <tr className={styles.expandedRow}>
-          <td colSpan={8}>
+          <td colSpan={9}>
             <div className={styles.expandedContent}>
               {finding.attack_vector && (
                 <div className={styles.expandedSection}>
