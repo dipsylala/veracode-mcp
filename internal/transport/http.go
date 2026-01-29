@@ -1,4 +1,4 @@
-package main
+package transport
 
 import (
 	"encoding/json"
@@ -8,25 +8,27 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dipsylala/veracodemcp-go/internal/types"
+
 	"github.com/google/uuid"
 )
 
 // HTTPTransport handles JSON-RPC over HTTP with SSE
 type HTTPTransport struct {
-	server  *MCPServer
+	handler RequestHandler
 	clients map[string]*SSEClient
 	mu      sync.RWMutex
 }
 
 type SSEClient struct {
 	id       string
-	messages chan *JSONRPCResponse
+	messages chan *types.JSONRPCResponse
 	done     chan struct{}
 }
 
-func NewHTTPTransport(server *MCPServer) *HTTPTransport {
+func NewHTTPTransport(handler RequestHandler) *HTTPTransport {
 	return &HTTPTransport{
-		server:  server,
+		handler: handler,
 		clients: make(map[string]*SSEClient),
 	}
 }
@@ -63,7 +65,7 @@ func (t *HTTPTransport) handleSSE(w http.ResponseWriter, r *http.Request) {
 	// Create new client
 	client := &SSEClient{
 		id:       uuid.New().String(),
-		messages: make(chan *JSONRPCResponse, 10),
+		messages: make(chan *types.JSONRPCResponse, 10),
 		done:     make(chan struct{}),
 	}
 
@@ -137,14 +139,14 @@ func (t *HTTPTransport) handleMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req JSONRPCRequest
+	var req types.JSONRPCRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid JSON-RPC request", http.StatusBadRequest)
 		return
 	}
 
 	// Process request
-	resp := t.server.HandleRequest(&req)
+	resp := t.handler.HandleRequest(&req)
 
 	// Send response via SSE
 	select {

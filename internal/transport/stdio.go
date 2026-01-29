@@ -1,4 +1,4 @@
-package main
+package transport
 
 import (
 	"bufio"
@@ -8,21 +8,23 @@ import (
 	"log"
 	"os"
 	"sync"
+
+	"github.com/dipsylala/veracodemcp-go/internal/types"
 )
 
 // StdioTransport handles JSON-RPC over stdin/stdout
 type StdioTransport struct {
-	server *MCPServer
-	reader *bufio.Reader
-	writer io.Writer
-	mu     sync.Mutex
+	handler RequestHandler
+	reader  *bufio.Reader
+	writer  io.Writer
+	mu      sync.Mutex
 }
 
-func NewStdioTransport(server *MCPServer) *StdioTransport {
+func NewStdioTransport(handler RequestHandler) *StdioTransport {
 	return &StdioTransport{
-		server: server,
-		reader: bufio.NewReader(os.Stdin),
-		writer: bufio.NewWriter(os.Stdout),
+		handler: handler,
+		reader:  bufio.NewReader(os.Stdin),
+		writer:  bufio.NewWriter(os.Stdout),
 	}
 }
 
@@ -45,7 +47,7 @@ func (t *StdioTransport) Start() error {
 
 		log.Printf("stdio: received message: %s", string(line[:min(len(line), 100)]))
 
-		var req JSONRPCRequest
+		var req types.JSONRPCRequest
 		if err := json.Unmarshal(line, &req); err != nil {
 			log.Printf("stdio: parse error for message: %v", err)
 			// Send parse error without logging to avoid stdio interference
@@ -64,7 +66,7 @@ func min(a, b int) int {
 	return b
 }
 
-func (t *StdioTransport) handleRequest(req *JSONRPCRequest) {
+func (t *StdioTransport) handleRequest(req *types.JSONRPCRequest) {
 	log.Printf("=== INCOMING REQUEST ===")
 	log.Printf("Method: %s (ID: %v)", req.Method, req.ID)
 	if req.Params != nil {
@@ -73,7 +75,7 @@ func (t *StdioTransport) handleRequest(req *JSONRPCRequest) {
 	}
 	log.Printf("========================")
 
-	resp := t.server.HandleRequest(req)
+	resp := t.handler.HandleRequest(req)
 
 	// Only send response if one was returned (notifications return nil)
 	if resp != nil {
@@ -89,7 +91,7 @@ func (t *StdioTransport) handleRequest(req *JSONRPCRequest) {
 	}
 }
 
-func (t *StdioTransport) sendResponse(resp *JSONRPCResponse) error {
+func (t *StdioTransport) sendResponse(resp *types.JSONRPCResponse) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -121,10 +123,10 @@ func (t *StdioTransport) sendResponse(resp *JSONRPCResponse) error {
 }
 
 func (t *StdioTransport) sendError(id interface{}, code int, message string, data interface{}) error {
-	resp := &JSONRPCResponse{
+	resp := &types.JSONRPCResponse{
 		JSONRPC: "2.0",
 		ID:      id,
-		Error: &RPCError{
+		Error: &types.RPCError{
 			Code:    code,
 			Message: message,
 			Data:    data,

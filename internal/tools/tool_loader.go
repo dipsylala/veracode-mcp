@@ -1,14 +1,20 @@
-package main
+package tools
 
 import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
 	"log"
+
+	"github.com/dipsylala/veracodemcp-go/internal/types"
 )
 
-//go:embed tools.json
 var toolsJSON []byte
+
+// SetToolsJSON sets the tools.json data from the main package
+func SetToolsJSON(data []byte) {
+	toolsJSON = data
+}
 
 // ToolDefinition represents a tool definition from JSON
 type ToolDefinition struct {
@@ -51,7 +57,7 @@ func LoadToolDefinitions() (*ToolRegistry, error) {
 }
 
 // ToMCPTool converts a ToolDefinition to an MCP Tool structure
-func (td *ToolDefinition) ToMCPTool() Tool {
+func (td *ToolDefinition) ToMCPTool() types.Tool {
 	// Build input schema from parameter definitions
 	properties := make(map[string]interface{})
 	required := []string{}
@@ -110,7 +116,7 @@ func (td *ToolDefinition) ToMCPTool() Tool {
 		inputSchema["required"] = required
 	}
 
-	return Tool{
+	return types.Tool{
 		Name:        td.Name,
 		Description: td.Description,
 		InputSchema: inputSchema,
@@ -171,8 +177,8 @@ func (tr *ToolRegistry) GetToolByName(name string) *ToolDefinition {
 }
 
 // GetAllMCPTools converts all tool definitions to MCP tools
-func (tr *ToolRegistry) GetAllMCPTools() []Tool {
-	tools := make([]Tool, len(tr.Tools))
+func (tr *ToolRegistry) GetAllMCPTools() []types.Tool {
+	tools := make([]types.Tool, len(tr.Tools))
 	for i, td := range tr.Tools {
 		tools[i] = td.ToMCPTool()
 	}

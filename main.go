@@ -1,12 +1,34 @@
 package main
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/dipsylala/veracodemcp-go/internal/server"
+	"github.com/dipsylala/veracodemcp-go/internal/tools"
 )
+
+//go:embed tools.json
+var toolsJSONData []byte
+
+//go:embed ui/pipeline-results-app/mcp-app.html
+var pipelineResultsHTML string
+
+//go:embed ui/static-findings-app/mcp-app.html
+var staticFindingsHTML string
+
+//go:embed ui/dynamic-findings-app/mcp-app.html
+var dynamicFindingsHTML string
+
+func init() {
+	// Set embedded resources in the internal packages
+	tools.SetToolsJSON(toolsJSONData)
+	server.SetUIResources(pipelineResultsHTML, staticFindingsHTML, dynamicFindingsHTML)
+}
 
 // version can be set at build time with -ldflags="-X main.version=x.y.z"
 var version = "dev"
@@ -32,11 +54,11 @@ func configureLogging(logFilePath string, verbose bool) error {
 }
 
 // runServer starts the MCP server in the specified mode
-func runServer(server *MCPServer, mode, addr string, verbose bool) error {
+func runServer(s *server.MCPServer, mode, addr string, verbose bool) error {
 	switch mode {
 	case "stdio":
 		log.Println("Starting MCP server in stdio mode...")
-		if err := server.ServeStdio(); err != nil {
+		if err := s.ServeStdio(); err != nil {
 			if verbose {
 				log.Fatalf("stdio server error: %v", err)
 			}
@@ -44,7 +66,7 @@ func runServer(server *MCPServer, mode, addr string, verbose bool) error {
 		}
 	case "http":
 		log.Printf("Starting MCP server in http mode on %s...\n", addr)
-		if err := server.ServeHTTP(addr); err != nil {
+		if err := s.ServeHTTP(addr); err != nil {
 			if verbose {
 				log.Fatalf("http server error: %v", err)
 			}
@@ -75,7 +97,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	server, err := NewMCPServer()
+	mcpServer, err := server.NewMCPServer()
 	if err != nil {
 		// Always show server creation errors to stderr, even in non-verbose mode
 		// This is before stdio transport starts, so it won't interfere with JSON-RPC
@@ -83,7 +105,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := runServer(server, *mode, *addr, *verbose); err != nil {
+	if err := runServer(mcpServer, *mode, *addr, *verbose); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
