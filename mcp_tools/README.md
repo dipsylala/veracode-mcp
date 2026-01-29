@@ -22,10 +22,10 @@ This directory contains all MCP tool implementations. **Tools automatically regi
 }
 ```
 
-### Step 2: Create `tools/my_tool.go`
+### Step 2: Create `mcp_tools/my_tool.go`
 
 ```go
-package tools
+package mcp_tools
 
 import (
  "context"
@@ -176,8 +176,8 @@ return nil, fmt.Errorf("critical error: %w", err)
 ## Checklist for New Tool
 
 - [ ] Add definition to `tools.json`
-- [ ] Create `tools/my_tool.go`
-- [ ] Add `package tools` at top
+- [ ] Create `mcp_tools/my_tool.go`
+- [ ] Add `package mcp_tools` at top
 - [ ] Include `init()` with `RegisterTool()`
 - [ ] Implement all interface methods
 - [ ] Run `go build`

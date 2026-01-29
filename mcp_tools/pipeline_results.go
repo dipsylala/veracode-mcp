@@ -1,4 +1,4 @@
-package tools
+package mcp_tools
 
 import (
 	"context"
@@ -252,20 +252,29 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 		responseJSON, _ = json.Marshal(response) // Fall back to compact JSON
 	}
 
-	log.Printf("Pipeline results: Returning %d findings from %s (content: JSON, structuredContent: full data for UI)", len(response.Findings), resultsFile)
-
-	// Return MCP response with content and structured data
-	// - content: Full JSON data (for LLM and non-UI clients)
-	// - structuredContent: Full structured data (for MCP Apps UI rendering)
-	return map[string]interface{}{
+	// Build result with content
+	result := map[string]interface{}{
 		"content": []map[string]interface{}{
 			{
 				"type": "text",
 				"text": string(responseJSON),
 			},
 		},
-		"structuredContent": response,
 	}
+
+	// Only include structuredContent if client supports MCP Apps UI
+	// This can be forced via --force-mcp-app flag
+	clientSupportsUI := ClientSupportsUIFromContext(ctx)
+	log.Printf("[PIPELINE-RESULTS] ClientSupportsUIFromContext(ctx) returned: %v", clientSupportsUI)
+
+	if clientSupportsUI {
+		log.Printf("Pipeline results: Returning %d findings from %s (content: JSON, structuredContent: full data for UI)", len(response.Findings), resultsFile)
+		result["structuredContent"] = response
+	} else {
+		log.Printf("Pipeline results: Returning %d findings from %s (content: JSON only, no structuredContent - client doesn't support UI)", len(response.Findings), resultsFile)
+	}
+
+	return result
 }
 
 // processPipelineFinding converts a pipeline flaw to MCP finding format

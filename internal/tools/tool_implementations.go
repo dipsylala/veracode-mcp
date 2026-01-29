@@ -3,23 +3,23 @@ package tools
 import (
 	"log"
 
-	"github.com/dipsylala/veracodemcp-go/tools"
+	"github.com/dipsylala/veracodemcp-go/mcp_tools"
 )
 
 // ToolImplRegistry manages all loaded tool implementations
 type ToolImplRegistry struct {
-	tools map[string]tools.ToolImplementation
+	tools map[string]mcp_tools.ToolImplementation
 }
 
 // NewToolImplRegistry creates a new tool implementation registry
 func NewToolImplRegistry() *ToolImplRegistry {
 	return &ToolImplRegistry{
-		tools: make(map[string]tools.ToolImplementation),
+		tools: make(map[string]mcp_tools.ToolImplementation),
 	}
 }
 
 // Register adds a tool implementation to the registry with its registered name
-func (r *ToolImplRegistry) Register(name string, tool tools.ToolImplementation) error {
+func (r *ToolImplRegistry) Register(name string, tool mcp_tools.ToolImplementation) error {
 	if _, exists := r.tools[name]; exists {
 		return nil // Already registered, skip
 	}
@@ -34,14 +34,14 @@ func (r *ToolImplRegistry) Register(name string, tool tools.ToolImplementation) 
 }
 
 // Get retrieves a tool implementation by name
-func (r *ToolImplRegistry) Get(name string) (tools.ToolImplementation, bool) {
+func (r *ToolImplRegistry) Get(name string) (mcp_tools.ToolImplementation, bool) {
 	tool, exists := r.tools[name]
 	return tool, exists
 }
 
 // GetAll returns all registered tool implementations
-func (r *ToolImplRegistry) GetAll() []tools.ToolImplementation {
-	result := make([]tools.ToolImplementation, 0, len(r.tools))
+func (r *ToolImplRegistry) GetAll() []mcp_tools.ToolImplementation {
+	result := make([]mcp_tools.ToolImplementation, 0, len(r.tools))
 	for _, tool := range r.tools {
 		result = append(result, tool)
 	}
@@ -61,7 +61,7 @@ func (r *ToolImplRegistry) ShutdownAll() {
 // Tools are automatically discovered via init() functions in the tools package
 func LoadAllTools(registry *ToolImplRegistry, handlerRegistry *ToolHandlerRegistry) error {
 	// Get all auto-registered tools from the tools package
-	allTools := tools.GetAllTools()
+	allTools := mcp_tools.GetAllTools()
 
 	for _, regTool := range allTools {
 		// Register the tool in the implementation registry (this also initializes it)

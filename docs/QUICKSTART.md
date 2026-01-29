@@ -28,12 +28,12 @@ Add your tool definition to the `tools.json` file in the root directory:
 }
 ```
 
-### 2. Create implementation in `tools/` directory
+### 2. Create implementation in `mcp_tools/` directory
 
-Create `tools/your_tool.go`:
+Create `mcp_tools/your_tool.go`:
 
 ```go
-package tools
+package mcp_tools
 
 import (
 	"context"
@@ -94,13 +94,13 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | .\mcp-server.exe -mode s
 
 Two files to touch:
 1. `tools.json` - Define parameters and description
-2. `tools/your_tool.go` - Implement the logic with auto-registration
+2. `mcp_tools/your_tool.go` - Implement the logic with auto-registration
 
 Then build and run. Your tool is now available via MCP!
 
 ## Tips
 
-- Copy `tools/dynamic_findings.go` as a template
+- Copy `mcp_tools/dynamic_findings.go` as a template
 - Tool name in code MUST match name in tools.json
 - Validate all required parameters in your handler
 - Return structured, readable text output

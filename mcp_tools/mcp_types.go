@@ -1,4 +1,4 @@
-package tools
+package mcp_tools
 
 // MCPFindingsResponse represents the complete MCP response for findings
 type MCPFindingsResponse struct {

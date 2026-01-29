@@ -3,10 +3,10 @@ package types
 // Tool represents a tool available through the MCP protocol.
 // This structure defines how tools are presented to MCP clients.
 type Tool struct {
-	Name        string      `json:"name"`           // Unique identifier for the tool
-	Description string      `json:"description"`    // Human-readable description
-	InputSchema interface{} `json:"inputSchema"`    // JSON Schema for tool parameters
-	Meta        interface{} `json:"meta,omitempty"` // Optional metadata (UI hints, etc.)
+	Name        string                 `json:"name"`            // Unique identifier for the tool
+	Description string                 `json:"description"`     // Human-readable description
+	InputSchema interface{}            `json:"inputSchema"`     // JSON Schema for tool parameters
+	Meta        map[string]interface{} `json:"_meta,omitempty"` // Optional metadata (UI hints, etc.) - underscore prefix per MCP spec
 }
 
 // JSONRPCRequest represents an incoming JSON-RPC 2.0 request.
@@ -51,9 +51,10 @@ type CallToolParams struct {
 // CallToolResult represents the response from a tools/call request.
 // Contains the tool's output in a structured format.
 type CallToolResult struct {
-	Content []Content   `json:"content"`           // Tool output content
-	IsError bool        `json:"isError,omitempty"` // Whether this represents an error
-	Meta    interface{} `json:"meta,omitempty"`    // Additional metadata
+	Content           []Content   `json:"content"`                     // Tool output content
+	IsError           bool        `json:"isError,omitempty"`           // Whether this represents an error
+	Meta              interface{} `json:"meta,omitempty"`              // Additional metadata
+	StructuredContent interface{} `json:"structuredContent,omitempty"` // Structured data for MCP Apps UI
 }
 
 // Content represents a piece of content in MCP responses.

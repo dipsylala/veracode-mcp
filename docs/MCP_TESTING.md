@@ -26,7 +26,7 @@ Tests the core MCP server functionality:
 go test -v -run "TestLoad|TestToMCP|TestServer" -short
 ```
 
-### 2. Tool Registry Tests ([tools/registry_test.go](tools/registry_test.go))
+### 2. Tool Registry Tests ([tools/registry_test.go](mcp_tools/registry_test.go))
 
 Tests the tool registration system:
 - Tool registration and retrieval
@@ -252,7 +252,7 @@ Typical test execution times:
 
 To add tests for new MCP tools:
 
-1. **Add tool implementation**: Create new file in `tools/` directory
+1. **Add tool implementation**: Create new file in `mcp_tools/` directory
 2. **Auto-registration**: Tool registers via `init()` function
 3. **Add to expected tools**: Update `mcp_integration_test.go` expectedTools list
 4. **Create specific test**: Add `TestMCPToolCall_YourNewTool()` function
@@ -260,8 +260,8 @@ To add tests for new MCP tools:
 
 ## Related Documentation
 
-- [MCP Tools README](tools/README.md) - Tool implementation guide
-- [Tool Testing Guide](tools/TESTING.md) - Detailed tool testing documentation
+- [MCP Tools README](mcp_tools/README.md) - Tool implementation guide
+- [Tool Testing Guide](mcp_tools/TESTING.md) - Detailed tool testing documentation
 - [API Integration Tests](api/README.md) - Low-level API testing
 
 ## Summary

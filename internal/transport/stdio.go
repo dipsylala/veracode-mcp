@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/dipsylala/veracodemcp-go/internal/types"
@@ -95,10 +96,30 @@ func (t *StdioTransport) sendResponse(resp *types.JSONRPCResponse) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
+	// Debug: Check for structuredContent before marshaling
+	if resp.Result != nil {
+		if ctr, ok := resp.Result.(*types.CallToolResult); ok {
+			log.Printf("[STDIO] Before JSON marshal: hasStructuredContent=%v", ctr.StructuredContent != nil)
+		}
+	}
+
 	data, err := json.Marshal(resp)
 	if err != nil {
 		log.Printf("stdio: marshal error: %v", err)
 		return fmt.Errorf("marshal error: %w", err)
+	}
+
+	// Debug: Check if structuredContent is in the JSON
+	if resp.Result != nil {
+		log.Printf("[STDIO] JSON output length: %d bytes", len(data))
+		jsonStr := string(data)
+		hasStructuredContent := contains(jsonStr, `"structuredContent":`)
+		log.Printf("[STDIO] JSON actually contains 'structuredContent': %v", hasStructuredContent)
+		if len(data) < 2000 {
+			log.Printf("[STDIO] JSON output: %s", jsonStr)
+		} else {
+			log.Printf("[STDIO] JSON preview (first 2000 chars): %s", jsonStr[0:min(2000, len(data))])
+		}
 	}
 
 	log.Printf("stdio: sending response (first 100 chars): %s", string(data[:min(len(data), 100)]))
@@ -120,6 +141,10 @@ func (t *StdioTransport) sendResponse(resp *types.JSONRPCResponse) error {
 	}
 
 	return nil
+}
+
+func contains(s, substr string) bool {
+	return strings.Contains(s, substr)
 }
 
 func (t *StdioTransport) sendError(id interface{}, code int, message string, data interface{}) error {

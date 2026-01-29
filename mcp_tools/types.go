@@ -1,19 +1,30 @@
-package tools
+package mcp_tools
 
-import "context"
+import (
+	"context"
+	"log"
+)
 
-// Context key for UI capability
+// Context key for UI capability (exported for use by server package)
 type contextKey string
 
-const uiCapabilityKey contextKey = "uiCapability"
+// UICapabilityKey is the context key for UI capability information
+const UICapabilityKey contextKey = "veracode-mcp:ui-capability"
 
 // ClientSupportsUIFromContext retrieves UI capability from context
 // Returns true if the client supports MCP Apps UI (text/html;profile=mcp-app)
 func ClientSupportsUIFromContext(ctx context.Context) bool {
-	if val := ctx.Value(uiCapabilityKey); val != nil {
+	val := ctx.Value(UICapabilityKey)
+	log.Printf("[UI-CONTEXT] Context value for UICapabilityKey: %v (type: %T)", val, val)
+
+	if val != nil {
 		if supportsUI, ok := val.(bool); ok {
+			log.Printf("[UI-CONTEXT] Returning: %v", supportsUI)
 			return supportsUI
 		}
+		log.Printf("[UI-CONTEXT] Value was not a bool, returning false")
+	} else {
+		log.Printf("[UI-CONTEXT] Value was nil, returning false")
 	}
 	return false
 }

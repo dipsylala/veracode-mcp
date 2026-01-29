@@ -6,14 +6,14 @@ import (
 	"log"
 
 	"github.com/dipsylala/veracodemcp-go/internal/types"
-	"github.com/dipsylala/veracodemcp-go/tools"
+	"github.com/dipsylala/veracodemcp-go/mcp_tools"
 )
 
 // ToolManager consolidates all tool-related registries and provides a unified
 // interface for tool management. It coordinates between tool definitions,
 // handler functions, and implementation instances.
 type ToolManager struct {
-	definitions     *ToolRegistry        // Tool schemas from tools.json
+	definitions     *ToolRegistry        // Tool schemas from mcp_tools.json
 	handlers        *ToolHandlerRegistry // Handler function mappings
 	implementations *ToolImplRegistry    // Tool implementation instances
 }
@@ -21,7 +21,7 @@ type ToolManager struct {
 // NewToolManager creates a new tool manager with all necessary registries.
 // It loads tool definitions, initializes registries, and prepares for tool registration.
 func NewToolManager() (*ToolManager, error) {
-	// Load tool definitions from tools.json
+	// Load tool definitions from mcp_tools.json
 	definitions, err := LoadToolDefinitions()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load tool definitions: %w", err)
@@ -44,7 +44,7 @@ func NewToolManager() (*ToolManager, error) {
 // This discovers tools automatically and registers their handlers.
 func (tm *ToolManager) LoadAllTools() error {
 	// Get all auto-registered tools from the tools package
-	allTools := tools.GetAllTools()
+	allTools := mcp_tools.GetAllTools()
 
 	for _, regTool := range allTools {
 		// Register the tool in the implementation registry (this also initializes it)
@@ -85,7 +85,7 @@ func (tm *ToolManager) GetToolHandler(name string) (func(context.Context, map[st
 
 // GetToolImplementation retrieves a tool implementation by name.
 // Returns the implementation and a boolean indicating whether it was found.
-func (tm *ToolManager) GetToolImplementation(name string) (tools.ToolImplementation, bool) {
+func (tm *ToolManager) GetToolImplementation(name string) (mcp_tools.ToolImplementation, bool) {
 	return tm.implementations.Get(name)
 }
 
@@ -150,12 +150,9 @@ func (tm *ToolManager) GetStats() ToolManagerStats {
 
 	// Count UI-enabled tools
 	for _, tool := range allTools {
-		if tool.Meta != nil {
-			// Type assert to map[string]interface{} before indexing
-			if metaMap, ok := tool.Meta.(map[string]interface{}); ok {
-				if _, hasUI := metaMap["ui"]; hasUI {
-					stats.ToolsWithUI++
-				}
+		if len(tool.Meta) > 0 {
+			if _, hasUI := tool.Meta["ui"]; hasUI {
+				stats.ToolsWithUI++
 			}
 		}
 	}

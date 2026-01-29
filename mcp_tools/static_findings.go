@@ -1,4 +1,4 @@
-package tools
+package mcp_tools
 
 import (
 	"context"
@@ -322,20 +322,26 @@ func formatStaticFindingsResponse(ctx context.Context, appPath, appProfile, appl
 		responseJSON, _ = json.Marshal(response) // Fall back to compact JSON
 	}
 
-	log.Printf("Static findings: Returning %d findings (content: JSON, structuredContent: full data for UI)", len(response.Findings))
-
-	// Return MCP response with content and structured data
-	// - content: Full JSON data (for LLM and non-UI clients)
-	// - structuredContent: Full structured data (for MCP Apps UI rendering)
-	return map[string]interface{}{
+	// Build result with content
+	result := map[string]interface{}{
 		"content": []map[string]interface{}{
 			{
 				"type": "text",
 				"text": string(responseJSON),
 			},
 		},
-		"structuredContent": response,
 	}
+
+	// Only include structuredContent if client supports MCP Apps UI
+	// This can be forced via --force-mcp-app flag
+	if ClientSupportsUIFromContext(ctx) {
+		log.Printf("Static findings: Returning %d findings (content: JSON, structuredContent: full data for UI)", len(response.Findings))
+		result["structuredContent"] = response
+	} else {
+		log.Printf("Static findings: Returning %d findings (content: JSON only, no structuredContent - client doesn't support UI)", len(response.Findings))
+	}
+
+	return result
 }
 
 // processStaticFinding transforms a single API finding into an MCP finding

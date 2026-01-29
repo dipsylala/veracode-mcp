@@ -1,4 +1,4 @@
-package tools
+package mcp_tools
 
 // VeracodeExitCodeInfo contains information about a Veracode CLI exit code
 type VeracodeExitCodeInfo struct {

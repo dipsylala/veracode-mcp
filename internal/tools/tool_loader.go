@@ -4,14 +4,13 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/dipsylala/veracodemcp-go/internal/types"
 )
 
 var toolsJSON []byte
 
-// SetToolsJSON sets the tools.json data from the main package
+// SetToolsJSON sets the mcp_tools.json data from the main package
 func SetToolsJSON(data []byte) {
 	toolsJSON = data
 }
@@ -125,45 +124,45 @@ func (td *ToolDefinition) ToMCPTool() types.Tool {
 }
 
 // GetToolMeta returns tool metadata including UI configuration if applicable
+// Note: This returns the static metadata. UI metadata is added dynamically
+// in handleListTools based on client capabilities.
 func (td *ToolDefinition) GetToolMeta() map[string]interface{} {
-	// Add UI metadata for tools with interactive UIs
+	// Base metadata can be added here
+	// UI metadata is added conditionally in server based on client support
+	return nil
+}
+
+// GetUIMetaForTool returns UI metadata for tools that have interactive UIs
+func GetUIMetaForTool(toolName string) map[string]interface{} {
 	// Provide BOTH formats for maximum compatibility:
 	// - Flat key "ui/resourceUri" (MCP Apps legacy format)
 	// - Nested "ui.resourceUri" (MCP Apps current format)
 
-	log.Printf("GetToolMeta called for tool: %s", td.Name)
-
-	if td.Name == "pipeline-results" {
-		meta := map[string]interface{}{
+	switch toolName {
+	case "pipeline-results":
+		return map[string]interface{}{
 			"ui/resourceUri": "ui://pipeline-results/app.html",
 			"ui": map[string]interface{}{
 				"resourceUri": "ui://pipeline-results/app.html",
 			},
 		}
-		log.Printf("Returning UI metadata for pipeline-results: %+v", meta)
-		return meta
-	}
-	if td.Name == "static-findings" {
-		meta := map[string]interface{}{
+	case "static-findings":
+		return map[string]interface{}{
 			"ui/resourceUri": "ui://static-findings/app.html",
 			"ui": map[string]interface{}{
 				"resourceUri": "ui://static-findings/app.html",
 			},
 		}
-		log.Printf("Returning UI metadata for static-findings: %+v", meta)
-		return meta
-	}
-	if td.Name == "dynamic-findings" {
-		meta := map[string]interface{}{
+	case "dynamic-findings":
+		return map[string]interface{}{
 			"ui/resourceUri": "ui://dynamic-findings/app.html",
 			"ui": map[string]interface{}{
 				"resourceUri": "ui://dynamic-findings/app.html",
 			},
 		}
-		log.Printf("Returning UI metadata for dynamic-findings: %+v", meta)
-		return meta
+	default:
+		return nil
 	}
-	return nil
 }
 
 // GetToolByName finds a tool definition by name

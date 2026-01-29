@@ -11,12 +11,11 @@ import (
 	"github.com/dipsylala/veracodemcp-go/internal/tools"
 	"github.com/dipsylala/veracodemcp-go/internal/transport"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
+	"github.com/dipsylala/veracodemcp-go/mcp_tools"
 )
 
-// Context key for UI capability
-type contextKey string
-
-const uiCapabilityKey contextKey = "uiCapability"
+// Context key for UI capability (using plain string for cross-package compatibility)
+const uiCapabilityKey = mcp_tools.UICapabilityKey
 
 // MCP protocol constants
 const (
@@ -29,17 +28,6 @@ const (
 // This allows tools to adapt their output based on client UI support.
 func WithUICapability(ctx context.Context, supportsUI bool) context.Context {
 	return context.WithValue(ctx, uiCapabilityKey, supportsUI)
-}
-
-// ClientSupportsUIFromContext retrieves UI capability from context.
-// Returns true if the client supports MCP Apps UI (text/html;profile=mcp-app).
-func ClientSupportsUIFromContext(ctx context.Context) bool {
-	if val := ctx.Value(uiCapabilityKey); val != nil {
-		if supportsUI, ok := val.(bool); ok {
-			return supportsUI
-		}
-	}
-	return false
 }
 
 var embeddedPipelineResultsHTML string
@@ -58,6 +46,7 @@ func SetUIResources(pipeline, staticFindings, dynamicFindings string) {
 type MCPServer struct {
 	initialized      bool
 	clientSupportsUI bool
+	forceMCPApp      bool // Override to always send structuredContent
 	capabilities     ServerCapabilities
 	tools            []types.Tool
 	toolManager      *tools.ToolManager
@@ -65,14 +54,15 @@ type MCPServer struct {
 
 // NewMCPServer creates a new MCP server instance with all necessary registries.
 // It loads tool definitions, initializes registries, and prepares tool handlers.
-func NewMCPServer() (*MCPServer, error) {
-	// Create unified tool manager
+func NewMCPServer(forceMCPApp bool) (*MCPServer, error) {
+	// Create tool manager
 	toolManager, err := tools.NewToolManager()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create tool manager: %w", err)
 	}
 
 	s := &MCPServer{
+		forceMCPApp: forceMCPApp,
 		capabilities: ServerCapabilities{
 			Tools: &ToolsCapability{
 				ListChanged: false,

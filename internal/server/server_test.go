@@ -3,15 +3,34 @@ package server
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/dipsylala/veracodemcp-go/internal/tools"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
 )
 
+// TestMain sets up test fixtures before running tests
+func TestMain(m *testing.M) {
+	// Load tools.json for tests
+	// Navigate up from internal/server to project root
+	toolsJSONPath := filepath.Join("..", "..", "tools.json")
+	// #nosec G304 -- toolsJSONPath is a fixed test fixture path, not user input
+	toolsJSONData, err := os.ReadFile(toolsJSONPath)
+	if err != nil {
+		panic("Failed to read tools.json for tests: " + err.Error())
+	}
+
+	// Set the tools JSON data
+	tools.SetToolsJSON(toolsJSONData)
+
+	// Run tests
+	os.Exit(m.Run())
+}
+
 func TestLoadToolDefinitions(t *testing.T) {
 	// Create a server which initializes the ToolManager internally
-	server, err := NewMCPServer()
+	server, err := NewMCPServer(false)
 	if err != nil {
 		t.Fatalf("Failed to create server with tool manager: %v", err)
 	}
@@ -57,7 +76,7 @@ func TestLoadToolDefinitions(t *testing.T) {
 
 func TestToMCPTool(t *testing.T) {
 	// Create a server which initializes the ToolManager internally
-	server, err := NewMCPServer()
+	server, err := NewMCPServer(false)
 	if err != nil {
 		t.Fatalf("Failed to create server with tool manager: %v", err)
 	}
@@ -130,7 +149,7 @@ func TestServerInitialization(t *testing.T) {
 // Helper functions for TestServerInitialization
 
 func createTestServer(t *testing.T) *MCPServer {
-	server, err := NewMCPServer()
+	server, err := NewMCPServer(false)
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}
@@ -208,7 +227,7 @@ func validateToolManagerStats(t *testing.T, server *MCPServer) {
 }
 
 func TestToolCallHandling(t *testing.T) {
-	server, err := NewMCPServer()
+	server, err := NewMCPServer(false)
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}
@@ -408,7 +427,7 @@ func TestToolManagerStatistics(t *testing.T) {
 }
 
 func TestServerRefactoredHandlers(t *testing.T) {
-	server, err := NewMCPServer()
+	server, err := NewMCPServer(false)
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}

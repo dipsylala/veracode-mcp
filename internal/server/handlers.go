@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/dipsylala/veracodemcp-go/internal/tools"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
@@ -72,25 +73,37 @@ func (s *MCPServer) handleToolsCallRequest(req *types.JSONRPCRequest, resp *type
 // handleResourcesReadRequest processes resource read requests.
 // This is used for serving UI applications and other static resources.
 func (s *MCPServer) handleResourcesReadRequest(req *types.JSONRPCRequest, resp *types.JSONRPCResponse) {
-	log.Printf(">>> resources/read called - this should load the UI HTML!")
+	log.Printf("\n╔════════════════════════════════════════╗")
+	log.Printf("║    🎨 RESOURCES/READ CALLED! 🎨       ║")
+	log.Printf("╚════════════════════════════════════════╝")
 
 	// Convert params to json.RawMessage for processing
 	var paramsRaw json.RawMessage
 	if req.Params != nil {
 		if paramsBytes, err := json.Marshal(req.Params); err == nil {
 			paramsRaw = paramsBytes
+			log.Printf("[RESOURCES/READ] Request params: %s", string(paramsBytes))
 		}
 	}
 
 	result, err := s.handleReadResource(paramsRaw)
 	if err != nil {
+		log.Printf("[RESOURCES/READ] ❌ ERROR: %v", err)
 		resp.Error = &types.RPCError{
 			Code:    -32603,
 			Message: err.Error(),
 		}
 	} else {
+		if result != nil && len(result.Contents) > 0 {
+			log.Printf("[RESOURCES/READ] ✅ SUCCESS: Serving %d content items", len(result.Contents))
+			for _, content := range result.Contents {
+				log.Printf("[RESOURCES/READ]   - URI: %s, MimeType: %s, Size: %d bytes",
+					content.URI, content.MimeType, len(content.Text))
+			}
+		}
 		resp.Result = result
 	}
+	log.Printf("╚════════════════════════════════════════╝\n")
 }
 
 // handleInitialize processes the initialize request and establishes
@@ -119,7 +132,9 @@ func (s *MCPServer) parseInitParams(params json.RawMessage) (*InitializeParams, 
 
 // logClientInfo logs detailed information about the connecting client for debugging.
 func (s *MCPServer) logClientInfo(initParams *InitializeParams) {
-	log.Printf("=== CLIENT INITIALIZATION ===")
+	log.Printf("\n╔════════════════════════════════════════╗")
+	log.Printf("║      CLIENT INITIALIZATION              ║")
+	log.Printf("╚════════════════════════════════════════╝")
 	log.Printf("Client Name: %s", initParams.ClientInfo.Name)
 	log.Printf("Client Version: %s", initParams.ClientInfo.Version)
 	log.Printf("Protocol Version: %s", initParams.ProtocolVersion)
@@ -127,6 +142,7 @@ func (s *MCPServer) logClientInfo(initParams *InitializeParams) {
 	// Log full capabilities structure for debugging
 	capsJSON, _ := json.MarshalIndent(initParams.Capabilities, "", "  ")
 	log.Printf("Client Capabilities (raw):\n%s", string(capsJSON))
+	log.Printf("╚════════════════════════════════════════╝\n")
 }
 
 // buildInitializeResult constructs the response for the initialize request
@@ -152,30 +168,48 @@ func (s *MCPServer) buildInitializeResult(initParams *InitializeParams) *Initial
 }
 
 // handleListTools returns the list of available tools with their schemas.
-// Debug logging is included for UI tools to ensure proper metadata registration.
+// Conditionally adds UI metadata based on client capabilities.
 func (s *MCPServer) handleListTools() *types.ListToolsResult {
+	// Create a copy of tools with conditional UI metadata
+	toolsList := make([]types.Tool, len(s.tools))
+	copy(toolsList, s.tools)
+
+	// Add UI metadata only if client supports it (or forced via flag)
+	log.Printf("[TOOLS] s.clientSupportsUI=%v, s.forceMCPApp=%v", s.clientSupportsUI, s.forceMCPApp)
+	if s.clientSupportsUI {
+		log.Printf("[TOOLS] Client supports UI - adding UI metadata to tool definitions")
+		for i := range toolsList {
+			if uiMeta := tools.GetUIMetaForTool(toolsList[i].Name); uiMeta != nil {
+				toolsList[i].Meta = uiMeta
+				log.Printf("[TOOLS] Added UI metadata to %s: %+v", toolsList[i].Name, uiMeta)
+			}
+		}
+	} else {
+		log.Printf("[TOOLS] Client does NOT support UI - omitting UI metadata from tool definitions")
+	}
+
 	result := &types.ListToolsResult{
-		Tools: s.tools,
+		Tools: toolsList,
 	}
 
 	// Debug: log metadata for UI tools
 	for _, tool := range result.Tools {
-		if tool.Name == "pipeline-results" || tool.Name == "get-static-findings" {
-			if tool.Meta != nil {
-				if metaMap, ok := tool.Meta.(map[string]interface{}); ok {
-					flatUri, _ := metaMap["ui/resourceUri"].(string)
-					nestedUI, _ := metaMap["ui"].(map[string]interface{})
-					var nestedUri string
-					if nestedUI != nil {
-						nestedUri, _ = nestedUI["resourceUri"].(string)
-					}
-					log.Printf("%s tool has UI metadata: flat='%s', nested='%s', full=%+v",
-						tool.Name, flatUri, nestedUri, tool.Meta)
-				} else {
-					log.Printf("WARNING: %s tool metadata is not a map!", tool.Name)
+		if tool.Name == "pipeline-results" || tool.Name == "static-findings" || tool.Name == "dynamic-findings" {
+			if len(tool.Meta) > 0 {
+				flatUri, _ := tool.Meta["ui/resourceUri"].(string)
+				nestedUI, _ := tool.Meta["ui"].(map[string]interface{})
+				var nestedUri string
+				if nestedUI != nil {
+					nestedUri, _ = nestedUI["resourceUri"].(string)
 				}
+				log.Printf("[TOOLS/LIST] %s tool has UI metadata: flat='%s', nested='%s'",
+					tool.Name, flatUri, nestedUri)
+
+				// Log the full tool as JSON to see what's actually being sent
+				toolJSON, _ := json.MarshalIndent(tool, "  ", "  ")
+				log.Printf("[TOOLS/LIST] Full %s tool JSON:\n%s", tool.Name, string(toolJSON))
 			} else {
-				log.Printf("WARNING: %s tool has NO UI metadata!", tool.Name)
+				log.Printf("[TOOLS/LIST] WARNING: %s tool has NO UI metadata!", tool.Name)
 			}
 		}
 	}
@@ -241,7 +275,12 @@ func (s *MCPServer) executeToolCall(handler func(context.Context, map[string]int
 	}
 
 	// Convert the result to CallToolResult format
-	return tools.ConvertToCallToolResult(result), nil
+	converted := tools.ConvertToCallToolResult(result)
+	log.Printf("[HANDLER] After conversion: hasStructuredContent=%v", converted.StructuredContent != nil)
+	if converted.StructuredContent != nil {
+		log.Printf("[HANDLER] StructuredContent type=%T", converted.StructuredContent)
+	}
+	return converted, nil
 }
 
 // createToolError creates a standardized error response for tool calls.
@@ -255,7 +294,7 @@ func (s *MCPServer) createToolError(message string) *types.CallToolResult {
 // handleListResources returns available resources including UI applications.
 // Resources provide static content like HTML UIs for interactive tools.
 func (s *MCPServer) handleListResources() *ListResourcesResult {
-	return &ListResourcesResult{
+	result := &ListResourcesResult{
 		Resources: []Resource{
 			{
 				URI:         "resource://example/hello",
@@ -283,6 +322,15 @@ func (s *MCPServer) handleListResources() *ListResourcesResult {
 			},
 		},
 	}
+
+	log.Printf("[RESOURCES/LIST] Returning %d resources", len(result.Resources))
+	for _, res := range result.Resources {
+		if strings.HasPrefix(res.URI, "ui://") {
+			log.Printf("[RESOURCES/LIST] UI Resource: %s (%s)", res.URI, res.MimeType)
+		}
+	}
+
+	return result
 }
 
 // handleReadResource serves the content for a specific resource URI.
@@ -293,7 +341,7 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 		return nil, fmt.Errorf("invalid read resource params: %w", err)
 	}
 
-	log.Printf("Reading resource: %s", readParams.URI)
+	log.Printf("[RESOURCES/READ] Requested URI: %s", readParams.URI)
 
 	switch readParams.URI {
 	case "resource://example/hello":
@@ -308,17 +356,29 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 		}, nil
 
 	case "ui://pipeline-results/app.html":
+		log.Printf("[RESOURCES/READ] 🎯 Serving Pipeline Results UI - HTML length: %d bytes", len(embeddedPipelineResultsHTML))
+		if len(embeddedPipelineResultsHTML) < 1000 {
+			log.Printf("[RESOURCES/READ] ⚠️  WARNING: HTML is suspiciously small! May not be built correctly.")
+		}
 		return s.serveUIResource(readParams.URI, embeddedPipelineResultsHTML)
 
 	case "ui://static-findings/app.html":
-		log.Printf("Serving static findings UI - HTML length: %d bytes", len(embeddedStaticFindingsHTML))
+		log.Printf("[RESOURCES/READ] 🎯 Serving Static Findings UI - HTML length: %d bytes", len(embeddedStaticFindingsHTML))
+		if len(embeddedStaticFindingsHTML) < 1000 {
+			log.Printf("[RESOURCES/READ] ⚠️  WARNING: HTML is suspiciously small! May not be built correctly.")
+		}
 		return s.serveUIResource(readParams.URI, embeddedStaticFindingsHTML)
 
 	case "ui://dynamic-findings/app.html":
-		log.Printf("Serving dynamic findings UI - HTML length: %d bytes", len(embeddedDynamicFindingsHTML))
+		log.Printf("[RESOURCES/READ] 🎯 Serving Dynamic Findings UI - HTML length: %d bytes", len(embeddedDynamicFindingsHTML))
+		if len(embeddedDynamicFindingsHTML) < 1000 {
+			log.Printf("[RESOURCES/READ] ⚠️  WARNING: HTML is suspiciously small! May not be built correctly.")
+		}
 		return s.serveUIResource(readParams.URI, embeddedDynamicFindingsHTML)
 
 	default:
+		log.Printf("[RESOURCES/READ] ❌ Resource not found: %s", readParams.URI)
+		log.Printf("[RESOURCES/READ] Available URIs: ui://pipeline-results/app.html, ui://static-findings/app.html, ui://dynamic-findings/app.html")
 		return nil, fmt.Errorf("resource not found: %s", readParams.URI)
 	}
 }

@@ -53,7 +53,7 @@ VeracodeMCP-Go/
 - ✅ Business logic (filtering, pagination)
 - ✅ Reusable across multiple tools
 
-**Tools** (`tools/`):
+**Tools** (`mcp_tools/`):
 
 - ✅ MCP tool implementations
 - ✅ Import api package only (not generated)

@@ -54,8 +54,35 @@ func convertMapToCallToolResult(resultMap map[string]interface{}) *types.CallToo
 		result.Meta = meta
 	}
 
-	// If we have content or meta, return the result
-	if len(result.Content) > 0 || result.Meta != nil {
+	// Check for structuredContent field (for MCP Apps UI data)
+	// Always include this if present - UI capability is checked elsewhere
+	if structuredContent, hasStructured := resultMap["structuredContent"]; hasStructured {
+		log.Printf("[CONVERTER] Found structuredContent in map, type=%T, nil=%v", structuredContent, structuredContent == nil)
+		// Try direct assignment first (if already map[string]interface{})
+		if sc, ok := structuredContent.(map[string]interface{}); ok {
+			result.StructuredContent = sc
+		} else {
+			// Convert struct to map[string]interface{} via JSON
+			// This is necessary because tool results often return structs
+			// but MCP protocol requires map[string]interface{}
+			scJSON, err := json.Marshal(structuredContent)
+			if err == nil {
+				var scMap map[string]interface{}
+				if unmarshalErr := json.Unmarshal(scJSON, &scMap); unmarshalErr == nil {
+					result.StructuredContent = scMap
+					log.Printf("[CONVERTER] Converted structuredContent from %T to map[string]interface{}", structuredContent)
+				} else {
+					log.Printf("[CONVERTER] Failed to unmarshal structuredContent: %v", unmarshalErr)
+				}
+			} else {
+				log.Printf("[CONVERTER] Failed to marshal structuredContent: %v", err)
+			}
+		}
+		log.Printf("[CONVERTER] Set result.StructuredContent, type=%T, nil=%v", result.StructuredContent, result.StructuredContent == nil)
+	}
+
+	// If we have content, meta, or structuredContent, return the result
+	if len(result.Content) > 0 || result.Meta != nil || result.StructuredContent != nil {
 		return result
 	}
 

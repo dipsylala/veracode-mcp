@@ -31,10 +31,10 @@ This auto-registration pattern provides:
 
 ### Step 1: Create Tool File
 
-Create `tools/your_tool.go`:
+Create `mcp_tools/your_tool.go`:
 
 ```go
-package tools
+package mcp_tools
 
 import (
     "context"
