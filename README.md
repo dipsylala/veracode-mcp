@@ -126,21 +126,41 @@ See [credentials/README.md](credentials/README.md) for detailed information.
 ```bash
 .\dist\veracode-mcp.exe [options]
 
-# Basic usage (silent mode, no logging)
+Options:
+  -mode string
+        Server mode: stdio or http (default "stdio")
+  -addr string
+        HTTP server address, only used in http mode (default ":8080")
+  -verbose
+        Enable verbose logging to stderr (disabled by default)
+  -log string
+        Log file path for debugging (recommended for stdio mode)
+  -force-mcp-app
+        Force MCP Apps mode (always send structuredContent regardless of client capabilities)
+  -version
+        Display version information
+```
+
+**Usage Examples:**
+
+```bash
+# Basic usage (silent mode, stdio transport)
 .\dist\veracode-mcp.exe
 
 # With debug logging to file (recommended for troubleshooting)
 .\dist\veracode-mcp.exe -log veracode-mcp.log
 
-# With verbose logging to stderr
+# With verbose logging to stderr (avoid in stdio mode with MCP clients)
 .\dist\veracode-mcp.exe -verbose
+
+# HTTP mode on custom port
+.\dist\veracode-mcp.exe -mode http -addr :9000
+
+# Force MCP Apps UI mode
+.\dist\veracode-mcp.exe -force-mcp-app -log debug.log
 ```
 
-**Important:** When using stdio mode with MCP clients (like VS Code or Codex), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.     Enable verbose logging to stderr (disabled by default)
-  -log string
-        Log file path for debugging (recommended for stdio mode)
-  -version
-        Display version information
+**Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.
 
 ### Stdio Mode (Default)
 
