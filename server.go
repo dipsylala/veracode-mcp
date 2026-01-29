@@ -28,13 +28,13 @@ func ClientSupportsUIFromContext(ctx context.Context) bool {
 	return false
 }
 
-//go:embed ui/pipeline-results-app/dist/mcp-app.html
+//go:embed ui/pipeline-results-app/mcp-app.html
 var pipelineResultsHTML string
 
-//go:embed ui/static-findings-app/dist/mcp-app.html
+//go:embed ui/static-findings-app/mcp-app.html
 var staticFindingsHTML string
 
-//go:embed ui/dynamic-findings-app/dist/mcp-app.html
+//go:embed ui/dynamic-findings-app/mcp-app.html
 var dynamicFindingsHTML string
 
 // MCPServer represents the core MCP server
