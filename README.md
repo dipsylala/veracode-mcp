@@ -41,6 +41,31 @@ go mod download
 go build -o dist/veracode-mcp.exe .  # Manual build
 ```
 
+### Veracode CLI
+
+Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) require the Veracode CLI to be installed and available in your system PATH.
+
+**Install the Veracode CLI:**
+
+*Windows (PowerShell):*
+```powershell
+iex (iwr https://tools.veracode.com/veracode-cli/install.ps1)
+```
+
+*macOS/Linux:*
+```bash
+curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+```
+
+**Authenticate the CLI:**
+
+After installation, configure your API credentials:
+```bash
+veracode configure
+```
+
+For detailed installation instructions and alternative methods, see the [official Veracode CLI installation guide](https://docs.veracode.com/r/Install_the_Veracode_CLI).
+
 ## Configuration
 
 ### Veracode API Credentials
