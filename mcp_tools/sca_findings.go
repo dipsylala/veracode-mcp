@@ -197,11 +197,11 @@ Please verify:
 	}
 
 	// Step 6: Format and return the response
-	return formatScaFindingsResponse(req.ApplicationPath, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
+	return formatScaFindingsResponse(appProfile, applicationGUID, req.Sandbox, findingsResp), nil
 }
 
 // formatScaFindingsResponse formats the findings API response into an MCP tool response
-func formatScaFindingsResponse(appPath, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+func formatScaFindingsResponse(appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{

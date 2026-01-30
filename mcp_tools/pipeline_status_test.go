@@ -75,7 +75,7 @@ func TestPipelineStatusTool_WithPIDFile(t *testing.T) {
 
 	// Create a temporary directory
 	tempDir := t.TempDir()
-	outputDir := filepath.Join(tempDir, ".veracode_pipeline")
+	outputDir := filepath.Join(tempDir, ".veracode", "pipeline")
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		t.Fatalf("Failed to create output directory: %v", err)
 	}

@@ -2,15 +2,12 @@
 
 ⚠️ **ALPHA SOFTWARE** - This is early-stage software under active development. APIs and functionality may change without notice. This is not production-ready code.
 
-A Model Context Protocol (MCP) server implementation in Go that provides Veracode security scanning capabilities to AI assistants and LLMs. Supports both stdio and HTTP/SSE transport modes.
+A Model Context Protocol (MCP) server implementation in Go that provides Veracode security scanning capabilities to AI assistants and LLMs. Uses stdio transport for local filesystem operations.
 
 ## Features
 
-- **Dual Transport Support**
-  - stdio mode for local process communication
-  - HTTP mode with Server-Sent Events (SSE) for network communication
-  
 - **MCP Protocol Support**
+  - stdio transport for local process communication
   - JSON-RPC 2.0 message handling
   - Tool invocation capabilities
   - Resource access
@@ -127,10 +124,6 @@ See [credentials/README.md](credentials/README.md) for detailed information.
 .\dist\veracode-mcp.exe [options]
 
 Options:
-  -mode string
-        Server mode: stdio or http (default "stdio")
-  -addr string
-        HTTP server address, only used in http mode (default ":8080")
   -verbose
         Enable verbose logging to stderr (disabled by default)
   -log string
@@ -153,47 +146,15 @@ Options:
 # With verbose logging to stderr (avoid in stdio mode with MCP clients)
 .\dist\veracode-mcp.exe -verbose
 
-# HTTP mode on custom port
-.\dist\veracode-mcp.exe -mode http -addr :9000
-
 # Force MCP Apps UI mode
 .\dist\veracode-mcp.exe -force-mcp-app -log debug.log
 ```
 
 **Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.
 
-### Stdio Mode (Default)
+### Stdio Mode
 
-The stdio mode is ideal for local integrations where the MCP server runs as a subprocess:
-
-```bash
-.\dist\veracode-mcp.exe -mode stdio
-```
-
-Or simply:
-```bash
-.\dist\veracode-mcp.exe
-```
-
-### MCP Client Configuration
-
-**VS Code:**
-
-Create/update `.vscode/mcp.json` in your workspace and update the paths as needed:
-
-```json
-{
-  "servers": {
-    "veracode": {
-      "command": "/absolute/path/to/veracode-mcp.exe",
-      "args": [],
-      "cwd": "${workspaceFolder}"
-    }
-  }
-}
-```
-
-Optional: Add `"-log", "/path/to/veracode-mcp.log"` to the `args` array for debugging, or any of the other [Command Line Options](#command-line-options).
+The server runs in stdio mode for local integrations where it operates as a subprocess. This is the only supported mode as the server requires local filesystem access for workspace operations.
 
 **Codex:**
 
@@ -219,20 +180,6 @@ Add to `claude_desktop_config.json`:
   }
 }
 ```
-
-### HTTP Mode
-
-The HTTP mode allows remote connections via HTTP with Server-Sent Events:
-
-```bash
-.\dist\veracode-mcp.exe -mode http -addr :8080
-```
-
-The HTTP server provides these endpoints:
-
-- `GET /sse` - Establish SSE connection for receiving responses
-- `POST /message?sessionId=<id>` - Send JSON-RPC requests
-- `GET /health` - Health check endpoint
 
 ## Available Tools
 

@@ -56,3 +56,7 @@ veracode-credentials.json
 tmp/
 temp/
 *.tmp
+
+# Veracode files generated during mcp scanning
+.veracode-workspace.json
+.veracode/

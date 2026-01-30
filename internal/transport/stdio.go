@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/dipsylala/veracodemcp-go/internal/types"
 )
@@ -67,7 +68,28 @@ func min(a, b int) int {
 	return b
 }
 
+// isValidMethod checks if a method name contains only alphanumeric characters and forward slashes
+// to prevent log forging attacks via CRLF injection
+func isValidMethod(method string) bool {
+	for _, r := range method {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '/' {
+			return false
+		}
+	}
+	return true
+}
+
 func (t *StdioTransport) handleRequest(req *types.JSONRPCRequest) {
+	// Validate method name before logging to prevent log forging attacks
+	if !isValidMethod(req.Method) {
+		log.Printf("=== INCOMING REQUEST - REJECTED ===")
+		log.Printf("Invalid method name (ID: %v)", req.ID)
+		log.Printf("========================")
+		// Send error response for invalid method
+		_ = t.sendError(req.ID, -32600, "Invalid request: method name contains invalid characters", nil)
+		return
+	}
+
 	log.Printf("=== INCOMING REQUEST ===")
 	log.Printf("Method: %s (ID: %v)", req.Method, req.ID)
 	if req.Params != nil {

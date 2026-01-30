@@ -73,7 +73,7 @@ func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
 
 	// Create a temporary directory with results file
 	tempDir := t.TempDir()
-	scaDir := filepath.Join(tempDir, ".veracode_sca")
+	scaDir := filepath.Join(tempDir, ".veracode", "sca")
 	if err := os.MkdirAll(scaDir, 0750); err != nil {
 		t.Fatalf("Failed to create SCA directory: %v", err)
 	}
@@ -169,7 +169,7 @@ func TestFormatSCAResultsResponse(t *testing.T) {
 		},
 	}
 
-	response := formatSCAResultsResponse("/test/path", "/test/path/.veracode_sca/veracode.json", results)
+	response := formatSCAResultsResponse("/test/path", "/test/path/.veracode/sca/veracode.json", results)
 
 	// Verify response structure
 	if response["content"] == nil {

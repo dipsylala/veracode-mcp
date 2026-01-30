@@ -225,11 +225,11 @@ Please verify:
 	}
 
 	// Step 6: Format and return the response
-	return formatStaticFindingsResponse(ctx, req.ApplicationPath, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
+	return formatStaticFindingsResponse(ctx, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
 }
 
 // formatStaticFindingsResponse formats the findings API response into an MCP tool response
-func formatStaticFindingsResponse(ctx context.Context, appPath, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+func formatStaticFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
