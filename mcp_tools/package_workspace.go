@@ -197,10 +197,18 @@ func executePackagingCommand(ctx context.Context, req *PackageWorkspaceRequest, 
 
 	// Write captured output to log file if requested
 	if req.LogToFile && logFile != nil {
-		logFile.WriteString("=== STDOUT ===\n")
-		logFile.Write(stdout.Bytes())
-		logFile.WriteString("\n\n=== STDERR ===\n")
-		logFile.Write(stderr.Bytes())
+		if _, err := logFile.WriteString("=== STDOUT ===\n"); err != nil {
+			log.Printf("Failed to write stdout header to log: %v", err)
+		}
+		if _, err := logFile.Write(stdout.Bytes()); err != nil {
+			log.Printf("Failed to write stdout to log: %v", err)
+		}
+		if _, err := logFile.WriteString("\n\n=== STDERR ===\n"); err != nil {
+			log.Printf("Failed to write stderr header to log: %v", err)
+		}
+		if _, err := logFile.Write(stderr.Bytes()); err != nil {
+			log.Printf("Failed to write stderr to log: %v", err)
+		}
 		logFile.Close()
 	}
 
