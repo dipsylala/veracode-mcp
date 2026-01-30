@@ -77,9 +77,9 @@ func validateAndPrepareSCADirectories(applicationPath string) (string, string, e
 		return "", "", fmt.Errorf("Failed to access application path: %v", err)
 	}
 
-	// Create output directory (.veracode_sca)
+	// Create output directory (.veracode/sca)
 	// MkdirAll creates the directory if it doesn't exist, or does nothing if it already exists
-	outputDir := filepath.Join(applicationPath, ".veracode_sca")
+	outputDir := filepath.Join(applicationPath, ".veracode", "sca")
 	err = os.MkdirAll(outputDir, 0750)
 	if err != nil {
 		return "", "", fmt.Errorf("Failed to create output directory: %v", err)

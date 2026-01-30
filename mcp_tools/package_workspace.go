@@ -98,8 +98,8 @@ func validateAndPrepareDirectories(applicationPath string) (string, error) {
 		return "", fmt.Errorf("Failed to access application path: %v", err)
 	}
 
-	// Create output directory (.veracode_packaging)
-	outputDir := filepath.Join(applicationPath, ".veracode_packaging")
+	// Create output directory (.veracode/packaging)
+	outputDir := filepath.Join(applicationPath, ".veracode", "packaging")
 	err = os.MkdirAll(outputDir, 0750)
 	if err != nil {
 		return "", fmt.Errorf("Failed to create output directory: %v", err)
@@ -193,6 +193,15 @@ func executePackagingCommand(ctx context.Context, req *PackageWorkspaceRequest, 
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			exitCode = exitErr.ExitCode()
 		}
+	}
+
+	// Write captured output to log file if requested
+	if req.LogToFile && logFile != nil {
+		logFile.WriteString("=== STDOUT ===\n")
+		logFile.Write(stdout.Bytes())
+		logFile.WriteString("\n\n=== STDERR ===\n")
+		logFile.Write(stderr.Bytes())
+		logFile.Close()
 	}
 
 	return exitCode, duration, stdout, stderr, logFile, nil

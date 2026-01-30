@@ -35,12 +35,12 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 	}
 	req.ApplicationPath = appPath
 
-	// Extract filename (optional) - if just a filename (no path), look in .veracode_packaging
+	// Extract filename (optional) - if just a filename (no path), look in .veracode/packaging
 	if filename, ok := args["filename"].(string); ok && filename != "" {
 		// Check if filename is just a name (no directory separators)
 		if filepath.Base(filename) == filename {
-			// Just a filename - prepend .veracode_packaging directory
-			req.Filename = filepath.Join(appPath, ".veracode_packaging", filename)
+			// Just a filename - prepend .veracode/packaging directory
+			req.Filename = filepath.Join(appPath, ".veracode", "packaging", filename)
 		} else {
 			// Full or relative path - use as-is
 			req.Filename = filename
@@ -79,7 +79,7 @@ func handlePipelineScan(ctx context.Context, args map[string]interface{}) (inter
 	}
 
 	// Create output directory for scan results
-	outputDir := filepath.Join(req.ApplicationPath, ".veracode_pipeline")
+	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
 	err = os.MkdirAll(outputDir, 0750)
 	if err != nil {
 		return map[string]interface{}{
@@ -111,12 +111,12 @@ func handlePipelineScan(ctx context.Context, args map[string]interface{}) (inter
 		}
 		_ = fileInfo // Unused but needed for os.Stat call
 	} else {
-		// Find the largest file in .veracode_packaging
-		packagingDir := filepath.Join(req.ApplicationPath, ".veracode_packaging")
+		// Find the largest file in .veracode/packaging
+		packagingDir := filepath.Join(req.ApplicationPath, ".veracode", "packaging")
 		scanTarget, err = findLargestFile(packagingDir)
 		if err != nil {
 			return map[string]interface{}{
-				"error": fmt.Sprintf("Failed to find file to scan: %v. Either specify a filename parameter or ensure .veracode_packaging contains packaged files.", err),
+				"error": fmt.Sprintf("Failed to find file to scan: %v. Either specify a filename parameter or ensure .veracode/packaging contains packaged files.", err),
 			}, nil
 		}
 	}

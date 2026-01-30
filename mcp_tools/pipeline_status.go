@@ -50,7 +50,7 @@ func handlePipelineStatus(ctx context.Context, args map[string]interface{}) (int
 	}
 
 	// Locate the PID file
-	outputDir := filepath.Join(req.ApplicationPath, ".veracode_pipeline")
+	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
 	pidFile := filepath.Join(outputDir, "pipeline.pid")
 
 	// Check if PID file exists

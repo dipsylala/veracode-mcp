@@ -254,7 +254,7 @@
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "Optional output filename for the packaged artifact. If just a filename (no path) is provided, it will be created in the .veracode-packaging directory. If a full path is provided, it will be used as-is."
+          "description": "Optional output filename for the packaged artifact. If just a filename (no path) is provided, it will be created in the .veracode/packaging directory. If a full path is provided, it will be used as-is."
         },
         {
           "name": "verbose",
@@ -266,7 +266,7 @@
           "name": "logToFile",
           "type": "boolean",
           "isRequired": false,
-          "description": "Write detailed output to a log file in ./.veracode-packaging"
+          "description": "Write detailed output to a log file in ./.veracode/packaging"
         }
       ]
     },
@@ -284,7 +284,7 @@
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "The file upon which to perform a pipeline scan. If just a filename (no path) is provided, it will look in the .veracode_packaging folder. If a full or relative path is provided, it will be used as-is. If not provided, the tool will scan the largest file in the .veracode_packaging folder"
+          "description": "The file upon which to perform a pipeline scan. If just a filename (no path) is provided, it will look in the .veracode/packaging folder. If a full or relative path is provided, it will be used as-is. If not provided, the tool will scan the largest file in the .veracode/packaging folder"
         },
         {
           "name": "verbose",

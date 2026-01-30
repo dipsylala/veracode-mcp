@@ -15,27 +15,8 @@ func init() {
 	RegisterSimpleTool(APIHealthToolName, handleAPIHealth)
 }
 
-// APIHealthRequest represents the parsed parameters for api-health
-type APIHealthRequest struct {
-	// Currently no parameters, but struct provides consistency for future extension
-}
-
-// parseAPIHealthRequest extracts and validates parameters from the raw args map
-func parseAPIHealthRequest(args map[string]interface{}) (*APIHealthRequest, error) {
-	req := &APIHealthRequest{}
-	// No parameters currently required
-	return req, nil
-}
-
 // handleAPIHealth checks the health of Veracode API endpoints
 func handleAPIHealth(ctx context.Context, args map[string]interface{}) (interface{}, error) {
-	// Parse and validate request parameters
-	_, err := parseAPIHealthRequest(args)
-	if err != nil {
-		return map[string]interface{}{
-			"error": err.Error(),
-		}, nil
-	}
 	timestamp := time.Now().Format(time.RFC3339)
 
 	// Try to create API client (will check credentials)

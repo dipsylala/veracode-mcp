@@ -1,5 +1,7 @@
 package types
 
+import "encoding/json"
+
 // Tool represents a tool available through the MCP protocol.
 // This structure defines how tools are presented to MCP clients.
 type Tool struct {
@@ -12,10 +14,10 @@ type Tool struct {
 // JSONRPCRequest represents an incoming JSON-RPC 2.0 request.
 // This is the standard format for MCP protocol messages.
 type JSONRPCRequest struct {
-	JSONRPC string      `json:"jsonrpc"`          // Always "2.0" for JSON-RPC 2.0
-	ID      interface{} `json:"id"`               // Request identifier for matching responses
-	Method  string      `json:"method"`           // MCP method name (e.g., "tools/call")
-	Params  interface{} `json:"params,omitempty"` // Method-specific parameters
+	JSONRPC string           `json:"jsonrpc"`
+	ID      *json.RawMessage `json:"id,omitempty"`
+	Method  string           `json:"method"`
+	Params  json.RawMessage  `json:"params,omitempty"`
 }
 
 // JSONRPCResponse represents an outgoing JSON-RPC 2.0 response.

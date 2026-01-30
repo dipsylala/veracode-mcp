@@ -52,7 +52,7 @@ func TestValidateAndPrepareSCADirectories_Success(t *testing.T) {
 		t.Fatalf("Failed to validate and prepare directories: %v", err)
 	}
 
-	expectedOutputDir := filepath.Join(tempDir, ".veracode_sca")
+	expectedOutputDir := filepath.Join(tempDir, ".veracode", "sca")
 	if outputDir != expectedOutputDir {
 		t.Errorf("Expected output directory '%s', got '%s'", expectedOutputDir, outputDir)
 	}
@@ -90,7 +90,7 @@ func TestValidateAndPrepareSCADirectories_CreatesDirectoryIfNeeded(t *testing.T)
 		t.Fatalf("Second call failed: %v", err)
 	}
 
-	expectedOutputDir := filepath.Join(tempDir, ".veracode_sca")
+	expectedOutputDir := filepath.Join(tempDir, ".veracode", "sca")
 	if outputDir != expectedOutputDir {
 		t.Errorf("Expected output directory '%s', got '%s'", expectedOutputDir, outputDir)
 	}
@@ -175,7 +175,7 @@ func TestRunSCAScanTool_OutputFileLocation(t *testing.T) {
 		t.Fatalf("Failed to prepare directories: %v", err)
 	}
 
-	expectedDir := filepath.Join(tempDir, ".veracode_sca")
+	expectedDir := filepath.Join(tempDir, ".veracode", "sca")
 	if outputDir != expectedDir {
 		t.Errorf("Expected output dir '%s', got '%s'", expectedDir, outputDir)
 	}
@@ -201,8 +201,8 @@ func TestBuildSCAScanResponse_Success(t *testing.T) {
 		ApplicationPath: "/test/path",
 	}
 
-	outputDir := "/test/path/.veracode_sca"
-	outputFile := "/test/path/.veracode_sca/veracode.json"
+	outputDir := "/test/path/.veracode/sca"
+	outputFile := "/test/path/.veracode/sca/veracode.json"
 
 	var stdout, stderr bytes.Buffer
 	response := buildSCAScanResponse(req, outputDir, outputFile, 0, 1000000, stdout, stderr)
@@ -218,8 +218,8 @@ func TestBuildSCAScanResponse_Error(t *testing.T) {
 		ApplicationPath: "/test/path",
 	}
 
-	outputDir := "/test/path/.veracode_sca"
-	outputFile := "/test/path/.veracode_sca/veracode.json"
+	outputDir := "/test/path/.veracode/sca"
+	outputFile := "/test/path/.veracode/sca/veracode.json"
 
 	var stdout, stderr bytes.Buffer
 	// Exit code 1 is a real error (not a warning)
@@ -236,8 +236,8 @@ func TestBuildSCAScanResponse_Warning(t *testing.T) {
 		ApplicationPath: "/test/path",
 	}
 
-	outputDir := "/test/path/.veracode_sca"
-	outputFile := "/test/path/.veracode_sca/veracode.json"
+	outputDir := "/test/path/.veracode/sca"
+	outputFile := "/test/path/.veracode/sca/veracode.json"
 
 	var stdout, stderr bytes.Buffer
 	// Exit code 3 is a warning (policy failure but scan succeeded)
