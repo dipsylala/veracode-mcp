@@ -15,36 +15,7 @@ const PackageWorkspaceToolName = "package-workspace"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(PackageWorkspaceToolName, func() ToolImplementation {
-		return NewPackageWorkspaceTool()
-	})
-}
-
-// PackageWorkspaceTool provides the package-workspace tool
-type PackageWorkspaceTool struct{}
-
-// NewPackageWorkspaceTool creates a new package workspace tool
-func NewPackageWorkspaceTool() *PackageWorkspaceTool {
-	return &PackageWorkspaceTool{}
-}
-
-// Initialize sets up the tool
-func (t *PackageWorkspaceTool) Initialize() error {
-	log.Printf("Initializing tool: %s", PackageWorkspaceToolName)
-	return nil
-}
-
-// RegisterHandlers registers the package workspace handler
-func (t *PackageWorkspaceTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", PackageWorkspaceToolName)
-	registry.RegisterHandler(PackageWorkspaceToolName, t.handlePackageWorkspace)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *PackageWorkspaceTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", PackageWorkspaceToolName)
-	return nil
+	RegisterSimpleTool(PackageWorkspaceToolName, handlePackageWorkspace)
 }
 
 // PackageWorkspaceRequest represents the parsed parameters for package-workspace
@@ -79,7 +50,7 @@ func parsePackageWorkspaceRequest(args map[string]interface{}) (*PackageWorkspac
 }
 
 // handlePackageWorkspace packages the workspace for Veracode scanning
-func (t *PackageWorkspaceTool) handlePackageWorkspace(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handlePackageWorkspace(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parsePackageWorkspaceRequest(args)
 	if err != nil {

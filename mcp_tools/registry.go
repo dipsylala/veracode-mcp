@@ -16,6 +16,19 @@ func RegisterTool(name string, constructor func() ToolImplementation) {
 	toolRegistry[name] = constructor
 }
 
+// RegisterSimpleTool registers a stateless tool with just a handler function
+// Use this for tools that don't need initialization, state, or cleanup
+// Example:
+//
+//	func init() {
+//	    RegisterSimpleTool("my-tool", handleMyTool)
+//	}
+func RegisterSimpleTool(name string, handler ToolHandler) {
+	RegisterTool(name, func() ToolImplementation {
+		return NewSimpleTool(name, handler)
+	})
+}
+
 // RegisteredTool wraps a tool implementation with its registered name
 type RegisteredTool struct {
 	Name string

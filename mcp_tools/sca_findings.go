@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/dipsylala/veracodemcp-go/api"
@@ -16,36 +15,7 @@ const ScaFindingsToolName = "get-sca-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(ScaFindingsToolName, func() ToolImplementation {
-		return NewScaFindingsTool()
-	})
-}
-
-// ScaFindingsTool provides the get-sca-findings tool
-type ScaFindingsTool struct{}
-
-// NewScaFindingsTool creates a new SCA findings tool
-func NewScaFindingsTool() *ScaFindingsTool {
-	return &ScaFindingsTool{}
-}
-
-// Initialize sets up the tool
-func (t *ScaFindingsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", ScaFindingsToolName)
-	return nil
-}
-
-// RegisterHandlers registers the SCA findings handler
-func (t *ScaFindingsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", ScaFindingsToolName)
-	registry.RegisterHandler(ScaFindingsToolName, t.handleGetScaFindings)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *ScaFindingsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", ScaFindingsToolName)
-	return nil
+	RegisterSimpleTool(ScaFindingsToolName, handleGetScaFindings)
 }
 
 // ScaFindingsRequest represents the parsed parameters for get-sca-findings
@@ -85,7 +55,7 @@ func parseScaFindingsRequest(args map[string]interface{}) (*ScaFindingsRequest, 
 	return req, nil
 }
 
-func (t *ScaFindingsTool) handleGetScaFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handleGetScaFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parseScaFindingsRequest(args)
 	if err != nil {
@@ -292,28 +262,34 @@ func formatScaFindingsResponse(appPath, appProfile, applicationGUID, sandbox str
 		}
 	}
 
-	// Marshal response to JSON string
-	responseJSON, err := json.Marshal(response)
+	// Marshal response to JSON for non-UI clients
+	responseJSON, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf("Error formatting response: %v", err),
-			}},
-			"isError": true,
-		}
+		// Fall back to compact JSON
+		responseJSON, _ = json.Marshal(response)
 	}
 
-	// Return as MCP tool response with JSON content
+	// Build pagination summary for LLM
+	var paginationSummary string
+	if response.Pagination != nil {
+		paginationSummary = fmt.Sprintf("Showing %d findings on page %d of %d (Total: %d findings across all pages)\n\n",
+			len(response.Findings),
+			response.Pagination.CurrentPage+1, // Display as 1-based
+			response.Pagination.TotalPages,
+			response.Pagination.TotalElements,
+		)
+	} else {
+		paginationSummary = fmt.Sprintf("Showing %d findings\n\n", len(response.Findings))
+	}
+
+	// Return as MCP tool response with text content (consistent with static/dynamic findings)
 	return map[string]interface{}{
-		"content": []map[string]interface{}{{
-			"type": "resource",
-			"resource": map[string]interface{}{
-				"uri":      fmt.Sprintf("veracode://findings/sca/%s", applicationGUID),
-				"mimeType": "application/json",
-				"text":     string(responseJSON),
+		"content": []map[string]interface{}{
+			{
+				"type": "text",
+				"text": paginationSummary + string(responseJSON),
 			},
-		}},
+		},
 	}
 }
 

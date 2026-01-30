@@ -1,7 +1,7 @@
 .container {
   padding: 16px;
   width: 100%;
-  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .header {
@@ -149,7 +149,7 @@
 }
 
 .expandedRow td {
-  padding: 16px;
+  padding: 4px;
   border-bottom: 2px solid var(--color-border-primary, #e0e0e0);
 }
 

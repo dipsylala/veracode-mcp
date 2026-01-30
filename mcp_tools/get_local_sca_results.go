@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,36 +13,7 @@ const GetLocalSCAResultsToolName = "get-local-sca-results"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(GetLocalSCAResultsToolName, func() ToolImplementation {
-		return NewGetLocalSCAResultsTool()
-	})
-}
-
-// GetLocalSCAResultsTool provides the get-local-sca-results tool
-type GetLocalSCAResultsTool struct{}
-
-// NewGetLocalSCAResultsTool creates a new get local SCA results tool
-func NewGetLocalSCAResultsTool() *GetLocalSCAResultsTool {
-	return &GetLocalSCAResultsTool{}
-}
-
-// Initialize sets up the tool
-func (t *GetLocalSCAResultsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", GetLocalSCAResultsToolName)
-	return nil
-}
-
-// RegisterHandlers registers the get local SCA results handler
-func (t *GetLocalSCAResultsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", GetLocalSCAResultsToolName)
-	registry.RegisterHandler(GetLocalSCAResultsToolName, t.handleGetLocalSCAResults)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *GetLocalSCAResultsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", GetLocalSCAResultsToolName)
-	return nil
+	RegisterSimpleTool(GetLocalSCAResultsToolName, handleGetLocalSCAResults)
 }
 
 // GetLocalSCAResultsRequest represents the parsed parameters for get-local-sca-results
@@ -177,7 +147,7 @@ type SCARelatedVuln struct {
 }
 
 // handleGetLocalSCAResults retrieves and formats local SCA scan results
-func (t *GetLocalSCAResultsTool) handleGetLocalSCAResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handleGetLocalSCAResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parseGetLocalSCAResultsRequest(args)
 	if err != nil {

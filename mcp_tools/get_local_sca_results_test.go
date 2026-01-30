@@ -8,31 +8,6 @@ import (
 	"testing"
 )
 
-func TestGetLocalSCAResultsTool_Initialize(t *testing.T) {
-	tool := NewGetLocalSCAResultsTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-}
-
-func TestGetLocalSCAResultsTool_RegisterHandlers(t *testing.T) {
-	tool := NewGetLocalSCAResultsTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	if registry.handlers[GetLocalSCAResultsToolName] == nil {
-		t.Fatal("Handler not registered")
-	}
-}
-
 func TestParseGetLocalSCAResultsRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
@@ -69,24 +44,12 @@ func TestParseGetLocalSCAResultsRequest_EmptyApplicationPath(t *testing.T) {
 }
 
 func TestGetLocalSCAResultsTool_HandleMissingResultsFile(t *testing.T) {
-	tool := NewGetLocalSCAResultsTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	handler := registry.handlers[GetLocalSCAResultsToolName]
 	ctx := context.Background()
 
 	// Create a temporary directory without results file
 	tempDir := t.TempDir()
 
-	result, err := handler(ctx, map[string]interface{}{
+	result, err := handleGetLocalSCAResults(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 
@@ -106,18 +69,6 @@ func TestGetLocalSCAResultsTool_HandleMissingResultsFile(t *testing.T) {
 }
 
 func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
-	tool := NewGetLocalSCAResultsTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	handler := registry.handlers[GetLocalSCAResultsToolName]
 	ctx := context.Background()
 
 	// Create a temporary directory with results file
@@ -157,7 +108,7 @@ func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
 		t.Fatalf("Failed to write results file: %v", err)
 	}
 
-	result, err := handler(ctx, map[string]interface{}{
+	result, err := handleGetLocalSCAResults(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 

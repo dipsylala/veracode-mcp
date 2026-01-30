@@ -15,36 +15,7 @@ const FindingDetailsToolName = "get-finding-details"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(FindingDetailsToolName, func() ToolImplementation {
-		return NewFindingDetailsTool()
-	})
-}
-
-// FindingDetailsTool provides the get-finding-details tool
-type FindingDetailsTool struct{}
-
-// NewFindingDetailsTool creates a new finding details tool
-func NewFindingDetailsTool() *FindingDetailsTool {
-	return &FindingDetailsTool{}
-}
-
-// Initialize sets up the tool
-func (t *FindingDetailsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", FindingDetailsToolName)
-	return nil
-}
-
-// RegisterHandlers registers the finding details handler
-func (t *FindingDetailsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", FindingDetailsToolName)
-	registry.RegisterHandler(FindingDetailsToolName, t.handleGetFindingDetails)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *FindingDetailsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", FindingDetailsToolName)
-	return nil
+	RegisterSimpleTool(FindingDetailsToolName, handleGetFindingDetails)
 }
 
 // FindingDetailsRequest represents the parsed parameters for get-finding-details
@@ -186,7 +157,7 @@ Please verify that:
 	}
 }
 
-func (t *FindingDetailsTool) handleGetFindingDetails(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handleGetFindingDetails(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parseFindingDetailsRequest(args)
 	if err != nil {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -18,36 +17,7 @@ const PipelineStatusToolName = "pipeline-status"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(PipelineStatusToolName, func() ToolImplementation {
-		return NewPipelineStatusTool()
-	})
-}
-
-// PipelineStatusTool provides the pipeline-status tool
-type PipelineStatusTool struct{}
-
-// NewPipelineStatusTool creates a new pipeline status tool
-func NewPipelineStatusTool() *PipelineStatusTool {
-	return &PipelineStatusTool{}
-}
-
-// Initialize sets up the tool
-func (t *PipelineStatusTool) Initialize() error {
-	log.Printf("Initializing tool: %s", PipelineStatusToolName)
-	return nil
-}
-
-// RegisterHandlers registers the pipeline status handler
-func (t *PipelineStatusTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", PipelineStatusToolName)
-	registry.RegisterHandler(PipelineStatusToolName, t.handlePipelineStatus)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *PipelineStatusTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", PipelineStatusToolName)
-	return nil
+	RegisterSimpleTool(PipelineStatusToolName, handlePipelineStatus)
 }
 
 // PipelineStatusRequest represents the parsed parameters for pipeline-status
@@ -70,7 +40,7 @@ func parsePipelineStatusRequest(args map[string]interface{}) (*PipelineStatusReq
 }
 
 // handlePipelineStatus checks the status of a running pipeline scan
-func (t *PipelineStatusTool) handlePipelineStatus(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handlePipelineStatus(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parsePipelineStatusRequest(args)
 	if err != nil {

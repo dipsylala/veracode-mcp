@@ -17,36 +17,7 @@ const PipelineResultsToolName = "pipeline-results"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(PipelineResultsToolName, func() ToolImplementation {
-		return NewPipelineResultsTool()
-	})
-}
-
-// PipelineResultsTool provides the pipeline-results tool
-type PipelineResultsTool struct{}
-
-// NewPipelineResultsTool creates a new pipeline results tool
-func NewPipelineResultsTool() *PipelineResultsTool {
-	return &PipelineResultsTool{}
-}
-
-// Initialize sets up the tool
-func (t *PipelineResultsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", PipelineResultsToolName)
-	return nil
-}
-
-// RegisterHandlers registers the pipeline results handler
-func (t *PipelineResultsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", PipelineResultsToolName)
-	registry.RegisterHandler(PipelineResultsToolName, t.handlePipelineResults)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *PipelineResultsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", PipelineResultsToolName)
-	return nil
+	RegisterSimpleTool(PipelineResultsToolName, handlePipelineResults)
 }
 
 // PipelineResultsRequest represents the parsed parameters for pipeline-results
@@ -104,7 +75,7 @@ type SourceFileInfo struct {
 }
 
 // handlePipelineResults retrieves and formats pipeline scan results
-func (t *PipelineResultsTool) handlePipelineResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handlePipelineResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parsePipelineResultsRequest(args)
 	if err != nil {

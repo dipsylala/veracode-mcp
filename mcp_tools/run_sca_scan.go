@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,36 +14,7 @@ const RunSCAScanToolName = "run-sca-scan"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(RunSCAScanToolName, func() ToolImplementation {
-		return NewRunSCAScanTool()
-	})
-}
-
-// RunSCAScanTool provides the run-sca-scan tool
-type RunSCAScanTool struct{}
-
-// NewRunSCAScanTool creates a new run SCA scan tool
-func NewRunSCAScanTool() *RunSCAScanTool {
-	return &RunSCAScanTool{}
-}
-
-// Initialize sets up the tool
-func (t *RunSCAScanTool) Initialize() error {
-	log.Printf("Initializing tool: %s", RunSCAScanToolName)
-	return nil
-}
-
-// RegisterHandlers registers the run SCA scan handler
-func (t *RunSCAScanTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", RunSCAScanToolName)
-	registry.RegisterHandler(RunSCAScanToolName, t.handleRunSCAScan)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *RunSCAScanTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", RunSCAScanToolName)
-	return nil
+	RegisterSimpleTool(RunSCAScanToolName, handleRunSCAScan)
 }
 
 // RunSCAScanRequest represents the parsed parameters for run-sca-scan
@@ -67,7 +37,7 @@ func parseRunSCAScanRequest(args map[string]interface{}) (*RunSCAScanRequest, er
 }
 
 // handleRunSCAScan runs a Software Composition Analysis scan on the workspace
-func (t *RunSCAScanTool) handleRunSCAScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handleRunSCAScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parseRunSCAScanRequest(args)
 	if err != nil {

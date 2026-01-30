@@ -8,31 +8,6 @@ import (
 	"testing"
 )
 
-func TestRunSCAScanTool_Initialize(t *testing.T) {
-	tool := NewRunSCAScanTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-}
-
-func TestRunSCAScanTool_RegisterHandlers(t *testing.T) {
-	tool := NewRunSCAScanTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	if registry.handlers[RunSCAScanToolName] == nil {
-		t.Fatal("Handler not registered")
-	}
-}
-
 func TestParseRunSCAScanRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
@@ -132,21 +107,9 @@ func TestValidateAndPrepareSCADirectories_CreatesDirectoryIfNeeded(t *testing.T)
 }
 
 func TestRunSCAScanTool_HandleInvalidPath(t *testing.T) {
-	tool := NewRunSCAScanTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	handler := registry.handlers[RunSCAScanToolName]
 	ctx := context.Background()
 
-	result, err := handler(ctx, map[string]interface{}{
+	result, err := handleRunSCAScan(ctx, map[string]interface{}{
 		"application_path": "/nonexistent/path/to/app",
 	})
 

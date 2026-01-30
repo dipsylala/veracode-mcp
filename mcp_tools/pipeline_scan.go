@@ -14,36 +14,7 @@ const PipelineScanToolName = "pipeline-scan"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(PipelineScanToolName, func() ToolImplementation {
-		return NewPipelineScanTool()
-	})
-}
-
-// PipelineScanTool provides the pipeline-scan tool
-type PipelineScanTool struct{}
-
-// NewPipelineScanTool creates a new pipeline scan tool
-func NewPipelineScanTool() *PipelineScanTool {
-	return &PipelineScanTool{}
-}
-
-// Initialize sets up the tool
-func (t *PipelineScanTool) Initialize() error {
-	log.Printf("Initializing tool: %s", PipelineScanToolName)
-	return nil
-}
-
-// RegisterHandlers registers the pipeline scan handler
-func (t *PipelineScanTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", PipelineScanToolName)
-	registry.RegisterHandler(PipelineScanToolName, t.handlePipelineScan)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *PipelineScanTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", PipelineScanToolName)
-	return nil
+	RegisterSimpleTool(PipelineScanToolName, handlePipelineScan)
 }
 
 // PipelineScanRequest represents the parsed parameters for pipeline-scan
@@ -85,7 +56,7 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 }
 
 // handlePipelineScan performs a local static scan using Veracode Pipeline Scanner
-func (t *PipelineScanTool) handlePipelineScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handlePipelineScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parsePipelineScanRequest(args)
 	if err != nil {

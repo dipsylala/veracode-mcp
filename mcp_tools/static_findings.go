@@ -17,37 +17,7 @@ const StaticFindingsToolName = "static-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(StaticFindingsToolName, func() ToolImplementation {
-		return NewStaticFindingsTool()
-	})
-}
-
-// StaticFindingsTool provides the get-static-findings tool
-type StaticFindingsTool struct{}
-
-// NewStaticFindingsTool creates a new static findings tool
-func NewStaticFindingsTool() *StaticFindingsTool {
-	return &StaticFindingsTool{}
-}
-
-// Initialize sets up the tool
-func (t *StaticFindingsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", StaticFindingsToolName)
-	// TODO: Initialize Veracode API client, load credentials, etc.
-	return nil
-}
-
-// RegisterHandlers registers the static findings handler
-func (t *StaticFindingsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", StaticFindingsToolName)
-	registry.RegisterHandler(StaticFindingsToolName, t.handleGetStaticFindings)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *StaticFindingsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", StaticFindingsToolName)
-	return nil
+	RegisterSimpleTool(StaticFindingsToolName, handleGetStaticFindings)
 }
 
 // StaticFindingsRequest represents the parsed parameters for get-static-findings
@@ -110,7 +80,7 @@ func parseStaticFindingsRequest(args map[string]interface{}) (*StaticFindingsReq
 	return req, nil
 }
 
-func (t *StaticFindingsTool) handleGetStaticFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handleGetStaticFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parseStaticFindingsRequest(args)
 	if err != nil {

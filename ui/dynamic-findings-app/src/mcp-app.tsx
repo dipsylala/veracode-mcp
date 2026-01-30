@@ -201,7 +201,7 @@ function FindingRow({ finding }: FindingRowProps) {
           </a>
         </td>
         <td>
-          <div className={styles.url}>
+          <div className={styles.url} title={finding.url || undefined}>
             {finding.url || '-'}
           </div>
         </td>

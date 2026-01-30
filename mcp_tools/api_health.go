@@ -3,7 +3,6 @@ package mcp_tools
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/dipsylala/veracodemcp-go/api"
@@ -13,36 +12,7 @@ const APIHealthToolName = "api-health"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(APIHealthToolName, func() ToolImplementation {
-		return NewAPIHealthTool()
-	})
-}
-
-// APIHealthTool provides the api-health tool
-type APIHealthTool struct{}
-
-// NewAPIHealthTool creates a new API health check tool
-func NewAPIHealthTool() *APIHealthTool {
-	return &APIHealthTool{}
-}
-
-// Initialize sets up the tool
-func (t *APIHealthTool) Initialize() error {
-	log.Printf("Initializing tool: %s", APIHealthToolName)
-	return nil
-}
-
-// RegisterHandlers registers the API health check handler
-func (t *APIHealthTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", APIHealthToolName)
-	registry.RegisterHandler(APIHealthToolName, t.handleAPIHealth)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *APIHealthTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", APIHealthToolName)
-	return nil
+	RegisterSimpleTool(APIHealthToolName, handleAPIHealth)
 }
 
 // APIHealthRequest represents the parsed parameters for api-health
@@ -58,7 +28,7 @@ func parseAPIHealthRequest(args map[string]interface{}) (*APIHealthRequest, erro
 }
 
 // handleAPIHealth checks the health of Veracode API endpoints
-func (t *APIHealthTool) handleAPIHealth(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handleAPIHealth(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	_, err := parseAPIHealthRequest(args)
 	if err != nil {

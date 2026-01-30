@@ -3,6 +3,7 @@ package mcp_tools
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/dipsylala/veracodemcp-go/api"
@@ -186,27 +187,24 @@ func extractMCPResponseFromResult(t *testing.T, result interface{}) *MCPFindings
 		t.Fatal("Content is not an array or is empty")
 	}
 
-	// Get the resource
-	resource, hasResource := contentArray[0]["resource"]
-	if !hasResource {
-		t.Fatal("Content does not have 'resource' field")
-	}
-
-	resourceMap, ok := resource.(map[string]interface{})
-	if !ok {
-		t.Fatal("Resource is not a map")
-	}
-
-	// Get the JSON text
-	jsonText, hasText := resourceMap["text"]
+	// Get the text field directly (new format consistent with static/dynamic findings)
+	jsonText, hasText := contentArray[0]["text"]
 	if !hasText {
-		t.Fatal("Resource does not have 'text' field")
+		t.Fatal("Content does not have 'text' field")
 	}
 
 	jsonStr, ok := jsonText.(string)
 	if !ok {
 		t.Fatal("Text is not a string")
 	}
+
+	// The text contains pagination summary followed by JSON, so we need to extract just the JSON part
+	// Find the first '{' character which marks the start of the JSON
+	jsonStart := strings.Index(jsonStr, "{")
+	if jsonStart == -1 {
+		t.Fatal("Could not find JSON start in text content")
+	}
+	jsonStr = jsonStr[jsonStart:]
 
 	// Parse the JSON response
 	var mcpResponse MCPFindingsResponse
@@ -260,7 +258,7 @@ func TestScaFindingsIntegrationWithLicenses(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	result, err := tool.handleGetScaFindings(ctx, args)
+	result, err := handleGetScaFindings(ctx, args)
 	if err != nil {
 		t.Fatalf("Handler returned error: %v", err)
 	}

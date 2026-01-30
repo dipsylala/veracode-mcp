@@ -17,38 +17,7 @@ const DynamicFindingsToolName = "dynamic-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(DynamicFindingsToolName, func() ToolImplementation {
-		return NewDynamicFindingsTool()
-	})
-}
-
-// DynamicFindingsTool provides the dynamic-findings tool
-type DynamicFindingsTool struct{}
-
-// NewDynamicFindingsTool creates a new dynamic findings tool
-func NewDynamicFindingsTool() *DynamicFindingsTool {
-	return &DynamicFindingsTool{}
-}
-
-// Initialize sets up the tool
-func (t *DynamicFindingsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", DynamicFindingsToolName)
-	// TODO: Initialize Veracode API client, load credentials, etc.
-	return nil
-}
-
-// RegisterHandlers registers the dynamic findings handler
-func (t *DynamicFindingsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", DynamicFindingsToolName)
-	registry.RegisterHandler(DynamicFindingsToolName, t.handleGetDynamicFindings)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *DynamicFindingsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", DynamicFindingsToolName)
-	// TODO: Close API connections, cleanup resources
-	return nil
+	RegisterSimpleTool(DynamicFindingsToolName, handleGetDynamicFindings)
 }
 
 // DynamicFindingsRequest represents the parsed parameters for dynamic-findings
@@ -111,7 +80,7 @@ func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsR
 	return req, nil
 }
 
-func (t *DynamicFindingsTool) handleGetDynamicFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handleGetDynamicFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parseDynamicFindingsRequest(args)
 	if err != nil {

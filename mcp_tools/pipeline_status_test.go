@@ -8,31 +8,6 @@ import (
 	"testing"
 )
 
-func TestPipelineStatusTool_Initialize(t *testing.T) {
-	tool := NewPipelineStatusTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-}
-
-func TestPipelineStatusTool_RegisterHandlers(t *testing.T) {
-	tool := NewPipelineStatusTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	if registry.handlers[PipelineStatusToolName] == nil {
-		t.Fatal("Handler not registered")
-	}
-}
-
 func TestParsePipelineStatusRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
@@ -58,24 +33,13 @@ func TestParsePipelineStatusRequest_MissingApplicationPath(t *testing.T) {
 }
 
 func TestPipelineStatusTool_NoPIDFile(t *testing.T) {
-	tool := NewPipelineStatusTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
 
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	handler := registry.handlers[PipelineStatusToolName]
 	ctx := context.Background()
 
 	// Create a temporary directory
 	tempDir := t.TempDir()
 
-	result, err := handler(ctx, map[string]interface{}{
+	result, err := handlePipelineStatus(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 

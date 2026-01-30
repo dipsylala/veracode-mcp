@@ -39,21 +39,6 @@ func (m *mockTool) Shutdown() error {
 	return nil
 }
 
-// Mock handler registry for testing
-type mockHandlerRegistry struct {
-	handlers map[string]ToolHandler
-}
-
-func newMockHandlerRegistry() *mockHandlerRegistry {
-	return &mockHandlerRegistry{
-		handlers: make(map[string]ToolHandler),
-	}
-}
-
-func (r *mockHandlerRegistry) RegisterHandler(toolName string, handler ToolHandler) {
-	r.handlers[toolName] = handler
-}
-
 func TestRegisterTool(t *testing.T) {
 	// Clear the global registry before test
 	registryMu.Lock()

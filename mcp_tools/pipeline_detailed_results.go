@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -14,36 +13,7 @@ const PipelineDetailedResultsToolName = "pipeline-detailed-results"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool(PipelineDetailedResultsToolName, func() ToolImplementation {
-		return NewPipelineDetailedResultsTool()
-	})
-}
-
-// PipelineDetailedResultsTool provides the pipeline-detailed-results tool
-type PipelineDetailedResultsTool struct{}
-
-// NewPipelineDetailedResultsTool creates a new pipeline detailed results tool
-func NewPipelineDetailedResultsTool() *PipelineDetailedResultsTool {
-	return &PipelineDetailedResultsTool{}
-}
-
-// Initialize sets up the tool
-func (t *PipelineDetailedResultsTool) Initialize() error {
-	log.Printf("Initializing tool: %s", PipelineDetailedResultsToolName)
-	return nil
-}
-
-// RegisterHandlers registers the pipeline detailed results handler
-func (t *PipelineDetailedResultsTool) RegisterHandlers(registry HandlerRegistry) error {
-	log.Printf("Registering handlers for tool: %s", PipelineDetailedResultsToolName)
-	registry.RegisterHandler(PipelineDetailedResultsToolName, t.handlePipelineDetailedResults)
-	return nil
-}
-
-// Shutdown cleans up tool resources
-func (t *PipelineDetailedResultsTool) Shutdown() error {
-	log.Printf("Shutting down tool: %s", PipelineDetailedResultsToolName)
-	return nil
+	RegisterSimpleTool(PipelineDetailedResultsToolName, handlePipelineDetailedResults)
 }
 
 // PipelineDetailedResultsRequest represents the parsed parameters for pipeline-detailed-results
@@ -160,7 +130,7 @@ type PipelineFlawWithStackDumps struct {
 }
 
 // handlePipelineDetailedResults retrieves detailed information about a specific flaw
-func (t *PipelineDetailedResultsTool) handlePipelineDetailedResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+func handlePipelineDetailedResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parsePipelineDetailedResultsRequest(args)
 	if err != nil {

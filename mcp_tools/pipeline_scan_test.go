@@ -7,31 +7,6 @@ import (
 	"testing"
 )
 
-func TestPipelineScanTool_Initialize(t *testing.T) {
-	tool := NewPipelineScanTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-}
-
-func TestPipelineScanTool_RegisterHandlers(t *testing.T) {
-	tool := NewPipelineScanTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	if registry.handlers[PipelineScanToolName] == nil {
-		t.Fatal("Handler not registered")
-	}
-}
-
 func TestParsePipelineScanRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
@@ -187,21 +162,9 @@ func TestParsePipelineScanRequest_EmptyApplicationPath(t *testing.T) {
 }
 
 func TestPipelineScanTool_HandleInvalidPath(t *testing.T) {
-	tool := NewPipelineScanTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	handler := registry.handlers[PipelineScanToolName]
 	ctx := context.Background()
 
-	result, err := handler(ctx, map[string]interface{}{
+	result, err := handlePipelineScan(ctx, map[string]interface{}{
 		"application_path": "/nonexistent/path/to/app",
 	})
 

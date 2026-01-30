@@ -23,28 +23,9 @@ func TestStaticFindingsTool_WithWorkspaceConfig(t *testing.T) {
 		t.Fatalf("Failed to create workspace file: %v", err)
 	}
 
-	// Create the tool
-	tool := NewStaticFindingsTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	// Create a mock registry
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	// Get the handler
-	handler := registry.handlers[StaticFindingsToolName]
-	if handler == nil {
-		t.Fatal("Handler not registered")
-	}
-
 	// Call the handler with application_path
 	ctx := context.Background()
-	result, err := handler(ctx, map[string]interface{}{
+	result, err := handleGetStaticFindings(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 
@@ -166,28 +147,9 @@ func TestDynamicFindingsTool_WithWorkspaceConfig(t *testing.T) {
 		t.Fatalf("Failed to create workspace file: %v", err)
 	}
 
-	// Create the tool
-	tool := NewDynamicFindingsTool()
-	if err := tool.Initialize(); err != nil {
-		t.Fatalf("Failed to initialize tool: %v", err)
-	}
-	defer tool.Shutdown()
-
-	// Create a mock registry
-	registry := newMockHandlerRegistry()
-	if err := tool.RegisterHandlers(registry); err != nil {
-		t.Fatalf("Failed to register handlers: %v", err)
-	}
-
-	// Get the handler
-	handler := registry.handlers[DynamicFindingsToolName]
-	if handler == nil {
-		t.Fatal("Handler not registered")
-	}
-
 	// Call the handler with application_path
 	ctx := context.Background()
-	result, err := handler(ctx, map[string]interface{}{
+	result, err := handleGetDynamicFindings(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 
