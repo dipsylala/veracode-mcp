@@ -196,7 +196,8 @@ This project embeds UI HTML files in the binary using `go:embed`. Before running
 ```
 
 If you run `golangci-lint` directly without building the UI first, you'll get typecheck errors like:
-```
+
+```text
 Error: pattern ui/dynamic-findings-app/dist/mcp-app.html: no matching files found (typecheck)
 ```
 

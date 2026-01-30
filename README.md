@@ -211,80 +211,6 @@ The HTTP server provides these endpoints:
 - `POST /message?sessionId=<id>` - Send JSON-RPC requests
 - `GET /health` - Health check endpoint
 
-## Architecture
-
-### File Structure
-
-- `main.go` - Entry point and mode selection
-- `server.go` - Core MCP server logic and request handling
-- `types.go` - MCP protocol type definitions
-- `stdio.go` - Stdio transport implementation
-- `http.go` - HTTP/SSE transport implementation
-- `tool_loader.go` - Tool registry and auto-registration system
-- `tool_handlers.go` - Tool handler registry
-- `tool_implementations.go` - Tool implementation registry
-- `tools.json` - JSON-driven tool definitions and schemas
-- `api/` - API integration layer
-  - `client.go` - Client orchestrator
-  - `helpers/` - Business logic wrappers
-  - `generated/` - Swagger-generated API clients
-- `mcp_tools/` - MCP tool implementations (auto-registered)
-- `credentials/` - Credential management
-- `hmac/` - HMAC authentication utilities
-- `docs/` - Documentation
-
-### Tool Architecture
-
-The server uses an **auto-registration architecture** where tools register themselves on import:
-
-- supports protocol versions >= 2024-11-05
-- `notifications/initialized` - Client initialization confirmation (properly handled as notification per JSON-RPC 2.0 spec)
-- `tools/list` - List available tools (loaded from tools.json)
-- `tools/call` - Execute a tool with validated parameters
-- `resources/list` - List available resources
-- `resources/read` - Read resource content
-
-**Protocol Compatibility:**
-
-- Automatically negotiates protocol version with client
-- Tested with Codex (protocol 2025-06-18) and VS Code MCP clients
-- Strict JSON-RPC 2.0 compliance (notifications receive no response)
-- Buffered stdio transport with explicit flushing for reliable communic
-  - Rich descriptions optimized for LLM consumption
-  - Enum values and allowed ranges
-
-**Tool Implementations** (`mcp_tools/*.go`)
-
-- Type-safe Go implementations
-- Self-registering via `init()` functions
-- Lifecycle management (Initialize → RegisterHandlers → Shutdown)
-
-**Registries**
-
-- **ToolRegistry**: Loads tool definitions from `tools.json`
-- **ToolHandlerRegistry**: Maps tool names to handler functions
-- **ToolImplRegistry**: Manages tool implementation lifecycle
-
-**Benefits:**
-
-- ✅ No manual registration - just create the file
-- ✅ Type-safe Go implementations
-- ✅ Self-documenting via JSON schemas
-- ✅ Thread-safe registry
-- ✅ Independent testing
-- ✅ Modular tool organization
-
-### MCP Server Methods
-
-The server implements these core MCP protocol methods:
-
-- `initialize` - Protocol handshake and capability negotiation
-- `tools/list` - List available tools (loaded from tools.json)
-- `tools/call` - Execute a tool with validated parameters
-- `resources/list` - List available resources
-- `resources/read` - Read resource content
-- `notifications/initialized` - Client initialization confirmation
-
 ## Available Tools
 
 The server provides these Veracode-specific tools:
@@ -311,6 +237,7 @@ See [docs/ADDING_TOOLS.md](docs/ADDING_TOOLS.md) for the complete guide on imple
 
 ## Documentation
 
+- **[Architecture & Design](docs/DESIGN.md)** - System architecture and design decisions
 - **[Quick Start](docs/QUICKSTART.md)** - Get up and running quickly
 - **[Adding Tools](docs/ADDING_TOOLS.md)** - Create new MCP tools (extensibility guide)
 - **[API Integration](docs/API_INTEGRATION.md)** - Integrate Veracode REST APIs
