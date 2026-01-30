@@ -39,27 +39,14 @@ func ConfigureLogging(logFilePath string, verbose bool) error {
 	return nil
 }
 
-// RunServer starts the MCP server in the specified mode
-func RunServer(s *server.MCPServer, mode, addr string, verbose bool) error {
-	switch mode {
-	case "stdio":
-		log.Println("Starting MCP server in stdio mode...")
-		if err := s.ServeStdio(); err != nil {
-			if verbose {
-				log.Fatalf("stdio server error: %v", err)
-			}
-			return err
+// RunServer starts the MCP server in stdio mode
+func RunServer(s *server.MCPServer, verbose bool) error {
+	log.Println("Starting MCP server in stdio mode...")
+	if err := s.ServeStdio(); err != nil {
+		if verbose {
+			log.Fatalf("stdio server error: %v", err)
 		}
-	case "http":
-		log.Printf("Starting MCP server in http mode on %s...\n", addr)
-		if err := s.ServeHTTP(addr); err != nil {
-			if verbose {
-				log.Fatalf("http server error: %v", err)
-			}
-			return err
-		}
-	default:
-		return fmt.Errorf("invalid mode: %s. Use 'stdio' or 'http'", mode)
+		return err
 	}
 	return nil
 }

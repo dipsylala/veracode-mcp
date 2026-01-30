@@ -34,8 +34,6 @@ var version = "dev"
 
 func main() {
 	showVersion := flag.Bool("version", false, "Display version information")
-	mode := flag.String("mode", "stdio", "Server mode: stdio or http")
-	addr := flag.String("addr", ":8080", "HTTP server address (only for http mode)")
 	verbose := flag.Bool("verbose", false, "Enable verbose logging (disabled by default)")
 	logFile := flag.String("log", "", "Log file path (if not specified, logs go to stderr when verbose)")
 	forceMCPApp := flag.Bool("force-mcp-app", false, "Force MCP Apps mode (always send structuredContent regardless of client capabilities)")
@@ -60,7 +58,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := cli.RunServer(mcpServer, *mode, *addr, *verbose); err != nil {
+	if err := cli.RunServer(mcpServer, *verbose); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}

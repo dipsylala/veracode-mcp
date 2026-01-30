@@ -1,5 +1,5 @@
-// Package main implements a Model Context Protocol (MCP) server for Veracode security tools.
-// It supports both stdio and HTTP transports and provides auto-registered tool discovery.
+// Package server implements a Model Context Protocol (MCP) server for Veracode security tools.
+// It uses stdio transport for local filesystem operations and provides auto-registered tool discovery.
 package server
 
 import (
@@ -90,17 +90,10 @@ func NewMCPServer(forceMCPApp bool) (*MCPServer, error) {
 }
 
 // ServeStdio starts the MCP server using stdio transport.
-// This is the standard mode for MCP client integrations.
+// This is the only supported mode as the server requires local filesystem access.
 func (s *MCPServer) ServeStdio() error {
 	t := transport.NewStdioTransport(s)
 	return t.Start()
-}
-
-// ServeHTTP starts the MCP server using HTTP transport with Server-Sent Events.
-// This allows remote connections and web-based integrations.
-func (s *MCPServer) ServeHTTP(addr string) error {
-	t := transport.NewHTTPTransport(s)
-	return t.Start(addr)
 }
 
 // HandleRequest processes incoming MCP protocol requests and routes them
