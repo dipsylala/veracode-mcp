@@ -171,8 +171,31 @@ The stdio mode is ideal for local integrations where the MCP server runs as a su
 ```
 
 Or simply:
+```bash
+.\dist\veracode-mcp.exe
+```
 
-**VS Code / Codex:**
+### MCP Client Configuration
+
+**VS Code:**
+
+Copy [mcp.json](mcp.json) to `.vscode/mcp.json` in your workspace and update the paths as needed:
+
+```json
+{
+  "servers": {
+    "veracode": {
+      "command": "/absolute/path/to/veracode-mcp.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
+```
+
+Optional: Add `"-log", "/path/to/veracode-mcp.log"` to the `args` array for debugging, or any of the other [Command Line Options](#command-line-options).
+
+**Codex:**
 
 Add to your MCP client configuration (e.g., `~/.codex/config.toml`):
 
