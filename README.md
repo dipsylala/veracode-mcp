@@ -179,7 +179,7 @@ Or simply:
 
 **VS Code:**
 
-Copy [mcp.json](mcp.json) to `.vscode/mcp.json` in your workspace and update the paths as needed:
+Create/update `.vscode/mcp.json` in your workspace and update the paths as needed:
 
 ```json
 {
