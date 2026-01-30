@@ -56,23 +56,23 @@ iex (iwr https://tools.veracode.com/veracode-cli/install.ps1)
 curl -fsS https://tools.veracode.com/veracode-cli/install | sh
 ```
 
-**Authenticate the CLI:**
-
-After installation, configure your API credentials:
-
-```bash
-veracode configure
-```
-
 For detailed installation instructions and alternative methods, see the [official Veracode CLI installation guide](https://docs.veracode.com/r/Install_the_Veracode_CLI).
 
 ## Configuration
 
 ### Veracode API Credentials
 
-The server requires Veracode API credentials to access the Veracode platform. Credentials can be provided in two ways (checked in order):
+**Authenticate the CLI:**
 
-1. **File-based configuration** (Recommended)
+After installation, configure your API credentials via:
+
+1. **Veracode CLI-based configuration** (Recommended)
+
+```bash
+veracode configure
+```
+
+2. **File-based configuration** (Recommended)
 
    Create `~/.veracode/veracode.yml`:
 
@@ -107,7 +107,7 @@ The server requires Veracode API credentials to access the Veracode platform. Cr
    "@ | Out-File -FilePath "$env:USERPROFILE\.veracode\veracode.yml" -Encoding UTF8
    ```
 
-2. **Environment variables** (Fallback)
+3. **Environment variables** (Fallback)
 
    ```bash
    export VERACODE_API_ID="YOUR_API_KEY_ID"
@@ -156,7 +156,7 @@ Options:
 
 The server runs in stdio mode for local integrations where it operates as a subprocess. This is the only supported mode as the server requires local filesystem access for workspace operations.
 
-**VS Code / Codex:**
+**Codex:**
 
 Add to your MCP client configuration (e.g., `~/.codex/config.toml`):
 
