@@ -183,6 +183,38 @@ issues:
 
 ## Quick Start
 
+**⚠️ IMPORTANT: Build UI First**
+
+This project embeds UI HTML files in the binary using `go:embed`. Before running golangci-lint or building, you **must** build the UI apps first:
+
+```bash
+# Build UI apps only
+.\build.ps1 -UIOnly
+
+# Or run full build (recommended)
+.\build.ps1
+```
+
+If you run `golangci-lint` directly without building the UI first, you'll get typecheck errors like:
+```
+Error: pattern ui/dynamic-findings-app/dist/mcp-app.html: no matching files found (typecheck)
+```
+
+**Proper workflow:**
+
+```bash
+# 1. Build UI apps (creates embedded HTML files)
+.\build.ps1 -UIOnly
+
+# 2. Now you can run linting
+golangci-lint run
+
+# 3. Or just use the full build script
+.\build.ps1   # Builds UI, runs quality checks, tests, and compiles binary
+```
+
+---
+
 1. **Install golangci-lint:**
 
   ```bash
@@ -213,14 +245,28 @@ issues:
 
 ## CI/CD Integration
 
-For GitHub Actions:
+For GitHub Actions, ensure UI is built before linting:
 
 ```yaml
+- name: Set up Node.js
+  uses: actions/setup-node@v4
+  with:
+    node-version: '20'
+
+- name: Build UI Apps
+  run: |
+    # Build all UI apps (required for go:embed to work)
+    cd ui/pipeline-results-app && npm install && npm run build && cd ../..
+    cd ui/static-findings-app && npm install && npm run build && cd ../..
+    cd ui/dynamic-findings-app && npm install && npm run build && cd ../..
+
 - name: Run golangci-lint
-  uses: golangci/golangci-lint-action@v3
+  uses: golangci/golangci-lint-action@v4
   with:
     version: latest
 ```
+
+**Why this is needed:** The `main.go` file uses `//go:embed` directives to bundle UI HTML files into the binary. These files must exist when Go's type checker runs, or you'll get errors like `pattern ui/.../dist/mcp-app.html: no matching files found`.
 
 ## Benefits
 

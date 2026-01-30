@@ -1,3 +1,12 @@
+# golangci-lint configuration for Veracode MCP Server
+#
+# IMPORTANT: Before running golangci-lint, ensure UI apps are built:
+#   .\build.ps1 -UIOnly   (Windows PowerShell)
+#   ./build.ps1 -UIOnly   (Linux/macOS with PowerShell)
+#
+# The main.go file embeds UI HTML files that must exist for typecheck to pass.
+# Run full build script to ensure everything is built: .\build.ps1
+
 run:
   timeout: 5m
   tests: true

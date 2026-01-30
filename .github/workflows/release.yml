@@ -22,6 +22,31 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build UI Apps
+        run: |
+          # Build Pipeline Results UI
+          cd ui/pipeline-results-app
+          npm install
+          npm run build
+          cd ../..
+          
+          # Build Static Findings UI
+          cd ui/static-findings-app
+          npm install
+          npm run build
+          cd ../..
+          
+          # Build Dynamic Findings UI
+          cd ui/dynamic-findings-app
+          npm install
+          npm run build
+          cd ../..
+
       - name: Get version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
