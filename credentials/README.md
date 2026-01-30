@@ -7,17 +7,18 @@ This package handles loading Veracode API credentials from multiple sources.
 1. **File-based configuration** (Preferred)
    - Location: `~/.veracode/veracode.yml`
    - Format:
+
      ```yaml
      api:
        key-id: 1*************1****
        key-secret: c*********************************************************a
-       api-base-url: https://api.veracode.com  # Optional, defaults to US region
+       # override-api-base-url is optional - api is auto-detected from key-id prefix (vera01ei-* → EU, otherwise → US)
      ```
 
 2. **Environment Variables** (Fallback)
    - `VERACODE_API_ID`
    - `VERACODE_API_KEY`
-   - `VERACODE_API_BASE_URL` (Optional, defaults to https://api.veracode.com)
+   - `VERACODE_OVERRIDE_API_BASE_URL` (Optional, auto-detected from API ID if not set)
 
 ## Usage
 
@@ -63,12 +64,12 @@ Configure the region in your `veracode.yml`:
 api:
   key-id: YOUR_API_KEY_ID
   key-secret: YOUR_API_KEY_SECRET
-  api-base-url: https://api.veracode.eu  # Override auto-detection
+  override-api-base-url: https://api.veracode.eu  # Override auto-detection
 ```
 
 Or via environment variable:
 ```bash
-export VERACODE_API_BASE_URL="https://api.veracode.eu"
+export VERACODE_OVERRIDE_API_BASE_URL="https://api.veracode.eu"
 ```
 
 **Note**: Explicit configuration always takes precedence over automatic detection.

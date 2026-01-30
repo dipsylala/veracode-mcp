@@ -13,7 +13,7 @@ type VeracodeConfig struct {
 	API struct {
 		KeyID     string `yaml:"key-id"`
 		KeySecret string `yaml:"key-secret"`
-		BaseURL   string `yaml:"api-base-url,omitempty"`
+		BaseURL   string `yaml:"override-api-base-url,omitempty"`
 	} `yaml:"api"`
 }
 
@@ -44,7 +44,7 @@ func GetCredentials() (apiID, apiSecret, baseURL string, err error) {
 	// Fall back to environment variables
 	apiID = os.Getenv("VERACODE_API_ID")
 	apiSecret = os.Getenv("VERACODE_API_KEY")
-	baseURL = os.Getenv("VERACODE_API_BASE_URL")
+	baseURL = os.Getenv("VERACODE_OVERRIDE_API_BASE_URL")
 
 	if baseURL == "" {
 		baseURL = detectRegionFromKeyID(apiID)
@@ -106,7 +106,7 @@ func GetCredentialsWithFallback() (apiID, apiSecret, baseURL, source string, err
 	// Fall back to environment variables
 	apiID = os.Getenv("VERACODE_API_ID")
 	apiSecret = os.Getenv("VERACODE_API_KEY")
-	baseURL = os.Getenv("VERACODE_API_BASE_URL")
+	baseURL = os.Getenv("VERACODE_OVERRIDE_API_BASE_URL")
 
 	if baseURL == "" {
 		baseURL = detectRegionFromKeyID(apiID)

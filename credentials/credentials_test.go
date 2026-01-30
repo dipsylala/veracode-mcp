@@ -55,7 +55,7 @@ func TestGetCredentials_WithCustomBaseURL(t *testing.T) {
 	customConfig := `api:
   key-id: test-key-id-123
   key-secret: test-key-secret-456
-  api-base-url: https://api.veracode.eu
+  override-api-base-url: https://api.veracode.eu
 `
 	if err := os.WriteFile(configPath, []byte(customConfig), 0600); err != nil {
 		t.Fatalf("Failed to write config file: %v", err)
@@ -450,7 +450,7 @@ func TestGetCredentials_ExplicitBaseURLOverridesAutoDetect(t *testing.T) {
 	explicitConfig := `api:
   key-id: vera01ei-1234-5678-90ab-cdef
   key-secret: test-key-secret-456
-  api-base-url: https://api.veracode.com
+  override-api-base-url: https://api.veracode.com
 `
 	if err := os.WriteFile(configPath, []byte(explicitConfig), 0600); err != nil {
 		t.Fatalf("Failed to write config file: %v", err)

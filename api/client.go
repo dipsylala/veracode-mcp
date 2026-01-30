@@ -76,9 +76,8 @@ func newHMACHTTPClient(apiID, apiKey string) *http.Client {
 // Credentials are loaded from:
 // 1. ~/.veracode/veracode.yml (preferred)
 // 2. Environment variables VERACODE_API_ID and VERACODE_API_KEY (fallback)
-// Base URL defaults to https://api.veracode.com but can be overridden via:
-// - api-base-url in veracode.yml
-// - VERACODE_API_BASE_URL environment variable
+// Base URL is auto-detected from API key ID prefix (vera01ei-* → EU, otherwise → US)
+// Can be overridden via override-api-base-url in veracode.yml or VERACODE_OVERRIDE_API_BASE_URL environment variable
 func NewVeracodeClient() (*VeracodeClient, error) {
 	apiID, apiKey, baseURL, err := credentials.GetCredentials()
 	if err != nil {
