@@ -4,7 +4,7 @@
 
 Server-Side Request Forgery (SSRF) allows attackers to make the server perform HTTP requests to arbitrary destinations, accessing internal services, cloud metadata endpoints (169.254.169.254), or bypassing firewall controls. Always validate URLs against an allowlist of permitted domains, block private/reserved IP ranges using the `ipaddress` module, and restrict protocols to `https://` only.
 
-## Remediation Strategy
+## Key Principles
 
 - Validate all URLs against an explicit allowlist of permitted domains/hosts before making requests
 - Block access to private IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8, 169.254.0.0/16)
@@ -21,7 +21,7 @@ Server-Side Request Forgery (SSRF) allows attackers to make the server perform H
 - Make the request with redirects disabled (`allow_redirects=False`)
 - Set short timeouts to prevent resource exhaustion
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import ipaddress

@@ -4,7 +4,7 @@
 
 Error Message Information Leak occurs when Java applications expose exception stack traces, SQL errors, or internal system details through HTTP responses, logs, or error pages. Java's detailed exception hierarchy aids debugging but becomes dangerous when exposed to untrusted users. **Primary Defence:** Return generic error messages to users while logging detailed exceptions server-side using `@ControllerAdvice` or exception handlers to centralize error handling.
 
-## Remediation Strategy
+## Key Principles
 
 - Centralize exception handling with `@ControllerAdvice` or JAX-RS `@Provider` mappers to ensure consistent, generic error responses
 - Return generic messages to clients while logging full exception details server-side with unique error IDs for correlation
@@ -21,7 +21,7 @@ Error Message Information Leak occurs when Java applications expose exception st
 - Configure custom error pages in `web.xml` pointing to `/WEB-INF/error-pages/` to prevent direct access
 - Implement log redaction using custom Logback layouts with regex patterns for passwords, tokens, and PII
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 @RestControllerAdvice

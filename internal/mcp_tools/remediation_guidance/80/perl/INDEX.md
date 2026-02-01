@@ -6,7 +6,7 @@ Cross-Site Scripting (CWE-80) occurs when untrusted data is included in web page
 
 **Primary Defence:** Use CGI.pm's `escapeHTML()` for HTML contexts, URL encoding for URLs, and JavaScript encoding for script contexts.
 
-## Remediation Strategy
+## Key Principles
 
 - Encode all user input before outputting to HTML using `CGI::escapeHTML()` or HTML::Entities
 - Use Content Security Policy headers to restrict script execution sources
@@ -23,7 +23,7 @@ Cross-Site Scripting (CWE-80) occurs when untrusted data is included in web page
 - Test with XSS payloads like `<script>alert(1)</script>` to verify protection
 - Audit code for direct `print` statements containing CGI parameters
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```perl
 #!/usr/bin/perl

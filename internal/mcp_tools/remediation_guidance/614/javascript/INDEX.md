@@ -4,7 +4,7 @@
 
 Sensitive Cookie Without 'Secure' Flag occurs when cookies containing sensitive data (session IDs, authentication tokens) are set without the `secure` attribute, allowing transmission over unencrypted HTTP connections. This exposes cookies to man-in-the-middle attacks, network sniffing, and session hijacking. The fix is to always set the `secure` flag on sensitive cookies to ensure they're only transmitted over HTTPS.
 
-## Remediation Strategy
+## Key Principles
 
 - Always set `secure: true` on cookies containing sensitive data (sessions, auth tokens, CSRF tokens)
 - Combine with `httpOnly: true` to prevent JavaScript access and `sameSite: 'strict'` or `'lax'` for CSRF protection
@@ -21,7 +21,7 @@ Sensitive Cookie Without 'Secure' Flag occurs when cookies containing sensitive 
 - Configure session middleware (express-session) with secure cookie defaults
 - Verify HTTPS is enforced in production (cookies with `secure` won't transmit over HTTP)
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // Express.js secure cookie configuration

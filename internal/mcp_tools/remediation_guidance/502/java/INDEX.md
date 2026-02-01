@@ -4,7 +4,7 @@
 
 Insecure deserialization occurs when untrusted data is used to create objects, potentially allowing attackers to execute arbitrary code, manipulate application logic, or achieve denial of service. Java's native serialization is particularly dangerous because it can invoke methods during deserialization. **Primary Defence:** Use JSON (Jackson, Gson) instead of Java serialization, or if Java serialization is required, implement `ObjectInputFilter` (Java 9+) to whitelist allowed classes.
 
-## Remediation Strategy
+## Key Principles
 
 - Prefer data-only formats: Replace Java serialization with JSON, Protocol Buffers, or other data-only formats that don't execute code during deserialization
 - Whitelist classes explicitly: If Java serialization is unavoidable, use `ObjectInputFilter` to allow only specific, known-safe classes
@@ -20,7 +20,7 @@ Insecure deserialization occurs when untrusted data is used to create objects, p
 - Update dependencies regularly to patch known deserialization gadgets
 - Monitor and log all deserialization activity for anomaly detection
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // ObjectInputFilter whitelist approach (Java 9+)

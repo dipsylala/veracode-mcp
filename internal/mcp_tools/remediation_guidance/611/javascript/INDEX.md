@@ -4,7 +4,7 @@
 
 XXE injection occurs when XML parsers process external entity references, allowing attackers to read local files, perform SSRF attacks, or cause denial of service. Node.js applications parsing XML from SOAP APIs, SVG uploads, RSS feeds, or configuration files are vulnerable when using libraries like `libxmljs`, `xml2js`, `fast-xml-parser` without disabling external entities. The core fix is to disable external entity resolution and DTD processing in parser configurations.
 
-## Remediation Strategy
+## Key Principles
 
 - Disable external entity processing and DTD resolution in all XML parser configurations
 - Use secure XML parsing libraries with XXE protection enabled by default
@@ -19,7 +19,7 @@ XXE injection occurs when XML parsers process external entity references, allowi
 - Review all XML parsing code and apply secure configurations consistently
 - Add input validation to reject XML containing DOCTYPE declarations or entity references
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // libxmljs with XXE protection

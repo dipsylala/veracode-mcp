@@ -4,7 +4,7 @@
 
 Insufficiently Protected Credentials in Java occurs when passwords, API keys, or authentication tokens are hardcoded, stored in plaintext, weakly encrypted, or transmitted insecurely. The core fix is to externalize credentials to secure vaults (AWS Secrets Manager, HashiCorp Vault, Azure Key Vault), use environment variables or encrypted configuration files, and leverage Java's KeyStore or strong encryption (AES-256) when storage is necessary. Never log, hardcode, or commit credentials to version control.
 
-## Remediation Strategy
+## Key Principles
 
 - Store credentials in external secret management systems (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
 - Use environment variables or encrypted configuration files with restricted file permissions
@@ -21,7 +21,7 @@ Insufficiently Protected Credentials in Java occurs when passwords, API keys, or
 - Replace String passwords with char[] and zero out arrays after authentication
 - Enable TLS 1.3 for all credential transmission; never send credentials in URLs or logs
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Retrieve credentials from AWS Secrets Manager

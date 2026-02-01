@@ -4,7 +4,7 @@
 
 Storing sensitive data (passwords, API keys, cryptographic keys) in memory as cleartext in Python exposes it to memory dumps, debuggers, and memory disclosure vulnerabilities. Python strings are immutable and persist in memory even after deletion, making secure handling challenging. Use `bytearray` for mutable secrets and explicitly zero them after use.
 
-## Remediation Strategy
+## Key Principles
 
 - Use mutable types (`bytearray`) instead of immutable strings for sensitive data
 - Minimize the lifetime of secrets in memory—clear immediately after use
@@ -21,7 +21,7 @@ Storing sensitive data (passwords, API keys, cryptographic keys) in memory as cl
 - Use `getpass.getpass()` for password input instead of `input()`
 - Integrate libraries like `ctypes` with `mlock()` for critical data protection
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import getpass

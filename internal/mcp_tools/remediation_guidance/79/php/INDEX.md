@@ -4,7 +4,7 @@
 
 XSS occurs when untrusted data is rendered in web pages without proper encoding, allowing attackers to inject malicious scripts. Always use `htmlspecialchars()` with `ENT_QUOTES | ENT_HTML5` flags and UTF-8 encoding for HTML output, or leverage framework auto-escaping (Laravel Blade `{{ }}`, Twig `{{ }}`). Apply context-specific encoding for JavaScript, URLs, and CSS contexts.
 
-## Remediation Strategy
+## Key Principles
 
 - Use output encoding appropriate to the context (HTML, JavaScript, URL, CSS)
 - Enable auto-escaping in templating engines by default
@@ -21,7 +21,7 @@ XSS occurs when untrusted data is rendered in web pages without proper encoding,
 - Review all instances of `echo`, `print`, and template rendering
 - Add CSP header - `Content-Security-Policy - default-src 'self'`
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 <?php

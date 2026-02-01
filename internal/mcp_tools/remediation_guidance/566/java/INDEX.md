@@ -21,7 +21,7 @@ Authorization bypass through user-controlled keys (IDOR) occurs when Java applic
 - Implement access control checks before returning or modifying resources
 - Test with different authenticated users attempting to access each other's resources
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 @GetMapping("/orders/{orderId}")

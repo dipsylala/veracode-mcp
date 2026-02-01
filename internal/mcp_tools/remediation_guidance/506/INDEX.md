@@ -4,7 +4,7 @@
 
 Embedded malicious code includes backdoors, logic bombs, time bombs, and trojans intentionally placed in source code or dependencies. Compromised npm packages, malicious gems, and supply chain attacks inject code that steals credentials, creates backdoors, or triggers on specific conditions.
 
-## Remediation Strategy
+## Key Principles
 
 - Enforce mandatory code review for all changes, especially from new contributors
 - Implement dependency signing and provenance verification

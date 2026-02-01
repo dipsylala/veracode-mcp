@@ -4,7 +4,7 @@
 
 XML Injection in JavaScript/Node.js applications occurs when untrusted user input is used to construct XML documents without proper validation or escaping. Attackers can manipulate XML structure by injecting special characters like `<`, `>`, `&`, `'`, and `"`, leading to data corruption, authentication bypass, or information disclosure. **Primary Defence:** Use XML builder libraries like `xmlbuilder2` or `fast-xml-parser` that automatically escape user input, or manually escape special XML characters before insertion.
 
-## Remediation Strategy
+## Key Principles
 
 - Always use XML builder libraries with automatic escaping instead of string concatenation
 - Validate and sanitize all user input before incorporating into XML documents
@@ -21,7 +21,7 @@ XML Injection in JavaScript/Node.js applications occurs when untrusted user inpu
 - Enable XML parser security features (disable external entities, limit depth)
 - Test with malicious payloads containing `<`, `>`, `&`, `CDATA` sections
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const { create } = require('xmlbuilder2');

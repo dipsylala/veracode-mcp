@@ -4,7 +4,7 @@
 
 Java applications commonly leak sensitive information through HTTP responses, error messages, exception stack traces, and API responses. While frameworks like Spring Boot and Jakarta EE provide security features, misconfigurations and improper exception handling can expose passwords, tokens, internal paths, PII, database credentials, and system details. The core fix is sanitizing all output, implementing global exception handlers, and using structured logging with sensitive data filtering.
 
-## Remediation Strategy
+## Key Principles
 
 - Implement global exception handlers that return sanitized error responses without stack traces or internal details
 - Use structured logging with explicit filtering of sensitive fields (passwords, tokens, API keys)
@@ -21,7 +21,7 @@ Java applications commonly leak sensitive information through HTTP responses, er
 - Review exception handling to catch specific exceptions and avoid leaking implementation details
 - Add response filters to strip sensitive headers and sanitize error content
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 @RestControllerAdvice

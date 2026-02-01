@@ -4,7 +4,7 @@
 
 Resource Injection occurs when untrusted input selects system resources (files, ports, class names, URLs) without validation, allowing attackers to manipulate which resources the application accesses. The core fix is to never let untrusted input directly select resources; instead, use allowlisted mappings and canonical path validation to ensure only permitted resources are accessed.
 
-## Remediation Strategy
+## Key Principles
 
 - Never let untrusted input select resources by name or path directly
 - Canonicalize all resource identifiers (resolve paths, normalize names) before validation

@@ -27,16 +27,12 @@ type PipelineResultsRequest struct {
 
 // parsePipelineResultsRequest extracts and validates parameters from the raw args map
 func parsePipelineResultsRequest(args map[string]interface{}) (*PipelineResultsRequest, error) {
-	req := &PipelineResultsRequest{}
-
-	// Extract application_path (required)
 	appPath, ok := args["application_path"].(string)
 	if !ok || appPath == "" {
 		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
 	}
-	req.ApplicationPath = appPath
 
-	return req, nil
+	return &PipelineResultsRequest{ApplicationPath: appPath}, nil
 }
 
 // PipelineScanResults represents the JSON structure from Veracode Pipeline Scanner
@@ -75,6 +71,16 @@ type SourceFileInfo struct {
 	Scope             string `json:"scope,omitempty"`
 }
 
+// pipelineErrorResponse creates a standardized error response for pipeline results
+func pipelineErrorResponse(message string) map[string]interface{} {
+	return map[string]interface{}{
+		"content": []map[string]string{{
+			"type": "text",
+			"text": message,
+		}},
+	}
+}
+
 // handlePipelineResults retrieves and formats pipeline scan results
 func handlePipelineResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
@@ -91,10 +97,7 @@ func handlePipelineResults(ctx context.Context, args map[string]interface{}) (in
 	// Find the most recent results file
 	resultsFile, err := findMostRecentResultsFile(outputDir)
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf(`Pipeline Scan Results
+		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Scan Results
 ==================
 
 Application Path: %s
@@ -105,26 +108,19 @@ Results Directory: %s
 %v
 
 To generate results, run a pipeline scan using the pipeline-static-scan tool.
-`, req.ApplicationPath, outputDir, err),
-			}},
-		}, nil
+`, req.ApplicationPath, outputDir, err)), nil
 	}
 
 	// Read and parse the results file
 	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
 	resultsData, err := os.ReadFile(resultsFile)
 	if err != nil {
-		return map[string]interface{}{
-			"error": fmt.Sprintf("Failed to read results file: %v", err),
-		}, nil
+		return pipelineErrorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil
 	}
 
 	var scanResults PipelineScanResults
-	err = json.Unmarshal(resultsData, &scanResults)
-	if err != nil {
-		return map[string]interface{}{
-			"error": fmt.Sprintf("Failed to parse results file: %v", err),
-		}, nil
+	if err = json.Unmarshal(resultsData, &scanResults); err != nil {
+		return pipelineErrorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
 	}
 
 	// Format and return the response
@@ -255,30 +251,25 @@ func processPipelineFinding(flaw PipelineFlaw) MCPFinding {
 	var cweID int32
 	_, _ = fmt.Sscanf(flaw.CWEID, "%d", &cweID) // Ignore error, default to 0 if parse fails
 
-	// Clean up the display text (remove HTML tags)
-	cleanDesc := CleanDescription(flaw.DisplayText)
-
-	if flaw.Severity > math.MaxInt32 {
-		flaw.Severity = math.MaxInt32
+	// Validate severity to prevent overflow
+	severityScore := flaw.Severity
+	if severityScore > math.MaxInt32 {
+		severityScore = math.MaxInt32
 	}
 
 	finding := MCPFinding{
 		FlawID:         fmt.Sprintf("%d", flaw.IssueID),
 		ScanType:       "STATIC",
 		Severity:       transformPipelineSeverity(flaw.Severity),
-		SeverityScore:  int32(flaw.Severity), // #nosec G115 - validated above
+		SeverityScore:  int32(severityScore), // #nosec G115 - validated above
 		CweId:          cweID,
-		Description:    cleanDesc,
+		Description:    CleanDescription(flaw.DisplayText),
 		Status:         "open",                          // Pipeline findings are always open
 		ViolatesPolicy: false,                           // Pipeline scanner doesn't provide this per-finding
 		FirstFound:     time.Now().Format(time.RFC3339), // Pipeline scans don't track this
 		FilePath:       flaw.Files.SourceFile.File,
 		LineNumber:     flaw.Files.SourceFile.Line,
-	}
-
-	// Add function information if available
-	if flaw.Files.SourceFile.FunctionName != "" {
-		finding.Procedure = flaw.Files.SourceFile.FunctionName
+		Procedure:      flaw.Files.SourceFile.FunctionName,
 	}
 
 	return finding
@@ -286,20 +277,16 @@ func processPipelineFinding(flaw PipelineFlaw) MCPFinding {
 
 // transformPipelineSeverity converts numeric severity to text representation
 func transformPipelineSeverity(severity int) string {
-	switch severity {
-	case 5:
-		return "very high"
-	case 4:
-		return "high"
-	case 3:
-		return "medium"
-	case 2:
-		return "low"
-	case 1:
-		return "very low"
-	case 0:
-		return "info"
-	default:
-		return "info"
+	severityMap := map[int]string{
+		5: "very high",
+		4: "high",
+		3: "medium",
+		2: "low",
+		1: "very low",
+		0: "info",
 	}
+	if text, ok := severityMap[severity]; ok {
+		return text
+	}
+	return "info"
 }

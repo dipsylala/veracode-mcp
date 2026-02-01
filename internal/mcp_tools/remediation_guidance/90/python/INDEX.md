@@ -4,7 +4,7 @@
 
 LDAP Injection occurs when untrusted user input is concatenated into LDAP queries without proper sanitization, allowing attackers to manipulate queries to bypass authentication, escalate privileges, or extract sensitive directory data. The primary defense is using parameterized queries with the `ldap3` library and escaping LDAP special characters (`*`, `(`, `)`, `\`, `NUL`) in user-controlled input. Never construct LDAP filter strings through concatenation.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `ldap3` library with parameterized queries instead of string concatenation
 - Escape all special LDAP characters in user input using `ldap3.utils.conv.escape_filter_chars()`
@@ -21,7 +21,7 @@ LDAP Injection occurs when untrusted user input is concatenated into LDAP querie
 - Test filters with malicious payloads like `*)(objectClass=*)` and `admin)(&(password=*)`
 - Restrict LDAP bind account permissions to minimum required scope
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from ldap3 import Server, Connection, ALL

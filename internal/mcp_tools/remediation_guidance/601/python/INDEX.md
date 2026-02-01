@@ -4,7 +4,7 @@
 
 Open redirect vulnerabilities occur when user-controlled input determines redirect destinations without validation, enabling phishing and credential theft. The core fix is validating that redirect URLs are either relative paths (starting with `/` but not `//`) or match an allowlist of trusted domains using `urlparse()`. For Flask, Django, and FastAPI, use framework-specific validators and never directly pass user input to redirect functions.
 
-## Remediation Strategy
+## Key Principles
 
 - Validate redirect URLs are relative paths using `urlparse().netloc == ''` to ensure no external domain
 - Maintain an allowlist of trusted domains for absolute URLs and reject all others
@@ -20,7 +20,7 @@ Open redirect vulnerabilities occur when user-controlled input determines redire
 - Use framework validators - Django's `url_has_allowed_host_and_scheme()` or implement custom validation
 - Set a default safe redirect (e.g., `/dashboard`) when validation fails
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from urllib.parse import urlparse

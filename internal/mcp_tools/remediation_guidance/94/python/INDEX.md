@@ -4,7 +4,7 @@
 
 Code injection in Python occurs when untrusted input is passed to code execution functions like `eval()`, `exec()`, `compile()`, or `__import__()`. This allows attackers to execute arbitrary Python code with full access to the application's runtime environment. Never use dynamic code execution with user input; use safe alternatives like literal evaluation, dictionaries for dispatch, or sandboxed parsers.
 
-## Remediation Strategy
+## Key Principles
 
 - Never use `eval()`, `exec()`, or `compile()` with any user-controlled input
 - Use `ast.literal_eval()` for safe evaluation of literals (strings, numbers, lists, dicts)
@@ -21,7 +21,7 @@ Code injection in Python occurs when untrusted input is passed to code execution
 - Remove or isolate any remaining exec/eval calls to sandboxed environments
 - Audit all uses of `__import__()`, `compile()`, and `importlib` for user input
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import ast

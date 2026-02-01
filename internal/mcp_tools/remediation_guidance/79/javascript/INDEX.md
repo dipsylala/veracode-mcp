@@ -4,7 +4,7 @@
 
 Cross-Site Scripting (XSS) occurs when untrusted data is rendered in web pages without proper encoding, allowing attackers to inject malicious scripts. The primary defense is using framework auto-escaping (React JSX, Vue templates), `textContent` for DOM manipulation, or DOMPurify for rich HTML sanitization.
 
-## Remediation Strategy
+## Key Principles
 
 - Use framework built-in escaping mechanisms (React JSX, Vue templates, template engines with escaping enabled)
 - Never use `innerHTML`, `dangerouslySetInnerHTML`, or `v-html` with untrusted data
@@ -21,7 +21,7 @@ Cross-Site Scripting (XSS) occurs when untrusted data is rendered in web pages w
 - Validate and encode URL parameters before rendering
 - Use parameterized queries for database operations to prevent injection
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // Safe: Use textContent for plain text

@@ -4,7 +4,7 @@
 
 Insufficiently Protected Credentials in JavaScript/Node.js occurs when passwords, API keys, tokens, or secrets are stored in plaintext, hardcoded in source code, committed to version control, or transmitted insecurely. The core fix is to use strong one-way hashing (bcrypt, argon2) for passwords, environment variables for secrets, and encrypted transmission channels. Never store plaintext credentials or commit secrets to repositories.
 
-## Remediation Strategy
+## Key Principles
 
 - Hash passwords with bcrypt or argon2 (never store plaintext or use weak algorithms like MD5/SHA1)
 - Store secrets in environment variables or secure vaults (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
@@ -21,7 +21,7 @@ Insufficiently Protected Credentials in JavaScript/Node.js occurs when passwords
 - Implement HTTPS for APIs and use secure cookie flags (`httpOnly`, `secure`, `sameSite`)
 - Rotate any credentials that were previously exposed
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const bcrypt = require('bcrypt');

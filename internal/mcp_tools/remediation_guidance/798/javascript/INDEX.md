@@ -4,7 +4,7 @@
 
 Hard-coded credentials in JavaScript/Node.js occur when sensitive values (passwords, API keys, database credentials, JWT secrets, encryption keys) are embedded directly in source code or configuration files. This exposes secrets in version control, build artifacts, and deployed code. The fix is to externalize all secrets to environment variables or secure secret management services, never committing them to repositories.
 
-## Remediation Strategy
+## Key Principles
 
 - Store all secrets in environment variables (process.env) or dedicated secret managers (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
 - Use .env files only for local development and ensure .gitignore excludes them from version control
@@ -21,7 +21,7 @@ Hard-coded credentials in JavaScript/Node.js occur when sensitive values (passwo
 - Rotate all exposed credentials and update them in secure storage systems
 - Add pre-commit hooks or CI checks using tools like gitleaks or trufflehog
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // Load environment variables

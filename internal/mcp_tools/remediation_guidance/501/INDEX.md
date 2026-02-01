@@ -4,7 +4,7 @@
 
 Trust boundary violations occur when untrusted data (user input, HTTP requests) is stored in trusted contexts (sessions, internal objects) without validation, or when trusted data is exposed to untrusted contexts. This enables session poisoning, privilege escalation, and security control bypass. Core fix: explicitly validate and authorize all data crossing trust boundaries.
 
-## Remediation Strategy
+## Key Principles
 
 - Treat trust boundaries explicitly—never allow data to cross without validation and authorization
 - Apply least privilege when storing data in trusted contexts

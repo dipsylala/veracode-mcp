@@ -4,7 +4,7 @@
 
 Command injection in Python occurs when applications construct system commands using untrusted input, allowing attackers to inject malicious commands through shell metacharacters. The primary defense is using `subprocess.run()` or `subprocess.Popen()` with argument lists (`shell=False`) instead of shell strings, never using `os.system()` or commands with `shell=True` on untrusted input.
 
-## Remediation Strategy
+## Key Principles
 
 - Use parameterized command execution with argument lists instead of shell string interpolation
 - Keep `shell=False` (default) in subprocess calls to prevent shell interpretation
@@ -21,7 +21,7 @@ Command injection in Python occurs when applications construct system commands u
 - Audit all subprocess and os module usage for untrusted input flow
 - Add security testing to verify commands cannot be manipulated
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import subprocess

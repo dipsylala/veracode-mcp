@@ -4,7 +4,7 @@
 
 Hard-coded credentials in source code create severe security risks as they are exposed in version control, decompiled bytecode, and configuration files. Attackers gaining access to the codebase can extract these credentials to compromise systems. Store credentials externally using environment variables, secrets management services (AWS Secrets Manager, Azure Key Vault), or encrypted configuration files with restricted access.
 
-## Remediation Strategy
+## Key Principles
 
 - Never embed passwords, API keys, tokens, or secrets directly in source code or properties files committed to version control
 - Use environment variables or system properties for runtime credential injection
@@ -21,7 +21,7 @@ Hard-coded credentials in source code create severe security risks as they are e
 - Remove credential history from version control using tools like git-filter-repo
 - Rotate all exposed credentials immediately after removal
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Retrieve credentials from environment variables at runtime

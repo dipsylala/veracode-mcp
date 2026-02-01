@@ -4,7 +4,7 @@
 
 Mass assignment vulnerabilities in Java occur when Spring MVC/Boot automatically binds HTTP request parameters to object fields, allowing attackers to modify security-critical fields like `isAdmin`, `role`, or `balance`. Use DTOs with only permitted fields for user input, apply `@JsonIgnoreProperties` or allowlist binding with `@InitBinder`, and validate with Bean Validation annotations. Never bind request data directly to JPA entities or domain objects.
 
-## Remediation Strategy
+## Key Principles
 
 - Use separate DTOs for user input that expose only modifiable fields
 - Apply `@JsonIgnoreProperties(ignoreUnknown = true)` and exclude sensitive fields with `@JsonIgnore`
@@ -21,7 +21,7 @@ Mass assignment vulnerabilities in Java occur when Spring MVC/Boot automatically
 - Use explicit field mapping when transferring DTO data to entities (avoid `BeanUtils.copyProperties`)
 - Never expose JPA entities directly as `@RequestBody` or form-backing objects
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // DTO with only permitted fields

@@ -4,7 +4,7 @@
 
 Use of Cryptographically Weak PRNG in PHP occurs when developers use non-cryptographic functions like `rand()`, `mt_rand()`, or `uniqid()` for security-sensitive operations such as generating tokens, keys, or passwords. These functions produce predictable values that attackers can exploit to compromise sessions, guess tokens, or break encryption. **Primary Defence:** Use `random_bytes()` or `random_int()` for all security-critical random value generation.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all `rand()`, `mt_rand()`, `uniqid()`, and `srand()` calls in security contexts with cryptographically secure alternatives
 - Use `random_bytes()` for generating random binary data (tokens, keys, salts)
@@ -21,7 +21,7 @@ Use of Cryptographically Weak PRNG in PHP occurs when developers use non-cryptog
 - Review and test all changes to verify randomness quality
 - Remove any custom seeding logic for PRNGs
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 // Generate cryptographically secure token

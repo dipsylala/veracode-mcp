@@ -4,7 +4,7 @@
 
 This vulnerability occurs when applications include code, libraries, or functionality from untrusted sources, allowing attackers to inject malicious behavior. The core fix is to verify the integrity and provenance of all executable code before inclusion, ensuring it originates only from trusted, controlled sources.
 
-## Remediation Strategy
+## Key Principles
 
 - Never execute or load functionality without explicitly verifying its integrity and provenance
 - Restrict all executable code to trusted, controlled sources with verified authenticity

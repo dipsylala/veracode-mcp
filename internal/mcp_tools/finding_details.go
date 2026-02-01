@@ -29,17 +29,18 @@ type FindingDetailsRequest struct {
 func parseFindingDetailsRequest(args map[string]interface{}) (*FindingDetailsRequest, error) {
 	req := &FindingDetailsRequest{}
 
-	// Use JSON marshaling to automatically map args to struct
-	jsonData, err := json.Marshal(args)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal arguments: %w", err)
+	if appPath, ok := args["application_path"].(string); ok {
+		req.ApplicationPath = appPath
+	}
+	if appProfile, ok := args["app_profile"].(string); ok {
+		req.AppProfile = appProfile
+	}
+	if flawID, ok := args["flaw_id"].(float64); ok {
+		req.FlawID = int(flawID)
+	} else if flawID, ok := args["flaw_id"].(int); ok {
+		req.FlawID = flawID
 	}
 
-	if err := json.Unmarshal(jsonData, req); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal arguments: %w", err)
-	}
-
-	// Validate required fields
 	if req.ApplicationPath == "" {
 		return nil, fmt.Errorf("application_path is required and must be an absolute path")
 	}

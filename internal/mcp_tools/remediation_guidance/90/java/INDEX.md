@@ -4,7 +4,7 @@
 
 LDAP Injection occurs when untrusted data is used to construct LDAP queries without proper encoding, allowing attackers to manipulate directory searches and access unauthorized data. **Primary Defence:** Use OWASP ESAPI's `encodeForLDAP()` and `encodeForDN()` methods, or Spring LDAP's query builder which provides automatic encoding.
 
-## Remediation Strategy
+## Key Principles
 
 - Always encode user input before inserting into LDAP queries or DN strings
 - Use parameterized query builders (Spring LDAP) instead of string concatenation
@@ -21,7 +21,7 @@ LDAP Injection occurs when untrusted data is used to construct LDAP queries with
 - Add input validation to reject unexpected characters before encoding
 - Test with payloads like `*)(uid=*))(|(uid=*` to verify protection
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 import org.owasp.esapi.ESAPI;

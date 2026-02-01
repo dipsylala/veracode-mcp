@@ -4,7 +4,7 @@
 
 OS Command Injection occurs when untrusted input is passed to system command execution functions like `child_process.exec()`, allowing attackers to execute arbitrary commands. The primary fix is to avoid shell invocation entirely by using `execFile()` or `spawn()` with argument arrays, ensuring commands and arguments are separated and cannot be manipulated.
 
-## Remediation Strategy
+## Key Principles
 
 - Never pass user input directly to shell command interpreters
 - Use argument arrays instead of string concatenation for commands
@@ -21,7 +21,7 @@ OS Command Injection occurs when untrusted input is passed to system command exe
 - Run commands with minimal privileges using appropriate user contexts
 - Log all command executions for security monitoring
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const { execFile } = require('child_process');

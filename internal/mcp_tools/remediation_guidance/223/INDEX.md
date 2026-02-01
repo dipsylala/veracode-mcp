@@ -4,7 +4,7 @@
 
 Omission of security-relevant information occurs when applications fail to log critical security events such as login failures, access denials, privilege escalations, and data modifications. This prevents effective security monitoring, incident response, compliance auditing, and attack detection. The core fix is implementing comprehensive logging of all security-relevant events while ensuring logged information doesn't expose sensitive data.
 
-## Remediation Strategy
+## Key Principles
 
 - Ensure exceptions and failure modes do not disclose sensitive data or bypass security checks; fail closed
 - Log all authentication and authorization events including both successes and failures

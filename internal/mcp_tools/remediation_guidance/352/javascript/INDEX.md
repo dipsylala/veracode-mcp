@@ -4,7 +4,7 @@
 
 CSRF vulnerabilities occur when state-changing endpoints don't verify that requests originated from the legitimate application, allowing attackers to trick users into executing unwanted actions. The core fix is implementing token-based verification where each form/request includes a secret token that the server validates. Use `csurf` middleware for Express or `@fastify/csrf-protection` for Fastify to automatically generate and validate CSRF tokens.
 
-## Remediation Strategy
+## Key Principles
 
 - Implement CSRF tokens for all state-changing operations (POST, PUT, DELETE, PATCH)
 - Use SameSite cookie attribute (`SameSite=Lax` or `Strict`) as defense-in-depth
@@ -21,7 +21,7 @@ CSRF vulnerabilities occur when state-changing endpoints don't verify that reque
 - Set cookie SameSite attribute and verify implementation with security tests
 - Handle CSRF errors gracefully with user-friendly messages
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const csrf = require('csurf');

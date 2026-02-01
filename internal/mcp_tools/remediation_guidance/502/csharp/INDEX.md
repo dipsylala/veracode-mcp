@@ -4,7 +4,7 @@
 
 Insecure deserialization in .NET occurs when untrusted data is deserialized using unsafe formatters like BinaryFormatter, NetDataContractSerializer, or ObjectStateFormatter, enabling remote code execution through arbitrary type instantiation. The core fix is to avoid deserializing untrusted data entirely, or use safe serializers like System.Text.Json with strict type controls.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace BinaryFormatter, NetDataContractSerializer, and ObjectStateFormatter with System.Text.Json or DataContractSerializer
 - Validate and restrict types that can be deserialized using allow-lists, never deserialize arbitrary types from untrusted sources
@@ -19,7 +19,7 @@ Insecure deserialization in .NET occurs when untrusted data is deserialized usin
 - Add HMAC-based integrity validation to verify data has not been tampered with before deserialization
 - Run static analysis tools to detect remaining unsafe deserialization usage
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 using System.Text.Json;

@@ -4,7 +4,7 @@
 
 Weak random number generation in PHP occurs when insecure functions like `rand()`, `mt_rand()`, or `uniqid()` are used for security-sensitive operations such as generating session tokens, password reset tokens, API keys, or CSRF tokens. These functions use predictable pseudo-random number generators that attackers can exploit. Always use cryptographically secure functions `random_bytes()` and `random_int()` (PHP 7.0+) for any security-related randomness.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all instances of `rand()`, `mt_rand()`, `uniqid()`, and `lcg_value()` with `random_int()` or `random_bytes()` in security contexts
 - Use `random_bytes()` for generating tokens, keys, and binary random data
@@ -21,7 +21,7 @@ Weak random number generation in PHP occurs when insecure functions like `rand()
 - Test that tokens are unpredictable and unique across multiple generations
 - Review and update any cryptographic operations to use secure randomness
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 // Generate secure session token

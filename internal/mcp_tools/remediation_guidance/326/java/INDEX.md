@@ -4,7 +4,7 @@
 
 Inadequate Encryption Strength in Java occurs when weak cryptographic algorithms (DES, RC4, MD5), insufficient key sizes (<128-bit for symmetric, <2048-bit for RSA), or deprecated ciphers are used, leaving data vulnerable to brute-force and cryptanalytic attacks. The core fix is to use strong, modern algorithms (AES-256, RSA-2048+, SHA-256+) with proper key generation from secure random sources via Java's JCA/JCE framework.
 
-## Remediation Strategy
+## Key Principles
 
 - Use AES with 256-bit keys for symmetric encryption and RSA with minimum 2048-bit keys for asymmetric encryption
 - Generate cryptographic keys using `SecureRandom` with proper entropy, never hardcode or derive from weak sources
@@ -21,7 +21,7 @@ Inadequate Encryption Strength in Java occurs when weak cryptographic algorithms
 - Review and update key storage mechanisms to use Java KeyStore with strong passwords
 - Add cipher strength validation in security configuration or startup checks
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 import javax.crypto.*;

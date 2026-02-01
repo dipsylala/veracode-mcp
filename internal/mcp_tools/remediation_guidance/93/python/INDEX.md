@@ -4,7 +4,7 @@
 
 CRLF Injection occurs when untrusted user input containing carriage return (`\r`) and line feed (`\n`) characters is used in HTTP headers, logs, or email headers without proper sanitization. Attackers exploit this to perform HTTP response splitting, header injection, log forgery, cache poisoning, and XSS attacks. Always strip or reject all newline characters (`\r`, `\n`, `\r\n`) and their URL-encoded equivalents (`%0d`, `%0a`) from user input before including in HTTP headers, logs, or protocol fields.
 
-## Remediation Strategy
+## Key Principles
 
 - Strip all CRLF characters (literal and encoded: `\r`, `\n`, `%0d`, `%0a`) from user input before use in headers or logs
 - Validate input against strict allowlists using regex patterns (e.g., alphanumeric with specific symbols only)
@@ -21,7 +21,7 @@ CRLF Injection occurs when untrusted user input containing carriage return (`\r`
 - Use validated/sanitized values in all header assignments, redirect calls, and logging statements
 - Test with CRLF payloads - `value%0d%0aInjected-Header -%20malicious` and verify they're neutralized
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from flask import Flask, request, redirect, abort

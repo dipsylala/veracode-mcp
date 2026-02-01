@@ -4,7 +4,7 @@
 
 XML Injection in Java occurs when untrusted user input is used to construct XML documents without proper validation or escaping. Attackers inject special characters (`<`, `>`, `&`, `'`, `"`) to manipulate XML structure, potentially causing data corruption, authentication bypass, or information disclosure. **Primary Defense:** Use DOM API methods (`DocumentBuilder`, `Element.setAttribute()`, `Element.setTextContent()`) or sanitize input by escaping XML metacharacters.
 
-## Remediation Strategy
+## Key Principles
 
 - Never concatenate untrusted input directly into XML strings
 - Use DOM APIs (`createElement`, `setTextContent`, `setAttribute`) which auto-escape content
@@ -20,7 +20,7 @@ XML Injection in Java occurs when untrusted user input is used to construct XML 
 - Configure parsers to disable DTDs and external entities (`setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)`)
 - Use parameterized XPath queries instead of string concatenation
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 import org.w3c.dom.*;

@@ -4,7 +4,7 @@
 
 Mass assignment vulnerabilities occur when user input is directly mapped to object attributes without validation, allowing attackers to modify unintended fields like `is_admin` or `role`. In Python, this happens through unsafe patterns like `fields = "__all__"` in Django forms/serializers, `setattr()` loops, or `**request.data` unpacking. Always use explicit allowlists to control which attributes can be modified.
 
-## Remediation Strategy
+## Key Principles
 
 - Use explicit field allowlists in forms/serializers; never use `fields = "__all__"`
 - Validate and filter input before assigning to model attributes
@@ -20,7 +20,7 @@ Mass assignment vulnerabilities occur when user input is directly mapped to obje
 - Create separate `CreateSerializer` and `UpdateSerializer` classes limiting exposed fields
 - Validate input with `clean()` methods before mass operations
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 # Django REST Framework - Explicit field control

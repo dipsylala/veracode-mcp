@@ -4,7 +4,7 @@
 
 Storing sensitive data (passwords, cryptographic keys, tokens) in memory as cleartext exposes it to heap dumps, debuggers, and memory disclosure vulnerabilities. Java strings are immutable and persist in the string pool, making them particularly dangerous. Use `char[]` for passwords, clear arrays explicitly with `Arrays.fill()`, and avoid string operations on credentials.
 
-## Remediation Strategy
+## Key Principles
 
 - Use mutable data structures: Prefer `char[]` or `byte[]` over `String` for sensitive data
 - Clear immediately after use: Zero out arrays in `finally` blocks to ensure cleanup
@@ -21,7 +21,7 @@ Storing sensitive data (passwords, cryptographic keys, tokens) in memory as clea
 - Implement `AutoCloseable` or `Destroyable` for credential holder classes
 - Review heap dump and debugging configurations to prevent memory exposure
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 char[] password = null;

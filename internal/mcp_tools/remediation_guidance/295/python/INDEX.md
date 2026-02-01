@@ -4,7 +4,7 @@
 
 Improper certificate validation occurs when Python applications disable SSL/TLS certificate verification (e.g., `requests.get(url, verify=False)` or `urllib3` with `cert_reqs='CERT_NONE'`), enabling man-in-the-middle attacks where attackers intercept and modify encrypted traffic. The core fix is to enable certificate validation by using default settings or explicitly setting `verify=True`, allowing Python to validate certificates against trusted certificate authorities.
 
-## Remediation Strategy
+## Key Principles
 
 - Always enable certificate validation - Never disable SSL/TLS verification in production code
 - Use system certificate stores - Rely on Python's default CA bundle or OS-provided certificates
@@ -21,7 +21,7 @@ Improper certificate validation occurs when Python applications disable SSL/TLS 
 - Update certificate-related packages - `pip install --upgrade requests urllib3 certifi`
 - Test connections to ensure certificate validation works in all environments
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import requests

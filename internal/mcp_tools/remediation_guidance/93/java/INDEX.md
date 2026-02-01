@@ -4,7 +4,7 @@
 
 CRLF Injection occurs when attackers inject `\r\n` characters to manipulate HTTP headers, log files, or line-based formats, potentially enabling HTTP response splitting or log forgery. The core fix is to strip or reject newline characters (`\r`, `\n`, `\r\n`) from all user input before using it in HTTP headers or logs. Use Spring Framework's `ResponseEntity` and `HttpHeaders` which provide built-in validation, or implement strict allowlist validation for header values.
 
-## Remediation Strategy
+## Key Principles
 
 - Input Sanitization: Remove or reject all CR/LF characters from user-controlled data before using in headers or logs
 - Framework Protection: Leverage Spring's `HttpHeaders` and `ResponseEntity` which validate header values automatically
@@ -21,7 +21,7 @@ CRLF Injection occurs when attackers inject `\r\n` characters to manipulate HTTP
 - Convert log statements to use SLF4J parameterized logging - `log.info("User - {}", username)`
 - Test with CRLF payloads (`%0d%0a`, `\r\n`) to verify protection
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 import org.springframework.http.HttpHeaders;

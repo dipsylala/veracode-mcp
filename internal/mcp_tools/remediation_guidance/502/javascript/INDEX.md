@@ -6,7 +6,7 @@ JavaScript deserialization vulnerabilities occur when `eval()`, `Function()`, `v
 
 **Primary Defense:** Use `JSON.parse()` exclusively for deserialization and validate input against strict schemas.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace `eval()`, `Function()`, and `vm` module usage with `JSON.parse()` for all data deserialization
 - Validate deserialized data with schema validation libraries (Joi, Ajv, Zod) before use
@@ -23,7 +23,7 @@ JavaScript deserialization vulnerabilities occur when `eval()`, `Function()`, `v
 - Configure CSP headers to prevent inline script execution
 - Test with malicious payloads to verify protections
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const Ajv = require('ajv');

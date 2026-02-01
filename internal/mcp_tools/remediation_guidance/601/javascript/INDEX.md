@@ -6,7 +6,7 @@ Open redirect vulnerabilities in Node.js occur when user-controlled input flows 
 
 **Primary Defence:** Validate all redirect URLs against an allowlist of allowed domains or restrict to relative paths only.
 
-## Remediation Strategy
+## Key Principles
 
 - Implement allowlist validation for all redirect destinations before redirecting
 - Use relative paths instead of absolute URLs when possible
@@ -21,7 +21,7 @@ Open redirect vulnerabilities in Node.js occur when user-controlled input flows 
 - Reject invalid destinations with error or fallback to safe default page
 - Log blocked redirect attempts for security monitoring
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const ALLOWED_DOMAINS = ['example.com', 'app.example.com'];

@@ -4,7 +4,7 @@
 
 Using reference equality (`==`) instead of value equality (`.equals()`) for string comparison in Java compares memory addresses, not content, causing security checks to fail unpredictably when strings are dynamically created vs literals, enabling authentication bypass and logic errors. **Primary Defence:** Always use `.equals()` for string content comparison; use constant-first pattern for null safety.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace `==` with `.equals()` for all string content comparisons
 - Use `"expected".equals(variable)` pattern to prevent NullPointerException
@@ -21,7 +21,7 @@ Using reference equality (`==`) instead of value equality (`.equals()`) for stri
 - Run comprehensive test suite to verify logic correctness after changes
 - Enable static analysis rules (e.g., PMD, SpotBugs) to prevent future violations
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Authentication check - safe string comparison

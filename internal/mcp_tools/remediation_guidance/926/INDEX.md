@@ -4,7 +4,7 @@
 
 Android Component Export occurs when application components (activities, services, broadcast receivers, or content providers) are unintentionally exposed to other applications. This vulnerability arises when components lack explicit `android:exported` declarations, allowing unauthorized apps to interact with sensitive functionality. All exposed components must be intentionally configured and protected.
 
-## Remediation Strategy
+## Key Principles
 
 - Never allow components to be accessible by other applications unless explicitly intended and protected
 - All activities, services, receivers, and providers must declare `android:exported` explicitly in AndroidManifest.xml

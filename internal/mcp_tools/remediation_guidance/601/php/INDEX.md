@@ -4,7 +4,7 @@
 
 Open redirect vulnerabilities occur when user-controlled input is used in `header("Location: ...")`, `<meta>` refresh tags, or JavaScript redirects without validation, enabling phishing and credential theft. The core fix is to validate redirect destinations using allowlists for external URLs or ensuring local redirects use relative paths starting with `/` but not `//`.
 
-## Remediation Strategy
+## Key Principles
 
 - Prefer allowlist validation for external URLs against known safe domains
 - For internal redirects, validate paths are relative (start with `/` not `//`) or match expected patterns
@@ -21,7 +21,7 @@ Open redirect vulnerabilities occur when user-controlled input is used in `heade
 - Apply framework security features (e.g., Laravel's `$request->validate()` with URL rules)
 - Add unit tests verifying malicious redirect attempts are blocked
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 function safeRedirect($userUrl, $allowedDomains = ['example.com']) {

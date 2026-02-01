@@ -4,7 +4,7 @@
 
 SQL Injection occurs when untrusted user input is incorporated into SQL queries without proper sanitization, allowing attackers to manipulate query logic, extract data, or execute administrative operations. Node.js database libraries (mysql, pg, better-sqlite3, etc.) all support parameterized queries as the primary defense against this vulnerability.
 
-## Remediation Strategy
+## Key Principles
 
 - Always use parameterized queries (prepared statements) instead of string concatenation or template literals
 - Validate and sanitize user input before use, enforcing strict type checking and whitelist validation
@@ -21,7 +21,7 @@ SQL Injection occurs when untrusted user input is incorporated into SQL queries 
 - Test with SQL injection payloads to verify fixes
 - Implement input validation layers before data reaches queries
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // Unsafe: String concatenation

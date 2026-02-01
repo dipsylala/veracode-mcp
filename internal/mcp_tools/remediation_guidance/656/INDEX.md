@@ -4,7 +4,7 @@
 
 Security through obscurity relies on hiding implementation details (secret URLs, obfuscated code, unusual ports) instead of implementing proper security controls like authentication, encryption, and access control. This approach provides a false sense of security that fails once attackers discover the hidden information. Replace obscurity with real security controls that remain effective even when implementation details are known.
 
-## Remediation Strategy
+## Key Principles
 
 - Implement proper authentication and authorization: Use role-based access control and session management instead of hidden URLs or obfuscated endpoints
 - Use encryption, not encoding: Replace base64, XOR, or custom encoding with proper cryptographic algorithms (AES, RSA)

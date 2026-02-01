@@ -4,7 +4,7 @@
 
 Storing sensitive data (passwords, cryptographic keys, tokens) in memory as cleartext in JavaScript exposes it to memory dumps, debugging tools, and memory disclosure vulnerabilities. JavaScript strings are immutable in V8, making them persist in memory. Use `Buffer` for sensitive data, clear buffers explicitly with `fill(0)`, and avoid logging or concatenating sensitive values.
 
-## Remediation Strategy
+## Key Principles
 
 - Use mutable Buffers: Store credentials in `Buffer` objects instead of strings
 - Explicit zeroing: Clear sensitive buffers with `.fill(0)` immediately after use
@@ -21,7 +21,7 @@ Storing sensitive data (passwords, cryptographic keys, tokens) in memory as clea
 - Clear buffers before returning from functions handling credentials
 - Use libraries like `libsodium-wrappers` that provide automatic memory protection
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const crypto = require('crypto');

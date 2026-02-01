@@ -4,7 +4,7 @@
 
 Python's `pickle` module executes arbitrary code during deserialization, enabling remote code execution when unpickling untrusted data. Attackers craft malicious pickle payloads that invoke `__reduce__` or `__setstate__` methods to run system commands. **Primary fix:** Replace pickle with JSON (`json.loads()`), MessagePack, or Protocol Buffers for all untrusted data.
 
-## Remediation Strategy
+## Key Principles
 
 - Never use `pickle.loads()`, `pickle.load()`, `marshal.loads()`, `shelve`, or `pd.read_pickle()` with untrusted data
 - Replace pickle with JSON for object serialization (requires manual object reconstruction)
@@ -21,7 +21,7 @@ Python's `pickle` module executes arbitrary code during deserialization, enablin
 - For Django sessions, set `SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'`
 - Test that legitimate data flows work correctly with new serialization format
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 # Replace pickle with JSON

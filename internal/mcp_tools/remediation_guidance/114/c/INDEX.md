@@ -6,7 +6,7 @@ In C, CWE-114 occurs when loading shared libraries (`dlopen()`, `LoadLibrary()`)
 
 **Primary Defense:** Use absolute paths, validate all inputs, disable unsafe search paths, and set secure file permissions.
 
-## Remediation Strategy
+## Key Principles
 
 - Use absolute paths for all library loads and process executions
 - Validate and sanitize all external inputs before use in library/process calls
@@ -23,7 +23,7 @@ In C, CWE-114 occurs when loading shared libraries (`dlopen()`, `LoadLibrary()`)
 - Set `LD_LIBRARY_PATH` restrictions and use RPATH with `$ORIGIN` carefully
 - Verify file ownership and permissions before loading
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```c
 #include <dlfcn.h>

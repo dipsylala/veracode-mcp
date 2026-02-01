@@ -31,23 +31,35 @@ type ScaFindingsRequest struct {
 
 // parseScaFindingsRequest extracts and validates parameters from the raw args map
 func parseScaFindingsRequest(args map[string]interface{}) (*ScaFindingsRequest, error) {
-	// Set defaults
 	req := &ScaFindingsRequest{
 		Size: 200,
 		Page: 0,
 	}
 
-	// Use JSON marshaling to automatically map args to struct
-	jsonData, err := json.Marshal(args)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal arguments: %w", err)
+	if appPath, ok := args["application_path"].(string); ok {
+		req.ApplicationPath = appPath
+	}
+	if appProfile, ok := args["app_profile"].(string); ok {
+		req.AppProfile = appProfile
+	}
+	if sandbox, ok := args["sandbox"].(string); ok {
+		req.Sandbox = sandbox
+	}
+	if size, ok := args["size"].(float64); ok {
+		req.Size = int(size)
+	}
+	if page, ok := args["page"].(float64); ok {
+		req.Page = int(page)
+	}
+	if severity, ok := args["severity"].(float64); ok {
+		sev := int32(severity)
+		req.Severity = &sev
+	}
+	if severityGte, ok := args["severity_gte"].(float64); ok {
+		sev := int32(severityGte)
+		req.SeverityGte = &sev
 	}
 
-	if err := json.Unmarshal(jsonData, req); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal arguments: %w", err)
-	}
-
-	// Validate required fields
 	if req.ApplicationPath == "" {
 		return nil, fmt.Errorf("application_path is required and must be an absolute path")
 	}

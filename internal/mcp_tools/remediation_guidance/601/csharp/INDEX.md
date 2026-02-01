@@ -4,7 +4,7 @@
 
 Open Redirect vulnerabilities occur when an application redirects users to URLs controlled by attackers, enabling phishing attacks and credential theft. Use `Url.IsLocalUrl()` (ASP.NET Core) or `Request.IsUrlLocalToHost()` (ASP.NET MVC 5) to validate that redirect URLs are local before redirecting. These framework methods reject external URLs, protocol-relative URLs, and JavaScript URLs.
 
-## Remediation Strategy
+## Key Principles
 
 - Always validate redirect URLs before using them in redirect responses
 - Prefer allowlists of known-safe redirect destinations over validation
@@ -21,7 +21,7 @@ Open Redirect vulnerabilities occur when an application redirects users to URLs 
 - Implement fallback redirects to safe defaults (e.g., home page) when validation fails
 - Test with malicious URLs like `//evil.com`, `javascript -alert(1)`, and `http -//attacker.com`
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 public IActionResult Login(string returnUrl)

@@ -4,7 +4,7 @@
 
 Python web applications commonly expose sensitive data through HTTP responses, error messages, logs, or API responses. Frameworks like Django, Flask, and FastAPI make it easy to serialize entire objects or return detailed error traces, which can leak passwords, tokens, internal paths, PII, and configuration details. The core fix is to explicitly control what data is returned and sanitize error messages.
 
-## Remediation Strategy
+## Key Principles
 
 - Explicitly whitelist response fields rather than serializing entire objects
 - Disable debug mode and detailed error traces in production
@@ -21,7 +21,7 @@ Python web applications commonly expose sensitive data through HTTP responses, e
 - Use environment variables for secrets, never hardcode in responses
 - Review API responses to ensure only required data is included
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 # FastAPI/Pydantic example - explicit response model

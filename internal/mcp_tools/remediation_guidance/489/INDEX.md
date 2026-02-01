@@ -4,7 +4,7 @@
 
 Leftover debug code in production (print statements, test backdoors, disabled authentication, verbose error messages, debug endpoints) exposes sensitive information, creates security bypasses, and provides attackers with reconnaissance data. Core principle: Remove or strictly gate all debug paths before production deployment.
 
-## Remediation Strategy
+## Key Principles
 
 - Remove before shipping: Strip debug code, test accounts, and development features from production builds
 - Gate debug features: If debug functionality is needed, protect it behind authentication, authorization, and environment checks

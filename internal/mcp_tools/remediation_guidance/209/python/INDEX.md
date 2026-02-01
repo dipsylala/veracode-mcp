@@ -4,7 +4,7 @@
 
 Error Message Information Leak occurs when Python applications expose sensitive details through exception tracebacks, debug output, or verbose error messages in responses. These leaks reveal file paths, code structure, library versions, SQL queries, and internal logic to attackers. Return generic error messages to users while logging detailed exceptions securely server-side.
 
-## Remediation Strategy
+## Key Principles
 
 - Separate user-facing and internal error handling: Show generic messages to clients, log full details securely
 - Disable debug mode in production: Set `DEBUG=False` in Django/Flask and disable verbose tracebacks
@@ -20,7 +20,7 @@ Error Message Information Leak occurs when Python applications expose sensitive 
 - Implement error monitoring with tools that capture exceptions server-side
 - Test error scenarios to verify no sensitive information leaks through responses
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import logging

@@ -4,7 +4,7 @@
 
 Using RSA encryption without OAEP padding enables padding oracle attacks, chosen ciphertext attacks, and message malleability. This occurs when using deprecated PyCrypto or not specifying OAEP padding with the `cryptography` library. Always use the modern `cryptography` library with explicit OAEP padding and SHA-256 or stronger hash algorithms.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `cryptography` library (not deprecated PyCrypto/`Crypto`) with explicit `padding.OAEP()`
 - Specify MGF1 hash (SHA-256 minimum) and OAEP hash algorithm explicitly
@@ -20,7 +20,7 @@ Using RSA encryption without OAEP padding enables padding oracle attacks, chosen
 - Test encryption/decryption with OAEP padding
 - Remove all imports from deprecated `Crypto` package
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from cryptography.hazmat.primitives.asymmetric import rsa, padding

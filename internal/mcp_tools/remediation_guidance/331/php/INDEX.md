@@ -4,7 +4,7 @@
 
 Insufficient entropy in PHP occurs when using `rand()`, `mt_rand()`, `uniqid()`, or other predictable functions for security-sensitive operations like generating tokens, encryption keys, IVs, or nonces. These functions produce predictable values that attackers can exploit. Always use `random_bytes()` or `random_int()` (PHP 7.0+) for cryptographic randomness.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all `rand()`, `mt_rand()`, `uniqid()`, and `srand()` calls with cryptographically secure alternatives in security contexts
 - Use `random_bytes()` for generating random binary data (tokens, keys, IVs)
@@ -20,7 +20,7 @@ Insufficient entropy in PHP occurs when using `rand()`, `mt_rand()`, `uniqid()`,
 - Ensure minimum entropy requirements (128+ bits for tokens, 256+ bits for encryption keys)
 - Test token uniqueness and verify unpredictability in security reviews
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 // Generate secure random token (32 bytes = 256 bits)

@@ -24,31 +24,25 @@ type PipelineDetailedResultsRequest struct {
 
 // parsePipelineDetailedResultsRequest extracts and validates parameters from the raw args map
 func parsePipelineDetailedResultsRequest(args map[string]interface{}) (*PipelineDetailedResultsRequest, error) {
-	req := &PipelineDetailedResultsRequest{}
-
-	// Extract application_path (required)
 	appPath, ok := args["application_path"].(string)
 	if !ok || appPath == "" {
 		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
 	}
-	req.ApplicationPath = appPath
 
-	// Extract flaw_id (required) - could be float64 from JSON
-	flawID, ok := args["flaw_id"]
-	if !ok {
-		return nil, fmt.Errorf("flaw_id is required")
-	}
-
-	switch v := flawID.(type) {
+	var flawID int
+	switch v := args["flaw_id"].(type) {
 	case float64:
-		req.FlawID = int(v)
+		flawID = int(v)
 	case int:
-		req.FlawID = v
+		flawID = v
 	default:
-		return nil, fmt.Errorf("flaw_id must be an integer")
+		return nil, fmt.Errorf("flaw_id is required and must be an integer")
 	}
 
-	return req, nil
+	return &PipelineDetailedResultsRequest{
+		ApplicationPath: appPath,
+		FlawID:          flawID,
+	}, nil
 }
 
 // PipelineDetailedFlaw represents a detailed finding with data paths
@@ -168,20 +162,15 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
 	resultsData, err := os.ReadFile(resultsFile)
 	if err != nil {
-		return map[string]interface{}{
-			"error": fmt.Sprintf("Failed to read results file: %v", err),
-		}, nil
+		return pipelineErrorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil
 	}
 
 	// Parse the full results to extract findings
 	var scanResults struct {
 		Findings []PipelineFlawWithStackDumps `json:"findings"`
 	}
-	err = json.Unmarshal(resultsData, &scanResults)
-	if err != nil {
-		return map[string]interface{}{
-			"error": fmt.Sprintf("Failed to parse results file: %v", err),
-		}, nil
+	if err = json.Unmarshal(resultsData, &scanResults); err != nil {
+		return pipelineErrorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
 	}
 
 	// Find the specific flaw by ID
@@ -194,10 +183,7 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 	}
 
 	if targetFlaw == nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf(`Pipeline Detailed Results
+		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Detailed Results
 ========================
 
 Application Path: %s
@@ -206,9 +192,7 @@ Flaw ID: %d
 ❌ Flaw not found
 
 The specified flaw ID was not found in the pipeline scan results.
-`, req.ApplicationPath, req.FlawID),
-			}},
-		}, nil
+`, req.ApplicationPath, req.FlawID)), nil
 	}
 
 	// Transform stack dumps to data paths

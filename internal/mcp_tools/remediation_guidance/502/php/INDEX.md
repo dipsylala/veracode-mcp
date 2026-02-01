@@ -4,7 +4,7 @@
 
 PHP's `unserialize()` can instantiate arbitrary classes and invoke magic methods (`__wakeup()`, `__destruct()`, `__toString()`), enabling remote code execution via gadget chains or property-oriented programming. **Primary fix:** Replace `unserialize()` with `json_decode()` for untrusted data. If `unserialize()` is unavoidable, use the `allowed_classes` option (PHP 7.0+) as a last-resort mitigation.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace deserialization with safer data formats (JSON, simple arrays)
 - Never deserialize user-controlled or untrusted input
@@ -21,7 +21,7 @@ PHP's `unserialize()` can instantiate arbitrary classes and invoke magic methods
 - Review magic methods (`__wakeup`, `__destruct`, `__toString`) for exploitable logic
 - Test thoroughly to ensure data integrity and functionality
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 // SAFE: Use JSON for untrusted data

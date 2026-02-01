@@ -4,7 +4,7 @@
 
 Process control vulnerabilities occur when applications accept untrusted input to control process execution, library loading, or behavior (start, stop, kill, priority, resource limits). This includes insecure dynamic library loading (DLL hijacking, LD_PRELOAD attacks), command injection through process execution, and unauthorized process control. Attackers exploit weak validation to load malicious libraries, execute arbitrary commands, or manipulate running processes.
 
-## Remediation Strategy
+## Key Principles
 
 Only load components from trusted, integrity-checked locations and never allow user input to directly control process operations or library search paths.
 

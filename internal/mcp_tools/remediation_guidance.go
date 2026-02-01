@@ -33,14 +33,16 @@ type RemediationGuidanceRequest struct {
 func parseRemediationGuidanceRequest(args map[string]interface{}) (*RemediationGuidanceRequest, error) {
 	req := &RemediationGuidanceRequest{}
 
-	// Use JSON marshaling to automatically map args to struct
-	jsonData, err := json.Marshal(args)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal arguments: %w", err)
+	// Extract application_path
+	if appPath, ok := args["application_path"].(string); ok {
+		req.ApplicationPath = appPath
 	}
 
-	if err := json.Unmarshal(jsonData, req); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal arguments: %w", err)
+	// Extract flaw_id (comes as float64 from JSON)
+	if flawID, ok := args["flaw_id"].(float64); ok {
+		req.FlawID = int(flawID)
+	} else if flawID, ok := args["flaw_id"].(int); ok {
+		req.FlawID = flawID
 	}
 
 	// Validate required fields
@@ -133,6 +135,16 @@ func findFlawInPipelineResults(results *PipelineScanResults, flawID int) *Pipeli
 	return nil
 }
 
+// errorResponse creates a standardized error response for MCP
+func errorResponse(message string) map[string]interface{} {
+	return map[string]interface{}{
+		"content": []map[string]string{{
+			"type": "text",
+			"text": message,
+		}},
+	}
+}
+
 func handleGetRemediationGuidance(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
 	req, err := parseRemediationGuidanceRequest(args)
@@ -146,10 +158,7 @@ func handleGetRemediationGuidance(ctx context.Context, args map[string]interface
 	// Find the most recent results file
 	resultsFile, err := findMostRecentResultsFile(outputDir)
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf(`Remediation Guidance Lookup
+		return errorResponse(fmt.Sprintf(`Remediation Guidance Lookup
 ============================
 
 Application Path: %s
@@ -160,35 +169,26 @@ Flaw ID: %d
 %v
 
 Please run a pipeline scan first using the pipeline-scan tool.
-`, req.ApplicationPath, req.FlawID, err),
-			}},
-		}, nil
+`, req.ApplicationPath, req.FlawID, err)), nil
 	}
 
 	// Read and parse the results file
 	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
 	resultsData, err := os.ReadFile(resultsFile)
 	if err != nil {
-		return map[string]interface{}{
-			"error": fmt.Sprintf("Failed to read results file: %v", err),
-		}, nil
+		return errorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil
 	}
 
 	var scanResults PipelineScanResults
 	err = json.Unmarshal(resultsData, &scanResults)
 	if err != nil {
-		return map[string]interface{}{
-			"error": fmt.Sprintf("Failed to parse results file: %v", err),
-		}, nil
+		return errorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
 	}
 
 	// Find the specific flaw by issue_id
 	flaw := findFlawInPipelineResults(&scanResults, req.FlawID)
 	if flaw == nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf(`Remediation Guidance Lookup
+		return errorResponse(fmt.Sprintf(`Remediation Guidance Lookup
 ============================
 
 Application Path: %s
@@ -202,27 +202,20 @@ Please verify that:
 1. The flaw ID is correct
 2. The pipeline scan completed successfully
 3. The flaw exists in the most recent scan
-`, req.ApplicationPath, req.FlawID),
-			}},
-		}, nil
+`, req.ApplicationPath, req.FlawID)), nil
 	}
 
 	// Extract CWE ID from the flaw (it's a string in the JSON)
 	cweID, err := strconv.Atoi(flaw.CWEID)
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf(`Remediation Guidance Lookup
+		return errorResponse(fmt.Sprintf(`Remediation Guidance Lookup
 ============================
 
 Application Path: %s
 Flaw ID: %d
 
 ❌ Error: Invalid CWE ID format: %s
-`, req.ApplicationPath, req.FlawID, flaw.CWEID),
-			}},
-		}, nil
+`, req.ApplicationPath, req.FlawID, flaw.CWEID)), nil
 	}
 
 	// Extract source file from the flaw
@@ -241,110 +234,100 @@ Flaw ID: %d
 	// Get the appropriate remediation guidance file
 	guidancePath, err := getRemediationGuidancePath(cweID, language)
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: %v\n", req.ApplicationPath, req.FlawID, cweID, sourceFile, language, err),
-			}},
-		}, nil
+		return errorResponse(fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: %v\n", req.ApplicationPath, req.FlawID, cweID, sourceFile, language, err)), nil
 	}
 
 	// Read the guidance file from embedded FS
 	guidanceContent, err := remediationGuidanceFS.ReadFile(guidancePath)
 	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: Failed to read guidance file\n\n%v\n", req.ApplicationPath, req.FlawID, cweID, sourceFile, language, err),
-			}},
-		}, nil
+		return errorResponse(fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: Failed to read guidance file\n\n%v\n", req.ApplicationPath, req.FlawID, cweID, sourceFile, language, err)), nil
 	}
 
 	// Format and return the guidance
 	return formatRemediationGuidanceResponse(req, cweID, flaw, language, sourceFile, string(guidanceContent)), nil
 }
 
+// detectMarkdownSection determines which section a line represents
+func detectMarkdownSection(trimmed string) string {
+	switch {
+	case strings.HasPrefix(trimmed, "## LLM Guidance"):
+		return "summary"
+	case strings.HasPrefix(trimmed, "## Key Principles"):
+		return "principles"
+	case strings.HasPrefix(trimmed, "## Remediation Steps"):
+		return "steps"
+	case strings.HasPrefix(trimmed, "## Safe Pattern"):
+		return "code_samples"
+	case strings.HasPrefix(trimmed, "##"):
+		return ""
+	default:
+		return "content"
+	}
+}
+
+// appendToSummary adds content to the summary builder
+func appendToSummary(summaryBuilder *strings.Builder, trimmed string) {
+	if summaryBuilder.Len() > 0 {
+		summaryBuilder.WriteString(" ")
+	}
+	summaryBuilder.WriteString(trimmed)
+}
+
+// appendToListSection adds content to a list section (bullet points or continuation)
+func appendToListSection(items *[]string, trimmed string) {
+	if strings.HasPrefix(trimmed, "- ") {
+		*items = append(*items, strings.TrimPrefix(trimmed, "- "))
+	} else if len(*items) > 0 {
+		(*items)[len(*items)-1] += " " + trimmed
+	}
+}
+
 // parseMarkdownGuidance parses markdown guidance into structured sections
-// nolint:gocyclo // Parsing markdown requires checking multiple conditions
-func parseMarkdownGuidance(markdown string) map[string]interface{} {
+func parseMarkdownGuidance(markdown string) (summary string, keyPrinciples, remediationSteps []string, codeSamples string) {
 	lines := strings.Split(markdown, "\n")
-
-	var summary strings.Builder
-	var keyPrinciples []string
-	var remediationSteps []string
-
+	var summaryBuilder strings.Builder
+	var codeSamplesBuilder strings.Builder
 	currentSection := ""
-	inList := false
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
-		// Skip the main title
-		if strings.HasPrefix(trimmed, "# CWE-") {
+		// Skip the main title and empty lines
+		if strings.HasPrefix(trimmed, "# CWE-") || trimmed == "" {
 			continue
 		}
 
-		// Detect sections
-		if strings.HasPrefix(trimmed, "## LLM Guidance") {
-			currentSection = "summary"
-			inList = false
-			continue
-		} else if strings.HasPrefix(trimmed, "## Key Principles") {
-			currentSection = "principles"
-			inList = false
-			continue
-		} else if strings.HasPrefix(trimmed, "## Remediation Steps") {
-			currentSection = "steps"
-			inList = false
-			continue
-		} else if strings.HasPrefix(trimmed, "##") {
-			currentSection = ""
-			inList = false
-			continue
-		}
-
-		// Skip empty lines between sections
-		if trimmed == "" && !inList {
+		// Detect section changes
+		section := detectMarkdownSection(trimmed)
+		if section != "content" {
+			currentSection = section
+			// For code samples, preserve the section heading
+			if section == "code_samples" {
+				if codeSamplesBuilder.Len() > 0 {
+					codeSamplesBuilder.WriteString("\n\n")
+				}
+				codeSamplesBuilder.WriteString(trimmed)
+				codeSamplesBuilder.WriteString("\n\n")
+			}
 			continue
 		}
 
 		// Process content based on current section
 		switch currentSection {
 		case "summary":
-			if trimmed != "" {
-				if summary.Len() > 0 {
-					summary.WriteString(" ")
-				}
-				summary.WriteString(trimmed)
-			}
+			appendToSummary(&summaryBuilder, trimmed)
 		case "principles":
-			if strings.HasPrefix(trimmed, "- ") {
-				inList = true
-				keyPrinciples = append(keyPrinciples, strings.TrimPrefix(trimmed, "- "))
-			} else if inList && trimmed != "" {
-				// Continuation of previous item
-				if len(keyPrinciples) > 0 {
-					keyPrinciples[len(keyPrinciples)-1] += " " + trimmed
-				}
-			}
+			appendToListSection(&keyPrinciples, trimmed)
 		case "steps":
-			if strings.HasPrefix(trimmed, "- ") {
-				inList = true
-				remediationSteps = append(remediationSteps, strings.TrimPrefix(trimmed, "- "))
-			} else if inList && trimmed != "" {
-				// Continuation of previous item
-				if len(remediationSteps) > 0 {
-					remediationSteps[len(remediationSteps)-1] += " " + trimmed
-				}
-			}
+			appendToListSection(&remediationSteps, trimmed)
+		case "code_samples":
+			// Preserve original formatting for code samples
+			codeSamplesBuilder.WriteString(line)
+			codeSamplesBuilder.WriteString("\n")
 		}
 	}
 
-	return map[string]interface{}{
-		"summary":           summary.String(),
-		"key_principles":    keyPrinciples,
-		"remediation_steps": remediationSteps,
-	}
+	return summaryBuilder.String(), keyPrinciples, remediationSteps, strings.TrimSpace(codeSamplesBuilder.String())
 }
 
 // extractDataPath extracts source, sink, and stack trace information from the flaw
@@ -352,8 +335,8 @@ func extractDataPath(flaw *PipelineFlaw) map[string]interface{} {
 	dataPath := map[string]interface{}{}
 
 	// Extract stack trace if available
-	stackTrace := []map[string]interface{}{}
 	if len(flaw.StackDumps.StackDump) > 0 && len(flaw.StackDumps.StackDump[0].Frame) > 0 {
+		stackTrace := make([]map[string]interface{}, 0, len(flaw.StackDumps.StackDump[0].Frame))
 		for _, frame := range flaw.StackDumps.StackDump[0].Frame {
 			stackFrame := map[string]interface{}{
 				"frame_id": frame.FrameID,
@@ -366,9 +349,6 @@ func extractDataPath(flaw *PipelineFlaw) map[string]interface{} {
 			}
 			stackTrace = append(stackTrace, stackFrame)
 		}
-	}
-
-	if len(stackTrace) > 0 {
 		dataPath["stack_trace"] = stackTrace
 	}
 
@@ -397,9 +377,8 @@ func formatRemediationStepsForLLM(steps []string) string {
 	return formatted.String()
 }
 
-// formatRemediationGuidanceResponse formats the remediation guidance into a structured JSON response
-func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID int, flaw *PipelineFlaw, language, sourceFile, guidance string) map[string]interface{} {
-	severityText := "Unknown"
+// getSeverityText converts severity score to text
+func getSeverityText(severity int) string {
 	severityMap := map[int]string{
 		0: "Informational",
 		1: "Very Low",
@@ -408,12 +387,16 @@ func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID in
 		4: "High",
 		5: "Very High",
 	}
-	if sev, ok := severityMap[flaw.Severity]; ok {
-		severityText = sev
+	if text, ok := severityMap[severity]; ok {
+		return text
 	}
+	return "Unknown"
+}
 
+// formatRemediationGuidanceResponse formats the remediation guidance into a structured JSON response
+func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID int, flaw *PipelineFlaw, language, sourceFile, guidance string) map[string]interface{} {
 	// Parse the markdown guidance into structured sections
-	parsedGuidance := parseMarkdownGuidance(guidance)
+	summary, keyPrinciples, remediationSteps, codeSamples := parseMarkdownGuidance(guidance)
 
 	// Build flaw details
 	flawDetails := map[string]interface{}{
@@ -421,7 +404,7 @@ func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID in
 		"issue_id":       flaw.IssueID,
 		"cwe_id":         cweID,
 		"issue_type":     flaw.IssueType,
-		"severity":       strings.ToLower(severityText),
+		"severity":       strings.ToLower(getSeverityText(flaw.Severity)),
 		"severity_score": flaw.Severity,
 	}
 
@@ -438,21 +421,48 @@ func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID in
 		flawDetails["language"] = language
 	}
 
-	// Build remediation guidance section (for user)
+	// Build remediation guidance section
 	remediationGuidance := map[string]interface{}{
-		"summary":           parsedGuidance["summary"],
-		"key_principles":    parsedGuidance["key_principles"],
+		"summary":           summary,
+		"key_principles":    keyPrinciples,
 		"language_specific": language != "",
 	}
 
-	// Build data path section
-	dataPath := extractDataPath(flaw)
+	// Add code samples if available
+	if codeSamples != "" {
+		remediationGuidance["code_samples"] = codeSamples
+	}
 
-	// Build detailed instructions for the LLM using the remediation steps
-	// Extract remediation steps to use as LLM guidance
-	remediationSteps, _ := parsedGuidance["remediation_steps"].([]string)
+	// Build complete structured response
+	structuredResponse := map[string]interface{}{
+		"flaw_details":         flawDetails,
+		"remediation_guidance": remediationGuidance,
+		"data_path":            extractDataPath(flaw),
+		"next_steps": map[string]interface{}{
+			"instructions_for_llm": buildLLMInstructions(sourceFile, flaw.Files.SourceFile.Line, remediationSteps),
+		},
+	}
 
-	llmInstructions := fmt.Sprintf(`You must immediately analyze this vulnerability and present a fix summary to the user.
+	// Marshal to JSON for clean formatting
+	responseJSON, err := json.Marshal(structuredResponse)
+	if err != nil {
+		return errorResponse(fmt.Sprintf("Error formatting JSON response: %v", err))
+	}
+
+	// Return MCP-formatted response with JSON content
+	return map[string]interface{}{
+		"content": []map[string]interface{}{
+			{
+				"type": "text",
+				"text": string(responseJSON),
+			},
+		},
+	}
+}
+
+// buildLLMInstructions creates detailed instructions for the LLM
+func buildLLMInstructions(sourceFile string, line int, remediationSteps []string) string {
+	return fmt.Sprintf(`You must immediately analyze this vulnerability and present a fix summary to the user.
 
 Read the vulnerable code at %s line %d and apply the following remediation steps:
 
@@ -478,39 +488,6 @@ IMPACT:
 
 Do NOT include large code blocks or complete implementations. Focus on describing WHAT needs to change, not showing all the code. The developer will implement based on your guidance.`,
 		sourceFile,
-		flaw.Files.SourceFile.Line,
+		line,
 		formatRemediationStepsForLLM(remediationSteps))
-
-	nextSteps := map[string]interface{}{
-		"instructions_for_llm": llmInstructions,
-	}
-
-	// Build the complete structured response
-	structuredResponse := map[string]interface{}{
-		"flaw_details":         flawDetails,
-		"remediation_guidance": remediationGuidance,
-		"data_path":            dataPath,
-		"next_steps":           nextSteps,
-	}
-
-	// Marshal to JSON for clean formatting
-	responseJSON, err := json.Marshal(structuredResponse)
-	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf("Error formatting JSON response: %v", err),
-			}},
-		}
-	}
-
-	// Return MCP-formatted response with JSON content
-	return map[string]interface{}{
-		"content": []map[string]interface{}{
-			{
-				"type": "text",
-				"text": string(responseJSON),
-			},
-		},
-	}
 }

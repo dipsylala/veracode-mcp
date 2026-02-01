@@ -4,7 +4,7 @@
 
 `Math.random()` is not cryptographically secure and must never be used for security-sensitive operations like generating tokens, keys, passwords, or session IDs. Attackers can predict these values to compromise authentication, sessions, or encryption. Always use Node.js `crypto` module functions (`crypto.randomBytes()`, `crypto.randomUUID()`, `crypto.randomInt()`) for security-critical randomness.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all `Math.random()` calls in security contexts with `crypto.randomBytes()` or equivalent
 - Use `crypto.randomUUID()` for unique identifiers (session tokens, API keys)
@@ -21,7 +21,7 @@
 - Test that changes don't break existing functionality
 - Review for indirect uses through utility functions or third-party libraries
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const crypto = require('crypto');

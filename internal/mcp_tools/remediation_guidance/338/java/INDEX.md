@@ -4,7 +4,7 @@
 
 Java's `java.util.Random` and `Math.random()` are predictable and unsuitable for security operations like generating tokens, keys, or passwords. Attackers can predict outputs and compromise security-sensitive values. Always use `java.security.SecureRandom` for cryptographic purposes.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all `java.util.Random` and `Math.random()` with `SecureRandom` in security-sensitive contexts
 - Use strong algorithm providers (e.g., "NativePRNGNonBlocking", "SHA1PRNG") when available
@@ -21,7 +21,7 @@ Java's `java.util.Random` and `Math.random()` are predictable and unsuitable for
 - Validate that the default provider offers cryptographic strength for your platform
 - Test for performance impact and optimize instance reuse if needed
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 import java.security.SecureRandom;

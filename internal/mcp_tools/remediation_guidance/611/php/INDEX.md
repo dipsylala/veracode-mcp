@@ -6,7 +6,7 @@ PHP's XML parsers can process external entities by default, leading to file disc
 
 **Primary Defence:** Call `libxml_disable_entity_loader(true)` before parsing XML (PHP < 8.0), or set `LIBXML_NOENT` to false and avoid `LIBXML_DTDLOAD` for all XML functions.
 
-## Remediation Strategy
+## Key Principles
 
 - Disable external entity loading globally before any XML parsing operations
 - Use parser options that explicitly prevent entity expansion and DTD loading
@@ -23,7 +23,7 @@ PHP's XML parsers can process external entities by default, leading to file disc
 - Test with payloads containing `<!ENTITY>` declarations to verify protection
 - Review all usages of `simplexml_*`, `DOMDocument`, `XMLReader`, and `xml_parse` functions
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 <?php

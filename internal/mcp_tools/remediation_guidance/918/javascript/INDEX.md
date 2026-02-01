@@ -4,7 +4,7 @@
 
 SSRF in Node.js occurs when applications fetch remote resources using user-supplied URLs without validation, enabling attackers to access internal services, cloud metadata endpoints, and bypass firewalls. The primary defense is validating URLs against an allowlist of permitted domains before making any HTTP requests.
 
-## Remediation Strategy
+## Key Principles
 
 - Allowlist domains: Only permit requests to explicitly approved domains/hosts
 - Block private networks: Reject private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x, localhost)
@@ -20,7 +20,7 @@ SSRF in Node.js occurs when applications fetch remote resources using user-suppl
 - Validate resolved IPs before connecting (DNS rebinding protection)
 - Use network-level controls to restrict outbound connections
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const ALLOWED_HOSTS = ['api.trusted-service.com', 'cdn.example.com'];

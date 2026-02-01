@@ -4,7 +4,7 @@
 
 Server-Side Request Forgery (SSRF) allows attackers to make the server perform HTTP requests to arbitrary destinations, potentially accessing internal services, cloud metadata endpoints (169.254.169.254), or bypassing firewalls. The primary defense is validating URLs against an allowlist of permitted domains/IPs, blocking private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x), and using `AllowAutoRedirect = false` to prevent redirect-based bypasses.
 
-## Remediation Strategy
+## Key Principles
 
 - Validate all URLs against an allowlist of permitted domains before making requests
 - Block private IP ranges (RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16), loopback (127.0.0.0/8), and link-local addresses (169.254.0.0/16)
@@ -21,7 +21,7 @@ Server-Side Request Forgery (SSRF) allows attackers to make the server perform H
 - Block cloud metadata endpoints (169.254.169.254, metadata.google.internal) explicitly
 - Return generic error messages to prevent information disclosure during validation failures
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 private static readonly HashSet<string> AllowedHosts = new() 

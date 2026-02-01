@@ -4,7 +4,7 @@
 
 Insecure temporary file creation occurs when applications create files with predictable names, insecure permissions, or in shared directories without proper protection. Python's `tempfile` module provides secure alternatives that generate unpredictable names with restricted permissions and automatic cleanup. Always use `tempfile.NamedTemporaryFile()` or `tempfile.mkstemp()` instead of manually creating files in `/tmp` or similar directories.
 
-## Remediation Strategy
+## Key Principles
 
 - Use Python's `tempfile` module exclusively for temporary file operations
 - Never hardcode temporary file names or use predictable patterns
@@ -21,7 +21,7 @@ Insecure temporary file creation occurs when applications create files with pred
 - For temporary directories, use `tempfile.TemporaryDirectory()` with context managers
 - Avoid passing temporary file paths to untrusted code or processes
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import tempfile

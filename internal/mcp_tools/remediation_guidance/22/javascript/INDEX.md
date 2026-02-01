@@ -4,7 +4,7 @@
 
 Path Traversal in JavaScript/Node.js occurs when applications use unsanitized user input to construct file paths, allowing attackers to access files outside intended directories using sequences like `../`. The primary defense is indirect reference mapping (mapping user IDs to files) rather than accepting direct file paths. When direct paths are necessary, validate against an allowlist and resolve paths to ensure they remain within the intended directory.
 
-## Remediation Strategy
+## Key Principles
 
 - Use indirect reference mapping with IDs/tokens instead of accepting file paths from users
 - Validate all path inputs against strict allowlists of permitted files/directories
@@ -21,7 +21,7 @@ Path Traversal in JavaScript/Node.js occurs when applications use unsanitized us
 - Sanitize input by rejecting `..`, null bytes, and encoded traversal attempts
 - Configure Express static middleware with `dotfiles - 'deny'` and strict root directories
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const path = require('path');

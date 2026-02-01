@@ -4,7 +4,7 @@
 
 Cross-Site Scripting (CWE-79) occurs when untrusted data is included in web pages without proper encoding, allowing attackers to inject malicious scripts that execute in victim browsers to steal sessions, harvest credentials, or distribute malware. Java applications must encode all user-controlled output using context-appropriate methods (HTML, JavaScript, URL, CSS). Fix by applying output encoding at every injection point based on the context where data appears.
 
-## Remediation Strategy
+## Key Principles
 
 - Always encode output based on context (HTML entity encoding for HTML content, JavaScript encoding for JS contexts, URL encoding for URLs)
 - Use established encoding libraries like OWASP Java Encoder or Spring's HtmlUtils rather than custom sanitization
@@ -21,7 +21,7 @@ Cross-Site Scripting (CWE-79) occurs when untrusted data is included in web page
 - Implement CSP headers with strict policies (`default-src 'self'`)
 - Review and test all dynamic content rendering paths
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 import org.owasp.encoder.Encode;

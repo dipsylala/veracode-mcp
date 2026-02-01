@@ -4,7 +4,7 @@
 
 XML Injection occurs when untrusted user input is embedded into XML documents without proper validation or escaping, allowing attackers to manipulate XML structure using special characters (`<`, `>`, `&`, `'`, `"`). This can lead to data corruption, authentication bypass, or information disclosure. Use LINQ to XML APIs (`XElement`, `XAttribute`) instead of string concatenation, and validate/escape all user input with `SecurityElement.Escape()`.
 
-## Remediation Strategy
+## Key Principles
 
 - Never concatenate user input directly into XML strings
 - Use LINQ to XML constructors that automatically escape content
@@ -21,7 +21,7 @@ XML Injection occurs when untrusted user input is embedded into XML documents wi
 - Test with XML metacharacters (`<test>`, `&payload;`, `"value"`) to verify escaping
 - Review existing code for `.ToString()` concatenation patterns
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 // Safe: LINQ to XML automatically escapes content

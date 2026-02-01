@@ -4,7 +4,7 @@
 
 CSRF vulnerabilities in Java web applications occur when state-changing endpoints don't verify that requests originated from the application itself, allowing attackers to execute unauthorized actions on behalf of authenticated users. Spring Security provides built-in CSRF protection using synchronizer tokens that must be included in state-changing requests. The defense requires enabling CSRF protection, including tokens in forms/AJAX calls, and using appropriate HTTP methods (POST/PUT/DELETE for state changes).
 
-## Remediation Strategy
+## Key Principles
 
 - Enable Spring Security CSRF protection (enabled by default in Spring Boot)
 - Include CSRF tokens in all state-changing requests (POST, PUT, DELETE, PATCH)
@@ -21,7 +21,7 @@ CSRF vulnerabilities in Java web applications occur when state-changing endpoint
 - Ensure Spring Security's CSRF filter is active in the filter chain
 - Test that requests without valid tokens are rejected with 403 Forbidden
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Spring Boot Controller with CSRF protection

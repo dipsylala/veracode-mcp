@@ -4,7 +4,7 @@
 
 Insufficient entropy in C# occurs when using `System.Random` or `Guid.NewGuid()` for security-sensitive operations instead of cryptographically secure alternatives. `Random` produces predictable sequences unsuitable for generating tokens, passwords, keys, or session identifiers. Always use `RandomNumberGenerator` (.NET 6+) or `RNGCryptoServiceProvider` (older .NET) for security-critical random values.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all `System.Random` instances in security contexts with `RandomNumberGenerator`
 - Never use `Guid.NewGuid()` for authentication tokens, session IDs, or cryptographic keys
@@ -19,7 +19,7 @@ Insufficient entropy in C# occurs when using `System.Random` or `Guid.NewGuid()`
 - Update token/session generation to use cryptographic RNG exclusively
 - Review and test authentication, encryption, and access control flows
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 using System.Security.Cryptography;

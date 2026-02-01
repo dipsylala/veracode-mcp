@@ -4,7 +4,7 @@
 
 Improper certificate validation in JavaScript/Node.js applications allows man-in-the-middle (MITM) attacks where attackers intercept and modify HTTPS communications. This occurs when applications disable TLS/SSL certificate verification, fail to validate certificate chains, don't check hostname matching, or accept self-signed certificates in production. The fix is to always enable strict certificate validation and never disable `rejectUnauthorized` in production code.
 
-## Remediation Strategy
+## Key Principles
 
 - Always keep `rejectUnauthorized: true` (the default) for HTTPS requests in production
 - Use proper certificate authorities (CA) and avoid self-signed certificates in production
@@ -21,7 +21,7 @@ Improper certificate validation in JavaScript/Node.js applications allows man-in
 - Test HTTPS connections in staging with valid certificates
 - Enable strict transport security headers (HSTS) to enforce HTTPS
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const https = require('https');

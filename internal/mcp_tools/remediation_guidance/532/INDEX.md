@@ -6,7 +6,7 @@ Sensitive information in log files occurs when applications write confidential d
 
 Common examples include authentication failures logging passwords, request/response logging containing sensitive data, error messages with credentials, debug output, database query logs, and API interaction logs containing tokens or payment information.
 
-## Remediation Strategy
+## Key Principles
 
 - Never log passwords, tokens, API keys, session IDs, PII, credit cards, or health data
 - Redact sensitive data at the source before it reaches logging infrastructure

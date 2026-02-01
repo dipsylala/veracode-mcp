@@ -4,7 +4,7 @@
 
 External control of file names or paths occurs when user-supplied input constructs file system paths without proper validation, enabling attackers to access unauthorized files through path traversal. Python's `open()`, `os.path`, and `pathlib` modules provide minimal built-in protection against these attacks. Use `Path.resolve()` with `relative_to()` validation to ensure canonicalized paths (with symlinks resolved) remain within intended directories.
 
-## Remediation Strategy
+## Key Principles
 
 - Canonicalize all paths using `Path.resolve()` to eliminate symlinks and relative components
 - Validate resolved paths stay within the intended base directory using `relative_to()`
@@ -21,7 +21,7 @@ External control of file names or paths occurs when user-supplied input construc
 - Replace custom file serving with `send_from_directory()` (Flask) or equivalent framework functions
 - Test with traversal payloads - `../../../etc/passwd`, `..%2F..%2F`, symlink attacks
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from pathlib import Path

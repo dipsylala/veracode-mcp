@@ -4,7 +4,7 @@
 
 Uncaught exceptions cause application crashes, expose sensitive information through stack traces (file paths, internal logic, SQL queries), and enable denial of service attacks. They also leave resources unclosed and abort critical operations mid-execution.
 
-## Remediation Strategy
+## Key Principles
 
 - Never allow exceptions to crash services - implement global exception handlers
 - Protect sensitive information - catch exceptions before stack traces leak internals

@@ -4,7 +4,7 @@
 
 Open redirect vulnerabilities in Java web applications occur when user-controlled input is used in `sendRedirect()`, `forward()`, or `<meta>` refresh tags without proper validation, enabling phishing attacks and credential theft. The core fix is to validate redirect URLs against an allowlist of trusted destinations or use relative paths only. For Spring MVC and Jakarta EE applications, use path-based routing instead of accepting arbitrary URLs.
 
-## Remediation Strategy
+## Key Principles
 
 - Allowlist validation: Match redirect URLs against a predefined list of permitted domains or paths
 - Relative paths only: Use context-relative paths (`/dashboard`) instead of accepting full URLs
@@ -21,7 +21,7 @@ Open redirect vulnerabilities in Java web applications occur when user-controlle
 - Implement a centralized redirect validator for consistent enforcement
 - Add unit tests verifying that malicious URLs (`//evil.com`, `https -//attacker.com`) are rejected
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Allowlist-based redirect validator

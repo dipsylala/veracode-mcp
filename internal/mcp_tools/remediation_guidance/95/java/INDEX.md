@@ -4,7 +4,7 @@
 
 Java eval injection occurs when untrusted input flows into dynamic code execution mechanisms like scripting engines (Nashorn, Groovy), reflection APIs, or expression languages (SpEL, OGNL, MVEL). While Java lacks a native `eval()`, these components enable runtime code execution. The core fix is eliminating dynamic code execution entirely or using strict allow-lists with sandboxed execution contexts.
 
-## Remediation Strategy
+## Key Principles
 
 - Eliminate dynamic evaluation: Replace scripting engines and expression languages with static business logic
 - Use allow-lists over deny-lists: If dynamic features are required, restrict to predefined safe operations only
@@ -21,7 +21,7 @@ Java eval injection occurs when untrusted input flows into dynamic code executio
 - Enable Java SecurityManager with restrictive policies for scripted code
 - Add automated scanning to detect new eval injection vectors in code reviews
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Replace dynamic evaluation with safe lookup map

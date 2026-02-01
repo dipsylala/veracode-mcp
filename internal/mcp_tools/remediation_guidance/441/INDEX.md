@@ -4,7 +4,7 @@
 
 Unintended proxy vulnerabilities occur when applications forward requests to arbitrary destinations based on user input, acting as open proxies that enable SSRF attacks, bypassing firewalls, port scanning internal networks, and accessing cloud metadata services. The core issue is allowing intermediaries to become confused deputies that perform actions on behalf of untrusted callers without proper authentication or authorization constraints.
 
-## Remediation Strategy
+## Key Principles
 
 - Never trust user-supplied URLs or destinations - treat all external input as hostile when determining where to send requests
 - Implement strict allowlists - only permit connections to explicitly approved domains, IPs, and ports

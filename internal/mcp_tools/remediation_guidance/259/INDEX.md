@@ -4,7 +4,7 @@
 
 Hard-coded passwords embed credentials directly in source code, configuration files, or binaries, exposing secrets to anyone with codebase access. Attackers can easily extract these credentials to gain unauthorized access.
 
-## Remediation Strategy
+## Key Principles
 
 - Never embed secrets in application artifacts (source, images, configs, or client code)
 - Inject secrets at runtime from dedicated secrets management systems

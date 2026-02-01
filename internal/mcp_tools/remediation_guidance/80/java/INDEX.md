@@ -4,7 +4,7 @@
 
 Cross-Site Scripting (CWE-80) occurs when untrusted data is included in web pages without proper encoding, allowing attackers to inject malicious scripts that execute in victim browsers. The core fix is to encode all user-controlled output using context-appropriate methods before rendering in HTML, JavaScript, URLs, or CSS contexts.
 
-## Remediation Strategy
+## Key Principles
 
 - Always encode output based on context (HTML, JavaScript, URL, CSS)
 - Use framework-provided encoding mechanisms (JSTL `<c:out>`, Spring escaping, Thymeleaf auto-escaping)
@@ -21,7 +21,7 @@ Cross-Site Scripting (CWE-80) occurs when untrusted data is included in web page
 - Implement Content Security Policy headers to block inline scripts
 - Review all output points where user data appears
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```jsp
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

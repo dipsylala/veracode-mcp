@@ -4,7 +4,7 @@
 
 Insufficiently Protected Credentials in Python occurs when passwords, API keys, tokens, or secrets are stored in plaintext, hardcoded in source code, weakly encrypted, or transmitted insecurely. Use secure storage (environment variables, secret managers), strong hashing (bcrypt, Argon2) for passwords, and encrypted channels for transmission.
 
-## Remediation Strategy
+## Key Principles
 
 - Hash passwords with bcrypt or Argon2, never store plaintext or use weak algorithms like MD5/SHA1
 - Store secrets in environment variables or dedicated secret managers (AWS Secrets Manager, HashiCorp Vault)
@@ -21,7 +21,7 @@ Insufficiently Protected Credentials in Python occurs when passwords, API keys, 
 - Implement credential scanning in CI/CD pipelines to prevent commits of secrets
 - Use credential vaults with IAM-based access controls for team environments
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import bcrypt

@@ -4,7 +4,7 @@
 
 Permissive input validation occurs when regex patterns or validation logic fails to match the complete input, allowing malicious data to bypass checks. In Java, use fully anchored regex patterns with `^` and `$` anchors and call `matches()` instead of `find()` to ensure complete input validation. Leverage secure APIs like `URI`, `Path`, and `InetAddress` for complex validation scenarios and always enforce length limits to prevent injection attacks.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `Pattern.matches()` with fully anchored patterns (`^...$`) to validate entire input strings
 - Avoid `Matcher.find()` which only matches substrings, creating bypass opportunities
@@ -21,7 +21,7 @@ Permissive input validation occurs when regex patterns or validation logic fails
 - Test validation with boundary cases including partial matches, empty strings, and oversized inputs
 - Log validation failures for security monitoring
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$");

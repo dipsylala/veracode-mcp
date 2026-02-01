@@ -4,7 +4,7 @@
 
 Mass assignment vulnerabilities in C# occur when ASP.NET model binding automatically maps user input to object properties, allowing attackers to modify security-critical fields like `IsAdmin`, `Role`, or `Balance`. This guidance focuses on ASP.NET Core and newer. Always use ViewModels/DTOs with only permitted properties, apply `[Bind]` attributes to restrict binding, and validate all model state.
 
-## Remediation Strategy
+## Key Principles
 
 - Use dedicated ViewModels/DTOs containing only properties safe for user modification
 - Never bind directly to domain models or entities with sensitive properties
@@ -21,7 +21,7 @@ Mass assignment vulnerabilities in C# occur when ASP.NET model binding automatic
 - Map ViewModel properties explicitly to domain entities using manual assignment or AutoMapper
 - Always check `ModelState.IsValid` before processing bound data
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 // ViewModel with only safe properties

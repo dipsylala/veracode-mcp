@@ -4,7 +4,7 @@
 
 Cross-Site Scripting (CWE-80) occurs when untrusted data is inserted into web pages without proper encoding, allowing attackers to inject malicious scripts that execute in victim browsers. In JavaScript applications, this happens when user input is directly inserted into the DOM via `innerHTML` or HTML attributes without sanitization. Use `textContent` or framework-provided escaping mechanisms to safely display user input.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `textContent` or `innerText` instead of `innerHTML` for displaying user-controlled data
 - Leverage framework built-in escaping (React JSX, Vue templates, Angular bindings)
@@ -21,7 +21,7 @@ Cross-Site Scripting (CWE-80) occurs when untrusted data is inserted into web pa
 - Set restrictive CSP headers (`script-src 'self'`) to block inline scripts
 - Validate and encode data based on output context (HTML entity encoding, JavaScript escaping, URL encoding)
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // UNSAFE: Direct innerHTML with user input

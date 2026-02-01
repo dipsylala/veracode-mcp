@@ -4,7 +4,7 @@
 
 `Math.random()` is predictable and unsuitable for security-sensitive operations like generating session tokens, CSRF tokens, API keys, or cryptographic material. For security purposes, always use `crypto.randomBytes()` (Node.js) or `crypto.getRandomValues()` (browser), which provide cryptographically secure random values.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all `Math.random()` calls in security contexts with cryptographic random generators
 - Use minimum 32 bytes of entropy for tokens and keys
@@ -21,7 +21,7 @@
 - Store tokens with hashing in database for validation
 - Test token uniqueness and unpredictability
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const crypto = require('crypto');

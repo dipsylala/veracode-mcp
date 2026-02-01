@@ -6,8 +6,8 @@ Log Injection occurs when untrusted user input is written to logs without proper
 
 ## Key Principles
 
-- Use structured JSON/ECS logging to separate data from structure
-- Always encode untrusted input so it appears as data values, not log control characters
+- Ideally, use structured JSON/ECS logging to separate data from structure
+- If JSON/ECS logging is not possible, always encode untrusted input so it appears as data values, not log control characters
 - Never concatenate user input directly into log messages
 - Validate and sanitize all external data before logging
 - Configure logging frameworks to auto-escape or encode fields

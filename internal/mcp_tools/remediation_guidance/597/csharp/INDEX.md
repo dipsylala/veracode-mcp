@@ -4,7 +4,7 @@
 
 Using reference equality (`==` on object types) instead of value equality (`.Equals()`) for string comparison in C# can compare memory addresses rather than content when strings are not interned, causing security checks to fail unpredictably and enabling authentication bypass and logic errors. Always use `.Equals()` method or `String.Equals()` with explicit `StringComparison` parameter for security-critical comparisons.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `.Equals()` or `String.Equals()` for all string content comparisons, never `==` for validation logic
 - Specify `StringComparison.Ordinal` for case-sensitive or `StringComparison.OrdinalIgnoreCase` for case-insensitive comparisons
@@ -20,7 +20,7 @@ Using reference equality (`==` on object types) instead of value equality (`.Equ
 - Add unit tests covering non-interned strings to verify correct comparison behavior
 - Use static analysis tools to flag `==` usage on string types
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 // UNSAFE: Reference comparison

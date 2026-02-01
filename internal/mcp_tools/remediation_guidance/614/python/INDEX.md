@@ -4,7 +4,7 @@
 
 Sensitive Cookie Without 'Secure' Flag occurs when cookies containing authentication tokens, session IDs, or other sensitive data are transmitted without the `Secure` flag, allowing them to be sent over unencrypted HTTP connections. This exposes cookies to interception through man-in-the-middle attacks and network sniffing. The fix requires setting `secure=True` on all sensitive cookies and enforcing HTTPS.
 
-## Remediation Strategy
+## Key Principles
 
 - Always set `secure=True` for cookies containing sensitive data (sessions, auth tokens, user identifiers)
 - Enforce HTTPS site-wide and redirect HTTP requests to HTTPS
@@ -21,7 +21,7 @@ Sensitive Cookie Without 'Secure' Flag occurs when cookies containing authentica
 - Set additional security flags - `httponly=True` and `samesite='Strict'/'Lax'`
 - Test that cookies are not transmitted over HTTP connections
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from flask import Flask, session

@@ -4,7 +4,7 @@
 
 SQL Injection occurs when untrusted user input is incorporated into SQL queries without proper sanitization, allowing attackers to manipulate query logic, extract data, or execute unauthorized database operations. Python's database libraries (sqlite3, psycopg2, mysql-connector) all support parameterized queries, which is the primary defense mechanism. Always use parameterized queries instead of string concatenation or f-strings when building SQL statements.
 
-## Remediation Strategy
+## Key Principles
 
 - Use parameterized queries exclusively - Never concatenate user input into SQL strings
 - Employ ORM frameworks - Use SQLAlchemy, Django ORM, or similar frameworks that handle parameterization
@@ -21,7 +21,7 @@ SQL Injection occurs when untrusted user input is incorporated into SQL queries 
 - Review all database interaction code for direct string manipulation
 - Implement automated testing with SQL injection payloads
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import sqlite3

@@ -21,7 +21,7 @@ Inadequate Encryption Strength occurs when C# applications use weak algorithms (
 - Add authentication if using CBC - apply HMAC-SHA256 (encrypt-then-MAC pattern)
 - Validate key storage - Ensure keys are in secure vaults (Azure Key Vault, DPAPI), not config files
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 using System.Security.Cryptography;

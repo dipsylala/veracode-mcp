@@ -4,7 +4,7 @@
 
 Applications fail to validate that required input parameters are present before use, causing null pointer exceptions, logic errors, security bypasses (missing authentication tokens), or crashes. The fix requires explicit validation that required parameters exist before accessing them, with proper error handling for missing values.
 
-## Remediation Strategy
+## Key Principles
 
 - Validate parameter existence: Check all required parameters are present before accessing their values
 - Fail securely: Reject requests with missing required parameters rather than using unsafe defaults

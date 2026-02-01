@@ -4,7 +4,7 @@
 
 Cross-Site Scripting (XSS) via improper neutralization of script-related HTML occurs when applications fail to properly encode, escape, or sanitize user-controlled data before including it in HTML output. This allows attackers to inject malicious scripts (typically JavaScript) that execute in victims' browsers within the security context of the vulnerable application. XSS attacks enable session hijacking, credential theft, phishing, keylogging, defacement, malware distribution, and unauthorized actions on behalf of authenticated users.
 
-## Remediation Strategy
+## Key Principles
 
 - Never trust user input in HTML contexts—treat all user data as untrusted
 - Apply context-appropriate output encoding based on where data is inserted (HTML body, attributes, JavaScript, URL, CSS)

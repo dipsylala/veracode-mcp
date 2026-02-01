@@ -4,7 +4,7 @@
 
 Command injection in .NET occurs when applications construct system commands using untrusted input through Process class and related APIs, allowing attackers to execute arbitrary commands. The primary defense is avoiding shell execution by setting `UseShellExecute = false` and passing arguments as arrays instead of concatenating strings. Always validate user input against strict allowlists before using in command construction.
 
-## Remediation Strategy
+## Key Principles
 
 - Avoid shell execution entirely by setting `UseShellExecute = false`
 - Pass arguments as arrays using `ArgumentList` collection, never concatenate strings
@@ -21,7 +21,7 @@ Command injection in .NET occurs when applications construct system commands usi
 - Implement input sanitization for unavoidable dynamic values
 - Log and monitor all system command executions
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 var startInfo = new ProcessStartInfo

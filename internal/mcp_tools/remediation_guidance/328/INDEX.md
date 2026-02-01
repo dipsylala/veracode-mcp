@@ -4,7 +4,7 @@
 
 Weak cryptographic hashes (MD5, SHA-1) are broken and vulnerable to collision attacks, enabling attackers to forge signatures, create malicious files with same hash, and crack hashed passwords. Modern applications must use SHA-256+ for integrity and bcrypt/Argon2 for passwords.
 
-## Remediation Strategy
+## Key Principles
 
 - Use purpose-appropriate hashing - bcrypt/Argon2 for passwords, SHA-256+ for integrity
 - Never use fast hashes (MD5, SHA-1, plain SHA-256) for password storage or security-critical operations

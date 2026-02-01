@@ -4,7 +4,7 @@
 
 CWE-183 occurs when input validation uses overly permissive patterns that fail to match the entire input string, allowing attackers to inject malicious content before or after valid data. Use fully anchored regex patterns with `^` and `$` or `re.fullmatch()`, validate complex inputs with specialized libraries like `pathlib` and `ipaddress`, and enforce strict length limits.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `re.fullmatch()` or anchor patterns with `^...$` to ensure complete string matching
 - Leverage Python's specialized validation libraries (`pathlib`, `ipaddress`, `urllib.parse`) instead of custom regex
@@ -21,7 +21,7 @@ CWE-183 occurs when input validation uses overly permissive patterns that fail t
 - Check input length with `len()` before validation to prevent DoS
 - Use sets or frozensets for exact string matching against allowlists
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import re

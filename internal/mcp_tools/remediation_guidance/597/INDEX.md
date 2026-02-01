@@ -6,7 +6,7 @@ Using reference equality (`==`) instead of value equality (`.equals()`) for stri
 
 **Primary Defence:** Always use `.equals()` in Java for string content comparison; use constant-first pattern for null safety; prefer enums over strings for security-critical values like roles and permissions. In C#, both `==` and `.Equals()` work for string comparison, though `.Equals()` with `StringComparison` options provides more control.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `.equals()` in Java for all string content comparisons, never `==` or `!=`
 - Apply constant-first pattern (e.g., `"admin".equals(userRole)`) to prevent NullPointerException

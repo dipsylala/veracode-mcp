@@ -4,7 +4,7 @@
 
 Using RSA encryption without OAEP (Optimal Asymmetric Encryption Padding) enables padding oracle attacks, chosen ciphertext attacks, and message malleability. In Java, this commonly occurs when using `Cipher.getInstance("RSA")` without specifying the padding mode, which defaults to the insecure PKCS#1 v1.5 padding. Always use `Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")` with explicit OAEP parameters.
 
-## Remediation Strategy
+## Key Principles
 
 - Always specify the complete cipher transformation string including OAEP padding mode
 - Use SHA-256 or stronger hash functions for OAEP (avoid SHA-1)
@@ -19,7 +19,7 @@ Using RSA encryption without OAEP (Optimal Asymmetric Encryption Padding) enable
 - Generate RSA keys with minimum 2048-bit key size using KeyPairGenerator
 - Test encryption/decryption with sample data to verify proper OAEP implementation
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 import javax.crypto.Cipher;

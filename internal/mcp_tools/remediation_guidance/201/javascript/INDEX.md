@@ -4,7 +4,7 @@
 
 CWE-201 occurs when JavaScript/Node.js applications expose sensitive data (passwords, tokens, API keys, stack traces, internal paths) in HTTP responses, error messages, logs, or client-side code. The core fix is to sanitize all outbound data by filtering sensitive fields, using allowlists for response properties, and implementing proper error handling that hides internal details from end users.
 
-## Remediation Strategy
+## Key Principles
 
 - Sanitize error objects and responses by explicitly selecting only non-sensitive fields for transmission
 - Use environment variables for secrets and never embed them in client-side JavaScript bundles
@@ -21,7 +21,7 @@ CWE-201 occurs when JavaScript/Node.js applications expose sensitive data (passw
 - Implement response serializers/transformers that explicitly define allowed fields
 - Add logging sanitization to strip sensitive data before writing to logs or external services
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // Express error handler - sanitize errors before sending

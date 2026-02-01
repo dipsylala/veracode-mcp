@@ -4,7 +4,7 @@
 
 Process control vulnerabilities occur when untrusted input influences process creation, termination, or management operations. Attackers can spawn malicious processes, kill critical services, or exhaust system resources. Always validate process identifiers, use allowlists for process operations, and avoid passing user input directly to process control functions.
 
-## Remediation Strategy
+## Key Principles
 
 - Validate all process identifiers (PIDs) against an allowlist of expected/authorized processes
 - Never pass unsanitized user input to subprocess calls, signal operations, or process management functions
@@ -21,7 +21,7 @@ Process control vulnerabilities occur when untrusted input influences process cr
 - Set resource limits using setrlimit() to prevent process exhaustion attacks
 - Log and monitor all process control operations for security auditing
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import subprocess

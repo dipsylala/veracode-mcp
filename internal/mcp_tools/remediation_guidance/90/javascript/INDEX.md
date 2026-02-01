@@ -4,7 +4,7 @@
 
 LDAP Injection occurs when untrusted user input is concatenated into LDAP queries without proper sanitization, allowing attackers to modify query logic. This can lead to authentication bypass, unauthorized data access, or privilege escalation in applications using LDAP for directory services. The core fix is to use parameterized queries or strict input validation with allowlisting.
 
-## Remediation Strategy
+## Key Principles
 
 - Use libraries that support parameterized LDAP queries or prepared filters
 - Validate and sanitize all user inputs with strict allowlists before using in LDAP queries
@@ -21,7 +21,7 @@ LDAP Injection occurs when untrusted user input is concatenated into LDAP querie
 - Add logging and monitoring for suspicious LDAP query patterns
 - Conduct security testing with LDAP injection payloads
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const ldap = require('ldapjs');

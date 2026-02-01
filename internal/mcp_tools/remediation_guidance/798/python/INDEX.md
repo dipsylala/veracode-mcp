@@ -4,7 +4,7 @@
 
 Hard-coded credentials (passwords, API keys, database credentials, encryption keys) in Python source code create critical security vulnerabilities by exposing secrets in version control and making rotation impossible. Always externalize credentials using environment variables, configuration files outside version control, or dedicated secrets managers. For production systems, use cloud-native solutions like AWS Secrets Manager or Azure Key Vault.
 
-## Remediation Strategy
+## Key Principles
 
 - Never commit credentials to version control; use `.gitignore` for local config files
 - Separate configuration from code using environment variables or external config files
@@ -21,7 +21,7 @@ Hard-coded credentials (passwords, API keys, database credentials, encryption ke
 - Rotate all exposed credentials immediately
 - Implement validation to ensure required credentials are present at startup
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import os

@@ -4,7 +4,7 @@
 
 HTTP Response Splitting occurs when attackers inject CRLF (`\r\n`) characters into HTTP headers, enabling them to inject additional headers or response bodies, potentially leading to cache poisoning, XSS, or session hijacking. The vulnerability arises when user input is directly concatenated into HTTP headers without sanitization. Always use ASP.NET Core's built-in methods that automatically sanitize headers and avoid manual header construction.
 
-## Remediation Strategy
+## Key Principles
 
 - Use ASP.NET Core framework methods (`Redirect()`, `RedirectToAction()`, `Response.Cookies.Append()`) that automatically encode/sanitize values
 - Never manually concatenate user input into `Response.Headers` or construct raw HTTP responses
@@ -21,7 +21,7 @@ HTTP Response Splitting occurs when attackers inject CRLF (`\r\n`) characters in
 - Set `cookieOptions.HttpOnly = true` and use `Response.Cookies.Append()` for cookies
 - Enable ASP.NET Core's built-in header validation (enabled by default in Core 2.1+)
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 // Safe redirect with ASP.NET Core built-in validation

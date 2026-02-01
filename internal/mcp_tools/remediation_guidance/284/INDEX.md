@@ -4,7 +4,7 @@
 
 Improper access control occurs when applications fail to restrict what authenticated users can access or do. While authentication verifies identity ("who you are"), authorization verifies permissions ("what you're allowed to access") - strong authentication doesn't prevent authenticated users from accessing unauthorized data. Fix by implementing deny-by-default, server-side authorization checks on every protected resource and operation.
 
-## Remediation Strategy
+## Key Principles
 
 - Implement deny-by-default access control - explicitly grant access rather than blocking known threats
 - Validate authorization server-side on every request to protected resources

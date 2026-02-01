@@ -4,7 +4,7 @@
 
 Cross-Site Scripting (CWE-79) occurs when untrusted data is included in web pages without proper encoding, allowing attackers to inject malicious scripts that execute in victim browsers. This leads to session hijacking, credential theft, or malware distribution. Perl applications must use context-appropriate encoding functions like `escapeHTML()` from CGI.pm or `encode_entities()` from HTML::Entities before outputting user data to HTML contexts.
 
-## Remediation Strategy
+## Key Principles
 
 - Always HTML-encode user input before rendering in HTML contexts using `encode_entities()` or `escapeHTML()`
 - Use parameterized templates with auto-escaping (Template Toolkit with HTML filter)
@@ -21,7 +21,7 @@ Cross-Site Scripting (CWE-79) occurs when untrusted data is included in web page
 - Implement Content-Security-Policy headers to block inline scripts
 - Test with XSS payloads like `<script>alert(1)</script>` to verify fixes
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```perl
 use CGI qw(:standard);

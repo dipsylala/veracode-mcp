@@ -21,7 +21,7 @@ Authorization bypass through user-controlled keys (IDOR) occurs when Python web 
 - Handle missing resources uniformly - Return 404 for both non-existent and unauthorized resources
 - Test privilege escalation - Verify users cannot access others' resources by ID manipulation
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from flask import abort

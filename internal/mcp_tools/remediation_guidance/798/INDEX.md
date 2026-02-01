@@ -11,7 +11,7 @@ Hard-coded credentials occur when authentication secrets (passwords, API keys, e
 - Add allowlist validation or encoding where required
 - Verify behavior with normal and boundary cases
 
-## Remediation Strategy
+## Key Principles
 
 1. Remove hard-coded secrets from source and config.
 2. Load secrets from environment variables or a secrets manager.

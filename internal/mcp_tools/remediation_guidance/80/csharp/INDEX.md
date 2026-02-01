@@ -4,7 +4,7 @@
 
 XSS occurs when untrusted data is included in web output without proper encoding, allowing attackers to inject malicious scripts that execute in victims' browsers. In C#/ASP.NET applications, leverage Razor's automatic HTML encoding and avoid raw HTML output. Always encode dynamic content using `HttpUtility.HtmlEncode()` or `System.Net.WebUtility.HtmlEncode()`, implement Content Security Policy headers, and validate input using allowlists.
 
-## Remediation Strategy
+## Key Principles
 
 - Use automatic encoding: Rely on Razor's `@variable` syntax which HTML-encodes by default
 - Avoid raw output: Never use `@Html.Raw()`, `HtmlString`, or `MvcHtmlString` with untrusted data
@@ -21,7 +21,7 @@ XSS occurs when untrusted data is included in web output without proper encoding
 - For rich text editors, sanitize HTML with `Ganss.Xss.HtmlSanitizer` before storage
 - Audit existing code for `InnerHtml`, `Write()`, and string concatenation in JavaScript
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 // Razor view - automatic encoding

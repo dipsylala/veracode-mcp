@@ -4,7 +4,7 @@
 
 Inadequate Encryption Strength in JavaScript/Node.js applications occurs when developers use weak cryptographic algorithms (MD5, DES, RC4), insufficient key sizes, or deprecated ciphers that fail to protect sensitive data against modern attacks. The Node.js `crypto` module provides both secure and insecure options—always use AES-256-GCM, ChaCha20-Poly1305, or modern algorithms with proper key derivation (PBKDF2, scrypt, Argon2).
 
-## Remediation Strategy
+## Key Principles
 
 - Use AES-256-GCM or ChaCha20-Poly1305 for symmetric encryption with authenticated encryption modes
 - Generate keys with cryptographically secure random sources (`crypto.randomBytes()`) at minimum 256-bit length
@@ -19,7 +19,7 @@ Inadequate Encryption Strength in JavaScript/Node.js applications occurs when de
 - Generate unique IVs/nonces per encryption operation using `crypto.randomBytes(12)` for GCM
 - Store algorithm, IV, salt, and ciphertext together; never hardcode encryption keys
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const crypto = require('crypto');

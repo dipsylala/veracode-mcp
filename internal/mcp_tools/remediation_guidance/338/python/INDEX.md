@@ -4,7 +4,7 @@
 
 Use of Cryptographically Weak PRNG occurs when developers use Python's `random` module (Mersenne Twister algorithm) for security-sensitive operations like generating tokens, passwords, or encryption keys. This module is predictable and allows attackers to forecast generated values. **Primary Defence:** Use `secrets` module (Python 3.6+) for all security-sensitive randomness.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace `random` module with `secrets` module for tokens, passwords, keys, and security identifiers
 - Use `secrets.token_bytes()`, `secrets.token_hex()`, or `secrets.token_urlsafe()` for cryptographic randomness
@@ -20,7 +20,7 @@ Use of Cryptographically Weak PRNG occurs when developers use Python's `random` 
 - For password generation - use `secrets.choice()` with character sets
 - Verify changes don't affect non-security code that legitimately uses `random`
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import secrets

@@ -4,7 +4,7 @@
 
 Inadequate Encryption Strength occurs when Python applications use weak cryptographic algorithms (DES, 3DES, RC4), insufficient key sizes (AES-128, RSA-1024), or deprecated ciphers that modern computing can break. The core fix is replacing weak algorithms with strong alternatives: AES-256-GCM for symmetric encryption, RSA-2048+ or Ed25519 for asymmetric operations, and SHA-256+ for hashing. Always use the `cryptography` library with secure defaults rather than implementing custom crypto or using deprecated libraries.
 
-## Remediation Strategy
+## Key Principles
 
 - Use AES-256-GCM for symmetric encryption, never DES/3DES/RC4
 - Use RSA-2048+ or elliptic curve cryptography (Ed25519, secp256r1) for asymmetric operations
@@ -21,7 +21,7 @@ Inadequate Encryption Strength occurs when Python applications use weak cryptogr
 - Generate keys with `Fernet.generate_key()` or `os.urandom(32)` for 256-bit strength
 - Review hash functions and replace MD5/SHA-1 with SHA-256 or newer
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from cryptography.fernet import Fernet

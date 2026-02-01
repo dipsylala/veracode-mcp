@@ -4,12 +4,9 @@
 
 Applications load code, libraries, or resources from attacker-controlled sources without verifying integrity or authenticity. This includes dynamic code loading from user-controlled paths, remote scripts without integrity checks, untrusted plugins/extensions, and compromised package managers. Fix by loading only from trusted sources with cryptographic verification and blocking user control of inclusion paths.
 
-## Core Principle
+## Key Principles
 
-Load code and resources only from trusted, verified sources; implement integrity checks using cryptographic hashes; never allow user input to control code inclusion paths.
-
-## Key Remediation Principles
-
+- Load code and resources only from trusted, verified sources; implement integrity checks using cryptographic hashes; never allow user input to control code inclusion paths.
 - Implement Subresource Integrity (SRI) for all external scripts and stylesheets
 - Use allowlists to restrict code sources to specific trusted domains and paths
 - Validate cryptographic signatures for dynamically loaded modules and plugins

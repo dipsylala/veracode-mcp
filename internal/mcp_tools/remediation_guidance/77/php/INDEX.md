@@ -4,7 +4,7 @@
 
 Command injection in PHP occurs when applications construct system commands using untrusted input through functions like `system()`, `exec()`, `shell_exec()`, or backticks. The primary defense is eliminating shell execution entirely by using PHP built-in functions or libraries for specific tasks. When shell execution is unavoidable, properly escape all user input with `escapeshellarg()` for arguments and `escapeshellcmd()` for entire commands.
 
-## Remediation Strategy
+## Key Principles
 
 - Eliminate shell execution functions entirely; use native PHP functions for file operations, network requests, and system tasks
 - Implement strict input validation with whitelists of allowed values before any processing
@@ -21,7 +21,7 @@ Command injection in PHP occurs when applications construct system commands usin
 - Remove or restrict user control over command structure, file paths, and executable names
 - Configure PHP with `disable_functions` in php.ini to block dangerous functions in production
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 // UNSAFE: Direct user input in command

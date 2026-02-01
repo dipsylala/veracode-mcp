@@ -4,7 +4,7 @@
 
 Insufficient entropy occurs when using Python's `random` module instead of `secrets` or `os.urandom()` for security-sensitive operations like generating tokens, encryption keys, IVs, or nonces. The `random` module uses pseudorandom number generation designed for statistical purposes, producing predictable values that attackers can exploit. Always use the `secrets` module (Python 3.6+) for cryptographic operations.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `secrets` module exclusively for all cryptographic random value generation
 - Never use `random` module for tokens, passwords, keys, IVs, nonces, or security decisions
@@ -21,7 +21,7 @@ Insufficient entropy occurs when using Python's `random` module instead of `secr
 - Use `secrets.choice()` for selecting random elements securely
 - Verify token length meets security requirements (≥32 bytes recommended)
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 import secrets

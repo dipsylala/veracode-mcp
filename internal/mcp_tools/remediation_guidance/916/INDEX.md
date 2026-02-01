@@ -4,7 +4,7 @@
 
 Weak password hashing uses fast cryptographic functions (MD5, SHA-1, SHA-256) or poorly configured algorithms that attackers can brute-force when database dumps are compromised. Password hashing requires intentionally slow, computationally expensive algorithms designed specifically for password storage to resist offline cracking attacks. Use adaptive algorithms like Argon2id, bcrypt, or scrypt with work factors tuned to current hardware.
 
-## Remediation Strategy
+## Key Principles
 
 - Use adaptive, purpose-built password hashing algorithms (Argon2id, bcrypt, scrypt)
 - Never use fast general-purpose hashes (MD5, SHA-1, SHA-256) for passwords

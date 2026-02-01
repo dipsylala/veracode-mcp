@@ -11,7 +11,7 @@ Process control vulnerabilities in JavaScript/Node.js applications occur when un
 - Allowing process termination via user-controlled PID values
 - Command injection through shell metacharacters in process execution
 
-## Remediation Strategy
+## Key Principles
 
 - Use strict allowlists for executable paths and process arguments
 - Disable shell interpretation by using `spawn()` with array arguments instead of `exec()`
@@ -28,7 +28,7 @@ Process control vulnerabilities in JavaScript/Node.js applications occur when un
 - Implement timeout and resource limits for spawned processes
 - Log all process execution attempts with security monitoring
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const { execFile } = require('child_process');

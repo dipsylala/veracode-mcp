@@ -4,7 +4,7 @@
 
 XXE vulnerabilities in .NET occur when XML parsers process external entity references in untrusted XML, enabling file disclosure, SSRF, and DoS attacks. Modern .NET versions (.NET Core 3.0+) have safe defaults, but .NET Framework and misconfigured parsers remain vulnerable. The primary defense is setting `DtdProcessing = DtdProcessing.Prohibit` and `XmlResolver = null` in `XmlReaderSettings`.
 
-## Remediation Strategy
+## Key Principles
 
 - Prohibit DTD processing entirely using `DtdProcessing.Prohibit` to reject DOCTYPE declarations
 - Set `XmlResolver = null` to block external entity resolution even if DTDs bypass other controls
@@ -21,7 +21,7 @@ XXE vulnerabilities in .NET occur when XML parsers process external entity refer
 - Test with XXE payloads (<!DOCTYPE, SYSTEM entities) to verify rejection
 - Validate legitimate XML workflows still function correctly after hardening
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 using System.Xml;

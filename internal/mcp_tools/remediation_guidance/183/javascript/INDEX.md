@@ -4,7 +4,7 @@
 
 CWE-183 occurs when input validation uses overly permissive patterns that fail to reject malicious inputs, allowing attackers to bypass security controls through crafted strings. In JavaScript/TypeScript, this commonly happens with unanchored regex, incomplete URL validation, or loose string matching. Use fully anchored regex patterns (`^...$`), native validation APIs (URL constructor, path.resolve()), Set-based allowlists, and strict length limits to ensure complete input validation.
 
-## Remediation Strategy
+## Key Principles
 
 - Always anchor regex patterns with `^` and `$` to match entire input
 - Prefer native APIs (URL, path) over regex for structured data validation
@@ -21,7 +21,7 @@ CWE-183 occurs when input validation uses overly permissive patterns that fail t
 - Normalize inputs (lowercase, trim) before allowlist comparison
 - Throw errors on validation failure; never fall back to permissive defaults
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 function validateAllowedDomain(input) {

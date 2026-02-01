@@ -21,7 +21,7 @@ In ASP.NET Core applications, improper authorization occurs when authentication 
 - Verify authorization configuration in `Program.cs` includes both `UseAuthentication()` and `UseAuthorization()`
 - Test each endpoint to confirm unauthorized access is blocked
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 [Authorize]  // Protect all actions by default

@@ -4,7 +4,7 @@
 
 Sensitive cookies in Java web applications transmitted without the `secure` attribute can be intercepted over HTTP connections, enabling man-in-the-middle attacks and session hijacking. The fix requires setting `setSecure(true)` on all cookies containing authentication tokens, session IDs, or other sensitive data to ensure transmission only over HTTPS.
 
-## Remediation Strategy
+## Key Principles
 
 - Set `secure` attribute to `true` on all cookies containing sensitive information
 - Enforce HTTPS-only transmission for authentication and session cookies
@@ -21,7 +21,7 @@ Sensitive cookies in Java web applications transmitted without the `secure` attr
 - Test in HTTPS environment to verify cookies transmit only over secure channels
 - Review session management configuration in `web.xml` or application properties
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Servlet API

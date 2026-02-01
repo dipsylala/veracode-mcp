@@ -4,7 +4,7 @@
 
 CSRF occurs when state-changing endpoints don't validate that requests originated from the application itself, allowing attackers to forge authenticated requests from malicious sites. Enable Django's `CsrfViewMiddleware` with `{% csrf_token %}` in forms, or use Flask-WTF's `CSRFProtect` for automatic token validation. Configure `SESSION_COOKIE_SAMESITE='Strict'` as defense-in-depth.
 
-## Remediation Strategy
+## Key Principles
 
 - Enable framework-native CSRF protection globally (Django middleware, Flask-WTF `CSRFProtect`)
 - Validate cryptographic tokens on all state-changing operations (POST/PUT/PATCH/DELETE)
@@ -21,7 +21,7 @@ CSRF occurs when state-changing endpoints don't validate that requests originate
 - Remove any `@csrf_exempt` decorators from state-changing endpoints
 - Verify all POST/PUT/PATCH/DELETE routes validate tokens automatically
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 # Django settings.py

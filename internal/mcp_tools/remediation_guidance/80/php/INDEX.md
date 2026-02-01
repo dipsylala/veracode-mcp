@@ -4,7 +4,7 @@
 
 XSS occurs when untrusted data is included in web output without proper encoding, allowing attackers to inject malicious scripts. The core fix is context-aware output encoding using `htmlspecialchars()` with `ENT_QUOTES | ENT_HTML5` flags for HTML contexts, `json_encode()` for JavaScript contexts, or framework auto-escaping features.
 
-## Remediation Strategy
+## Key Principles
 
 - Apply output encoding at the point of rendering, not at input
 - Use context-appropriate encoding (HTML, JavaScript, URL, CSS)
@@ -21,7 +21,7 @@ XSS occurs when untrusted data is included in web output without proper encoding
 - Enable framework auto-escaping globally (Blade, Twig default behavior)
 - Validate the fix by testing with payloads like `<script>alert(1)</script>`
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 // HTML context - safe encoding

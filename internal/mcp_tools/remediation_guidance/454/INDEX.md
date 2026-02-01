@@ -1,16 +1,16 @@
-# CWE-454: External Initialization of Trusted Variables or Data Stores
+# CWE-454 - External Initialization of Trusted Variables or Data Stores
 
 ## LLM Guidance
 
 External initialization vulnerabilities occur when applications initialize critical variables from untrusted sources (environment variables, config files, user input) without validation, enabling attackers to control application behavior, bypass security, or execute code. Trusted variables must be initialized internally with strict validation; never allow external inputs to override trusted state.
 
-## Key Remediation Principles
+## Key Principles
 
-- **Internal initialization first:** Initialize critical variables with safe defaults; treat external sources as untrusted overrides requiring validation
-- **Strict input validation:** Validate all external configuration values against allowlists of acceptable values before use
-- **Minimize external trust:** Reduce reliance on environment variables, config files, and command-line arguments for security-critical settings
-- **Immutable after init:** Once validated and set, prevent runtime modification of trusted variables
-- **Defense in depth:** Combine validation with least privilege and sandboxing to limit impact of compromised values
+- Internal initialization first - Initialize critical variables with safe defaults; treat external sources as untrusted overrides requiring validation
+- Strict input validation - Validate all external configuration values against allowlists of acceptable values before use
+- Minimize external trust - Reduce reliance on environment variables, config files, and command-line arguments for security-critical settings
+- Immutable after init - Once validated and set, prevent runtime modification of trusted variables
+- Defense in depth - Combine validation with least privilege and sandboxing to limit impact of compromised values
 
 ## Remediation Steps
 

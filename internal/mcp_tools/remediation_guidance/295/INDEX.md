@@ -6,7 +6,7 @@ Improper certificate validation occurs when an application fails to correctly ve
 
 SSL/TLS certificates serve two critical purposes: authentication (prove the server is who it claims to be) and encryption (establish a secure encrypted channel). When certificate validation is disabled or improperly implemented, encryption alone is insufficient - you may be encrypting data to an attacker's server.
 
-## Remediation Strategy
+## Key Principles
 
 1. Replace unsafe sinks with safe native APIs or library functions.
 2. Apply the primary safe pattern for this CWE.
@@ -19,13 +19,3 @@ SSL/TLS certificates serve two critical purposes: authentication (prove the serv
 - Apply the primary safe pattern for this CWE
 - Add allowlist validation or encoding where required
 - Verify behavior with normal and boundary cases
-
-### Code Review Verification
-
-Verify -
-
-- No TrustAllCertificates implementations remain
-- No certificate validation bypass flags
-- Default validation is used
-- No SSL error suppression
-- Production config differs from development

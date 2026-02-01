@@ -4,7 +4,7 @@
 
 XSS occurs when untrusted data is included in web output without proper encoding, allowing attackers to inject malicious scripts into victim browsers. In C#/ASP.NET, leverage built-in auto-encoding features and context-specific encoders to prevent malicious content from executing.
 
-## Remediation Strategy
+## Key Principles
 
 - Use Razor's automatic HTML encoding with `@variable` syntax (ASP.NET Core/MVC)
 - Apply context-specific encoders: `HtmlEncoder` for HTML, `JavaScriptEncoder` for JS contexts, `UrlEncoder` for URLs
@@ -21,7 +21,7 @@ XSS occurs when untrusted data is included in web output without proper encoding
 - For rich text editors, integrate HtmlSanitizer with allowlist of safe tags before rendering with `@Html.Raw()`
 - Add CSP middleware to restrict script sources and enforce 'self' policy
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 // Razor view - auto-encoded by default

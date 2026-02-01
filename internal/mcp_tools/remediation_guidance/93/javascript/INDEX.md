@@ -4,7 +4,7 @@
 
 CRLF Injection occurs when untrusted input containing carriage return (`\r`) and line feed (`\n`) characters is used in HTTP headers or protocol fields without validation, enabling HTTP response splitting, header injection, cache poisoning, and XSS attacks. The primary defense is to strip or reject newline characters from all user input before using it in headers or protocol-sensitive contexts.
 
-## Remediation Strategy
+## Key Principles
 
 - Remove or reject `\r` and `\n` characters from user input before use in HTTP headers
 - Use framework-provided header-setting methods that automatically sanitize input
@@ -21,7 +21,7 @@ CRLF Injection occurs when untrusted input containing carriage return (`\r`) and
 - Test with payloads containing CRLF sequences to verify sanitization effectiveness
 - Review logging and error handling to ensure headers aren't logged with unsanitized input
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // Safe header setting using Express framework methods

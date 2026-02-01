@@ -4,7 +4,7 @@
 
 HTTP Response Splitting occurs when attackers inject CRLF characters (`\r\n`) into HTTP headers, enabling them to inject additional headers or response bodies, leading to cache poisoning, XSS, or session hijacking. Use Spring Framework's built-in redirect methods and header builders that automatically sanitize inputs; never manually construct headers with untrusted data.
 
-## Remediation Strategy
+## Key Principles
 
 - Use framework-provided abstractions: Spring's `redirect:` prefix, `RedirectView`, `ResponseCookie.from()`, and `ContentDisposition.builder()` handle encoding automatically
 - Validate and sanitize user input: Reject CRLF sequences (`\r`, `\n`) from any data used in headers
@@ -21,7 +21,7 @@ HTTP Response Splitting occurs when attackers inject CRLF characters (`\r\n`) in
 - Implement allowlist validation for redirect URLs using `UrlValidator` or regex patterns
 - Review all response header manipulations and replace with framework methods
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 @Controller

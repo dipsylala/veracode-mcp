@@ -4,7 +4,7 @@
 
 SQL Injection occurs when untrusted data is incorporated into SQL queries without proper parameterization, allowing attackers to manipulate queries to bypass authentication, access unauthorized data, or execute administrative operations. The primary defense is using prepared statements with PDO or MySQLi, or modern ORMs like Laravel Eloquent that use prepared statements internally. Escape functions alone are insufficient and must not be relied upon.
 
-## Remediation Strategy
+## Key Principles
 
 - Always use prepared statements with bound parameters for all SQL queries containing user input
 - Employ parameterized queries through PDO or MySQLi, never string concatenation
@@ -21,7 +21,7 @@ SQL Injection occurs when untrusted data is incorporated into SQL queries withou
 - Validate input types and formats as secondary defense (e.g., verify IDs are numeric)
 - Test the fix by attempting injection attacks and reviewing query logs
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 // PDO prepared statement with named parameters

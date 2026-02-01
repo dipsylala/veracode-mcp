@@ -4,7 +4,7 @@
 
 XSS occurs when untrusted data is included in web output without proper encoding, allowing attackers to inject malicious scripts. Python frameworks like Django and Flask provide auto-escaping in templates—use `{{ variable }}` syntax and keep auto-escaping enabled. For manual encoding, use `html.escape()` or `bleach.clean()` with allowlists for rich content.
 
-## Remediation Strategy
+## Key Principles
 
 - Use framework auto-escaping: Django templates and Jinja2 `.html` files escape by default
 - Never mark untrusted input as safe: Avoid `|safe`, `mark_safe()`, or `Markup()` on user data
@@ -21,7 +21,7 @@ XSS occurs when untrusted data is included in web output without proper encoding
 - Set `Content-Security-Policy` headers to restrict script execution
 - Audit all template rendering and ensure no raw user input reaches the DOM
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from flask import Flask, render_template_string

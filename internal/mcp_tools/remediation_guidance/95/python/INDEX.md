@@ -4,7 +4,7 @@
 
 CWE-95 occurs when untrusted input from HTTP requests, APIs, files, or external sources is passed to dynamic code execution functions like `eval()`, `exec()`, `compile()`, or `__import__()`. These functions execute arbitrary Python code with full application privileges, enabling attackers to access data, modify system state, or execute commands. The core fix is to eliminate dynamic code execution entirely and use safe alternatives like whitelisted function mappings, AST parsing, or data serialization.
 
-## Remediation Strategy
+## Key Principles
 
 - Never use `eval()`, `exec()`, `compile()`, or `__import__()` with untrusted input
 - Replace dynamic execution with static alternatives: dictionaries, match/case statements, or allowlists
@@ -21,7 +21,7 @@ CWE-95 occurs when untrusted input from HTTP requests, APIs, files, or external 
 - Apply input whitelisting to allow only specific, predefined values or patterns
 - Review and audit all external data sources feeding into the application
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 # UNSAFE: Using eval with user input

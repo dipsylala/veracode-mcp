@@ -4,7 +4,7 @@
 
 Insecure temporary file creation occurs when applications create files with predictable names, insecure permissions, or without proper cleanup mechanisms. Use .NET's `Path.GetTempFileName()` for unpredictable filenames, `FileOptions.DeleteOnClose` for automatic cleanup, and set appropriate ACLs to restrict file access to the current user only.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `Path.GetTempFileName()` instead of constructing custom temporary filenames
 - Enable `FileOptions.DeleteOnClose` to ensure automatic cleanup when file handles close
@@ -21,7 +21,7 @@ Insecure temporary file creation occurs when applications create files with pred
 - Use `FileOptions.Encrypted` when handling sensitive data in temporary files
 - Validate `Path.GetTempPath()` output points to expected secure location
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 string tempFile = Path.GetTempFileName();

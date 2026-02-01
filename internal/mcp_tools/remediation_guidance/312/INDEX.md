@@ -4,7 +4,7 @@
 
 Cleartext storage occurs when sensitive information (credentials, PII, financial data, cryptographic keys) is stored without encryption in databases, files, logs, cache, backups, or memory dumps, making it readable to anyone who gains access. Unlike cleartext transmission (CWE-319), this vulnerability affects data at rest. Core fix - Encrypt sensitive data at rest or redact before persisting.
 
-## Remediation Strategy
+## Key Principles
 
 - Never store sensitive information in cleartext; always encrypt or redact before persisting
 - Use strong encryption algorithms (AES-256) for data at rest

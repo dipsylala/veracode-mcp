@@ -4,7 +4,7 @@
 
 Improper ownership management occurs when files, directories, or resources are created with incorrect ownership, allowing unauthorized modification, privilege escalation, or data tampering by unintended users. Core fix: Set explicit ownership on all resources and verify it—never assume safe defaults.
 
-## Remediation Strategy
+## Key Principles
 
 - Set explicit ownership on all created resources using chown/chgrp
 - Use least-privilege ownership (service users, not root) for application files

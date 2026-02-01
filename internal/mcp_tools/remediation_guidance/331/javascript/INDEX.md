@@ -6,7 +6,7 @@ Insufficient entropy occurs when using `Math.random()` for security-sensitive op
 
 **Primary Defence:** Use `crypto.randomBytes()` (Node.js) or `crypto.getRandomValues()` (browser) for all security-sensitive random value generation.
 
-## Remediation Strategy
+## Key Principles
 
 - Never use `Math.random()`, `Date.now()`, or predictable sources for security-sensitive values
 - Always use cryptographically secure random number generators (CSPRNGs) from the `crypto` module
@@ -23,7 +23,7 @@ Insufficient entropy occurs when using `Math.random()` for security-sensitive op
 - Test that generated values are unpredictable and non-repeating
 - Audit dependencies for insecure random usage
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 const crypto = require('crypto');

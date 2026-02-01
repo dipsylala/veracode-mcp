@@ -4,7 +4,7 @@
 
 This vulnerability occurs when critical resources (files, directories, services) are assigned overly broad or incorrect permissions, allowing unauthorized users to access or modify them. The core fix is applying least privilege principles: default-deny access and grant only minimum necessary permissions for legitimate operations.
 
-## Remediation Strategy
+## Key Principles
 
 - Apply least privilege to all permission assignments and ACLs
 - Use default-deny approach: start restrictive, grant only required access

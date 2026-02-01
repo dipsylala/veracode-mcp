@@ -4,7 +4,7 @@
 
 JavaScript eval injection occurs when untrusted input flows into dynamic code execution functions like `eval()`, `Function()`, or `setTimeout()`/`setInterval()` with strings. Attackers can execute arbitrary code, access sensitive data, or compromise the application. Never pass user-controlled data to these functions; use safer alternatives like object property access, JSON parsing, or predefined function mappings.
 
-## Remediation Strategy
+## Key Principles
 
 - Eliminate dynamic code execution: Replace `eval()` and `Function()` with static alternatives
 - Use allowlists: Map user input to predefined functions or values rather than executing strings
@@ -21,7 +21,7 @@ JavaScript eval injection occurs when untrusted input flows into dynamic code ex
 - For unavoidable cases, validate input against strict allowlists before execution
 - Enable CSP headers with `unsafe-eval` disabled to prevent runtime eval
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```javascript
 // UNSAFE: eval with user input

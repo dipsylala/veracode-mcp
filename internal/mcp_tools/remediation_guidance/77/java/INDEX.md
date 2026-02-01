@@ -4,7 +4,7 @@
 
 Command injection occurs when applications construct system commands using untrusted input without proper sanitization, allowing attackers to inject shell metacharacters and execute arbitrary commands. The primary defense is using `ProcessBuilder` with separate arguments instead of concatenating strings with `Runtime.exec()`, avoiding shell invocation entirely.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `ProcessBuilder` with argument arrays to prevent shell interpretation
 - Avoid shell interpreters (`sh -c`, `cmd /c`) that enable metacharacter injection
@@ -21,7 +21,7 @@ Command injection occurs when applications construct system commands using untru
 - Use hardcoded command paths and restrict argument values to known-safe options
 - Apply runtime security policies to limit command execution capabilities
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Safe: ProcessBuilder with separate arguments

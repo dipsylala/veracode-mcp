@@ -4,7 +4,7 @@
 
 XML External Entity (XXE) injection occurs when XML input containing a reference to an external entity is processed by a weakly configured XML parser. The vulnerability exists because XML parsers, by default, often resolve external entities defined in Document Type Definitions (DTDs), allowing attackers to inject malicious entity definitions that can read arbitrary files, perform Server-Side Request Forgery (SSRF) attacks, cause Denial of Service (DoS), or in rare cases execute remote code.
 
-## Remediation Strategy
+## Key Principles
 
 - Disable XML external entities and DTD processing by default in all parsers
 - Only enable external entity resolution if explicitly required and with strict security constraints

@@ -4,7 +4,7 @@
 
 Weak encoding schemes (Base64, XOR, ROT13, URL encoding) are not cryptography and provide zero security. Encoded passwords are trivially reversible and offer no protection. Use strong cryptographic password hashing algorithms (bcrypt, Argon2, PBKDF2) instead of encoding.
 
-## Remediation Strategy
+## Key Principles
 
 - Replace all encoding with proper cryptographic password hashing
 - Use adaptive hashing algorithms with appropriate work factors

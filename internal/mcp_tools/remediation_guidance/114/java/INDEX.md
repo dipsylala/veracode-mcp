@@ -4,7 +4,7 @@
 
 In Java, CWE-114 occurs when loading native libraries or executing processes with untrusted input, enabling attackers to inject malicious libraries via DLL hijacking or execute arbitrary commands. The core fix is validating all inputs against strict allowlists and using absolute paths for library loading.
 
-## Remediation Strategy
+## Key Principles
 
 - Use `System.load()` with absolute paths instead of `System.loadLibrary()` with relative names
 - Validate all external inputs against strict allowlists before using in `ProcessBuilder` or library loading
@@ -19,7 +19,7 @@ In Java, CWE-114 occurs when loading native libraries or executing processes wit
 - Set environment variables explicitly using `ProcessBuilder.environment()` to prevent injection
 - Implement input validation that rejects special characters and path separators
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // Safe library loading and process execution with allowlists

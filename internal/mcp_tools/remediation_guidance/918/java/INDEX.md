@@ -6,7 +6,7 @@ SSRF occurs when attackers manipulate server-side requests to access internal re
 
 **Primary Defence:** Validate URLs against an allowlist of permitted domains/IPs, block private IP ranges (RFC 1918, loopback, link-local), and restrict protocols to `https://` only.
 
-## Remediation Strategy
+## Key Principles
 
 - Validate all URLs against allowlists of permitted domains/IPs before making requests
 - Block private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x, 169.254.x) using `InetAddress` checks
@@ -23,7 +23,7 @@ SSRF occurs when attackers manipulate server-side requests to access internal re
 - Configure HttpClient with strict redirect and timeout policies (disable redirects if possible)
 - Log all outbound requests for monitoring and incident response
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 private static final Set<String> ALLOWED_HOSTS = Set.of("api.example.com", "cdn.example.com");

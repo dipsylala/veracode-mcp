@@ -4,7 +4,7 @@
 
 XML Injection occurs when untrusted input is used to construct XML documents without proper validation or escaping, allowing attackers to manipulate XML structure using special characters (`<`, `>`, `&`, `'`, `"`). This can lead to data corruption, authentication bypass, or information disclosure. **Primary Defense:** Use `xml.etree.ElementTree` or `lxml` with proper element creation methods instead of string concatenation, and validate/escape all user input.
 
-## Remediation Strategy
+## Key Principles
 
 - Never construct XML documents using string concatenation or formatting with user input
 - Use XML library APIs that handle escaping automatically (ElementTree, lxml)
@@ -21,7 +21,7 @@ XML Injection occurs when untrusted input is used to construct XML documents wit
 - Escape special XML characters using `xml.sax.saxutils.escape()` if manual construction is unavoidable
 - Review all XML generation code paths for user input handling
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```python
 from xml.etree.ElementTree import Element, SubElement, tostring

@@ -27,21 +27,16 @@ type PackageWorkspaceRequest struct {
 
 // parsePackageWorkspaceRequest extracts and validates parameters from the raw args map
 func parsePackageWorkspaceRequest(args map[string]interface{}) (*PackageWorkspaceRequest, error) {
-	req := &PackageWorkspaceRequest{}
-
-	// Extract application_path (required)
 	appPath, ok := args["application_path"].(string)
 	if !ok || appPath == "" {
 		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
 	}
-	req.ApplicationPath = appPath
 
-	// Extract verbose (optional)
+	req := &PackageWorkspaceRequest{ApplicationPath: appPath}
+
 	if verbose, ok := args["verbose"].(bool); ok {
 		req.Verbose = verbose
 	}
-
-	// Extract logToFile (optional)
 	if logToFile, ok := args["logToFile"].(bool); ok {
 		req.LogToFile = logToFile
 	}

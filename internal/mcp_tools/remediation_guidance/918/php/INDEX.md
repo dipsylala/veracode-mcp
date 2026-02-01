@@ -4,7 +4,7 @@
 
 Server-Side Request Forgery (SSRF) allows attackers to make the server perform HTTP requests to arbitrary destinations, potentially accessing internal services, cloud metadata endpoints, or bypassing firewalls. Always validate URLs against an allowlist of permitted domains, block private IP ranges (127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16), and restrict protocols to HTTPS only.
 
-## Remediation Strategy
+## Key Principles
 
 - Use strict allowlist validation for permitted domains before making requests
 - Block private, reserved, and loopback IP ranges using PHP's filter functions
@@ -21,7 +21,7 @@ Server-Side Request Forgery (SSRF) allows attackers to make the server perform H
 - Disable `CURLOPT_FOLLOWLOCATION` or validate all redirect targets
 - Set timeouts and use `CURLOPT_PROTOCOLS` to restrict allowed protocols
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```php
 function safeFetchUrl($url, array $allowedHosts) {

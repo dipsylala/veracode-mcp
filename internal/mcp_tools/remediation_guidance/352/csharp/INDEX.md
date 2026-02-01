@@ -4,7 +4,7 @@
 
 CSRF vulnerabilities occur when state-changing endpoints don't verify requests originated from the application itself, allowing attackers to perform actions on behalf of authenticated users. ASP.NET Core provides built-in anti-forgery token support that should be enabled on all state-changing operations. The primary defense is using `[ValidateAntiForgeryToken]` attribute on POST/PUT/DELETE actions or enabling automatic validation globally.
 
-## Remediation Strategy
+## Key Principles
 
 - Apply anti-forgery tokens to all state-changing HTTP methods (POST, PUT, DELETE, PATCH)
 - Use automatic token validation globally rather than relying on per-action attributes
@@ -21,7 +21,7 @@ CSRF vulnerabilities occur when state-changing endpoints don't verify requests o
 - Configure SameSite cookies - `options.Cookie.SameSite = SameSiteMode.Strict`
 - Test protected endpoints reject requests without valid tokens
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```csharp
 // Startup.cs - Global configuration

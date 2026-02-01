@@ -4,7 +4,7 @@
 
 OS Command Injection occurs when untrusted data is incorporated into OS commands without proper validation, allowing attackers to execute arbitrary commands on the host system. The primary defense is to use Java native APIs (Files, HttpClient, etc.) instead of system commands to eliminate the vulnerability entirely. If system commands are unavoidable, use ProcessBuilder with argument arrays and never invoke a shell or concatenate strings.
 
-## Remediation Strategy
+## Key Principles
 
 - Use Java native APIs instead of system calls (Files.copy, HttpClient, ProcessHandle) to eliminate command injection risk
 - Use ProcessBuilder with argument arrays if commands are unavoidable—separate command from arguments, never use string concatenation or shell interpretation
@@ -21,7 +21,7 @@ OS Command Injection occurs when untrusted data is incorporated into OS commands
 - Configure process execution with minimal required OS permissions
 - Remove all shell invocation (sh, cmd.exe, bash) and string concatenation patterns
 
-## Minimal Safe Pattern
+## Safe Pattern
 
 ```java
 // PREFERRED: Use Java native APIs
