@@ -13,7 +13,7 @@ The MCP server provides a JSON-RPC 2.0 interface that allows AI assistants and o
 
 ## Test Structure
 
-### 1. Unit Tests ([server_test.go](server_test.go))
+### 1. Unit Tests ([server_test.go](../internal/server/server_test.go))
 
 Tests the core MCP server functionality:
 
@@ -27,7 +27,7 @@ Tests the core MCP server functionality:
 go test -v -run "TestLoad|TestToMCP|TestServer" -short
 ```
 
-### 2. Tool Registry Tests ([tools/registry_test.go](mcp_tools/registry_test.go))
+### 2. Tool Registry Tests ([mcp_tools/registry_test.go](../internal/mcp_tools/registry_test.go))
 
 Tests the tool registration system:
 
@@ -40,7 +40,7 @@ Tests the tool registration system:
 go test -v ./tools -run "Registry"
 ```
 
-### 3. Tool Integration Tests ([tools/integration_test.go](../tools/integration_test.go))
+### 3. Tool Integration Tests ([mcp_tools/integration_test.go](../internal/mcp_tools/integration_test.go)
 
 Tests that actual tool implementations auto-register correctly:
 
@@ -53,7 +53,7 @@ Tests that actual tool implementations auto-register correctly:
 go test -v ./tools -run "TestActual"
 ```
 
-### 4. Workspace Integration Tests ([tools/workspace_integration_test.go](../tools/workspace_integration_test.go))
+### 4. Workspace Integration Tests ([mcp_tools/workspace_integration_test.go](../internal/mcp_tools/workspace_integration_test.go))
 
 **End-to-end tests** that simulate real workspace scenarios:
 
@@ -263,9 +263,9 @@ To add tests for new MCP tools:
 
 ## Related Documentation
 
-- [MCP Tools README](mcp_tools/README.md) - Tool implementation guide
-- [Tool Testing Guide](mcp_tools/TESTING.md) - Detailed tool testing documentation
-- [API Integration Tests](api/README.md) - Low-level API testing
+- [MCP Tools README](../internal/mcp_tools/README.md) - Tool implementation guide
+- [Tool Testing Guide](../internal/mcp_tools/TESTING.md) - Detailed tool testing documentation
+- [API Integration Tests](../internal/api/README.md) - Low-level API testing
 
 ## Summary
 
