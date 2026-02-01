@@ -184,7 +184,7 @@
     },
     {
       "name": "remediation-guidance",
-      "description": "Get language-specific remediation guidance for a security finding from pipeline scan results. Retrieves detailed, actionable guidance on how to fix a specific vulnerability based on the CWE ID and programming language detected from the source file.",
+      "description": "Get language-specific guidance and code examples to fix/remediate/resolve pipeline scan flaws. Use when user asks how to fix, resolve, patch, or remediate a vulnerability, flaw, issue, or finding. Returns detailed solutions with safe code patterns.",
       "category": "veracode",
       "params": [
         {
@@ -274,18 +274,6 @@
           "type": "string",
           "isRequired": false,
           "description": "Optional output filename for the packaged artifact. If just a filename (no path) is provided, it will be created in the .veracode/packaging directory. If a full path is provided, it will be used as-is."
-        },
-        {
-          "name": "verbose",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Enable verbose/debug output from Veracode CLI. Creates a timestamped log file with detailed output."
-        },
-        {
-          "name": "logToFile",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Write detailed output to a log file in ./.veracode/packaging"
         }
       ]
     },
@@ -304,12 +292,6 @@
           "type": "string",
           "isRequired": false,
           "description": "The file upon which to perform a pipeline scan. If just a filename (no path) is provided, it will look in the .veracode/packaging folder. If a full or relative path is provided, it will be used as-is. If not provided, the tool will scan the largest file in the .veracode/packaging folder"
-        },
-        {
-          "name": "verbose",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Enable verbose/debug output from Veracode CLI. Creates a timestamped log file with detailed output."
         }
       ]
     },

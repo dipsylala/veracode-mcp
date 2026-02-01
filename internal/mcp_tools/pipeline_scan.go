@@ -21,7 +21,6 @@ func init() {
 type PipelineScanRequest struct {
 	ApplicationPath string
 	Filename        string
-	Verbose         bool
 }
 
 // parsePipelineScanRequest extracts and validates parameters from the raw args map
@@ -45,11 +44,6 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 			// Full or relative path - use as-is
 			req.Filename = filename
 		}
-	}
-
-	// Extract verbose (optional)
-	if verbose, ok := args["verbose"].(bool); ok {
-		req.Verbose = verbose
 	}
 
 	return req, nil
@@ -130,11 +124,7 @@ func handlePipelineScan(ctx context.Context, args map[string]interface{}) (inter
 		"scan",
 		scanTarget,
 		"--results-file", resultsFile,
-	}
-
-	// Add verbose flag if requested
-	if req.Verbose {
-		cmdArgs = append(cmdArgs, "-v")
+		"-v",
 	}
 
 	// #nosec G204 -- veracode command is hardcoded, only arguments are user-controlled and validated

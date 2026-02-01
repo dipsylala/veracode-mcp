@@ -46,10 +46,6 @@ func TestParsePipelineScanRequest_WithFilename(t *testing.T) {
 	if req.Filename != expectedFilename {
 		t.Errorf("Expected filename '%s', got '%s'", expectedFilename, req.Filename)
 	}
-
-	if req.Verbose {
-		t.Errorf("Expected verbose to be false, got true")
-	}
 }
 
 func TestParsePipelineScanRequest_WithFullPath(t *testing.T) {
@@ -108,10 +104,6 @@ func TestParsePipelineScanRequest_WithVerbose(t *testing.T) {
 	if req.ApplicationPath != "/path/to/app" {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
-
-	if !req.Verbose {
-		t.Errorf("Expected verbose to be true, got false")
-	}
 }
 
 func TestParsePipelineScanRequest_AllParameters(t *testing.T) {
@@ -134,10 +126,6 @@ func TestParsePipelineScanRequest_AllParameters(t *testing.T) {
 	expectedFilename := filepath.Join("/path/to/app", ".veracode", "packaging", "myapp.zip")
 	if req.Filename != expectedFilename {
 		t.Errorf("Expected filename '%s', got '%s'", expectedFilename, req.Filename)
-	}
-
-	if !req.Verbose {
-		t.Errorf("Expected verbose to be true, got false")
 	}
 }
 

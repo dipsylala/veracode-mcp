@@ -21,8 +21,6 @@ func init() {
 // PackageWorkspaceRequest represents the parsed parameters for package-workspace
 type PackageWorkspaceRequest struct {
 	ApplicationPath string
-	Verbose         bool
-	LogToFile       bool
 }
 
 // parsePackageWorkspaceRequest extracts and validates parameters from the raw args map
@@ -33,13 +31,6 @@ func parsePackageWorkspaceRequest(args map[string]interface{}) (*PackageWorkspac
 	}
 
 	req := &PackageWorkspaceRequest{ApplicationPath: appPath}
-
-	if verbose, ok := args["verbose"].(bool); ok {
-		req.Verbose = verbose
-	}
-	if logToFile, ok := args["logToFile"].(bool); ok {
-		req.LogToFile = logToFile
-	}
 
 	return req, nil
 }
@@ -145,11 +136,7 @@ func executePackagingCommand(ctx context.Context, req *PackageWorkspaceRequest, 
 		"-a",                      // Trust the source directory
 		"-s", req.ApplicationPath, // Source directory
 		"-o", outputDir, // Output directory
-	}
-
-	// Add verbose flag if requested
-	if req.Verbose {
-		cmdArgs = append(cmdArgs, "-v")
+		"-v", // Verbose flag
 	}
 
 	// #nosec G204 -- veracode command is hardcoded, only arguments are user-controlled and validated
@@ -160,22 +147,17 @@ func executePackagingCommand(ctx context.Context, req *PackageWorkspaceRequest, 
 	var err error
 
 	// Set up logging
-	if req.LogToFile {
-		timestamp := time.Now().Format("20060102-150405")
-		logFilePath := filepath.Join(outputDir, fmt.Sprintf("veracode-packaging-%s.log", timestamp))
-		// #nosec G304 -- logFilePath is constructed from validated outputDir and timestamp, not user input
-		logFile, err = os.Create(logFilePath)
-		if err != nil {
-			return 0, 0, stdout, stderr, nil, fmt.Errorf("Failed to create log file: %v", err)
-		}
-
-		// Write to log file
-		cmd.Stdout = logFile
-		cmd.Stderr = logFile
-	} else {
-		cmd.Stdout = &stdout
-		cmd.Stderr = &stderr
+	timestamp := time.Now().Format("20060102-150405")
+	logFilePath := filepath.Join(outputDir, fmt.Sprintf("veracode-packaging-%s.log", timestamp))
+	// #nosec G304 -- logFilePath is constructed from validated outputDir and timestamp, not user input
+	logFile, err = os.Create(logFilePath)
+	if err != nil {
+		return 0, 0, stdout, stderr, nil, fmt.Errorf("Failed to create log file: %v", err)
 	}
+
+	// Write to log file
+	cmd.Stdout = logFile
+	cmd.Stderr = logFile
 
 	// Execute the command
 	startTime := time.Now()
@@ -191,21 +173,20 @@ func executePackagingCommand(ctx context.Context, req *PackageWorkspaceRequest, 
 	}
 
 	// Write captured output to log file if requested
-	if req.LogToFile && logFile != nil {
-		if _, err := logFile.WriteString("=== STDOUT ===\n"); err != nil {
-			log.Printf("Failed to write stdout header to log: %v", err)
-		}
-		if _, err := logFile.Write(stdout.Bytes()); err != nil {
-			log.Printf("Failed to write stdout to log: %v", err)
-		}
-		if _, err := logFile.WriteString("\n\n=== STDERR ===\n"); err != nil {
-			log.Printf("Failed to write stderr header to log: %v", err)
-		}
-		if _, err := logFile.Write(stderr.Bytes()); err != nil {
-			log.Printf("Failed to write stderr to log: %v", err)
-		}
-		logFile.Close()
+	if _, err := logFile.WriteString("=== STDOUT ===\n"); err != nil {
+		log.Printf("Failed to write stdout header to log: %v", err)
 	}
+	if _, err := logFile.Write(stdout.Bytes()); err != nil {
+		log.Printf("Failed to write stdout to log: %v", err)
+	}
+	if _, err := logFile.WriteString("\n\n=== STDERR ===\n"); err != nil {
+		log.Printf("Failed to write stderr header to log: %v", err)
+	}
+	if _, err := logFile.Write(stderr.Bytes()); err != nil {
+		log.Printf("Failed to write stderr to log: %v", err)
+	}
+
+	logFile.Close()
 
 	return exitCode, duration, stdout, stderr, logFile, nil
 }
@@ -221,9 +202,7 @@ func buildPackagingResponse(req *PackageWorkspaceRequest, outputDir string, exit
 		"-s", "-t", "directory", "-a",
 		"-s", req.ApplicationPath,
 		"-o", outputDir,
-	}
-	if req.Verbose {
-		cmdArgs = append(cmdArgs, "-v")
+		"-v",
 	}
 
 	// Build base response information
@@ -251,9 +230,7 @@ veracode %s
 
 	responseText := baseInfo + fmt.Sprintf("%s %s\n\n", cliInfo.Icon, cliInfo.Message)
 
-	if req.LogToFile && logFile != nil {
-		responseText += fmt.Sprintf("Log file: %s\n", logFile.Name())
-	}
+	responseText += fmt.Sprintf("Log file: %s\n", logFile.Name())
 
 	if stdout.Len() > 0 {
 		responseText += fmt.Sprintf("\nOutput:\n%s\n", stdout.String())
