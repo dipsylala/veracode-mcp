@@ -265,7 +265,7 @@ To add tests for new MCP tools:
 
 - [MCP Tools README](../internal/mcp_tools/README.md) - Tool implementation guide
 - [Tool Testing Guide](../internal/mcp_tools/TESTING.md) - Detailed tool testing documentation
-- [API Integration Tests](../internal/api/README.md) - Low-level API testing
+- [API Integration Tests](../api/README.md) - Low-level API testing
 
 ## Summary
 
