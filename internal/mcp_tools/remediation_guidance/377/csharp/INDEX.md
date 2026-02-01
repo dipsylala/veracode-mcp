@@ -1,4 +1,4 @@
-# CWE-377: Insecure Temporary File - C#
+# CWE-377: Insecure Temporary File - C\#
 
 ## LLM Guidance
 

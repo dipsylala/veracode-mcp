@@ -1,4 +1,4 @@
-# CWE-352: Cross-Site Request Forgery (CSRF) - C#
+# CWE-352: Cross-Site Request Forgery (CSRF) - C\#
 
 ## LLM Guidance
 

@@ -1,4 +1,4 @@
-# CWE-597: Use of Wrong Operator in String Comparison - C#
+# CWE-597: Use of Wrong Operator in String Comparison - C\#
 
 ## LLM Guidance
 

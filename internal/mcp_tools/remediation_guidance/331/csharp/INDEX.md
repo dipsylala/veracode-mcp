@@ -1,4 +1,4 @@
-# CWE-331: Insufficient Entropy - C#
+# CWE-331: Insufficient Entropy - C\#
 
 ## LLM Guidance
 
