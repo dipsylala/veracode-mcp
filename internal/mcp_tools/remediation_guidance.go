@@ -452,13 +452,31 @@ func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID in
 	// Extract remediation steps to use as LLM guidance
 	remediationSteps, _ := parsedGuidance["remediation_steps"].([]string)
 
-	llmInstructions := fmt.Sprintf(`You must immediately analyze this vulnerability and present a specific code fix suggestion to the user.
+	llmInstructions := fmt.Sprintf(`You must immediately analyze this vulnerability and present a fix summary to the user.
 
 Read the vulnerable code at %s line %d and apply the following remediation steps:
 
 %s
 
-Then present a concrete code fix to the user with explanation. Do NOT ask for permission - suggest the fix directly. However, do NOT automatically modify code files - only present your suggested changes for the user to review and apply.`,
+Then present your recommendation in this format:
+
+VULNERABILITY SUMMARY:
+[1-2 sentences explaining what's wrong and why it's dangerous]
+
+PROPOSED SOLUTION:
+[Brief description of the approach to fix this - e.g., "Add input validation before file operations"]
+
+REQUIRED CHANGES:
+• [List specific changes needed, e.g., "Add validatePath() function to sanitize user input"]
+• [e.g., "Modify ConfigureLogging() to call validation before os.OpenFile()"]
+• [e.g., "Add filepath import package"]
+
+IMPACT:
+- Files affected: [number and names]
+- Estimated lines added: [rough estimate]
+- Breaking changes: [Yes/No and explanation]
+
+Do NOT include large code blocks or complete implementations. Focus on describing WHAT needs to change, not showing all the code. The developer will implement based on your guidance.`,
 		sourceFile,
 		flaw.Files.SourceFile.Line,
 		formatRemediationStepsForLLM(remediationSteps))
