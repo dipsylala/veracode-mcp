@@ -60,3 +60,6 @@ temp/
 # Veracode files generated during mcp scanning
 .veracode-workspace.json
 .veracode/
+
+# guidance brought over from the FlawRemediationGuidelines
+guidance/
