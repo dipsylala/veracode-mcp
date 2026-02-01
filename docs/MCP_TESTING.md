@@ -16,6 +16,7 @@ The MCP server provides a JSON-RPC 2.0 interface that allows AI assistants and o
 ### 1. Unit Tests ([server_test.go](server_test.go))
 
 Tests the core MCP server functionality:
+
 - Tool definition loading from JSON
 - Tool schema conversion to MCP format
 - Server initialization
@@ -29,6 +30,7 @@ go test -v -run "TestLoad|TestToMCP|TestServer" -short
 ### 2. Tool Registry Tests ([tools/registry_test.go](mcp_tools/registry_test.go))
 
 Tests the tool registration system:
+
 - Tool registration and retrieval
 - Concurrent access safety
 - Handler registration and execution
@@ -41,6 +43,7 @@ go test -v ./tools -run "Registry"
 ### 3. Tool Integration Tests ([tools/integration_test.go](../tools/integration_test.go))
 
 Tests that actual tool implementations auto-register correctly:
+
 - Dynamic findings tool
 - Static findings tool
 - API health tool
@@ -57,7 +60,7 @@ go test -v ./tools -run "TestActual"
 #### Test Coverage
 
 | Test | Purpose | API Call |
-|------|---------|----------|
+| ------ | --------- | ---------- |
 | `TestWorkspaceDiscovery` | Verify workspace.json loading | No |
 | `TestWorkspaceOverride` | Test application override functionality | No |
 | `TestPipelineScanIntegration` | Test pipeline scan workflow | Yes |
@@ -233,7 +236,7 @@ go test -v ./tools -run "Integration"
 Typical test execution times:
 
 | Test Suite | Duration | API Calls |
-|------------|----------|-----------|
+| ------------ | ---------- | ----------- |
 | Unit tests (server_test.go) | ~50ms | 0 |
 | Registry tests | ~100ms | 0 |
 | Tool integration tests | ~50ms | 0 |
@@ -276,6 +279,7 @@ The best way to test the MCP component is through the comprehensive integration 
 ✅ **Easy to extend** for new tools and features
 
 Run with:
+
 ```powershell
 # Run server tests
 go test -v -timeout 120s
