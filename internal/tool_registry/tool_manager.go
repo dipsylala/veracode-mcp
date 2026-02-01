@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/dipsylala/veracodemcp-go/internal/mcp_tools"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
-	"github.com/dipsylala/veracodemcp-go/mcp_tools"
 )
 
 // ToolManager consolidates all tool-related registries and provides a unified

@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/dipsylala/veracodemcp-go/internal/tools"
+	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
 )
 

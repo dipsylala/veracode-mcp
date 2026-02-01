@@ -8,7 +8,7 @@ import (
 
 	"github.com/dipsylala/veracodemcp-go/internal/cli"
 	"github.com/dipsylala/veracodemcp-go/internal/server"
-	"github.com/dipsylala/veracodemcp-go/internal/tools"
+	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
 )
 
 //go:embed tools.json

@@ -13,10 +13,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/dipsylala/veracodemcp-go/internal/tools"
+	"github.com/dipsylala/veracodemcp-go/internal/mcp_tools"
+	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
 	"github.com/dipsylala/veracodemcp-go/internal/transport"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
-	"github.com/dipsylala/veracodemcp-go/mcp_tools"
 )
 
 // Context key for UI capability (using plain string for cross-package compatibility)
