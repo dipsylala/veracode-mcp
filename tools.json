@@ -183,6 +183,25 @@
       ]
     },
     {
+      "name": "remediation-guidance",
+      "description": "Get language-specific remediation guidance for a security finding from pipeline scan results. Retrieves detailed, actionable guidance on how to fix a specific vulnerability based on the CWE ID and programming language detected from the source file.",
+      "category": "veracode",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+        },
+        {
+          "name": "flaw_id",
+          "type": "number",
+          "isRequired": true,
+          "description": "The Flaw ID (issue_id) from the pipeline scan results. Used to locate the flaw, extract the CWE ID and source file path, and detect the programming language for language-specific guidance."
+        }
+      ]
+    },
+    {
       "name": "get-sca-findings",
       "description": "Get third-party library vulnerabilities from SCA (Software Composition Analysis) scans.\n\nReturns: Vulnerable dependencies, outdated libraries, license issues, known CVEs in open source components\nIncludes: CWE ID, CVE ID, component name/version, CVSS score, severity, status\nRelated: get-static-findings (source code), get-dynamic-findings (runtime)\n\nDisplay as table: | Severity | CWE | CVE | Component | Version | Description |",
       "params": [

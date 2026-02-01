@@ -50,15 +50,16 @@ type PipelineScanResults struct {
 
 // PipelineFlaw represents a finding from the pipeline scanner
 type PipelineFlaw struct {
-	Title           string   `json:"title"`
-	IssueID         int      `json:"issue_id"`
-	CWEID           string   `json:"cwe_id"` // Note: This is a string in the actual JSON
-	IssueType       string   `json:"issue_type"`
-	IssueTypeID     string   `json:"issue_type_id"`
-	Severity        int      `json:"severity"`
-	DisplayText     string   `json:"display_text"`
-	Files           FileInfo `json:"files"`
-	FlawDetailsLink string   `json:"flaw_details_link"`
+	Title           string     `json:"title"`
+	IssueID         int        `json:"issue_id"`
+	CWEID           string     `json:"cwe_id"` // Note: This is a string in the actual JSON
+	IssueType       string     `json:"issue_type"`
+	IssueTypeID     string     `json:"issue_type_id"`
+	Severity        int        `json:"severity"`
+	DisplayText     string     `json:"display_text"`
+	Files           FileInfo   `json:"files"`
+	FlawDetailsLink string     `json:"flaw_details_link"`
+	StackDumps      StackDumps `json:"stack_dumps,omitempty"`
 }
 
 type FileInfo struct {

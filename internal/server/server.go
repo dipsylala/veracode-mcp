@@ -221,7 +221,7 @@ func (s *MCPServer) HandleRequest(req *types.JSONRPCRequest) *types.JSONRPCRespo
 	// Validate method name to prevent log forging attacks
 	errMethod := ValidateMethod(req.Method)
 	if errMethod != nil {
-		log.Printf("Rejecting request with invalid id: %v)", req.ID)
+		log.Printf("Rejecting request with invalid method name: %v)", req.Method)
 		return &types.JSONRPCResponse{
 			JSONRPC: "2.0",
 			ID:      req.ID,
