@@ -17,6 +17,16 @@
   color: var(--color-text-primary, #000);
 }
 
+.paginationInfo {
+  font-size: var(--font-text-sm-size, 12px);
+  color: var(--color-text-secondary, #666);
+  margin-bottom: 12px;
+  padding: 4px;
+  background-color: var(--color-bg-secondary, #f5f5f5);
+  border-radius: 4px;
+  border: 1px solid var(--color-border-secondary, #e0e0e0);
+}
+
 .summary {
   display: flex;
   gap: 24px;

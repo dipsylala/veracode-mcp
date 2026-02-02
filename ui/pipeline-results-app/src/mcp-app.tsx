@@ -104,12 +104,18 @@ interface PipelineResultsViewProps {
 }
 
 function PipelineResultsView({ data }: PipelineResultsViewProps) {
-  const { application, summary, findings } = data;
+  const { application, summary, findings, pagination } = data;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>Pipeline Scan Results: {application.name}</h1>
+        
+        {pagination && (
+          <div className={styles.paginationInfo}>
+            Showing {findings.length} findings on page {pagination.current_page + 1} of {pagination.total_pages} (Total: {pagination.total_elements} findings)
+          </div>
+        )}
         
         <div className={styles.summary}>
           <div className={styles.summaryItem}>
