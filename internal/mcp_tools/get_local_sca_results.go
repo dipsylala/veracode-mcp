@@ -19,11 +19,16 @@ func init() {
 // GetLocalSCAResultsRequest represents the parsed parameters for get-local-sca-results
 type GetLocalSCAResultsRequest struct {
 	ApplicationPath string
+	Size            int `json:"size,omitempty"`
+	Page            int `json:"page,omitempty"`
 }
 
 // parseGetLocalSCAResultsRequest extracts and validates parameters from the raw args map
 func parseGetLocalSCAResultsRequest(args map[string]interface{}) (*GetLocalSCAResultsRequest, error) {
-	req := &GetLocalSCAResultsRequest{}
+	req := &GetLocalSCAResultsRequest{
+		Size: 50,
+		Page: 0,
+	}
 
 	// Extract application_path (required)
 	appPath, ok := args["application_path"].(string)
@@ -31,6 +36,16 @@ func parseGetLocalSCAResultsRequest(args map[string]interface{}) (*GetLocalSCARe
 		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
 	}
 	req.ApplicationPath = appPath
+
+	// Extract size if provided
+	if size, ok := args["size"].(float64); ok {
+		req.Size = int(size)
+	}
+
+	// Extract page if provided
+	if page, ok := args["page"].(float64); ok {
+		req.Page = int(page)
+	}
 
 	return req, nil
 }
@@ -197,7 +212,7 @@ The results file does not exist. Run a local SCA scan using the run-sca-scan too
 	}
 
 	// Format and return the response
-	return formatSCAResultsResponse(req.ApplicationPath, resultsFile, &scaResults), nil
+	return formatSCAResultsResponse(req.ApplicationPath, resultsFile, &scaResults, req), nil
 }
 
 // scaSummary holds summary statistics for SCA results
@@ -247,19 +262,20 @@ func buildSCASummary(results *SCAResults) scaSummary {
 	return summary
 }
 
-// buildSCAHeader builds the text header for SCA results
-func buildSCAHeader(appPath, resultsFile string, summary scaSummary) string {
+// buildSCAHeaderWithPagination builds the text header for SCA results with pagination info
+func buildSCAHeaderWithPagination(appPath, resultsFile string, summary scaSummary, pagination map[string]interface{}, showingCount int) string {
 	return fmt.Sprintf(`Local SCA Scan Results
 ===================
 
 Application Path: %s
 Results File: %s
 
-Total Vulnerability Matches: %d
+Showing %d findings on page %d of %d (Total: %d findings across all pages)
+
 Unique Vulnerabilities: %d
 Vulnerable Components: %d
 
-Severity Breakdown:
+Severity Breakdown (Total):
 - Critical: %d
 - High: %d
 - Medium: %d
@@ -271,7 +287,10 @@ EPSS Data Available: %d vulnerabilities
 `,
 		appPath,
 		filepath.Base(resultsFile),
-		summary.Total,
+		showingCount,
+		pagination["current_page"].(int)+1,
+		pagination["total_pages"],
+		pagination["total_elements"],
 		summary.TotalVulns,
 		summary.TotalArtifacts,
 		summary.Critical,
@@ -301,14 +320,14 @@ func convertMatchToFinding(match SCAMatch) map[string]interface{} {
 			"locations": match.Artifact.Locations,
 		},
 		"fix": map[string]interface{}{
-			"state":             match.Vulnerability.Fix.State,
-			"versions":          match.Vulnerability.Fix.Versions,
-			"suggested_version": "",
+			"state":               match.Vulnerability.Fix.State,
+			"versions":            match.Vulnerability.Fix.Versions,
+			"recommended_version": "",
 		},
 	}
 
 	if len(match.MatchDetails) > 0 && match.MatchDetails[0].Fix.SuggestedVersion != "" {
-		finding["fix"].(map[string]interface{})["suggested_version"] = match.MatchDetails[0].Fix.SuggestedVersion
+		finding["fix"].(map[string]interface{})["recommended_version"] = match.MatchDetails[0].Fix.SuggestedVersion
 	}
 
 	addCVSSData(finding, match.Vulnerability.CVSS)
@@ -384,15 +403,41 @@ func addRelatedCVEs(finding map[string]interface{}, relatedVulns []SCARelatedVul
 }
 
 // formatSCAResultsResponse formats the SCA results into an MCP response
-func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults) map[string]interface{} {
+func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults, req *GetLocalSCAResultsRequest) map[string]interface{} {
 	summary := buildSCASummary(results)
-	header := buildSCAHeader(appPath, resultsFile, summary)
 
-	// Convert matches to LLM-friendly format
-	llmFriendlyFindings := make([]map[string]interface{}, 0, len(results.Vulnerabilities.Matches))
+	// Convert all matches to LLM-friendly format
+	allFindings := make([]map[string]interface{}, 0, len(results.Vulnerabilities.Matches))
 	for _, match := range results.Vulnerabilities.Matches {
-		llmFriendlyFindings = append(llmFriendlyFindings, convertMatchToFinding(match))
+		allFindings = append(allFindings, convertMatchToFinding(match))
 	}
+
+	// Apply pagination
+	totalFindings := len(allFindings)
+	startIdx := req.Page * req.Size
+	endIdx := startIdx + req.Size
+	if startIdx > totalFindings {
+		startIdx = totalFindings
+	}
+	if endIdx > totalFindings {
+		endIdx = totalFindings
+	}
+
+	// Get paginated findings
+	llmFriendlyFindings := allFindings[startIdx:endIdx]
+
+	// Build pagination info
+	pagination := map[string]interface{}{
+		"current_page":   req.Page,
+		"page_size":      req.Size,
+		"total_elements": totalFindings,
+		"total_pages":    (totalFindings + req.Size - 1) / req.Size,
+		"has_next":       endIdx < totalFindings,
+		"has_previous":   req.Page > 0,
+	}
+
+	// Build header with pagination info
+	header := buildSCAHeaderWithPagination(appPath, resultsFile, summary, pagination, len(llmFriendlyFindings))
 
 	// Build the response structure
 	responseData := map[string]interface{}{
@@ -413,7 +458,8 @@ func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults) 
 			},
 			"epss_data_available": summary.WithEPSS,
 		},
-		"findings": llmFriendlyFindings,
+		"pagination": pagination,
+		"findings":   llmFriendlyFindings,
 	}
 
 	// Marshal response to JSON string

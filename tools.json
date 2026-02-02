@@ -8,19 +8,19 @@
     },
     {
       "name": "dynamic-findings",
-      "description": "Get runtime vulnerabilities from DYNAMIC analysis scans.\n\nReturns: Auth/session flaws, authorization bypasses, misconfigurations, CSRF, clickjacking, missing headers\nIncludes: CWE ID, URL, HTTP details, attack vectors, severity, status\nRelated: static-findings (source code)\n\nDisplay as table: | Flaw ID | Severity | CWE | Status | URL | Description |",
+      "description": "Get runtime vulnerabilities from DYNAMIC analysis scans (auth/session flaws, authorization bypasses, CSRF, clickjacking, etc.)",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "app_profile",
           "type": "string",
           "isRequired": false,
-          "description": "Application Profile name to get findings for. If not provided, will automatically read from .veracode-workspace.json in the application directory."
+          "description": "Application name (auto-detected if not provided)"
         },
         {
           "name": "severity",
@@ -30,7 +30,7 @@
             "min": 0,
             "max": 5
           },
-          "description": "Filter findings with severity equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+          "description": "Exact severity (0=Info, 1=VeryLow, 2=Low, 3=Med, 4=High, 5=VeryHigh)"
         },
         {
           "name": "severity_gte",
@@ -40,13 +40,13 @@
             "min": 0,
             "max": 5
           },
-          "description": "Filter findings with severity greater than or equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+          "description": "Minimum severity (0-5)"
         },
         {
           "name": "cwe_ids",
           "type": "array",
           "isRequired": false,
-          "description": "Filter findings by CWE IDs. Provide one or more CWE IDs as numbers without the 'CWE-' prefix. Example: [89, 79] for SQL Injection and XSS. Can be combined with severity filters."
+          "description": "Filter by CWE IDs (e.g., [89, 79] for SQLi and XSS)"
         },
         {
           "name": "size",
@@ -56,7 +56,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
+          "description": "Results per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -66,37 +66,37 @@
             "min": 0,
             "max": 500
           },
-          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
+          "description": "Page number (0-based, default 0)"
         },
         {
           "name": "violates_policy",
           "type": "boolean",
           "isRequired": false,
-          "description": "Filter findings by policy violation status. Set to true to return only findings that violate policy, false for non-violating findings. If omitted, returns all findings regardless of policy status."
+          "description": "Filter by policy violation status"
         },
         {
           "name": "include_mitigations",
           "type": "boolean",
           "isRequired": false,
-          "description": "Include mitigation/annotation information for findings. Default is false. Set to true to include proposed mitigations, approvals, and other annotation details."
+          "description": "Include mitigation details (default false)"
         }
       ]
     },
     {
       "name": "static-findings",
-      "description": "Get source code vulnerabilities from STATIC analysis scans. Calls Veracode API to retrieve real scan findings. Returns interactive UI with findings.\n\nReturns: XSS, SQL injection, crypto issues, race conditions, buffer overflows, unsafe functions\nIncludes: CWE ID, file path, line number, severity, status, policy violations\nRelated: get-dynamic-findings (runtime)",
+      "description": "Get source code vulnerabilities from STATIC analysis scans (XSS, SQLi, crypto issues, buffer overflows, etc.)",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "app_profile",
           "type": "string",
           "isRequired": false,
-          "description": "Application Profile name to get findings for. If not provided, will automatically read from .veracode-workspace.json in the application directory. The tool will lookup the application GUID by name using the Veracode API."
+          "description": "Application name (auto-detected if not provided)"
         },
         {
           "name": "severity",
@@ -106,7 +106,7 @@
             "min": 0,
             "max": 5
           },
-          "description": "Filter findings with severity equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+          "description": "Exact severity (0=Info, 1=VeryLow, 2=Low, 3=Med, 4=High, 5=VeryHigh)"
         },        
         {
           "name": "severity_gte",
@@ -116,13 +116,13 @@
             "min": 0,
             "max": 5
           },
-          "description": "Filter findings with severity greater than or equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+          "description": "Minimum severity (0-5)"
         },
         {
           "name": "cwe_ids",
           "type": "array",
           "isRequired": false,
-          "description": "Filter findings by CWE IDs. Provide one or more CWE IDs as numbers without the 'CWE-' prefix. Example: [89, 79] for SQL Injection and XSS. Can be combined with severity filters."
+          "description": "Filter by CWE IDs (e.g., [89, 79] for SQLi and XSS)"
         },
         {
           "name": "size",
@@ -132,7 +132,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
+          "description": "Results per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -142,80 +142,80 @@
             "min": 0,
             "max": 500
           },
-          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
+          "description": "Page number (0-based, default 0)"
         },
         {
           "name": "violates_policy",
           "type": "boolean",
           "isRequired": false,
-          "description": "Filter findings by policy violation status. Set to true to return only findings that violate policy, false for non-violating findings. If omitted, returns all findings regardless of policy status."
+          "description": "Filter by policy violation status"
         },
         {
           "name": "include_mitigations",
           "type": "boolean",
           "isRequired": false,
-          "description": "Include mitigation/annotation information for findings. Default is false. Set to true to include proposed mitigations, approvals, and other annotation details."
+          "description": "Include mitigation details (default false)"
         }
       ]
     },
     {
       "name": "get-finding-details",
-      "description": "Get more details about a flaw from a DYNAMIC or STATIC scan",
+      "description": "Get detailed information about a specific flaw from DYNAMIC or STATIC scan",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "app_profile",
           "type": "string",
           "isRequired": false,
-          "description": "Application Profile name to get findings for. If not provided, will automatically read from .veracode-workspace.json in the application directory. The tool will lookup the application GUID by name using the Veracode API."
+          "description": "Application name (auto-detected if not provided)"
         },
         {
           "name": "flaw_id",
           "type": "number",
           "isRequired": true,
-          "description": "The Flaw ID of the finding to retrieve details for."
+          "description": "Flaw ID to retrieve"
         }
       ]
     },
     {
       "name": "remediation-guidance",
-      "description": "Get language-specific guidance and code examples to fix/remediate/resolve pipeline scan flaws. Use when user asks how to fix, resolve, patch, or remediate a vulnerability, flaw, issue, or finding. Returns detailed solutions with safe code patterns.",
+      "description": "Get language-specific guidance and code examples to fix a pipeline scan flaw",
       "category": "veracode",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "flaw_id",
           "type": "number",
           "isRequired": true,
-          "description": "The Flaw ID (issue_id) from the pipeline scan results. Used to locate the flaw, extract the CWE ID and source file path, and detect the programming language for language-specific guidance."
+          "description": "Flaw ID from pipeline scan results"
         }
       ]
     },
     {
       "name": "get-sca-findings",
-      "description": "Get third-party library vulnerabilities from SCA (Software Composition Analysis) scans.\n\nReturns: Vulnerable dependencies, outdated libraries, license issues, known CVEs in open source components\nIncludes: CWE ID, CVE ID, component name/version, CVSS score, severity, status\nRelated: get-static-findings (source code), get-dynamic-findings (runtime)\n\nDisplay as table: | Severity | CWE | CVE | Component | Version | Description |",
+      "description": "Get third-party library vulnerabilities from SCA scans (vulnerable dependencies, outdated libraries, CVEs)",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "app_profile",
           "type": "string",
           "isRequired": false,
-          "description": "Application Profile name to get findings for. If not provided, will automatically read from .veracode-workspace.json in the application directory."
+          "description": "Application name (auto-detected if not provided)"
         },
         {
           "name": "severity",
@@ -225,7 +225,7 @@
             "min": 0,
             "max": 5
           },
-          "description": "Filter findings with severity equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+          "description": "Exact severity (0=Info, 1=VeryLow, 2=Low, 3=Med, 4=High, 5=VeryHigh)"
         },
         {
           "name": "severity_gte",
@@ -235,7 +235,7 @@
             "min": 0,
             "max": 5
           },
-          "description": "Filter findings with severity greater than or equal to the specified value. Severity scale: 0=Informational, 1=Very Low, 2=Low, 3=Medium, 4=High, 5=Very High. Example: 3 returns Medium, High, and Very High findings."
+          "description": "Minimum severity (0-5)"
         },
         {
           "name": "size",
@@ -245,7 +245,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
+          "description": "Results per page (1-500, default 50)"
         },
         {
           "name": "page",
@@ -255,67 +255,67 @@
             "min": 0,
             "max": 500
           },
-          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
+          "description": "Page number (0-based, default 0)"
         }
       ]
     },
     {
       "name": "package-workspace",
-      "description": "Package the current workspace for Veracode security scanning.",
+      "description": "Package workspace files for Veracode scanning",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "Optional output filename for the packaged artifact. If just a filename (no path) is provided, it will be created in the .veracode/packaging directory. If a full path is provided, it will be used as-is."
+          "description": "Output filename (saved to .veracode/packaging if no path specified)"
         }
       ]
     },
     {
       "name": "pipeline-scan",
-      "description": "Perform a local SAST scan of the current workspace using Veracode's Pipeline Scanner",
+      "description": "Perform local SAST scan using Veracode Pipeline Scanner",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "The file upon which to perform a pipeline scan. If just a filename (no path) is provided, it will look in the .veracode/packaging folder. If a full or relative path is provided, it will be used as-is. If not provided, the tool will scan the largest file in the .veracode/packaging folder"
+          "description": "File to scan (defaults to largest file in .veracode/packaging)"
         }
       ]
     },
     {
       "name": "pipeline-status",
-      "description": "Check the current status of the pipeline static scan",
+      "description": "Check pipeline scan status",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         }
       ]
     },
     {
       "name": "pipeline-results",
-      "description": "Get the results of the completed pipeline scan. Returns interactive UI with findings.",
+      "description": "Get completed pipeline scan results with interactive UI",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "size",
@@ -325,7 +325,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
+          "description": "Results per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -335,49 +335,69 @@
             "min": 0,
             "max": 500
           },
-          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
+          "description": "Page number (0-based, default 0)"
         }
       ]
     },
     {
       "name": "pipeline-detailed-results",
-      "description": "Get detailed results of a specific pipeline scan flaw including data flow paths.\n\nWhen presenting results, create clickable file links for all source files and line numbers mentioned in the data paths using markdown link format: [filename](path#L123) or [path:line](path#L123)",
+      "description": "Get detailed pipeline scan flaw with data flow paths",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         },
         {
           "name": "flaw_id",
           "type": "integer",
           "isRequired": true,
-          "description": "The flaw ID for which to retrieve detailed information."
+          "description": "Flaw ID to retrieve"
         }
       ]
     },
         {
       "name": "run-sca-scan",
-      "description": "Run Software Composition Analysis (SCA) scan on a directory to identify vulnerable dependencies, license issues, and outdated packages. get-local-sca-results tool will read the relevant results",
+      "description": "Run local SCA scan to identify vulnerable dependencies",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
         }
       ]
     },
     {
       "name": "get-local-sca-results",
-      "description": "Gets the results of a local SCA scan on a directory to identify vulnerable dependencies, license issues, and outdated packages. Executes 'veracode scan' CLI and returns results with vulnerability details, CVSS/EPSS scores, and fix recommendations.",
+      "description": "Get local SCA scan results with vulnerability details and fix recommendations",
       "params": [
         {
           "name": "application_path",
           "type": "string",
           "isRequired": true,
-          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+          "description": "Absolute path to the application workspace"
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 1,
+            "max": 500
+          },
+          "description": "Results per page (1-500, default 50)"
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 500
+          },
+          "description": "Page number (0-based, default 0)"
         }
       ]
     }
