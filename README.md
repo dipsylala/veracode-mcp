@@ -128,8 +128,6 @@ Options:
         Enable verbose logging to stderr (disabled by default)
   -log string
         Log file path for debugging (recommended for stdio mode)
-  -force-mcp-app
-        Force MCP Apps mode (always send structuredContent regardless of client capabilities)
   -version
         Display version information
 ```
@@ -145,9 +143,6 @@ Options:
 
 # With verbose logging to stderr (avoid in stdio mode with MCP clients)
 .\dist\veracode-mcp.exe -verbose
-
-# Force MCP Apps UI mode
-.\dist\veracode-mcp.exe -force-mcp-app -log debug.log
 ```
 
 **Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.
@@ -190,7 +185,7 @@ The server provides these Veracode-specific tools:
 - **static-findings** - Retrieve source code vulnerabilities from Static Analysis (SAST) scans
 - **sca-findings** - Retrieve third-party component vulnerabilities from Software Composition Analysis
 - **finding-details** - Get detailed information about a specific finding
-
+- **remediation-guidance** - Get language-specific remediation guidance and code examples for pipeline scan flaws
 - **package-workspace** - Package workspace files for Veracode upload
 - **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
 - **pipeline-status** - Check the status of a Pipeline Scan
@@ -200,6 +195,18 @@ The server provides these Veracode-specific tools:
 - **get-local-sca-results** - Read and parse local SCA scan results from veracode.json file
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
+
+### Remediation Guidance
+
+The `remediation-guidance` tool provides CWE-specific, language-aware security guidance with code examples. It returns structured JSON containing:
+
+- Vulnerability summary and key principles
+- Step-by-step remediation instructions  
+- Safe code patterns and examples
+- Data flow information from the scan
+
+> [!NOTE]
+> **Quality Expectations:** The usefulness of remediation guidance depends heavily on how the AI assistant (LLM) interprets and applies the returned information. The tool provides structured security best practices and code samples, but the quality of the final code suggestions is determined by the capabilities of the LLM you're using (e.g., Claude, GPT-4, etc.). More capable models will better understand context and provide more accurate, applicable fixes.
 
 ## Adding New Tools
 

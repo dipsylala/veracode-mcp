@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/internal/tools"
+	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
 )
 
@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 
 func TestLoadToolDefinitions(t *testing.T) {
 	// Create a server which initializes the ToolManager internally
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server with tool manager: %v", err)
 	}
@@ -38,9 +38,9 @@ func TestLoadToolDefinitions(t *testing.T) {
 	// Get all MCP tools from the tool manager
 	mcpTools := server.toolManager.GetAllMCPTools()
 
-	// tools.json now has 12 tools: api-health, dynamic-findings, static-findings, get-finding-details, get-sca-findings, package-workspace, pipeline-scan, pipeline-status, pipeline-results, pipeline-detailed-results, run-sca-scan, get-local-sca-results
-	if len(mcpTools) != 12 {
-		t.Errorf("Expected 12 tools, got %d", len(mcpTools))
+	// tools.json now has 13 tools: api-health, dynamic-findings, static-findings, get-finding-details, get-remediation-guidance, get-sca-findings, package-workspace, pipeline-scan, pipeline-status, pipeline-results, pipeline-detailed-results, run-sca-scan, get-local-sca-results
+	if len(mcpTools) != 13 {
+		t.Errorf("Expected 13 tools, got %d", len(mcpTools))
 	}
 
 	// Check dynamic findings tool
@@ -76,7 +76,7 @@ func TestLoadToolDefinitions(t *testing.T) {
 
 func TestToMCPTool(t *testing.T) {
 	// Create a server which initializes the ToolManager internally
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server with tool manager: %v", err)
 	}
@@ -149,7 +149,7 @@ func TestServerInitialization(t *testing.T) {
 // Helper functions for TestServerInitialization
 
 func createTestServer(t *testing.T) *MCPServer {
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}
@@ -227,7 +227,7 @@ func validateToolManagerStats(t *testing.T, server *MCPServer) {
 }
 
 func TestToolCallHandling(t *testing.T) {
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}
@@ -427,7 +427,7 @@ func TestToolManagerStatistics(t *testing.T) {
 }
 
 func TestServerRefactoredHandlers(t *testing.T) {
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}

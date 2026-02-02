@@ -225,7 +225,6 @@ The server includes **MCP Apps** support for rich UI experiences:
 
 - Checks client capabilities in `initialize` request
 - Looks for `experimental.mcpApps` capability
-- Can be forced with `-force-mcp-app` flag
 
 **Response Format:**
 

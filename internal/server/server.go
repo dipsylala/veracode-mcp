@@ -13,10 +13,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/dipsylala/veracodemcp-go/internal/tools"
+	"github.com/dipsylala/veracodemcp-go/internal/mcp_tools"
+	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
 	"github.com/dipsylala/veracodemcp-go/internal/transport"
 	"github.com/dipsylala/veracodemcp-go/internal/types"
-	"github.com/dipsylala/veracodemcp-go/mcp_tools"
 )
 
 // Context key for UI capability (using plain string for cross-package compatibility)
@@ -51,7 +51,6 @@ func SetUIResources(pipeline, staticFindings, dynamicFindings string) {
 type MCPServer struct {
 	initialized      bool
 	clientSupportsUI bool
-	forceMCPApp      bool // Override to always send structuredContent
 	capabilities     ServerCapabilities
 	tools            []types.Tool
 	toolManager      *tools.ToolManager
@@ -59,7 +58,7 @@ type MCPServer struct {
 
 // NewMCPServer creates a new MCP server instance with all necessary registries.
 // It loads tool definitions, initializes registries, and prepares tool handlers.
-func NewMCPServer(forceMCPApp bool) (*MCPServer, error) {
+func NewMCPServer() (*MCPServer, error) {
 	// Create tool manager
 	toolManager, err := tools.NewToolManager()
 	if err != nil {
@@ -67,7 +66,6 @@ func NewMCPServer(forceMCPApp bool) (*MCPServer, error) {
 	}
 
 	s := &MCPServer{
-		forceMCPApp: forceMCPApp,
 		capabilities: ServerCapabilities{
 			Tools: &ToolsCapability{
 				ListChanged: false,
@@ -221,7 +219,7 @@ func (s *MCPServer) HandleRequest(req *types.JSONRPCRequest) *types.JSONRPCRespo
 	// Validate method name to prevent log forging attacks
 	errMethod := ValidateMethod(req.Method)
 	if errMethod != nil {
-		log.Printf("Rejecting request with invalid id: %v)", req.ID)
+		log.Printf("Rejecting request with invalid method name: %v)", req.Method)
 		return &types.JSONRPCResponse{
 			JSONRPC: "2.0",
 			ID:      req.ID,

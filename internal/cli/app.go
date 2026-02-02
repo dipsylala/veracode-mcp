@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/dipsylala/veracodemcp-go/internal/server"
-	"github.com/dipsylala/veracodemcp-go/internal/tools"
+	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
 )
 
 // AppConfig holds the application configuration

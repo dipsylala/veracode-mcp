@@ -3,6 +3,7 @@
 Veracode Findings API Documentation
 
 Use one of the following base URLs depending on the region for your account:
+
 * https://api.veracode.com/ - Veracode US Region (default)
 * https://api.veracode.eu/ - Veracode European Region
 * https://api.veracode.us/ - Veracode US Federal Region
@@ -68,12 +69,12 @@ Similar rules for overriding default operation server index and variables applie
 
 ```go
 ctx := context.WithValue(context.Background(), findings.ContextOperationServerIndices, map[string]int{
-	"{classname}Service.{nickname}": 2,
+    "{classname}Service.{nickname}": 2,
 })
 ctx = context.WithValue(context.Background(), findings.ContextOperationServerVariables, map[string]map[string]string{
-	"{classname}Service.{nickname}": {
-		"port": "8443",
-	},
+    "{classname}Service.{nickname}": {
+        "port": "8443",
+    },
 })
 ```
 

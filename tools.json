@@ -183,6 +183,25 @@
       ]
     },
     {
+      "name": "remediation-guidance",
+      "description": "Get language-specific guidance and code examples to fix/remediate/resolve pipeline scan flaws. Use when user asks how to fix, resolve, patch, or remediate a vulnerability, flaw, issue, or finding. Returns detailed solutions with safe code patterns.",
+      "category": "veracode",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+        },
+        {
+          "name": "flaw_id",
+          "type": "number",
+          "isRequired": true,
+          "description": "The Flaw ID (issue_id) from the pipeline scan results. Used to locate the flaw, extract the CWE ID and source file path, and detect the programming language for language-specific guidance."
+        }
+      ]
+    },
+    {
       "name": "get-sca-findings",
       "description": "Get third-party library vulnerabilities from SCA (Software Composition Analysis) scans.\n\nReturns: Vulnerable dependencies, outdated libraries, license issues, known CVEs in open source components\nIncludes: CWE ID, CVE ID, component name/version, CVSS score, severity, status\nRelated: get-static-findings (source code), get-dynamic-findings (runtime)\n\nDisplay as table: | Severity | CWE | CVE | Component | Version | Description |",
       "params": [
@@ -255,18 +274,6 @@
           "type": "string",
           "isRequired": false,
           "description": "Optional output filename for the packaged artifact. If just a filename (no path) is provided, it will be created in the .veracode/packaging directory. If a full path is provided, it will be used as-is."
-        },
-        {
-          "name": "verbose",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Enable verbose/debug output from Veracode CLI. Creates a timestamped log file with detailed output."
-        },
-        {
-          "name": "logToFile",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Write detailed output to a log file in ./.veracode/packaging"
         }
       ]
     },
@@ -285,12 +292,6 @@
           "type": "string",
           "isRequired": false,
           "description": "The file upon which to perform a pipeline scan. If just a filename (no path) is provided, it will look in the .veracode/packaging folder. If a full or relative path is provided, it will be used as-is. If not provided, the tool will scan the largest file in the .veracode/packaging folder"
-        },
-        {
-          "name": "verbose",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Enable verbose/debug output from Veracode CLI. Creates a timestamped log file with detailed output."
         }
       ]
     },
@@ -315,6 +316,26 @@
           "type": "string",
           "isRequired": true,
           "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 1,
+            "max": 500
+          },
+          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 500
+          },
+          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
         }
       ]
     },
