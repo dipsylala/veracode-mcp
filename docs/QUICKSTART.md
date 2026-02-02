@@ -90,9 +90,10 @@ Tools automatically register themselves when you import the tools package! No ma
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | .\mcp-server.exe -mode stdio
 ```
 
-## That's It!
+## That's It
 
 Two files to touch:
+
 1. `tools.json` - Define parameters and description
 2. `mcp_tools/your_tool.go` - Implement the logic with auto-registration
 
