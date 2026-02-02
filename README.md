@@ -24,27 +24,23 @@ A Model Context Protocol (MCP) server implementation in Go that provides Veracod
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/dipsylala/veracodemcp-go.git
-cd veracodemcp-go
+### Download from Releases
 
-# Install dependencies
-go mod download
+Download the latest pre-built binary from the [Releases page](https://github.com/dipsylala/veracodemcp-go/releases):
 
-# Build the server
-.\build.ps1    # Windows (builds to dist/veracode-mcp.exe)
-# or
-go build -o dist/veracode-mcp.exe .  # Manual build
-```
+- **Windows**: `veracode-mcp-windows-amd64.exe` or `veracode-mcp-windows-arm64.exe`
+- **macOS**: `veracode-mcp-darwin-amd64` or `veracode-mcp-darwin-arm64`
+- **Linux**: `veracode-mcp-linux-amd64`
 
-### Veracode CLI
+Extract and place the executable in a directory of your choice (e.g., `C:\Program Files\VeracodeMCP\` on Windows or `/usr/local/bin/` on macOS/Linux).
+
+### Install Veracode CLI (Required)
 
 Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) require the Veracode CLI to be installed and available in your system PATH.
 
 **Install the Veracode CLI:**
 
-*Windows (PowerShell):*
+*Windows (Admin PowerShell):*
 
 ```powershell
 iex (iwr https://tools.veracode.com/veracode-cli/install.ps1)
@@ -128,6 +124,8 @@ Options:
         Enable verbose logging to stderr (disabled by default)
   -log string
         Log file path for debugging (recommended for stdio mode)
+  -force-mcp-app
+        Force MCP Apps mode (always send structuredContent regardless of client capabilities)
   -version
         Display version information
 ```
@@ -143,6 +141,9 @@ Options:
 
 # With verbose logging to stderr (avoid in stdio mode with MCP clients)
 .\dist\veracode-mcp.exe -verbose
+
+# Force MCP Apps UI mode
+.\dist\veracode-mcp.exe -force-mcp-app -log debug.log
 ```
 
 **Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.
@@ -176,6 +177,20 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
+**VS Code:**
+
+```json
+{
+  "servers": {
+    "veracode": {
+      "command": "/path/to/veracode-mcp.exe",
+      "cwd": "${workspaceFolder}",
+      "args": ["-log", "/path/to/veracode-mcp.log"]
+    },
+  }
+}
+```
+
 ## Available Tools
 
 The server provides these Veracode-specific tools:
@@ -185,7 +200,7 @@ The server provides these Veracode-specific tools:
 - **static-findings** - Retrieve source code vulnerabilities from Static Analysis (SAST) scans
 - **sca-findings** - Retrieve third-party component vulnerabilities from Software Composition Analysis
 - **finding-details** - Get detailed information about a specific finding
-- **remediation-guidance** - Get language-specific remediation guidance and code examples for pipeline scan flaws
+
 - **package-workspace** - Package workspace files for Veracode upload
 - **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
 - **pipeline-status** - Check the status of a Pipeline Scan
@@ -208,21 +223,27 @@ The `remediation-guidance` tool provides CWE-specific, language-aware security g
 > [!NOTE]
 > **Quality Expectations:** The usefulness of remediation guidance depends heavily on how the AI assistant (LLM) interprets and applies the returned information. The tool provides structured security best practices and code samples, but the quality of the final code suggestions is determined by the capabilities of the LLM you're using (e.g., Claude, GPT-4, etc.). More capable models will better understand context and provide more accurate, applicable fixes.
 
-## Adding New Tools
+---
 
-See [docs/ADDING_TOOLS.md](docs/ADDING_TOOLS.md) for the complete guide on implementing new MCP tools.
+## For Developers
 
-## Documentation
+### Building from Source
 
-- **[Architecture & Design](docs/DESIGN.md)** - System architecture and design decisions
-- **[Quick Start](docs/QUICKSTART.md)** - Get up and running quickly
-- **[Adding Tools](docs/ADDING_TOOLS.md)** - Create new MCP tools (extensibility guide)
-- **[API Integration](docs/API_INTEGRATION.md)** - Integrate Veracode REST APIs
-- **[Code Quality](docs/CODE_QUALITY.md)** - Build tools and quality checks
-- **[Tool Structure](docs/TOOLS_STRUCTURE.md)** - Tool system architecture
-- **[MCP Testing](docs/MCP_TESTING.md)** - Testing MCP implementations
+If you want to build from source instead of using the pre-built releases:
 
-## Building
+```bash
+# Clone the repository
+git clone https://github.com/dipsylala/veracodemcp-go.git
+cd veracodemcp-go
+
+# Install dependencies
+go mod download
+
+# Build the server
+.\build.ps1    # Windows (builds to dist/veracode-mcp.exe)
+# or
+go build -o dist/veracode-mcp.exe .  # Manual build
+```
 
 The project includes a PowerShell build script with quality checks:
 
@@ -241,7 +262,7 @@ The build script performs:
 4. Unit tests
 5. Binary compilation to `dist/veracode-mcp.exe`
 
-## Testing
+### Testing
 
 Run tests with:
 
@@ -252,6 +273,20 @@ go test ./tools/...  # Test only tools package
 ```
 
 See [docs/MCP_TESTING.md](docs/MCP_TESTING.md) for MCP integration testing.
+
+### Adding New Tools
+
+See [docs/ADDING_TOOLS.md](docs/ADDING_TOOLS.md) for the complete guide on implementing new MCP tools.
+
+### Developer Documentation
+
+- **[Architecture & Design](docs/DESIGN.md)** - System architecture and design decisions
+- **[Quick Start](docs/QUICKSTART.md)** - Get up and running quickly
+- **[Adding Tools](docs/ADDING_TOOLS.md)** - Create new MCP tools (extensibility guide)
+- **[API Integration](docs/API_INTEGRATION.md)** - Integrate Veracode REST APIs
+- **[Code Quality](docs/CODE_QUALITY.md)** - Build tools and quality checks
+- **[Tool Structure](docs/TOOLS_STRUCTURE.md)** - Tool system architecture
+- **[MCP Testing](docs/MCP_TESTING.md)** - Testing MCP implementations
 
 ## License
 
