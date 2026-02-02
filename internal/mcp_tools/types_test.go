@@ -62,13 +62,13 @@ func TestSimpleTool_Shutdown(t *testing.T) {
 	}
 }
 
-func TestRegisterSimpleTool(t *testing.T) {
+func TestRegisterMCPTool(t *testing.T) {
 	handler := func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
 		return "test-result", nil
 	}
 
 	// Register the tool
-	RegisterSimpleTool("simple-test-tool", handler)
+	RegisterMCPTool("simple-test-tool", handler)
 
 	// Verify it was registered in the global registry
 	allTools := GetAllTools()

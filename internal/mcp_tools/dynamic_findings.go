@@ -17,7 +17,7 @@ const DynamicFindingsToolName = "dynamic-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(DynamicFindingsToolName, handleGetDynamicFindings)
+	RegisterMCPTool(DynamicFindingsToolName, handleGetDynamicFindings)
 }
 
 // DynamicFindingsRequest represents the parsed parameters for dynamic-findings

@@ -14,7 +14,7 @@ const PipelineScanToolName = "pipeline-scan"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(PipelineScanToolName, handlePipelineScan)
+	RegisterMCPTool(PipelineScanToolName, handlePipelineScan)
 }
 
 // PipelineScanRequest represents the parsed parameters for pipeline-scan

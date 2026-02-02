@@ -15,7 +15,7 @@ const ScaFindingsToolName = "get-sca-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(ScaFindingsToolName, handleGetScaFindings)
+	RegisterMCPTool(ScaFindingsToolName, handleGetScaFindings)
 }
 
 // ScaFindingsRequest represents the parsed parameters for get-sca-findings

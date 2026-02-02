@@ -15,7 +15,7 @@ const PackageWorkspaceToolName = "package-workspace"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(PackageWorkspaceToolName, handlePackageWorkspace)
+	RegisterMCPTool(PackageWorkspaceToolName, handlePackageWorkspace)
 }
 
 // PackageWorkspaceRequest represents the parsed parameters for package-workspace

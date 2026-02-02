@@ -15,7 +15,7 @@ const FindingDetailsToolName = "get-finding-details"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(FindingDetailsToolName, handleGetFindingDetails)
+	RegisterMCPTool(FindingDetailsToolName, handleGetFindingDetails)
 }
 
 // FindingDetailsRequest represents the parsed parameters for get-finding-details

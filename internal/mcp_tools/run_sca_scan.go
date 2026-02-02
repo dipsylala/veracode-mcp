@@ -14,7 +14,7 @@ const RunSCAScanToolName = "run-sca-scan"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(RunSCAScanToolName, handleRunSCAScan)
+	RegisterMCPTool(RunSCAScanToolName, handleRunSCAScan)
 }
 
 // RunSCAScanRequest represents the parsed parameters for run-sca-scan

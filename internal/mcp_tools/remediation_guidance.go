@@ -20,7 +20,7 @@ const RemediationGuidanceToolName = "remediation-guidance"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(RemediationGuidanceToolName, handleGetRemediationGuidance)
+	RegisterMCPTool(RemediationGuidanceToolName, handleGetRemediationGuidance)
 }
 
 // RemediationGuidanceRequest represents the parsed parameters for remediation-guidance

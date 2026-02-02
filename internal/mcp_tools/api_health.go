@@ -12,7 +12,7 @@ const APIHealthToolName = "api-health"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(APIHealthToolName, handleAPIHealth)
+	RegisterMCPTool(APIHealthToolName, handleAPIHealth)
 }
 
 // handleAPIHealth checks the health of Veracode API endpoints

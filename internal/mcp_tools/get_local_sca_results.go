@@ -13,7 +13,7 @@ const GetLocalSCAResultsToolName = "get-local-sca-results"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(GetLocalSCAResultsToolName, handleGetLocalSCAResults)
+	RegisterMCPTool(GetLocalSCAResultsToolName, handleGetLocalSCAResults)
 }
 
 // GetLocalSCAResultsRequest represents the parsed parameters for get-local-sca-results

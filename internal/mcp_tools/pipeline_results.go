@@ -17,7 +17,7 @@ const PipelineResultsToolName = "pipeline-results"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(PipelineResultsToolName, handlePipelineResults)
+	RegisterMCPTool(PipelineResultsToolName, handlePipelineResults)
 }
 
 // PipelineResultsRequest represents the parsed parameters for pipeline-results

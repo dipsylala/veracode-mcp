@@ -17,7 +17,7 @@ const StaticFindingsToolName = "static-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(StaticFindingsToolName, handleGetStaticFindings)
+	RegisterMCPTool(StaticFindingsToolName, handleGetStaticFindings)
 }
 
 // StaticFindingsRequest represents the parsed parameters for get-static-findings

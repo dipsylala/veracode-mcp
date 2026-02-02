@@ -17,7 +17,7 @@ const PipelineStatusToolName = "pipeline-status"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterSimpleTool(PipelineStatusToolName, handlePipelineStatus)
+	RegisterMCPTool(PipelineStatusToolName, handlePipelineStatus)
 }
 
 // PipelineStatusRequest represents the parsed parameters for pipeline-status
