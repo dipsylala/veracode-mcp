@@ -23,16 +23,35 @@ func init() {
 // PipelineResultsRequest represents the parsed parameters for pipeline-results
 type PipelineResultsRequest struct {
 	ApplicationPath string
+	Size            int `json:"size,omitempty"`
+	Page            int `json:"page,omitempty"`
 }
 
 // parsePipelineResultsRequest extracts and validates parameters from the raw args map
 func parsePipelineResultsRequest(args map[string]interface{}) (*PipelineResultsRequest, error) {
+	req := &PipelineResultsRequest{
+		Size: 10,
+		Page: 0,
+	}
+
+	// Extract application path
 	appPath, ok := args["application_path"].(string)
 	if !ok || appPath == "" {
 		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
 	}
+	req.ApplicationPath = appPath
 
-	return &PipelineResultsRequest{ApplicationPath: appPath}, nil
+	// Extract size if provided
+	if size, ok := args["size"].(float64); ok {
+		req.Size = int(size)
+	}
+
+	// Extract page if provided
+	if page, ok := args["page"].(float64); ok {
+		req.Page = int(page)
+	}
+
+	return req, nil
 }
 
 // PipelineScanResults represents the JSON structure from Veracode Pipeline Scanner
@@ -124,7 +143,7 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 	}
 
 	// Format and return the response
-	return formatPipelineResultsResponse(ctx, req.ApplicationPath, resultsFile, &scanResults), nil
+	return formatPipelineResultsResponse(ctx, req.ApplicationPath, resultsFile, &scanResults, req), nil
 }
 
 // findMostRecentResultsFile finds the most recent results-*.json file in the directory
@@ -161,7 +180,7 @@ func findMostRecentResultsFile(dir string) (string, error) {
 }
 
 // formatPipelineResultsResponse formats the pipeline results into an MCP response
-func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults) map[string]interface{} {
+func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults, req *PipelineResultsRequest) map[string]interface{} {
 	// Build MCP response structure similar to static findings
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
@@ -178,40 +197,79 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 				"info":      0,
 			},
 			ByStatus: map[string]int{
-				"open": len(results.Findings), // All pipeline findings are "open"
+				"open": 0,
 			},
 			ByMitigation: map[string]int{
-				"none": len(results.Findings), // Pipeline findings have no mitigation
+				"none": 0,
 			},
 		},
 		Findings: []MCPFinding{},
 	}
 
 	// Set total findings - all pipeline findings are "open" by default
-	response.Summary.TotalFindings = len(results.Findings)
-	response.Summary.OpenFindings = len(results.Findings)
+	totalFindings := len(results.Findings)
+	response.Summary.TotalFindings = totalFindings
 	response.Summary.PolicyViolations = 0 // Pipeline scanner doesn't provide policy violation info per finding
 
-	// Process each finding
+	// Add pagination info
+	response.Pagination = &MCPPagination{
+		CurrentPage:   req.Page,
+		PageSize:      req.Size,
+		TotalElements: totalFindings,
+		TotalPages:    (totalFindings + req.Size - 1) / req.Size,
+		HasNext:       (req.Page+1)*req.Size < totalFindings,
+		HasPrevious:   req.Page > 0,
+	}
+
+	// First, convert all findings and sort them by severity
+	allFindings := make([]MCPFinding, 0, len(results.Findings))
 	for _, finding := range results.Findings {
 		mcpFinding := processPipelineFinding(finding)
+		allFindings = append(allFindings, mcpFinding)
+	}
+
+	// Sort findings by severity (most severe first), then by Flaw ID for consistent ordering
+	sort.Slice(allFindings, func(i, j int) bool {
+		if allFindings[i].SeverityScore != allFindings[j].SeverityScore {
+			return allFindings[i].SeverityScore > allFindings[j].SeverityScore
+		}
+		// Secondary sort by Flaw ID for consistent ordering when severities are equal
+		return allFindings[i].FlawID < allFindings[j].FlawID
+	})
+
+	// Apply pagination
+	startIdx := req.Page * req.Size
+	endIdx := startIdx + req.Size
+	if startIdx > len(allFindings) {
+		startIdx = len(allFindings)
+	}
+	if endIdx > len(allFindings) {
+		endIdx = len(allFindings)
+	}
+
+	// Process paginated findings and update counters
+	for i := startIdx; i < endIdx; i++ {
+		mcpFinding := allFindings[i]
 		response.Findings = append(response.Findings, mcpFinding)
 
-		// Update summary counters
+		// Update summary counters for the current page
 		severity := strings.ToLower(mcpFinding.Severity)
 		if count, ok := response.Summary.BySeverity[severity]; ok {
 			response.Summary.BySeverity[severity] = count + 1
 		}
-	}
 
-	// Sort findings by severity (most severe first), then by Flaw ID for consistent ordering
-	sort.Slice(response.Findings, func(i, j int) bool {
-		if response.Findings[i].SeverityScore != response.Findings[j].SeverityScore {
-			return response.Findings[i].SeverityScore > response.Findings[j].SeverityScore
+		if mcpFinding.Status == "open" || mcpFinding.Status == "OPEN" {
+			response.Summary.OpenFindings++
 		}
-		// Secondary sort by Flaw ID for consistent ordering when severities are equal
-		return response.Findings[i].FlawID < response.Findings[j].FlawID
-	})
+
+		mitigationStatus := strings.ToLower(mcpFinding.MitigationStatus)
+		if mitigationStatus == "" {
+			mitigationStatus = "none"
+		}
+		if count, ok := response.Summary.ByMitigation[mitigationStatus]; ok {
+			response.Summary.ByMitigation[mitigationStatus] = count + 1
+		}
+	}
 
 	// Marshal response to JSON for non-UI clients
 	responseJSON, err := json.MarshalIndent(response, "", "  ")
@@ -220,12 +278,25 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 		responseJSON, _ = json.Marshal(response) // Fall back to compact JSON
 	}
 
+	// Build pagination summary for LLM
+	var paginationSummary string
+	if response.Pagination != nil {
+		paginationSummary = fmt.Sprintf("Showing %d findings on page %d of %d (Total: %d findings across all pages)\n\n",
+			len(response.Findings),
+			response.Pagination.CurrentPage+1, // Display as 1-based
+			response.Pagination.TotalPages,
+			response.Pagination.TotalElements,
+		)
+	} else {
+		paginationSummary = fmt.Sprintf("Showing %d findings\n\n", len(response.Findings))
+	}
+
 	// Build result with content
 	result := map[string]interface{}{
 		"content": []map[string]interface{}{
 			{
 				"type": "text",
-				"text": string(responseJSON),
+				"text": paginationSummary + string(responseJSON),
 			},
 		},
 	}

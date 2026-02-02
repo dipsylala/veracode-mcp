@@ -316,6 +316,26 @@
           "type": "string",
           "isRequired": true,
           "description": "The absolute path to the application directory or workspace to scan. The path MUST be absolute and have an appropriate path separator. The absolute path can be retrieved by invoking `pwd` on the command line in the working directory. Example: `/a/my-workspace` on linux/macOS or, on Windows `C:\\\\a\\my-workspace`."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 1,
+            "max": 500
+          },
+          "description": "Number of findings per page (1-500). Default is 50. Use smaller values for faster responses."
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 500
+          },
+          "description": "Page number for pagination (0-based). Use for large result sets. Default is 0"
         }
       ]
     },
