@@ -4,7 +4,7 @@ This directory contains remediation guidance for security vulnerabilities organi
 
 ## Directory Structure
 
-```
+```text
 remediation_guidance/
 ├── README.md (this file)
 ├── {CWE_ID}/
@@ -154,5 +154,3 @@ Current language directories in use:
 ## Usage
 
 The remediation guidance tool loads these files automatically and provides them to LLMs when developers need help fixing security vulnerabilities identified by Veracode scans.
-
-
