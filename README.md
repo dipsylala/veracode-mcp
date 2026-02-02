@@ -22,6 +22,8 @@ A Model Context Protocol (MCP) server implementation in Go that provides Veracod
   - Finding details
   - Workspace packaging
 
+<video src="docs/media/mcp-package-scan-demo.mp4" controls></video>
+
 ## Installation
 
 ### Download from Releases
