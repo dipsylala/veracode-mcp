@@ -152,6 +152,11 @@ The server runs in stdio mode for local integrations where it operates as a subp
 
 **Codex:**
 
+via the command-line:
+```bash
+codex mcp add veracode -- "\path\to\veracode-mcp.exe"
+```
+
 Add to your MCP client configuration (e.g., `~/.codex/config.toml`):
 
 ```toml
@@ -178,7 +183,7 @@ Add to `claude_desktop_config.json`:
 **Claude CLI**
 
 ```bash
- claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
+claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 ```
 
 **VS Code:**
