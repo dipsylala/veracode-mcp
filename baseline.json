@@ -6,7 +6,7 @@
          "templated": false
       },
       "self": {
-         "href": "/scans/50d1b20e-807d-4b4d-aee4-21aa800844b4/findings",
+         "href": "/scans/d3ab7862-1b5a-4268-b7e1-dfd8ad71c808/findings",
          "name": "",
          "templated": false
       },
@@ -41,9 +41,9 @@
          "templated": false
       }
    },
-   "scan_id": "50d1b20e-807d-4b4d-aee4-21aa800844b4",
+   "scan_id": "d3ab7862-1b5a-4268-b7e1-dfd8ad71c808",
    "scan_status": "SUCCESS",
-   "message": "Scan successful. Results size: 38544 bytes",
+   "message": "Scan successful. Results size: 50140 bytes",
    "modules": [
       "GO files within veracode-auto-pack-VeracodeMCP-Go-go.zip"
    ],
@@ -51,7 +51,7 @@
    "findings": [
       {
          "title": "log::Printf",
-         "issue_id": 1008,
+         "issue_id": 1011,
          "image_path": "transport",
          "gob": "B",
          "severity": 3,
@@ -62,8 +62,8 @@
          "display_text": "\u003cspan\u003eThis call to log::Printf() could result in a log forging attack.  Writing untrusted data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. The second argument to Printf() contains tainted data. The tainted data originated from an earlier call to github.com.dipsylala.veracodemcp-go.internal.transport.NewStdioTransport.\u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize untrusted data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.  Alternatively, some of the XSS escaping functions from the OWASP Java Encoder project will also sanitize CRLF sequences.  Only create a custom blocklist when absolutely necessary.  Always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers?tocId=nYnZqAenFFZmB75MQrZwuA\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/transport/stdio.go",
-               "upload_file": "VeracodeMCP-Go/internal/transport/stdio.go",
+               "file": "veracodemcp-go/internal/transport/stdio.go",
+               "upload_file": "veracodemcp-go/internal/transport/stdio.go",
                "line": 94,
                "function_name": "handleRequest",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.handleRequest",
@@ -90,9 +90,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "handleRequest",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "93",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.handleRequest",
                         "FunctionPrototype": "void handleRequest(struct types::JSONRPCRequest /*20*/ *)"
@@ -100,9 +100,9 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "33",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "VarNames": "!go_make\u003cstruct types::JSONRPCRequest\u003e()",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
@@ -126,9 +126,9 @@
          "display_text": "\u003cspan\u003eThis call to log::Printf() could result in a log forging attack.  Writing untrusted data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. The second argument to Printf() contains tainted data. The tainted data originated from an earlier call to github.com.dipsylala.veracodemcp-go.internal.transport.NewStdioTransport.\u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize untrusted data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.  Alternatively, some of the XSS escaping functions from the OWASP Java Encoder project will also sanitize CRLF sequences.  Only create a custom blocklist when absolutely necessary.  Always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers?tocId=nYnZqAenFFZmB75MQrZwuA\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/server/server.go",
-               "upload_file": "VeracodeMCP-Go/internal/server/server.go",
-               "line": 161,
+               "file": "veracodemcp-go/internal/server/server.go",
+               "upload_file": "veracodemcp-go/internal/server/server.go",
+               "line": 165,
                "function_name": "HandleRequest",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
                "function_prototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)",
@@ -136,7 +136,7 @@
             }
          },
          "flaw_match": {
-            "procedure_hash": "3508606906",
+            "procedure_hash": "3899119241",
             "prototype_hash": "3481734563",
             "flaw_hash": "3132762339",
             "flaw_hash_count": 4,
@@ -154,9 +154,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "HandleRequest",
-                        "SourceFile": "VeracodeMCP-Go/internal/server/server.go",
-                        "SourceLine": "160",
-                        "SourceFileId": "131",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "164",
+                        "SourceFileId": "159",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
                         "FunctionPrototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)"
@@ -164,9 +164,73 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "33",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
+                        "StatementText": {},
+                        "VarNames": "!go_make\u003cstruct types::JSONRPCRequest\u003e()",
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
+                        "FunctionPrototype": "error /*0*/ * Start()"
+                     }
+                  ]
+               }
+            ]
+         }
+      },
+      {
+         "title": "log::Printf",
+         "issue_id": 1008,
+         "image_path": "server",
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "exploit_level": "1",
+         "display_text": "\u003cspan\u003eThis call to log::Printf() could result in a log forging attack.  Writing untrusted data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. The second argument to Printf() contains tainted data. The tainted data originated from an earlier call to github.com.dipsylala.veracodemcp-go.internal.transport.NewStdioTransport.\u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize untrusted data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.  Alternatively, some of the XSS escaping functions from the OWASP Java Encoder project will also sanitize CRLF sequences.  Only create a custom blocklist when absolutely necessary.  Always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers?tocId=nYnZqAenFFZmB75MQrZwuA\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
+         "files": {
+            "source_file": {
+               "file": "veracodemcp-go/internal/server/server.go",
+               "upload_file": "veracodemcp-go/internal/server/server.go",
+               "line": 169,
+               "function_name": "HandleRequest",
+               "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+               "function_prototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)",
+               "scope": "^::github.com::dipsylala::veracodemcp-go::internal::server::MCPServer"
+            }
+         },
+         "flaw_match": {
+            "procedure_hash": "3899119241",
+            "prototype_hash": "3481734563",
+            "flaw_hash": "3132762339",
+            "flaw_hash_count": 4,
+            "flaw_hash_ordinal": 2,
+            "cause_hash": "1176028798",
+            "cause_hash_count": 1,
+            "cause_hash_ordinal": 1,
+            "cause_hash2": "1522093433",
+            "cause_hash2_ordinal": "3"
+         },
+         "stack_dumps": {
+            "stack_dump": [
+               {
+                  "Frame": [
+                     {
+                        "FrameId": "0",
+                        "FunctionName": "HandleRequest",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "168",
+                        "SourceFileId": "159",
+                        "StatementText": {},
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+                        "FunctionPrototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)"
+                     },
+                     {
+                        "FrameId": "1",
+                        "FunctionName": "Start",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
+                        "SourceLine": "33",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "VarNames": "!go_make\u003cstruct types::JSONRPCRequest\u003e()",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
@@ -190,9 +254,9 @@
          "display_text": "\u003cspan\u003eThis call to log::Printf() could result in a log forging attack.  Writing untrusted data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. The second argument to Printf() contains tainted data. The tainted data originated from an earlier call to github.com.dipsylala.veracodemcp-go.internal.transport.NewStdioTransport.\u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize untrusted data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.  Alternatively, some of the XSS escaping functions from the OWASP Java Encoder project will also sanitize CRLF sequences.  Only create a custom blocklist when absolutely necessary.  Always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers?tocId=nYnZqAenFFZmB75MQrZwuA\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/server/server.go",
-               "upload_file": "VeracodeMCP-Go/internal/server/server.go",
-               "line": 204,
+               "file": "veracodemcp-go/internal/server/server.go",
+               "upload_file": "veracodemcp-go/internal/server/server.go",
+               "line": 222,
                "function_name": "HandleRequest",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
                "function_prototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)",
@@ -200,7 +264,71 @@
             }
          },
          "flaw_match": {
-            "procedure_hash": "3508606906",
+            "procedure_hash": "3899119241",
+            "prototype_hash": "3481734563",
+            "flaw_hash": "3132762339",
+            "flaw_hash_count": 4,
+            "flaw_hash_ordinal": 3,
+            "cause_hash": "1176028798",
+            "cause_hash_count": 1,
+            "cause_hash_ordinal": 1,
+            "cause_hash2": "1522093433",
+            "cause_hash2_ordinal": "3"
+         },
+         "stack_dumps": {
+            "stack_dump": [
+               {
+                  "Frame": [
+                     {
+                        "FrameId": "0",
+                        "FunctionName": "HandleRequest",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "221",
+                        "SourceFileId": "159",
+                        "StatementText": {},
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+                        "FunctionPrototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)"
+                     },
+                     {
+                        "FrameId": "1",
+                        "FunctionName": "Start",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
+                        "SourceLine": "33",
+                        "SourceFileId": "169",
+                        "StatementText": {},
+                        "VarNames": "!go_make\u003cstruct types::JSONRPCRequest\u003e()",
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
+                        "FunctionPrototype": "error /*0*/ * Start()"
+                     }
+                  ]
+               }
+            ]
+         }
+      },
+      {
+         "title": "log::Printf",
+         "issue_id": 1009,
+         "image_path": "server",
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "exploit_level": "1",
+         "display_text": "\u003cspan\u003eThis call to log::Printf() could result in a log forging attack.  Writing untrusted data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. The second argument to Printf() contains tainted data. The tainted data originated from an earlier call to github.com.dipsylala.veracodemcp-go.internal.transport.NewStdioTransport.\u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize untrusted data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.  Alternatively, some of the XSS escaping functions from the OWASP Java Encoder project will also sanitize CRLF sequences.  Only create a custom blocklist when absolutely necessary.  Always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers?tocId=nYnZqAenFFZmB75MQrZwuA\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
+         "files": {
+            "source_file": {
+               "file": "veracodemcp-go/internal/server/server.go",
+               "upload_file": "veracodemcp-go/internal/server/server.go",
+               "line": 233,
+               "function_name": "HandleRequest",
+               "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+               "function_prototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)",
+               "scope": "^::github.com::dipsylala::veracodemcp-go::internal::server::MCPServer"
+            }
+         },
+         "flaw_match": {
+            "procedure_hash": "3899119241",
             "prototype_hash": "3481734563",
             "flaw_hash": "3132762339",
             "flaw_hash_count": 4,
@@ -218,9 +346,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "HandleRequest",
-                        "SourceFile": "VeracodeMCP-Go/internal/server/server.go",
-                        "SourceLine": "203",
-                        "SourceFileId": "131",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "232",
+                        "SourceFileId": "159",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
                         "FunctionPrototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)"
@@ -228,9 +356,9 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "33",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "VarNames": "!go_make\u003cstruct types::JSONRPCRequest\u003e()",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
@@ -254,8 +382,8 @@
          "display_text": "\u003cspan\u003eThis call to os::OpenFile() contains a path manipulation flaw.  The argument to the function is a filename constructed using untrusted input.  If an attacker is allowed to specify all or part of the filename, it may be possible to gain unauthorized access to files on the server, including those outside the webroot, that would be normally be inaccessible to end users.  The level of exposure depends on the effectiveness of input validation routines, if any. The first argument to OpenFile() contains tainted data from the variable logFilePath. The tainted data originated from an earlier call to flag.String.\u003c/span\u003e \u003cspan\u003eValidate all untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/73.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Path_Traversal\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/cli/app.go",
-               "upload_file": "VeracodeMCP-Go/internal/cli/app.go",
+               "file": "veracodemcp-go/internal/cli/app.go",
+               "upload_file": "veracodemcp-go/internal/cli/app.go",
                "line": 29,
                "function_name": "ConfigureLogging",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.cli.ConfigureLogging",
@@ -282,9 +410,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "ConfigureLogging",
-                        "SourceFile": "VeracodeMCP-Go/internal/cli/app.go",
+                        "SourceFile": "veracodemcp-go/internal/cli/app.go",
                         "SourceLine": "28",
-                        "SourceFileId": "128",
+                        "SourceFileId": "127",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.cli.ConfigureLogging",
                         "FunctionPrototype": "error /*0*/ * ConfigureLogging(string, bool)"
@@ -292,9 +420,9 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "ConfigureLogging",
-                        "SourceFile": "VeracodeMCP-Go/internal/cli/app.go",
+                        "SourceFile": "veracodemcp-go/internal/cli/app.go",
                         "SourceLine": "22",
-                        "SourceFileId": "128",
+                        "SourceFileId": "127",
                         "StatementText": {},
                         "VarNames": "/**X-VC defscope id=\"274428\" */string logFilePath/**X-VC /defscope */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.cli.ConfigureLogging",
@@ -303,20 +431,20 @@
                      {
                         "FrameId": "2",
                         "FunctionName": "main",
-                        "SourceFile": "VeracodeMCP-Go/main.go",
-                        "SourceLine": "47",
-                        "SourceFileId": "143",
+                        "SourceFile": "veracodemcp-go/main.go",
+                        "SourceLine": "46",
+                        "SourceFileId": "171",
                         "StatementText": {},
-                        "VarNames": "*/**X-VC scoperef targetid=\"295873\" */logFile/**X-VC /scoperef */",
+                        "VarNames": "*/**X-VC scoperef targetid=\"296086\" */logFile/**X-VC /scoperef */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.main",
                         "FunctionPrototype": "void main(void)"
                      },
                      {
                         "FrameId": "3",
                         "FunctionName": "main",
-                        "SourceFile": "VeracodeMCP-Go/main.go",
+                        "SourceFile": "veracodemcp-go/main.go",
                         "SourceLine": "37",
-                        "SourceFileId": "143",
+                        "SourceFileId": "171",
                         "StatementText": {},
                         "VarNames": "flag::String(!go_string(\"log\"), !go_string(), !go_string(\"Log file path (if not specified, logs go to stderr when verbose)\"))",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.main",
@@ -340,8 +468,8 @@
          "display_text": "\u003cspan\u003e The application calls the log::Printf() function, which may expose information about the application logic or other details such as the names and versions of the application container and associated components.  This information can be useful in executing other attacks and can also enable the attacker to target known vulnerabilities in application components. The second argument to Printf() contains data from an error message (possibly containing untrusted data). The data from an error message (possibly containing untrusted data) originated from an earlier call to bufio.Reader.ReadBytes.\u003c/span\u003e \u003cspan\u003eEnsure that error codes or other messages returned to end users are not overly verbose.  Sanitize all messages of any sensitive information that is not absolutely necessary.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/209.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/transport/stdio.go",
-               "upload_file": "VeracodeMCP-Go/internal/transport/stdio.go",
+               "file": "veracodemcp-go/internal/transport/stdio.go",
+               "upload_file": "veracodemcp-go/internal/transport/stdio.go",
                "line": 41,
                "function_name": "Start",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
@@ -368,9 +496,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "40",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
@@ -378,33 +506,33 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "36",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC defscope id=\"529902\" */slice\u003cinterface *\u003e !t9/**X-VC /defscope */",
+                        "VarNames": "/**X-VC defscope id=\"581762\" */slice\u003cinterface *\u003e !t9/**X-VC /defscope */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
                      },
                      {
                         "FrameId": "2",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "34",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"529807\" */!t1/**X-VC /scoperef */./**X-VC scoperef targetid=\"11669\" */!1/**X-VC /scoperef */",
+                        "VarNames": "/**X-VC scoperef targetid=\"581667\" */!t1/**X-VC /scoperef */./**X-VC scoperef targetid=\"11669\" */!1/**X-VC /scoperef */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
                      },
                      {
                         "FrameId": "3",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "34",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"277025\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"276951\" */reader/**X-VC /scoperef */.ReadBytes(39)",
+                        "VarNames": "/**X-VC scoperef targetid=\"280165\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"280091\" */reader/**X-VC /scoperef */.ReadBytes(39)",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
                      }
@@ -426,8 +554,8 @@
          "display_text": "\u003cspan\u003e The application calls the log::Printf() function, which may expose information about the application logic or other details such as the names and versions of the application container and associated components.  This information can be useful in executing other attacks and can also enable the attacker to target known vulnerabilities in application components. The second argument to Printf() contains data from an error message (possibly containing untrusted data). The data from an error message (possibly containing untrusted data) originated from an earlier call to bufio.Reader.ReadBytes.\u003c/span\u003e \u003cspan\u003eEnsure that error codes or other messages returned to end users are not overly verbose.  Sanitize all messages of any sensitive information that is not absolutely necessary.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/209.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/transport/stdio.go",
-               "upload_file": "VeracodeMCP-Go/internal/transport/stdio.go",
+               "file": "veracodemcp-go/internal/transport/stdio.go",
+               "upload_file": "veracodemcp-go/internal/transport/stdio.go",
                "line": 54,
                "function_name": "Start",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
@@ -454,9 +582,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "53",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
@@ -464,33 +592,33 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "52",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC defscope id=\"530190\" */slice\u003cinterface *\u003e !t29/**X-VC /defscope */",
+                        "VarNames": "/**X-VC defscope id=\"582050\" */slice\u003cinterface *\u003e !t29/**X-VC /defscope */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
                      },
                      {
                         "FrameId": "2",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "34",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"529807\" */!t1/**X-VC /scoperef */./**X-VC scoperef targetid=\"11669\" */!1/**X-VC /scoperef */",
+                        "VarNames": "/**X-VC scoperef targetid=\"581667\" */!t1/**X-VC /scoperef */./**X-VC scoperef targetid=\"11669\" */!1/**X-VC /scoperef */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
                      },
                      {
                         "FrameId": "3",
                         "FunctionName": "Start",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "34",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"277025\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"276951\" */reader/**X-VC /scoperef */.ReadBytes(39)",
+                        "VarNames": "/**X-VC scoperef targetid=\"280165\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"280091\" */reader/**X-VC /scoperef */.ReadBytes(39)",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.Start",
                         "FunctionPrototype": "error /*0*/ * Start()"
                      }
@@ -512,8 +640,8 @@
          "display_text": "\u003cspan\u003e The application calls the log::Printf() function, which may expose information about the application logic or other details such as the names and versions of the application container and associated components.  This information can be useful in executing other attacks and can also enable the attacker to target known vulnerabilities in application components. The second argument to Printf() contains data from an error message (possibly containing untrusted data). The data from an error message (possibly containing untrusted data) originated from an earlier call to bytes.Buffer.Write.\u003c/span\u003e \u003cspan\u003eEnsure that error codes or other messages returned to end users are not overly verbose.  Sanitize all messages of any sensitive information that is not absolutely necessary.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/209.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/transport/stdio.go",
-               "upload_file": "VeracodeMCP-Go/internal/transport/stdio.go",
+               "file": "veracodemcp-go/internal/transport/stdio.go",
+               "upload_file": "veracodemcp-go/internal/transport/stdio.go",
                "line": 112,
                "function_name": "handleRequest",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.handleRequest",
@@ -540,9 +668,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "handleRequest",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "111",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.handleRequest",
                         "FunctionPrototype": "void handleRequest(struct types::JSONRPCRequest /*20*/ *)"
@@ -550,44 +678,44 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "handleRequest",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "110",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC defscope id=\"530800\" */slice\u003cinterface *\u003e !t36/**X-VC /defscope */",
+                        "VarNames": "/**X-VC defscope id=\"582660\" */slice\u003cinterface *\u003e !t36/**X-VC /defscope */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.handleRequest",
                         "FunctionPrototype": "void handleRequest(struct types::JSONRPCRequest /*20*/ *)"
                      },
                      {
                         "FrameId": "2",
                         "FunctionName": "handleRequest",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "110",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"277045\" */this/**X-VC /scoperef */./**X-VC scoperef targetid=\"277047\" */sendResponse/**X-VC /scoperef */(/**X-VC scoperef targetid=\"530594\" */resp/**X-VC /scoperef */)",
+                        "VarNames": "/**X-VC scoperef targetid=\"280185\" */this/**X-VC /scoperef */./**X-VC scoperef targetid=\"280187\" */sendResponse/**X-VC /scoperef */(/**X-VC scoperef targetid=\"582454\" */resp/**X-VC /scoperef */)",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.handleRequest",
                         "FunctionPrototype": "void handleRequest(struct types::JSONRPCRequest /*20*/ *)"
                      },
                      {
                         "FrameId": "3",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "149",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"531468\" */!t53/**X-VC /scoperef */./**X-VC scoperef targetid=\"98156\" */err/**X-VC /scoperef */",
+                        "VarNames": "/**X-VC scoperef targetid=\"583328\" */!t53/**X-VC /scoperef */./**X-VC scoperef targetid=\"98156\" */err/**X-VC /scoperef */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      },
                      {
                         "FrameId": "4",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "149",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"277049\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"276952\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"531020\" */data/**X-VC /scoperef */)",
+                        "VarNames": "/**X-VC scoperef targetid=\"280189\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"280092\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"582880\" */data/**X-VC /scoperef */)",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      }
@@ -609,8 +737,8 @@
          "display_text": "\u003cspan\u003e The application calls the log::Printf() function, which may expose information about the application logic or other details such as the names and versions of the application container and associated components.  This information can be useful in executing other attacks and can also enable the attacker to target known vulnerabilities in application components. The second argument to Printf() contains data from an error message (possibly containing untrusted data). The data from an error message (possibly containing untrusted data) originated from an earlier call to bytes.Buffer.Write.\u003c/span\u003e \u003cspan\u003eEnsure that error codes or other messages returned to end users are not overly verbose.  Sanitize all messages of any sensitive information that is not absolutely necessary.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/209.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/transport/stdio.go",
-               "upload_file": "VeracodeMCP-Go/internal/transport/stdio.go",
+               "file": "veracodemcp-go/internal/transport/stdio.go",
+               "upload_file": "veracodemcp-go/internal/transport/stdio.go",
                "line": 130,
                "function_name": "sendResponse",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
@@ -637,9 +765,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "129",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
@@ -647,11 +775,11 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "149",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"277049\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"276952\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"531020\" */data/**X-VC /scoperef */)",
+                        "VarNames": "/**X-VC scoperef targetid=\"280189\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"280092\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"582880\" */data/**X-VC /scoperef */)",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      }
@@ -662,7 +790,7 @@
       },
       {
          "title": "log::Printf",
-         "issue_id": 1009,
+         "issue_id": 1012,
          "image_path": "transport",
          "gob": "B",
          "severity": 2,
@@ -673,8 +801,8 @@
          "display_text": "\u003cspan\u003e The application calls the log::Printf() function, which may expose information about the application logic or other details such as the names and versions of the application container and associated components.  This information can be useful in executing other attacks and can also enable the attacker to target known vulnerabilities in application components. The second argument to Printf() contains data from an error message (possibly containing untrusted data). The data from an error message (possibly containing untrusted data) originated from an earlier call to bytes.Buffer.Write.\u003c/span\u003e \u003cspan\u003eEnsure that error codes or other messages returned to end users are not overly verbose.  Sanitize all messages of any sensitive information that is not absolutely necessary.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/209.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/transport/stdio.go",
-               "upload_file": "VeracodeMCP-Go/internal/transport/stdio.go",
+               "file": "veracodemcp-go/internal/transport/stdio.go",
+               "upload_file": "veracodemcp-go/internal/transport/stdio.go",
                "line": 152,
                "function_name": "sendResponse",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
@@ -701,9 +829,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "151",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
@@ -711,33 +839,33 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "150",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC defscope id=\"531506\" */slice\u003cinterface *\u003e !t56/**X-VC /defscope */",
+                        "VarNames": "/**X-VC defscope id=\"583366\" */slice\u003cinterface *\u003e !t56/**X-VC /defscope */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      },
                      {
                         "FrameId": "2",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "149",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"531468\" */!t53/**X-VC /scoperef */./**X-VC scoperef targetid=\"98156\" */err/**X-VC /scoperef */",
+                        "VarNames": "/**X-VC scoperef targetid=\"583328\" */!t53/**X-VC /scoperef */./**X-VC scoperef targetid=\"98156\" */err/**X-VC /scoperef */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      },
                      {
                         "FrameId": "3",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "149",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"277049\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"276952\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"531020\" */data/**X-VC /scoperef */)",
+                        "VarNames": "/**X-VC scoperef targetid=\"280189\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"280092\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"582880\" */data/**X-VC /scoperef */)",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      }
@@ -759,8 +887,8 @@
          "display_text": "\u003cspan\u003e The application calls the log::Printf() function, which may expose information about the application logic or other details such as the names and versions of the application container and associated components.  This information can be useful in executing other attacks and can also enable the attacker to target known vulnerabilities in application components. The second argument to Printf() contains data from an error message (possibly containing untrusted data). The data from an error message (possibly containing untrusted data) originated from an earlier call to bytes.Buffer.Write.\u003c/span\u003e \u003cspan\u003eEnsure that error codes or other messages returned to end users are not overly verbose.  Sanitize all messages of any sensitive information that is not absolutely necessary.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/209.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
          "files": {
             "source_file": {
-               "file": "VeracodeMCP-Go/internal/transport/stdio.go",
-               "upload_file": "VeracodeMCP-Go/internal/transport/stdio.go",
+               "file": "veracodemcp-go/internal/transport/stdio.go",
+               "upload_file": "veracodemcp-go/internal/transport/stdio.go",
                "line": 159,
                "function_name": "sendResponse",
                "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
@@ -787,9 +915,9 @@
                      {
                         "FrameId": "0",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "158",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
@@ -797,35 +925,132 @@
                      {
                         "FrameId": "1",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "157",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC defscope id=\"531676\" */slice\u003cinterface *\u003e !t63/**X-VC /defscope */",
+                        "VarNames": "/**X-VC defscope id=\"583536\" */slice\u003cinterface *\u003e !t63/**X-VC /defscope */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      },
                      {
                         "FrameId": "2",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "149",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"531468\" */!t53/**X-VC /scoperef */./**X-VC scoperef targetid=\"98156\" */err/**X-VC /scoperef */",
+                        "VarNames": "/**X-VC scoperef targetid=\"583328\" */!t53/**X-VC /scoperef */./**X-VC scoperef targetid=\"98156\" */err/**X-VC /scoperef */",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
                      },
                      {
                         "FrameId": "3",
                         "FunctionName": "sendResponse",
-                        "SourceFile": "VeracodeMCP-Go/internal/transport/stdio.go",
+                        "SourceFile": "veracodemcp-go/internal/transport/stdio.go",
                         "SourceLine": "149",
-                        "SourceFileId": "141",
+                        "SourceFileId": "169",
                         "StatementText": {},
-                        "VarNames": "/**X-VC scoperef targetid=\"277049\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"276952\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"531020\" */data/**X-VC /scoperef */)",
+                        "VarNames": "/**X-VC scoperef targetid=\"280189\" */this/**X-VC /scoperef */-\u003e/**X-VC scoperef targetid=\"280092\" */writer/**X-VC /scoperef */.Write(/**X-VC scoperef targetid=\"582880\" */data/**X-VC /scoperef */)",
                         "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.transport.StdioTransport.sendResponse",
                         "FunctionPrototype": "error /*0*/ * sendResponse(struct types::JSONRPCResponse /*12*/ *)"
+                     }
+                  ]
+               }
+            ]
+         }
+      },
+      {
+         "title": "log::Printf",
+         "issue_id": 1010,
+         "image_path": "server",
+         "gob": "B",
+         "severity": 2,
+         "issue_type_id": "taint",
+         "issue_type": "Information Exposure Through an Error Message",
+         "cwe_id": "209",
+         "exploit_level": "0",
+         "display_text": "\u003cspan\u003e The application calls the log::Printf() function, which may expose information about the application logic or other details such as the names and versions of the application container and associated components.  This information can be useful in executing other attacks and can also enable the attacker to target known vulnerabilities in application components. The second argument to Printf() contains data from an error message (possibly containing untrusted data). The data from an error message (possibly containing untrusted data) originated from an earlier call to errors.New.\u003c/span\u003e \u003cspan\u003eEnsure that error codes or other messages returned to end users are not overly verbose.  Sanitize all messages of any sensitive information that is not absolutely necessary.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/209.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
+         "files": {
+            "source_file": {
+               "file": "veracodemcp-go/internal/server/server.go",
+               "upload_file": "veracodemcp-go/internal/server/server.go",
+               "line": 208,
+               "function_name": "HandleRequest",
+               "qualified_function_name": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+               "function_prototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)",
+               "scope": "^::github.com::dipsylala::veracodemcp-go::internal::server::MCPServer"
+            }
+         },
+         "flaw_match": {
+            "procedure_hash": "3899119241",
+            "prototype_hash": "3481734563",
+            "flaw_hash": "450374752",
+            "flaw_hash_count": 1,
+            "flaw_hash_ordinal": 1,
+            "cause_hash": "3945514889",
+            "cause_hash_count": 1,
+            "cause_hash_ordinal": 1,
+            "cause_hash2": "1522093433",
+            "cause_hash2_ordinal": "3"
+         },
+         "stack_dumps": {
+            "stack_dump": [
+               {
+                  "Frame": [
+                     {
+                        "FrameId": "0",
+                        "FunctionName": "HandleRequest",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "207",
+                        "SourceFileId": "159",
+                        "StatementText": {},
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+                        "FunctionPrototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)"
+                     },
+                     {
+                        "FrameId": "1",
+                        "FunctionName": "HandleRequest",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "206",
+                        "SourceFileId": "159",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC defscope id=\"575210\" */slice\u003cinterface *\u003e !t60/**X-VC /defscope */",
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+                        "FunctionPrototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)"
+                     },
+                     {
+                        "FrameId": "2",
+                        "FunctionName": "HandleRequest",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "205",
+                        "SourceFileId": "159",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC scoperef targetid=\"278849\" */ValidateID/**X-VC /scoperef */(\u0026/**X-VC scoperef targetid=\"574982\" */idValue/**X-VC /scoperef */, 64)",
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.MCPServer.HandleRequest",
+                        "FunctionPrototype": "struct types::JSONRPCResponse /*12*/ * HandleRequest(struct types::JSONRPCRequest /*20*/ *)"
+                     },
+                     {
+                        "FrameId": "3",
+                        "FunctionName": "ValidateID",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "131",
+                        "SourceFileId": "159",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC scoperef targetid=\"278843\" */ErrInvalidIDString/**X-VC /scoperef */",
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.ValidateID",
+                        "FunctionPrototype": "error /*0*/ * ValidateID(interface *, int)"
+                     },
+                     {
+                        "FrameId": "4",
+                        "FunctionName": "init",
+                        "SourceFile": "veracodemcp-go/internal/server/server.go",
+                        "SourceLine": "104",
+                        "SourceFileId": "159",
+                        "StatementText": {},
+                        "VarNames": "errors::New(!go_string(\"json-rpc id must be printable ASCII\"))",
+                        "QualifiedFunctionName": "github.com.dipsylala.veracodemcp-go.internal.server.init",
+                        "FunctionPrototype": "void init(void)"
                      }
                   ]
                }
