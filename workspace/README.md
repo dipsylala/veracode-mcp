@@ -57,7 +57,7 @@ The package provides helpful error messages for common issues:
 
 ### File Not Found
 
-```
+```text
 workspace configuration not found
 
 The directory '/path/to/project' does not contain a .veracode-workspace.json file.
@@ -75,7 +75,7 @@ To create a workspace configuration:
 
 ### Invalid JSON
 
-```
+```text
 invalid JSON in .veracode-workspace.json: ...
 
 The workspace configuration file must be valid JSON with this format:
@@ -88,7 +88,7 @@ The workspace configuration file must be valid JSON with this format:
 
 ### Missing Name Field
 
-```
+```text
 missing or empty "name" field in .veracode-workspace.json
 
 The workspace configuration must include an application profile name:
@@ -117,13 +117,16 @@ The workspace configuration must include an application profile name:
 Searches for `.veracode-workspace.json` in the given directory and returns the application profile name.
 
 **Parameters:**
+
 - `directory`: Path to the directory to search (absolute or relative)
 
 **Returns:**
+
 - `string`: The application profile name from the workspace file
 - `error`: Error with guidance if file not found or invalid
 
 **Example:**
+
 ```go
 name, err := workspace.FindWorkspaceConfig("./my-project")
 ```
@@ -133,10 +136,12 @@ name, err := workspace.FindWorkspaceConfig("./my-project")
 Convenience function that searches for `.veracode-workspace.json` in the current working directory.
 
 **Returns:**
+
 - `string`: The application profile name from the workspace file
 - `error`: Error with guidance if file not found or invalid
 
 **Example:**
+
 ```go
 name, err := workspace.FindWorkspaceConfigInCurrentDir()
 ```
@@ -210,6 +215,7 @@ go test -v ./workspace
 ```
 
 The test suite includes:
+
 - ✅ Success case with valid config
 - ✅ File not found error handling
 - ✅ Invalid JSON error handling
@@ -232,7 +238,7 @@ All tests use temporary directories and clean up automatically.
 
 ## Example Project Structure
 
-```
+```text
 my-project/
 ├── .veracode-workspace.json   ← Workspace config
 ├── src/
@@ -252,6 +258,7 @@ If you see an error about missing workspace file:
 ## Future Enhancements
 
 Potential additions for future versions:
+
 - Support for additional configuration (region, credentials path, etc.)
 - Hierarchical search (search parent directories)
 - Multiple workspace file formats (YAML, TOML)
