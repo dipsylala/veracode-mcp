@@ -302,7 +302,6 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 	}
 
 	// Only include structuredContent if client supports MCP Apps UI
-	// This can be forced via --force-mcp-app flag
 	clientSupportsUI := ClientSupportsUIFromContext(ctx)
 	log.Printf("[PIPELINE-RESULTS] ClientSupportsUIFromContext(ctx) returned: %v", clientSupportsUI)
 

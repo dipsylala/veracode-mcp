@@ -174,8 +174,8 @@ func (s *MCPServer) handleListTools() *types.ListToolsResult {
 	toolsList := make([]types.Tool, len(s.tools))
 	copy(toolsList, s.tools)
 
-	// Add UI metadata only if client supports it (or forced via flag)
-	log.Printf("[TOOLS] s.clientSupportsUI=%v, s.forceMCPApp=%v", s.clientSupportsUI, s.forceMCPApp)
+	// Add UI metadata only if client supports it
+	log.Printf("[TOOLS] s.clientSupportsUI=%v", s.clientSupportsUI)
 	if s.clientSupportsUI {
 		log.Printf("[TOOLS] Client supports UI - adding UI metadata to tool definitions")
 		for i := range toolsList {

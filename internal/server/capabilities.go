@@ -11,15 +11,6 @@ import (
 // detectUICapability analyzes client capabilities to determine UI support.
 // It looks for the MCP Apps UI extension and the specific MIME type support.
 func (s *MCPServer) detectUICapability(capabilities ClientCapabilities) bool {
-	// Check for force override first
-	if s.forceMCPApp {
-		log.Printf("\n=== FORCE MCP APP MODE ENABLED ===")
-		log.Printf("✓✓✓ Forcing MCP Apps UI mode via --force-mcp-app flag ✓✓✓")
-		log.Printf("   structuredContent will always be sent regardless of client capabilities")
-		log.Printf("=== END UI SUPPORT CHECK ===\n")
-		return true
-	}
-
 	log.Printf("\n=== CHECKING FOR UI SUPPORT ===")
 	log.Printf("Extensions field present: %v", capabilities.Extensions != nil)
 

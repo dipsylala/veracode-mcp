@@ -328,7 +328,6 @@ func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationG
 	}
 
 	// Only include structuredContent if client supports MCP Apps UI
-	// This can be forced via --force-mcp-app flag
 	if ClientSupportsUIFromContext(ctx) {
 		log.Printf("Dynamic findings: Returning %d findings (content: JSON, structuredContent: full data for UI)", len(response.Findings))
 		result["structuredContent"] = response

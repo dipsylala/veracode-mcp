@@ -128,8 +128,6 @@ Options:
         Enable verbose logging to stderr (disabled by default)
   -log string
         Log file path for debugging (recommended for stdio mode)
-  -force-mcp-app
-        Force MCP Apps mode (always send structuredContent regardless of client capabilities)
   -version
         Display version information
 ```
@@ -145,9 +143,6 @@ Options:
 
 # With verbose logging to stderr (avoid in stdio mode with MCP clients)
 .\dist\veracode-mcp.exe -verbose
-
-# Force MCP Apps UI mode
-.\dist\veracode-mcp.exe -force-mcp-app -log debug.log
 ```
 
 **Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.

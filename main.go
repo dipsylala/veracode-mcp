@@ -36,7 +36,6 @@ func main() {
 	showVersion := flag.Bool("version", false, "Display version information")
 	verbose := flag.Bool("verbose", false, "Enable verbose logging (disabled by default)")
 	logFile := flag.String("log", "", "Log file path (if not specified, logs go to stderr when verbose)")
-	forceMCPApp := flag.Bool("force-mcp-app", false, "Force MCP Apps mode (always send structuredContent regardless of client capabilities)")
 	flag.Parse()
 
 	if *showVersion {
@@ -50,7 +49,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	mcpServer, err := server.NewMCPServer(*forceMCPApp)
+	mcpServer, err := server.NewMCPServer()
 	if err != nil {
 		// Always show server creation errors to stderr, even in non-verbose mode
 		// This is before stdio transport starts, so it won't interfere with JSON-RPC

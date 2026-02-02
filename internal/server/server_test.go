@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 
 func TestLoadToolDefinitions(t *testing.T) {
 	// Create a server which initializes the ToolManager internally
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server with tool manager: %v", err)
 	}
@@ -76,7 +76,7 @@ func TestLoadToolDefinitions(t *testing.T) {
 
 func TestToMCPTool(t *testing.T) {
 	// Create a server which initializes the ToolManager internally
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server with tool manager: %v", err)
 	}
@@ -149,7 +149,7 @@ func TestServerInitialization(t *testing.T) {
 // Helper functions for TestServerInitialization
 
 func createTestServer(t *testing.T) *MCPServer {
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}
@@ -227,7 +227,7 @@ func validateToolManagerStats(t *testing.T, server *MCPServer) {
 }
 
 func TestToolCallHandling(t *testing.T) {
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}
@@ -427,7 +427,7 @@ func TestToolManagerStatistics(t *testing.T) {
 }
 
 func TestServerRefactoredHandlers(t *testing.T) {
-	server, err := NewMCPServer(false)
+	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)
 	}

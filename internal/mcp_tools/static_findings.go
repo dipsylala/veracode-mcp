@@ -351,7 +351,6 @@ func formatStaticFindingsResponse(ctx context.Context, appProfile, applicationGU
 	}
 
 	// Only include structuredContent if client supports MCP Apps UI
-	// This can be forced via --force-mcp-app flag
 	if ClientSupportsUIFromContext(ctx) {
 		log.Printf("Static findings: Returning %d findings (content: JSON, structuredContent: full data for UI)", len(response.Findings))
 		result["structuredContent"] = response

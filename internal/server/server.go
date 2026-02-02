@@ -51,7 +51,6 @@ func SetUIResources(pipeline, staticFindings, dynamicFindings string) {
 type MCPServer struct {
 	initialized      bool
 	clientSupportsUI bool
-	forceMCPApp      bool // Override to always send structuredContent
 	capabilities     ServerCapabilities
 	tools            []types.Tool
 	toolManager      *tools.ToolManager
@@ -59,7 +58,7 @@ type MCPServer struct {
 
 // NewMCPServer creates a new MCP server instance with all necessary registries.
 // It loads tool definitions, initializes registries, and prepares tool handlers.
-func NewMCPServer(forceMCPApp bool) (*MCPServer, error) {
+func NewMCPServer() (*MCPServer, error) {
 	// Create tool manager
 	toolManager, err := tools.NewToolManager()
 	if err != nil {
@@ -67,7 +66,6 @@ func NewMCPServer(forceMCPApp bool) (*MCPServer, error) {
 	}
 
 	s := &MCPServer{
-		forceMCPApp: forceMCPApp,
 		capabilities: ServerCapabilities{
 			Tools: &ToolsCapability{
 				ListChanged: false,
