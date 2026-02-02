@@ -169,7 +169,13 @@ func TestFormatSCAResultsResponse(t *testing.T) {
 		},
 	}
 
-	response := formatSCAResultsResponse("/test/path", "/test/path/.veracode/sca/veracode.json", results)
+	req := &GetLocalSCAResultsRequest{
+		ApplicationPath: "/test/path",
+		Size:            50,
+		Page:            0,
+	}
+
+	response := formatSCAResultsResponse("/test/path", "/test/path/.veracode/sca/veracode.json", results, req)
 
 	// Verify response structure
 	if response["content"] == nil {
@@ -191,8 +197,12 @@ func TestFormatSCAResultsResponse(t *testing.T) {
 		t.Fatal("Expected header to be string")
 	}
 
-	if !contains(header, "Total Vulnerability Matches: 2") {
-		t.Errorf("Header should contain total matches count, got: %s", header)
+	if !contains(header, "Showing 2 findings on page 1 of 1") {
+		t.Errorf("Header should contain pagination info, got: %s", header)
+	}
+
+	if !contains(header, "Total: 2 findings across all pages") {
+		t.Errorf("Header should contain total findings count, got: %s", header)
 	}
 
 	if !contains(header, "Critical: 1") {

@@ -22,8 +22,6 @@ A Model Context Protocol (MCP) server implementation in Go that provides Veracod
   - Finding details
   - Workspace packaging
 
-<video src="https://github.com/dipsylala/veracodemcp-go/raw/main/docs/media/mcp-package-scan-demo.mp4" controls></video>
-
 ## Installation
 
 ### Download from Releases
@@ -175,6 +173,12 @@ Add to `claude_desktop_config.json`:
     }
   }
 }
+```
+
+**Claude CLI**
+
+```bash
+ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 ```
 
 **VS Code:**

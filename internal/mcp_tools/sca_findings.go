@@ -32,7 +32,7 @@ type ScaFindingsRequest struct {
 // parseScaFindingsRequest extracts and validates parameters from the raw args map
 func parseScaFindingsRequest(args map[string]interface{}) (*ScaFindingsRequest, error) {
 	req := &ScaFindingsRequest{
-		Size: 200,
+		Size: 50,
 		Page: 0,
 	}
 
