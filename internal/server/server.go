@@ -38,12 +38,25 @@ func WithUICapability(ctx context.Context, supportsUI bool) context.Context {
 var embeddedPipelineResultsHTML string
 var embeddedStaticFindingsHTML string
 var embeddedDynamicFindingsHTML string
+var embeddedInstructions string
 
 // SetUIResources sets the embedded UI resources from the main package
 func SetUIResources(pipeline, staticFindings, dynamicFindings string) {
 	embeddedPipelineResultsHTML = pipeline
 	embeddedStaticFindingsHTML = staticFindings
 	embeddedDynamicFindingsHTML = dynamicFindings
+}
+
+// SetInstructions sets the embedded instructions from the main package
+func SetInstructions(instructionsData []byte) {
+	var data struct {
+		Instructions string `json:"instructions"`
+	}
+	if err := json.Unmarshal(instructionsData, &data); err != nil {
+		log.Printf("Warning: failed to parse instructions.json: %v", err)
+		return
+	}
+	embeddedInstructions = data.Instructions
 }
 
 // MCPServer represents the core MCP server that handles protocol communication

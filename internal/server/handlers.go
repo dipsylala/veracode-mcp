@@ -164,6 +164,7 @@ func (s *MCPServer) buildInitializeResult(initParams *InitializeParams) *Initial
 			Name:    "veracode-mcp-server",
 			Version: serverVersion,
 		},
+		Instructions: embeddedInstructions,
 	}
 }
 

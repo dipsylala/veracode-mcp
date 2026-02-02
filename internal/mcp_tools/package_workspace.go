@@ -131,7 +131,6 @@ func executePackagingCommand(ctx context.Context, req *PackageWorkspaceRequest, 
 	// Build command arguments
 	cmdArgs := []string{
 		"package",
-		"-s",              // Include source files
 		"-t", "directory", // Target type is directory
 		"-a",                      // Trust the source directory
 		"-s", req.ApplicationPath, // Source directory
