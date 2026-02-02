@@ -9,7 +9,7 @@ This vulnerability occurs when user input is used to construct file or directory
 - Never use untrusted data directly as file names or path components
 - Map external identifiers to server-controlled filenames using whitelists or indirect references
 - Enforce canonical path validation and containment within safe directories
-- Apply defense-in-depth with both input validation and filesystem-level restrictions
+- Apply defence-in-depth with both input validation and filesystem-level restrictions
 - Use platform-safe path handling libraries to prevent traversal attacks
 
 ## Remediation Steps

@@ -9,7 +9,7 @@ This vulnerability occurs when applications include code, libraries, or function
 - Never execute or load functionality without explicitly verifying its integrity and provenance
 - Restrict all executable code to trusted, controlled sources with verified authenticity
 - Implement strict validation and verification mechanisms for any dynamically loaded components
-- Apply defense-in-depth by combining source verification, integrity checks, and runtime controls
+- Apply defence-in-depth by combining source verification, integrity checks, and runtime controls
 
 ## Remediation Steps
 

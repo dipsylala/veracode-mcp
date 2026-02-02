@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-Path Traversal in JavaScript/Node.js occurs when applications use unsanitized user input to construct file paths, allowing attackers to access files outside intended directories using sequences like `../`. The primary defense is indirect reference mapping (mapping user IDs to files) rather than accepting direct file paths. When direct paths are necessary, validate against an allowlist and resolve paths to ensure they remain within the intended directory.
+Path Traversal in JavaScript/Node.js occurs when applications use unsanitized user input to construct file paths, allowing attackers to access files outside intended directories using sequences like `../`.
+
+**Primary Defence:** Use indirect reference mapping (mapping user IDs to files) rather than accepting direct file paths. When direct paths are necessary, validate against an allowlist and resolve paths to ensure they remain within the intended directory.
 
 ## Key Principles
 

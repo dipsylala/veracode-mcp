@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-CSRF occurs when state-changing endpoints don't validate that requests originated from the application itself, allowing attackers to forge authenticated requests from malicious sites. Enable Django's `CsrfViewMiddleware` with `{% csrf_token %}` in forms, or use Flask-WTF's `CSRFProtect` for automatic token validation. Configure `SESSION_COOKIE_SAMESITE='Strict'` as defense-in-depth.
+CSRF occurs when state-changing endpoints don't validate that requests originated from the application itself, allowing attackers to forge authenticated requests from malicious sites. Enable Django's `CsrfViewMiddleware` with `{% csrf_token %}` in forms, or use Flask-WTF's `CSRFProtect` for automatic token validation. Configure `SESSION_COOKIE_SAMESITE='Strict'` as defence-in-depth.
 
 ## Key Principles
 

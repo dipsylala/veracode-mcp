@@ -2,14 +2,16 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when applications incorporate untrusted data into OS commands without proper validation, allowing attackers to execute arbitrary commands on the host system. The primary defense is using Python native libraries (pathlib, requests, etc.) instead of system commands. If system calls are unavoidable, use `subprocess.run()` with argument lists and `shell=False`.
+OS Command Injection occurs when applications incorporate untrusted data into OS commands without proper validation, allowing attackers to execute arbitrary commands on the host system.
+
+**Primary Defence:** Use Python native libraries (pathlib, requests, etc.) instead of system commands. If system calls are unavoidable, use `subprocess.run()` with argument lists and `shell=False`.
 
 ## Key Principles
 
 - Use Python native libraries instead of executing system commands to eliminate vulnerability entirely
 - If subprocess is required, use `subprocess.run()` with argument lists and `shell=False` (never `shell=True`)
-- Implement allowlist-based input validation as defense in depth, never as sole protection
-- Apply least privilege principles and resource limits alongside other defenses
+- Implement allowlist-based input validation as defence in depth, never as sole protection
+- Apply least privilege principles and resource limits alongside other defences
 - Never concatenate user input into command strings
 
 ## Remediation Steps

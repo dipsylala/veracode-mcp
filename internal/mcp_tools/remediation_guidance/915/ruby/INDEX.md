@@ -6,11 +6,11 @@ Mass assignment vulnerabilities in Ruby on Rails occur when Rails automatically 
 
 ## Key Principles
 
-- **Allowlist only safe attributes** - Never permit all parameters; explicitly define permitted fields
-- **Separate create/update permissions** - Different actions may require different permitted attributes
-- **Protect administrative fields** - Never permit `role`, `is_admin`, `user_id`, or similar security fields
-- **Validate business logic** - Strong Parameters prevents mass assignment but doesn't validate values
-- **Avoid legacy patterns** - Never use `attr_accessible` or permit all with `params.permit!`
+- Allowlist only safe attributes - Never permit all parameters; explicitly define permitted fields
+- Separate create/update permissions - Different actions may require different permitted attributes
+- Protect administrative fields - Never permit `role`, `is_admin`, `user_id`, or similar security fields
+- Validate business logic - Strong Parameters prevents mass assignment but doesn't validate values
+- Avoid legacy patterns - Never use `attr_accessible` or permit all with `params.permit!`
 
 ## Remediation Steps
 

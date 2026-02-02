@@ -26,7 +26,7 @@ remediation_guidance/
 
 ## General CWE INDEX.md Structure
 
-**Location:** `{CWE_ID}/INDEX.md`
+Location: `{CWE_ID}/INDEX.md`
 
 Each general CWE INDEX.md file provides language-agnostic guidance and follows this structure:
 
@@ -41,10 +41,10 @@ Each general CWE INDEX.md file provides language-agnostic guidance and follows t
 
 ## Key Principles
 
-- {Principle 1: Primary defense mechanism}
+- {Principle 1: Primary Defence mechanism}
 - {Principle 2: What NOT to do}
 - {Principle 3: Data handling approach}
-- {Principle 4: Defense-in-depth considerations}
+- {Principle 4: Defence-in-depth considerations}
 - {Principle 5: Additional security controls}
 
 ## Remediation Steps
@@ -53,17 +53,17 @@ Each general CWE INDEX.md file provides language-agnostic guidance and follows t
 - {Step 2: Find the problematic pattern - describe what to look for}
 - {Step 3: Replace with secure pattern - describe the fix approach}
 - {Step 4: Implement the fix - describe technical implementation}
-- {Step 5: Add secondary defenses - describe validation/additional layers}
+- {Step 5: Add secondary defences - describe validation/additional layers}
 - {Step 6: Test - describe verification approach}
 ```
 
 ### Guidelines
 
-- **LLM Guidance**: Write for an LLM that will help developers fix code. Be direct and actionable
-- **Key Principles**: List 4-6 fundamental security principles that apply to this vulnerability class
-- **Remediation Steps**: Provide 4-8 sequential steps that guide from detection to verification
-- **Tone**: Technical, concise, and prescriptive
-- **Length**: Keep total content under 500 words for efficient LLM processing
+- LLM Guidance: Write for an LLM that will help developers fix code. Be direct and actionable
+- Key Principles: List 4-6 fundamental security principles that apply to this vulnerability class
+- Remediation Steps: Provide 4-8 sequential steps that guide from detection to verification
+- Tone: Technical, concise, and prescriptive
+- Length: Keep total content under 500 words for efficient LLM processing
 
 ### Example
 
@@ -73,7 +73,7 @@ See [89/INDEX.md](89/INDEX.md) for SQL Injection as a reference implementation.
 
 ## Language-Specific INDEX.md Structure
 
-**Location:** `{CWE_ID}/{language}/INDEX.md`
+Location: `{CWE_ID}/{language}/INDEX.md`
 
 Each language-specific INDEX.md file provides concrete, language-specific remediation guidance and code examples:
 
@@ -88,7 +88,7 @@ Each language-specific INDEX.md file provides concrete, language-specific remedi
 
 ## Key Principles
 
-- {Principle 1: Language-specific primary defense with API/framework names}
+- {Principle 1: Language-specific Primary Defence with API/framework names}
 - {Principle 2: Preferred language patterns/frameworks}
 - {Principle 3: Language-specific validation approaches}
 - {Principle 4: Framework-specific best practices}
@@ -96,12 +96,12 @@ Each language-specific INDEX.md file provides concrete, language-specific remedi
 
 ## Remediation Steps
 
-- **Locate** - {Identify source and sink with language-specific function names like `request.getParameter()`, `executeQuery()`}
-- **Trace data flow** - {Describe language-specific patterns to look for like string concatenation operators, formatting functions}
-- **Replace {anti-pattern}** - {Describe how to convert to secure pattern with specific API names and syntax}
-- **Bind parameters** - {Show how to bind/pass parameters using language-specific methods}
-- **Test** - {Describe testing approach with language-specific considerations}
-- **Review** - {Additional review steps or patterns to check}
+- Locate - {Identify source and sink with language-specific function names like `request.getParameter()`, `executeQuery()`}
+- Trace data flow - {Describe language-specific patterns to look for like string concatenation operators, formatting functions}
+- Replace {anti-pattern} - {Describe how to convert to secure pattern with specific API names and syntax}
+- Bind parameters - {Show how to bind/pass parameters using language-specific methods}
+- Test - {Describe testing approach with language-specific considerations}
+- Review - {Additional review steps or patterns to check}
 
 ## Safe Pattern
 
@@ -115,14 +115,14 @@ Each language-specific INDEX.md file provides concrete, language-specific remedi
 
 ### Guidelines
 
-- **Language/Framework Specificity**: Reference actual APIs, methods, classes, and packages
-- **Code Examples**: Include runnable code showing SAFE patterns (and optionally UNSAFE for contrast)
-- **Function Names**: Use actual function names from the language/framework (e.g., `PreparedStatement`, `setString()`, `createQuery()`)
-- **Syntax**: Use correct language syntax with proper code fencing
-- **Imports**: Include necessary import statements when they're not obvious
-- **Comments**: Mark examples clearly as SAFE or UNSAFE
-- **Length**: Keep under 800 words; focus on the most common/important patterns
-- **Version Awareness**: Prefer modern language versions but note if older patterns are still common
+- Language/Framework Specificity: Reference actual APIs, methods, classes, and packages
+- Code Examples: Include runnable code showing SAFE patterns (and optionally UNSAFE for contrast)
+- Function Names: Use actual function names from the language/framework (e.g., `PreparedStatement`, `setString()`, `createQuery()`)
+- Syntax: Use correct language syntax with proper code fencing
+- Imports: Include necessary import statements when they're not obvious
+- Comments: Mark examples clearly as SAFE or UNSAFE
+- Length: Keep under 800 words; focus on the most common/important patterns
+- Version Awareness: Prefer modern language versions but note if older patterns are still common
 
 ### Example
 

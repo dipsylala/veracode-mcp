@@ -8,7 +8,7 @@ Cross-Site Scripting (CWE-79) occurs when untrusted data is included in web page
 
 - Always encode output based on context (HTML entity encoding for HTML content, JavaScript encoding for JS contexts, URL encoding for URLs)
 - Use established encoding libraries like OWASP Java Encoder or Spring's HtmlUtils rather than custom sanitization
-- Validate and sanitize input as defense-in-depth, but never rely on input validation alone
+- Validate and sanitize input as defence-in-depth, but never rely on input validation alone
 - Set Content Security Policy (CSP) headers to restrict script execution sources
 - Use HTML templating engines with auto-escaping enabled by default
 

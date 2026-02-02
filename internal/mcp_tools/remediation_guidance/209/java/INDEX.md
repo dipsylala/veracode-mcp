@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-Error Message Information Leak occurs when Java applications expose exception stack traces, SQL errors, or internal system details through HTTP responses, logs, or error pages. Java's detailed exception hierarchy aids debugging but becomes dangerous when exposed to untrusted users. **Primary Defence:** Return generic error messages to users while logging detailed exceptions server-side using `@ControllerAdvice` or exception handlers to centralize error handling.
+Error Message Information Leak occurs when Java applications expose exception stack traces, SQL errors, or internal system details through HTTP responses, logs, or error pages. Java's detailed exception hierarchy aids debugging but becomes dangerous when exposed to untrusted users.
+
+**Primary Defence:** Return generic error messages to users while logging detailed exceptions server-side using `@ControllerAdvice` or exception handlers to centralize error handling.
 
 ## Key Principles
 

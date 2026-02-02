@@ -23,5 +23,5 @@ Calling System.exit() in J2EE applications terminates the entire application ser
 
 ## Wrong vs. Right Pattern
 
-- **Wrong:** `if (error) { System.exit(1); }` — kills entire application server
-- **Right:** `if (error) { throw new ServletException("Error message"); }` — terminates request, logs error, server continues
+- Wrong: `if (error) { System.exit(1); }` - kills entire application server
+- Right: `if (error) { throw new ServletException("Error message"); }` - terminates request, logs error, server continues

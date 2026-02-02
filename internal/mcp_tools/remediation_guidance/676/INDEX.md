@@ -6,11 +6,11 @@ Dangerous functions (strcpy, gets, system, eval, exec) lack bounds checking, ena
 
 ## Key Principles
 
-- **Replace unsafe string functions** with bounds-checked alternatives: strcpy → strncpy/snprintf/strlcpy, gets → fgets, sprintf → snprintf
-- **Replace command execution** with parameterized alternatives: system/os.system → subprocess with argument arrays, shell=False
-- **Use secure crypto/random functions**: rand() → RAND_bytes, /dev/random, secrets module
-- **Ban dangerous functions** in security-sensitive code through linting rules, static analysis, and code review policies
-- **Add validation layers** if dangerous functions cannot be replaced: strict input validation, bounds checking, allowlisting
+- Replace unsafe string functions with bounds-checked alternatives: strcpy → strncpy/snprintf/strlcpy, gets → fgets, sprintf → snprintf
+- Replace command execution with parameterized alternatives: system/os.system → subprocess with argument arrays, shell=False
+- Use secure crypto/random functions: rand() → RAND_bytes, /dev/random, secrets module
+- Ban dangerous functions in security-sensitive code through linting rules, static analysis, and code review policies
+- Add validation layers if dangerous functions cannot be replaced: strict input validation, bounds checking, allowlisting
 
 ## Remediation Steps
 

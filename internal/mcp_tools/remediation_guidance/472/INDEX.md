@@ -6,7 +6,7 @@ Assumed-immutable parameter vulnerabilities occur when applications trust that c
 
 ## Key Principles
 
-- Never trust client-side data as immutable—always validate server-side
+- Never trust client-side data as immutable-always validate server-side
 - Recompute critical values (prices, permissions, quotas) from authoritative sources
 - Store authoritative state server-side (sessions, databases), not in client parameters
 - Validate all inputs even if marked "disabled" or "hidden" in UI
@@ -19,4 +19,4 @@ Assumed-immutable parameter vulnerabilities occur when applications trust that c
 - Implement server-side validation - Verify all client-supplied values against authoritative server-side sources
 - Recompute critical values - Calculate prices, quotas, and permissions from database/session data, not client parameters
 - Use secure tokens - For parameters requiring client storage, apply cryptographic signatures (HMAC) to detect tampering
-- Apply defense-in-depth - Combine server-side validation with session management and access controls
+- Apply defence-in-depth - Combine server-side validation with session management and access controls

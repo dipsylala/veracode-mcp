@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-Log Injection occurs when untrusted data is written to log files without sanitization, allowing attackers to forge log entries, hide malicious activity, or inject malicious content into log viewing tools. The primary defense is structured logging with JSON formatters (Microsoft.Extensions.Logging with JSON output or Serilog) that automatically encode control characters within structured fields. For manual logging, encode all control characters: ASCII controls (0x00-0x1F), DEL (0x7F), C1 controls (0x80-0x9F), and Unicode line separators (U+0085, U+2028, U+2029).
+Log Injection occurs when untrusted data is written to log files without sanitization, allowing attackers to forge log entries, hide malicious activity, or inject malicious content into log viewing tools.
+
+**Primary Defence:** is structured logging with JSON formatters (Microsoft.Extensions.Logging with JSON output or Serilog) that automatically encode control characters within structured fields. For manual logging, encode all control characters: ASCII controls (0x00-0x1F), DEL (0x7F), C1 controls (0x80-0x9F), and Unicode line separators (U+0085, U+2028, U+2029).
 
 ## Key Principles
 

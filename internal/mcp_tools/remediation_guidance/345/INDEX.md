@@ -10,7 +10,7 @@ Insufficient verification of data authenticity occurs when applications don't va
 - Use cryptographic signatures or MACs to verify data has not been modified
 - Validate data authenticity at trust boundaries before processing
 - Implement server-side verification; never rely solely on client-side checks
-- Apply defense-in-depth with multiple verification layers for critical data
+- Apply defence-in-depth with multiple verification layers for critical data
 
 ## Remediation Steps
 

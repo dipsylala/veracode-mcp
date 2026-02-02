@@ -2,13 +2,15 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when untrusted data is incorporated into OS commands without proper validation, allowing attackers to execute arbitrary commands on the host system. The primary defense is to use Java native APIs (Files, HttpClient, etc.) instead of system commands to eliminate the vulnerability entirely. If system commands are unavoidable, use ProcessBuilder with argument arrays and never invoke a shell or concatenate strings.
+OS Command Injection occurs when untrusted data is incorporated into OS commands without proper validation, allowing attackers to execute arbitrary commands on the host system.
+
+**Primary Defence:** Use Java native APIs (Files, HttpClient, etc.) instead of system commands to eliminate the vulnerability entirely. If system commands are unavoidable, use ProcessBuilder with argument arrays and never invoke a shell or concatenate strings.
 
 ## Key Principles
 
 - Use Java native APIs instead of system calls (Files.copy, HttpClient, ProcessHandle) to eliminate command injection risk
-- Use ProcessBuilder with argument arrays if commands are unavoidable—separate command from arguments, never use string concatenation or shell interpretation
-- Apply allowlist input validation as defense-in-depth, never as sole protection
+- Use ProcessBuilder with argument arrays if commands are unavoidable-separate command from arguments, never use string concatenation or shell interpretation
+- Apply allowlist input validation as defence-in-depth, never as sole protection
 - Run with least privilege by configuring minimal OS permissions for processes
 - Never use Runtime.exec() or shell invocation with any user-controlled input
 

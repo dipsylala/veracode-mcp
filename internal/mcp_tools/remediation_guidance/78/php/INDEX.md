@@ -2,13 +2,15 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when applications execute OS commands with untrusted data without proper sanitization, allowing attackers to run arbitrary commands on the host system. The primary defense is using PHP native functions (scandir, cURL, ZipArchive) instead of system commands. If system calls are unavoidable, use `proc_open()` with argument arrays and `bypass_shell => true`.
+OS Command Injection occurs when applications execute OS commands with untrusted data without proper sanitization, allowing attackers to run arbitrary commands on the host system.
+
+**Primary Defence:** Use PHP native functions (scandir, cURL, ZipArchive) instead of system commands. If system calls are unavoidable, use `proc_open()` with argument arrays and `bypass_shell => true`.
 
 ## Key Principles
 
 - Replace system calls entirely: Use PHP native functions instead of exec()/system()/shell_exec() to eliminate the vulnerability
 - Use proc_open() with bypass_shell: If system calls are required, pass arguments as arrays with `bypass_shell => true` option
-- Apply defense-in-depth: Implement allowlist validation and `escapeshellarg()` as additional layers, never as primary defense
+- Apply defence-in-depth: Implement allowlist validation and `escapeshellarg()` as additional layers, never as primary defence
 - Harden environment: Disable dangerous functions in php.ini and apply least privilege permissions
 
 ## Remediation Steps

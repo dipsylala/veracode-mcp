@@ -10,7 +10,7 @@ LDAP Injection occurs when untrusted user input is used to construct LDAP querie
 - Escape special LDAP characters using framework-specific encoding functions
 - Apply strict allowlist validation for filter components
 - Minimize search scope and restrict returned attributes
-- Implement defense-in-depth with input validation, output encoding, and least privilege
+- Implement defence-in-depth with input validation, output encoding, and least privilege
 
 ## Remediation Steps
 

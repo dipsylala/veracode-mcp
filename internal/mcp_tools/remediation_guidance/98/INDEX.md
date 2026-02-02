@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-Remote File Inclusion (RFI) in PHP occurs when untrusted input is used in file inclusion functions (`include`, `require`, `include_once`, `require_once`) without proper validation, allowing attackers to execute arbitrary code from remote sources. The core fix is to never allow untrusted input to select files for inclusion—use allowlists and disable remote file inclusion entirely.
+Remote File Inclusion (RFI) in PHP occurs when untrusted input is used in file inclusion functions (`include`, `require`, `include_once`, `require_once`) without proper validation, allowing attackers to execute arbitrary code from remote sources. The core fix is to never allow untrusted input to select files for inclusion-use allowlists and disable remote file inclusion entirely.
 
 ## Key Principles
 

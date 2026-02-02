@@ -10,7 +10,7 @@ External initialization vulnerabilities occur when applications initialize criti
 - Strict input validation - Validate all external configuration values against allowlists of acceptable values before use
 - Minimize external trust - Reduce reliance on environment variables, config files, and command-line arguments for security-critical settings
 - Immutable after init - Once validated and set, prevent runtime modification of trusted variables
-- Defense in depth - Combine validation with least privilege and sandboxing to limit impact of compromised values
+- Defence in depth - Combine validation with least privilege and sandboxing to limit impact of compromised values
 
 ## Remediation Steps
 

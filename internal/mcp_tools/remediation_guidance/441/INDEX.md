@@ -10,7 +10,7 @@ Unintended proxy vulnerabilities occur when applications forward requests to arb
 - Implement strict allowlists - only permit connections to explicitly approved domains, IPs, and ports
 - Authenticate and authorize the true caller - verify who is making the request and what they're permitted to access
 - Constrain delegated actions - limit what the proxy can do even for authorized requests
-- Apply defense in depth - combine input validation, network controls, and runtime restrictions
+- Apply defence in depth - combine input validation, network controls, and runtime restrictions
 
 ## Remediation Steps
 

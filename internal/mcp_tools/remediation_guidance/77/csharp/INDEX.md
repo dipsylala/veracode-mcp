@@ -2,23 +2,26 @@
 
 ## LLM Guidance
 
-Command injection in .NET occurs when applications construct system commands using untrusted input through Process class and related APIs, allowing attackers to execute arbitrary commands. The primary defense is avoiding shell execution by setting `UseShellExecute = false` and passing arguments as arrays instead of concatenating strings. Always validate user input against strict allowlists before using in command construction.
+Command injection in .NET occurs when applications construct system commands using untrusted input through Process class and related APIs, allowing attackers to execute arbitrary commands.
+
+**Primary Defence:** Use .NET native APIs (File, Directory, HttpClient, etc.) instead of executing system commands to eliminate the vulnerability entirely. If system commands are unavoidable, set `UseShellExecute = false` and use `ProcessStartInfo.ArgumentList` with argument arrays.
 
 ## Key Principles
 
-- Avoid shell execution entirely by setting `UseShellExecute = false`
-- Pass arguments as arrays using `ArgumentList` collection, never concatenate strings
-- Validate all user input against strict allowlists (e.g., alphanumeric patterns)
-- Use absolute paths for executable files
+- **BEST:** Use .NET native APIs (File, Directory, HttpClient) instead of Process.Start() to eliminate command injection risk
+- **If commands unavoidable:** Set `UseShellExecute = false` and use `ProcessStartInfo.ArgumentList` with argument arrays
+- Never concatenate strings or use shell execution with untrusted input
+- Validate all user input against strict allowlists as defence-in-depth
+- Use absolute paths for executable files to prevent PATH injection
 - Apply least privilege principles to process execution
 
 ## Remediation Steps
 
-- Set `ProcessStartInfo.UseShellExecute = false` to prevent shell interpretation
-- Use `ProcessStartInfo.ArgumentList.Add()` to pass individual arguments safely
-- Validate input against allowlists before use
+- **Replace system commands with .NET native APIs** (File.Copy, Directory.Delete, HttpClient, etc.) to eliminate vulnerability
+- If commands are unavoidable, set `ProcessStartInfo.UseShellExecute = false` to prevent shell interpretation
+- Use `ProcessStartInfo.ArgumentList.Add()` (.NET 6+) to pass individual arguments safely
+- Validate input against allowlists as additional defence
 - Specify full executable paths to prevent PATH injection
-- Implement input sanitization for unavoidable dynamic values
 - Log and monitor all system command executions
 
 ## Safe Pattern

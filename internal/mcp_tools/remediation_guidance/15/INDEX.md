@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-This vulnerability occurs when user input controls system or application configuration settings, allowing attackers to alter application behavior, security controls, or environment variables. The core fix is to never allow untrusted input to directly control configuration—all settings must be defined and enforced by trusted code.
+This vulnerability occurs when user input controls system or application configuration settings, allowing attackers to alter application behavior, security controls, or environment variables. The core fix is to never allow untrusted input to directly control configuration-all settings must be defined and enforced by trusted code.
 
 ## Key Remediation Principles
 

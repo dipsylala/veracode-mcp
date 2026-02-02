@@ -8,9 +8,9 @@ XML External Entity (XXE) injection occurs when XML input containing a reference
 
 - Disable XML external entities and DTD processing by default in all parsers
 - Only enable external entity resolution if explicitly required and with strict security constraints
-- Server must fully control XML parsing behavior—never trust parser defaults
+- Server must fully control XML parsing behavior-never trust parser defaults
 - Use the most restrictive parser configuration possible for your use case
-- Apply defense-in-depth: input validation combined with secure parser settings
+- Apply defence-in-depth: input validation combined with secure parser settings
 
 ## Remediation Steps
 

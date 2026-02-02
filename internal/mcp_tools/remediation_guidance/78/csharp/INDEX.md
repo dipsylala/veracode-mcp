@@ -2,15 +2,17 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when untrusted data is incorporated into operating system commands without proper validation, allowing attackers to execute arbitrary commands. Use .NET native APIs (File, Directory, HttpClient) instead of system commands. If unavoidable, use `ProcessStartInfo.ArgumentList` (.NET 6+) with `UseShellExecute = false`.
+OS Command Injection occurs when untrusted data is incorporated into operating system commands without proper validation, allowing attackers to execute arbitrary commands.
+
+**Primary Defence:** Use .NET native APIs (File, Directory, HttpClient) instead of system commands. If unavoidable, use `ProcessStartInfo.ArgumentList` (.NET 6+) with `UseShellExecute = false`.
 
 ## Key Principles
 
-- **Eliminate the risk**: Use .NET native APIs instead of Process.Start() whenever possible
-- **Disable shell execution**: Set `UseShellExecute = false` to prevent shell interpretation
-- **Use ArgumentList**: Prefer `ProcessStartInfo.ArgumentList` (.NET 6+) over command strings
-- **Validate inputs**: Allowlist permitted characters as defense-in-depth (never rely on validation alone)
-- **Apply least privilege**: Run processes with minimal permissions
+- Eliminate the risk: Use .NET native APIs instead of Process.Start() whenever possible
+- Disable shell execution: Set `UseShellExecute = false` to prevent shell interpretation
+- Use ArgumentList: Prefer `ProcessStartInfo.ArgumentList` (.NET 6+) over command strings
+- Validate inputs: Allowlist permitted characters as defence-in-depth (never rely on validation alone)
+- Apply least privilege: Run processes with minimal permissions
 
 ## Remediation Steps
 

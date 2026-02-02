@@ -8,7 +8,7 @@ Formula Injection (also known as CSV Injection or Excel Injection) occurs when u
 
 - Treat all spreadsheet exports as potential code execution vectors requiring input sanitization
 - Neutralize formula metacharacters (=, +, -, @) at export time before writing to cells
-- Apply defense-in-depth by combining prefix detection, sanitization, and CSV-safe encoding
+- Apply defence-in-depth by combining prefix detection, sanitization, and CSV-safe encoding
 - Validate all untrusted data sources (user input, databases, external files) before export
 - Use established libraries that handle formula injection protection automatically
 

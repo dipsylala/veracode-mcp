@@ -6,11 +6,11 @@ Authorization bypass through user-controlled keys (IDOR) occurs when Python web 
 
 ## Key Principles
 
-- **Never trust user-controlled resource identifiers** - Always validate ownership before returning data
-- **Implement access control checks at the data layer** - Verify `resource.owner_id == current_user.id`
-- **Use framework-level authorization decorators** - Enforce permissions consistently across endpoints
-- **Query by composite keys** - Filter by both resource ID and user ID: `filter(id=doc_id, user_id=current_user.id)`
-- **Return 404 instead of 403** - Avoid leaking resource existence information
+- Never trust user-controlled resource identifiers - Always validate ownership before returning data
+- Implement access control checks at the data layer - Verify `resource.owner_id == current_user.id`
+- Use framework-level authorization decorators - Enforce permissions consistently across endpoints
+- Query by composite keys - Filter by both resource ID and user ID: `filter(id=doc_id, user_id=current_user.id)`
+- Return 404 instead of 403 - Avoid leaking resource existence information
 
 ## Remediation Steps
 

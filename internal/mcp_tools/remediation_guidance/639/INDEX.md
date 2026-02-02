@@ -6,7 +6,7 @@ Insecure Direct Object Reference (IDOR) occurs when applications expose direct r
 
 ## Key Principles
 
-- Verify user authorization for every object access—never trust user-supplied identifiers
+- Verify user authorization for every object access-never trust user-supplied identifiers
 - Check both existence AND ownership before returning objects
 - Use query filters or ACL lookups to enforce object-level permissions
 - Return consistent error responses (403/404) that don't reveal whether objects exist

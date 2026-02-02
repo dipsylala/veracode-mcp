@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-Improper ownership management occurs when files, directories, or resources are created with incorrect ownership, allowing unauthorized modification, privilege escalation, or data tampering by unintended users. Core fix: Set explicit ownership on all resources and verify it—never assume safe defaults.
+Improper ownership management occurs when files, directories, or resources are created with incorrect ownership, allowing unauthorized modification, privilege escalation, or data tampering by unintended users. Core fix: Set explicit ownership on all resources and verify it-never assume safe defaults.
 
 ## Key Principles
 

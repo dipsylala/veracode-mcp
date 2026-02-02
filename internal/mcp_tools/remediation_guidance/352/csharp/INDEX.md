@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-CSRF vulnerabilities occur when state-changing endpoints don't verify requests originated from the application itself, allowing attackers to perform actions on behalf of authenticated users. ASP.NET Core provides built-in anti-forgery token support that should be enabled on all state-changing operations. The primary defense is using `[ValidateAntiForgeryToken]` attribute on POST/PUT/DELETE actions or enabling automatic validation globally.
+CSRF vulnerabilities occur when state-changing endpoints don't verify requests originated from the application itself, allowing attackers to perform actions on behalf of authenticated users. ASP.NET Core provides built-in anti-forgery token support that should be enabled on all state-changing operations.
+
+**Primary Defence:** Use `[ValidateAntiForgeryToken]` attribute on POST/PUT/DELETE actions or enabling automatic validation globally.
 
 ## Key Principles
 

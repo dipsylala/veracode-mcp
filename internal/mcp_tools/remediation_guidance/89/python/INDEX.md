@@ -2,13 +2,15 @@
 
 ## LLM Guidance
 
-SQL Injection occurs when untrusted user input is incorporated into SQL queries without proper sanitization, allowing attackers to manipulate query logic, extract data, or execute unauthorized database operations. Python's database libraries (sqlite3, psycopg2, mysql-connector) all support parameterized queries, which is the primary defense mechanism. Always use parameterized queries instead of string concatenation or f-strings when building SQL statements.
+SQL Injection occurs when untrusted user input is incorporated into SQL queries without proper sanitization, allowing attackers to manipulate query logic, extract data, or execute unauthorized database operations.
+
+**Primary Defence:** Use parameterized queries provided by Python's database libraries (sqlite3, psycopg2, mysql-connector). Always use parameterized queries instead of string concatenation or f-strings when building SQL statements.
 
 ## Key Principles
 
 - Use parameterized queries exclusively - Never concatenate user input into SQL strings
 - Employ ORM frameworks - Use SQLAlchemy, Django ORM, or similar frameworks that handle parameterization
-- Apply input validation - Validate data types, formats, and ranges as a secondary defense layer
+- Apply input validation - Validate data types, formats, and ranges as a secondary defence layer
 - Use least privilege - Database accounts should have minimal necessary permissions
 - Escape dynamic identifiers - When table/column names must be dynamic, use allowlisting
 

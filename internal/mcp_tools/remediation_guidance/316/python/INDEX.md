@@ -7,7 +7,7 @@ Storing sensitive data (passwords, API keys, cryptographic keys) in memory as cl
 ## Key Principles
 
 - Use mutable types (`bytearray`) instead of immutable strings for sensitive data
-- Minimize the lifetime of secrets in memory—clear immediately after use
+- Minimize the lifetime of secrets in memory-clear immediately after use
 - Avoid operations that create copies of sensitive data (string concatenation, logging)
 - Use secure input methods (`getpass`) and avoid printing/logging credentials
 - Consider memory-locking libraries (`mlock`) for highly sensitive applications

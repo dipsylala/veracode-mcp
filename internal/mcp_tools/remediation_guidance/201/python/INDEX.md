@@ -36,5 +36,5 @@ class UserResponse(BaseModel):
 @app.get("/users/{user_id}", response_model=UserResponse)
 async def get_user(user_id: int):
     user = db.get_user(user_id)
-    return UserResponse(**user.dict())  # Only whitelisted fields returned
+    return UserResponse(user.dict())  # Only whitelisted fields returned
 ```

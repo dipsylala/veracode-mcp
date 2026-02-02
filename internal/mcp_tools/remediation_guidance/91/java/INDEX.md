@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-XML Injection in Java occurs when untrusted user input is used to construct XML documents without proper validation or escaping. Attackers inject special characters (`<`, `>`, `&`, `'`, `"`) to manipulate XML structure, potentially causing data corruption, authentication bypass, or information disclosure. **Primary Defense:** Use DOM API methods (`DocumentBuilder`, `Element.setAttribute()`, `Element.setTextContent()`) or sanitize input by escaping XML metacharacters.
+XML Injection in Java occurs when untrusted user input is used to construct XML documents without proper validation or escaping. Attackers inject special characters (`<`, `>`, `&`, `'`, `"`) to manipulate XML structure, potentially causing data corruption, authentication bypass, or information disclosure.
+
+**Primary Defence:** Use DOM API methods (`DocumentBuilder`, `Element.setAttribute()`, `Element.setTextContent()`) or sanitize input by escaping XML metacharacters.
 
 ## Key Principles
 

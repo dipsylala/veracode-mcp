@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-Using reference equality (`==`) instead of value equality (`.equals()`) for string comparison in **Java** compares memory addresses, not content, causing security checks to fail unpredictably when strings are dynamically created vs literals, enabling authentication bypass and logic errors. **Note:** In C#, `==` is overloaded for strings and performs value comparison, making it safe to use.
+Using reference equality (`==`) instead of value equality (`.equals()`) for string comparison in Java compares memory addresses, not content, causing security checks to fail unpredictably when strings are dynamically created vs literals, enabling authentication bypass and logic errors. Note: In C#, `==` is overloaded for strings and performs value comparison, making it safe to use.
 
 **Primary Defence:** Always use `.equals()` in Java for string content comparison; use constant-first pattern for null safety; prefer enums over strings for security-critical values like roles and permissions. In C#, both `==` and `.Equals()` work for string comparison, though `.Equals()` with `StringComparison` options provides more control.
 

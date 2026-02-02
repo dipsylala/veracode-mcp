@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-CRLF Injection occurs when untrusted input containing carriage return (`\r`) and line feed (`\n`) characters is used in HTTP headers or protocol fields without validation, enabling HTTP response splitting, header injection, cache poisoning, and XSS attacks. The primary defense is to strip or reject newline characters from all user input before using it in headers or protocol-sensitive contexts.
+CRLF Injection occurs when untrusted input containing carriage return (`\r`) and line feed (`\n`) characters is used in HTTP headers or protocol fields without validation, enabling HTTP response splitting, header injection, cache poisoning, and XSS attacks.
+
+**Primary Defence:** Strip or reject newline characters from all user input before using it in headers or protocol-sensitive contexts.
 
 ## Key Principles
 

@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-XSS occurs when untrusted data is included in web output without proper encoding, allowing attackers to inject malicious scripts. Python frameworks like Django and Flask provide auto-escaping in templates—use `{{ variable }}` syntax and keep auto-escaping enabled. For manual encoding, use `html.escape()` or `bleach.clean()` with allowlists for rich content.
+XSS occurs when untrusted data is included in web output without proper encoding, allowing attackers to inject malicious scripts. Python frameworks like Django and Flask provide auto-escaping in templates-use `{{ variable }}` syntax and keep auto-escaping enabled. For manual encoding, use `html.escape()` or `bleach.clean()` with allowlists for rich content.
 
 ## Key Principles
 

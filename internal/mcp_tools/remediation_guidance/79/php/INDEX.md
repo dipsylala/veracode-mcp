@@ -9,7 +9,7 @@ XSS occurs when untrusted data is rendered in web pages without proper encoding,
 - Use output encoding appropriate to the context (HTML, JavaScript, URL, CSS)
 - Enable auto-escaping in templating engines by default
 - Never trust user input or data from external sources
-- Implement Content Security Policy (CSP) headers as defense-in-depth
+- Implement Content Security Policy (CSP) headers as defence-in-depth
 - Validate and sanitize input at application boundaries
 
 ## Remediation Steps

@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-Path Traversal occurs when user input constructs file paths without validation, allowing attackers to use `../` sequences or absolute paths to access files outside the intended directory. This can expose sensitive files like `/etc/passwd` or `WEB-INF/web.xml`. The primary defense is using indirect reference mapping (map IDs to filenames) or validating with `Path.normalize()` and checking the canonical path stays within allowed directories.
+Path Traversal occurs when user input constructs file paths without validation, allowing attackers to use `../` sequences or absolute paths to access files outside the intended directory. This can expose sensitive files like `/etc/passwd` or `WEB-INF/web.xml`.
+
+**Primary Defence:** Use indirect reference mapping (map IDs to filenames) or validating with `Path.normalize()` and checking the canonical path stays within allowed directories.
 
 ## Key Principles
 

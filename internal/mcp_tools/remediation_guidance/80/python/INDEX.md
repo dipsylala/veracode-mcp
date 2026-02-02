@@ -12,7 +12,7 @@ XSS occurs when untrusted data is included in web output without proper encoding
 - Never mark untrusted data as safe: Avoid `mark_safe()`, `|safe` filter, or `Markup()` on user input
 - Context-aware encoding: Use appropriate escaping for HTML attributes, JavaScript, CSS, or URLs
 - Validate input types: Restrict input to expected formats before rendering
-- Content Security Policy: Implement CSP headers as defense-in-depth
+- Content Security Policy: Implement CSP headers as defence-in-depth
 
 ## Remediation Steps
 
