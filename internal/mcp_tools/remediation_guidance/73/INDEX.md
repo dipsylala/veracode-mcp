@@ -19,4 +19,4 @@ This vulnerability occurs when user input is used to construct file or directory
 - Implement whitelist validation - Use strict allowlists of permitted filenames or extensions before any file operation
 - Canonicalize and validate - Resolve paths to canonical form and verify they remain within intended base directories
 - Apply filesystem restrictions - Use chroot jails, restricted permissions, or platform APIs that enforce containment
-- Sanitize inputs - If paths must include user data, strip dangerous characters (`.`, `/`, `\`, `%`, ` -`) and reject absolute paths
+- Sanitize inputs - If paths must include user data, strip dangerous characters (`.`, `/`, `\`, `%`, `-`) and reject absolute paths
