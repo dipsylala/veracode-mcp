@@ -43,6 +43,7 @@ Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) requir
 *Windows (Admin PowerShell):*
 
 ```powershell
+Set-ExecutionPolicy AllSigned -Scope Process -Force
 iex (iwr https://tools.veracode.com/veracode-cli/install.ps1)
 ```
 
