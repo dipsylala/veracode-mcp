@@ -6,7 +6,7 @@ Trust boundary violations occur when untrusted data (user input, HTTP requests) 
 
 ## Key Principles
 
-- Treat trust boundaries explicitly—never allow data to cross without validation and authorization
+- Treat trust boundaries explicitly-never allow data to cross without validation and authorization
 - Apply least privilege when storing data in trusted contexts
 - Never assume session, cache, or internal object data is inherently safe
 - Validate and sanitize before storing untrusted data in trusted contexts

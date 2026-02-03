@@ -4,7 +4,7 @@
 
 In C, CWE-114 occurs when loading shared libraries (`dlopen()`, `LoadLibrary()`) or executing processes (`exec*()`, `CreateProcess()`) without proper validation. Attackers exploit this through DLL hijacking, LD_PRELOAD attacks, and path manipulation.
 
-**Primary Defense:** Use absolute paths, validate all inputs, disable unsafe search paths, and set secure file permissions.
+**Primary Defence**: Use absolute paths, validate all inputs, disable unsafe search paths, and set secure file permissions.
 
 ## Key Principles
 

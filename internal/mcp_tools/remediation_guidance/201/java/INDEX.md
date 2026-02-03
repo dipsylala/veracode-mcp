@@ -10,7 +10,7 @@ Java applications commonly leak sensitive information through HTTP responses, er
 - Use structured logging with explicit filtering of sensitive fields (passwords, tokens, API keys)
 - Configure frameworks to disable detailed error pages and debug information in production
 - Validate and sanitize all data before including in responses, especially user-controlled input
-- Apply principle of least privilege to error messages—only expose what users need
+- Apply principle of least privilege to error messages-only expose what users need
 
 ## Remediation Steps
 

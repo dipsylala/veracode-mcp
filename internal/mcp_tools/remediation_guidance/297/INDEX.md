@@ -10,7 +10,7 @@ Improper certificate hostname validation occurs when TLS/SSL clients don't verif
 - Applications must not bypass or weaken hostname verification (avoid SSL_VERIFY_NONE, check_hostname=False)
 - Use default SSL/TLS library configurations which enable hostname verification by default
 - Custom certificate validators must explicitly check CN/SAN fields against the target hostname
-- Hostname verification is separate from certificate chain validation—both are required
+- Hostname verification is separate from certificate chain validation-both are required
 
 ## Remediation Steps
 

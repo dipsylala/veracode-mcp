@@ -4,7 +4,7 @@
 
 Process control vulnerabilities in JavaScript/Node.js applications occur when untrusted user input controls process execution, lifecycle, or behavior. Node.js's `child_process` module and process management capabilities make these vulnerabilities particularly dangerous as attackers can spawn malicious processes, terminate critical services, or exhaust system resources. Always validate and sanitize input before using it in process-related operations, and use allowlists to restrict which processes can be controlled.
 
-**Key Security Issues:**
+Key Security Issues:
 
 - User input directly controls `child_process.spawn()`, `exec()`, or `fork()` parameters
 - Unsanitized input used in process arguments, environment variables, or working directories

@@ -10,7 +10,7 @@ Insecure Deserialization occurs when applications deserialize untrusted data wit
 - Implement cryptographic integrity checks (HMAC signatures) on all serialized data
 - Enforce strict type whitelisting and class instantiation controls
 - Isolate deserialization operations in sandboxed, low-privilege environments
-- Apply defense-in-depth: validation, monitoring, and runtime restrictions
+- Apply defence-in-depth: validation, monitoring, and runtime restrictions
 
 ## Remediation Steps
 

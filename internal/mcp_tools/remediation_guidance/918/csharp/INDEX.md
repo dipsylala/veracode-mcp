@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-Server-Side Request Forgery (SSRF) allows attackers to make the server perform HTTP requests to arbitrary destinations, potentially accessing internal services, cloud metadata endpoints (169.254.169.254), or bypassing firewalls. The primary defense is validating URLs against an allowlist of permitted domains/IPs, blocking private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x), and using `AllowAutoRedirect = false` to prevent redirect-based bypasses.
+Server-Side Request Forgery (SSRF) allows attackers to make the server perform HTTP requests to arbitrary destinations, potentially accessing internal services, cloud metadata endpoints (169.254.169.254), or bypassing firewalls.
+
+**Primary Defence:** Validate URLs against an allowlist of permitted domains/IPs, blocking private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x), and using `AllowAutoRedirect = false` to prevent redirect-based bypasses.
 
 ## Key Principles
 

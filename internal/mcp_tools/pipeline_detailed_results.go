@@ -24,25 +24,21 @@ type PipelineDetailedResultsRequest struct {
 
 // parsePipelineDetailedResultsRequest extracts and validates parameters from the raw args map
 func parsePipelineDetailedResultsRequest(args map[string]interface{}) (*PipelineDetailedResultsRequest, error) {
-	appPath, ok := args["application_path"].(string)
-	if !ok || appPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
+	req := &PipelineDetailedResultsRequest{}
+
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
 
-	var flawID int
-	switch v := args["flaw_id"].(type) {
-	case float64:
-		flawID = int(v)
-	case int:
-		flawID = v
-	default:
-		return nil, fmt.Errorf("flaw_id is required and must be an integer")
+	req.FlawID, err = extractFlawID(args)
+	if err != nil {
+		return nil, err
 	}
 
-	return &PipelineDetailedResultsRequest{
-		ApplicationPath: appPath,
-		FlawID:          flawID,
-	}, nil
+	return req, nil
 }
 
 // PipelineDetailedFlaw represents a detailed finding with data paths

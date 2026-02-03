@@ -10,7 +10,7 @@ External control of file names or paths occurs when user-supplied input construc
 - Canonicalize paths using `Path.GetFullPath()` to resolve traversal sequences (`../`, `..\\`)
 - Use allowlists for file extensions and names when possible
 - Never trust `IFormFile.FileName` or any user-controlled path input directly
-- Implement defense-in-depth with filesystem permissions
+- Implement defence-in-depth with filesystem permissions
 
 ## Remediation Steps
 

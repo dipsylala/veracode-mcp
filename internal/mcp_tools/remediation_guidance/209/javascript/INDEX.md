@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-Error Message Information Leak occurs when JavaScript applications expose sensitive details like stack traces, database queries, file paths, or internal system information through API responses, error pages, or console output. The core fix is to sanitize error responses in production by logging detailed errors server-side while returning generic messages to clients. Node.js frameworks (Express, Fastify, Koa, Next.js) require proper error middleware configuration to prevent disclosure.
+Error Message Information Leak occurs when JavaScript applications expose sensitive details like stack traces, database queries, file paths, or internal system information through API responses, error pages, or console output.
+
+**Primary Defence:** sanitize error responses in production by logging detailed errors server-side while returning generic messages to clients. Node.js frameworks (Express, Fastify, Koa, Next.js) require proper error middleware configuration to prevent disclosure.
 
 ## Key Principles
 

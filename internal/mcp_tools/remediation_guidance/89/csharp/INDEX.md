@@ -1,8 +1,10 @@
-# CWE-89: SQL Injection - C#
+# CWE-89: SQL Injection - C\#
 
 ## LLM Guidance
 
-SQL Injection occurs when untrusted data is incorporated into SQL queries without proper validation or parameterization, allowing attackers to manipulate queries to bypass authentication, access unauthorized data, modify/delete records, or execute administrative operations. The primary defense is using parameterized queries with `SqlCommand.Parameters`, Entity Framework LINQ queries, or Dapper with parameter binding.
+SQL Injection occurs when untrusted data is incorporated into SQL queries without proper validation or parameterization, allowing attackers to manipulate queries to bypass authentication, access unauthorized data, modify/delete records, or execute administrative operations.
+
+**Primary Defence:** Use parameterized queries with `SqlCommand.Parameters`, Entity Framework LINQ queries, or Dapper with parameter binding.
 
 ## Key Principles
 

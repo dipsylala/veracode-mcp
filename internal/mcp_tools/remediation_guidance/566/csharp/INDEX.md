@@ -1,4 +1,4 @@
-# CWE-566: Authorization Bypass Through User-Controlled Key - C#
+# CWE-566: Authorization Bypass Through User-Controlled Key - C\#
 
 ## LLM Guidance
 

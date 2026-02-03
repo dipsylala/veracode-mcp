@@ -10,7 +10,7 @@ This vulnerability occurs when applications download code or executables from ex
 - Download code only from trusted, authenticated sources over secure channels (HTTPS/TLS)
 - Implement checksum verification for all packages, plugins, scripts, and executables
 - Use package managers with built-in integrity checking and signed repositories
-- Fail securely if integrity verification fails—never execute unverified code
+- Fail securely if integrity verification fails-never execute unverified code
 
 ## Remediation Steps
 

@@ -8,7 +8,7 @@ Cleartext storage occurs when sensitive information (credentials, PII, financial
 
 - Never store sensitive information in cleartext; always encrypt or redact before persisting
 - Use strong encryption algorithms (AES-256) for data at rest
-- Implement defense-in-depth - combine database encryption, column-level encryption, and application-level encryption
+- Implement defence-in-depth - combine database encryption, column-level encryption, and application-level encryption
 - Protect encryption keys separately from encrypted data
 - Redact sensitive data from logs, cache, and temporary files
 

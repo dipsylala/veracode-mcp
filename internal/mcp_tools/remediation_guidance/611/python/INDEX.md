@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-Python XML parsing is risky for untrusted input because some parsers allow DTDs, entities, or entity expansion. Use `defusedxml` or configure parsers securely to prevent file disclosure, SSRF, and denial of service attacks. The primary defense is using `defusedxml` library as a drop-in replacement for standard XML parsers, which disables all dangerous features by default.
+Python XML parsing is risky for untrusted input because some parsers allow DTDs, entities, or entity expansion. Use `defusedxml` or configure parsers securely to prevent file disclosure, SSRF, and denial of service attacks.
+
+**Primary Defence:** Use `defusedxml` library as a drop-in replacement for standard XML parsers, which disables all dangerous features by default.
 
 ## Key Principles
 
@@ -10,7 +12,7 @@ Python XML parsing is risky for untrusted input because some parsers allow DTDs,
 - Disable DTD processing, external entities, and entity expansion in all XML parsers
 - Validate and sanitize XML input before parsing when possible
 - Avoid parsing untrusted XML with default configurations
-- Use secure parser configurations as defense-in-depth even with trusted sources
+- Use secure parser configurations as defence-in-depth even with trusted sources
 
 ## Remediation Steps
 

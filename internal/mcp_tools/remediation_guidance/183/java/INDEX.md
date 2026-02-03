@@ -10,7 +10,7 @@ Permissive input validation occurs when regex patterns or validation logic fails
 - Avoid `Matcher.find()` which only matches substrings, creating bypass opportunities
 - Implement strict length validation before regex processing to prevent ReDoS attacks
 - Use specialized validation classes (`URI`, `Path`, `InetAddress`) for structured data instead of regex
-- Apply defense-in-depth with multiple validation layers for critical inputs
+- Apply defence-in-depth with multiple validation layers for critical inputs
 
 ## Remediation Steps
 

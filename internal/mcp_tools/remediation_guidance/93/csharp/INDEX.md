@@ -30,7 +30,7 @@ public IActionResult SetCustomHeader(string userInput)
     // Remove CRLF characters
     var sanitized = Regex.Replace(userInput, @"[\r\n]", "");
     
-    // ASP.NET Core validates automatically, but explicit sanitization is defense-in-depth
+    // ASP.NET Core validates automatically, but explicit sanitization is defence-in-depth
     Response.Headers.Append("X-Custom-Header", sanitized);
     
     return Ok();

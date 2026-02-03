@@ -2,14 +2,14 @@
 
 ## LLM Guidance
 
-CWE-566 (Insecure Direct Object Reference/IDOR) occurs when applications use user-controlled identifiers directly in database lookups or access decisions without verifying the authenticated user is authorized to access that specific resource. This enables horizontal privilege escalation where attackers access other users' data by manipulating ID parameters. **Core fix:** Enforce object-level access control on every resource lookup—never trust user-controlled keys to bypass authorization.
+CWE-566 (Insecure Direct Object Reference/IDOR) occurs when applications use user-controlled identifiers directly in database lookups or access decisions without verifying the authenticated user is authorized to access that specific resource. This enables horizontal privilege escalation where attackers access other users' data by manipulating ID parameters. Core fix: Enforce object-level access control on every resource lookup-never trust user-controlled keys to bypass authorization.
 
 ## Key Principles
 
 - Validate ownership/authorization before every resource access, not just authentication
 - Use session-based ownership verification rather than trusting user-supplied IDs
 - Return consistent error codes (403 for unauthorized, 404 for not found) to prevent enumeration
-- Implement defense-in-depth with indirect references, access control lists, and audit logging
+- Implement defence-in-depth with indirect references, access control lists, and audit logging
 - Apply authorization checks at the data access layer, not just application layer
 
 ## Remediation Steps

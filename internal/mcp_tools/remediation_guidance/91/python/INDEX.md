@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-XML Injection occurs when untrusted input is used to construct XML documents without proper validation or escaping, allowing attackers to manipulate XML structure using special characters (`<`, `>`, `&`, `'`, `"`). This can lead to data corruption, authentication bypass, or information disclosure. **Primary Defense:** Use `xml.etree.ElementTree` or `lxml` with proper element creation methods instead of string concatenation, and validate/escape all user input.
+XML Injection occurs when untrusted input is used to construct XML documents without proper validation or escaping, allowing attackers to manipulate XML structure using special characters (`<`, `>`, `&`, `'`, `"`). This can lead to data corruption, authentication bypass, or information disclosure.
+
+**Primary Defence:** Use `xml.etree.ElementTree` or `lxml` with proper element creation methods instead of string concatenation, and validate/escape all user input.
 
 ## Key Principles
 

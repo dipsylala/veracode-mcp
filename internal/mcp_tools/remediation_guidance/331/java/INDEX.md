@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-Insufficient entropy in Java occurs when using `java.util.Random` or `Math.random()` instead of `java.security.SecureRandom` for cryptographic operations. The `Random` class produces predictable sequences that can be reproduced if the seed is known, making it unsuitable for security-sensitive operations like generating session tokens, encryption keys, or initialization vectors. **Use `java.security.SecureRandom` for all security-sensitive random value generation.**
+Insufficient entropy in Java occurs when using `java.util.Random` or `Math.random()` instead of `java.security.SecureRandom` for cryptographic operations. The `Random` class produces predictable sequences that can be reproduced if the seed is known, making it unsuitable for security-sensitive operations like generating session tokens, encryption keys, or initialization vectors. Use `java.security.SecureRandom` for all security-sensitive random value generation.
 
 ## Key Principles
 

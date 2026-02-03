@@ -55,11 +55,13 @@ This means you typically don't need to manually configure the region - just prov
 You can override automatic detection by explicitly setting the base URL:
 
 **Available Regions:**
+
 - `https://api.veracode.com` - US Region (default)
 - `https://api.veracode.eu` - European Region  
 - `https://api.veracode.us` - US Federal Region
 
 Configure the region in your `veracode.yml`:
+
 ```yaml
 api:
   key-id: YOUR_API_KEY_ID
@@ -68,6 +70,7 @@ api:
 ```
 
 Or via environment variable:
+
 ```bash
 export VERACODE_OVERRIDE_API_BASE_URL="https://api.veracode.eu"
 ```
@@ -77,6 +80,7 @@ export VERACODE_OVERRIDE_API_BASE_URL="https://api.veracode.eu"
 ## Setting Up Credentials File
 
 ### Linux/macOS
+
 ```bash
 mkdir -p ~/.veracode
 cat > ~/.veracode/veracode.yml << EOF
@@ -88,6 +92,7 @@ chmod 600 ~/.veracode/veracode.yml
 ```
 
 ### Windows PowerShell
+
 ```powershell
 New-Item -ItemType Directory -Path "$env:USERPROFILE\.veracode" -Force
 @"

@@ -6,7 +6,7 @@ This document describes how REST API calls are integrated with the MCP server to
 
 ## Package Structure
 
-```
+```text
 VeracodeMCP-Go/
 ├── api/                        # API package
 │   ├── client.go              # Client orchestrator (manages all API clients)
@@ -64,8 +64,7 @@ VeracodeMCP-Go/
 
 **One Tool → Multiple API Calls:**
 
-```
-
+```text
 get-dynamic-findings tool
 ├── api.GetDynamicFindings()
 ├── api.GetFindingByID()
@@ -74,8 +73,7 @@ get-dynamic-findings tool
 
 **One API Call → Multiple Tools:**
 
-```
-
+```text
 api.GetDynamicFindings()
 ├── get-dynamic-findings tool
 ├── compare-scans tool (future)
@@ -165,6 +163,7 @@ func (t *DynamicFindingsTool) handleGetDynamicFindings(ctx context.Context, para
 ## Authentication
 
 Environment variables required:
+
 - `VERACODE_API_ID` - Your Veracode API ID
 - `VERACODE_API_KEY` - Your Veracode API Secret Key
 
@@ -216,6 +215,7 @@ Run the regeneration script:
 ```
 
 This will:
+
 - Generate the client in `api/generated/new_api/`
 - Set the package name to `new_api`
 - Run `go mod tidy`
@@ -295,6 +295,7 @@ For simple APIs, skip the business logic layer and call the generated client dir
 ## Example: Real API Integration
 
 ### Current State (Placeholder)
+
 ```go
 // tools/api_health.go
 func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]interface{}) (interface{}, error) {
@@ -304,6 +305,7 @@ func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]i
 ```
 
 ### After Integration
+
 ```go
 // tools/api_health.go
 import "github.com/dipsylala/veracodemcp-go/api"
@@ -387,6 +389,7 @@ func TestGetDynamicFindings(t *testing.T) {
 - **Tool usage**: `tools/` package (imports api, uses business logic or client directly)
 
 **Many:many relationships handled by:**
+
 - API business logic shared across multiple tools
 - Tools can call multiple API business logic functions
 - Clean separation via 3-layer architecture: tools → business logic → generated clients

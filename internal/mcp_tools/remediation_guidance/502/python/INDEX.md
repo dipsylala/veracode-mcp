@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-Python's `pickle` module executes arbitrary code during deserialization, enabling remote code execution when unpickling untrusted data. Attackers craft malicious pickle payloads that invoke `__reduce__` or `__setstate__` methods to run system commands. **Primary fix:** Replace pickle with JSON (`json.loads()`), MessagePack, or Protocol Buffers for all untrusted data.
+Python's `pickle` module executes arbitrary code during deserialization, enabling remote code execution when unpickling untrusted data. Attackers craft malicious pickle payloads that invoke `__reduce__` or `__setstate__` methods to run system commands. Primary fix: Replace pickle with JSON (`json.loads()`), MessagePack, or Protocol Buffers for all untrusted data.
 
 ## Key Principles
 

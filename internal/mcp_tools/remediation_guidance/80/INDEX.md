@@ -9,7 +9,7 @@ CWE-80 occurs when applications fail to properly neutralize script-related HTML 
 - Never include untrusted input in HTML output without context-appropriate encoding
 - Ensure data cannot be interpreted as executable markup or script
 - Apply encoding based on specific output context (HTML body, attribute, JavaScript, CSS, URL)
-- Use context-aware output encoding as the primary defense layer
+- Use context-aware output encoding as the primary defence layer
 
 ## Remediation Steps
 

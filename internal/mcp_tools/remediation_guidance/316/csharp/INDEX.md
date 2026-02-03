@@ -8,7 +8,7 @@ Storing sensitive data (passwords, keys, tokens) as cleartext strings in C# memo
 
 - Replace `string` with mutable `char[]` or `byte[]` for sensitive data to enable immediate zeroing
 - Clear sensitive arrays explicitly in `finally` blocks using `Array.Clear()`
-- Minimize sensitive data lifetime in memory—clear immediately after use
+- Minimize sensitive data lifetime in memory-clear immediately after use
 - Use `SecureString` for Windows-specific password handling with pinning
 - Avoid serialization, logging, or concatenation of sensitive data
 

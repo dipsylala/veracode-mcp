@@ -10,7 +10,7 @@ Session Fixation occurs when an application allows an attacker to set or reuse a
 - Never accept session identifiers from URL parameters or untrusted sources
 - Invalidate old session identifiers to prevent reuse
 - Use framework-native session regeneration functions (session.regenerate(), session_regenerate_id())
-- Bind sessions to additional user context for defense-in-depth
+- Bind sessions to additional user context for defence-in-depth
 
 ## Remediation Steps
 

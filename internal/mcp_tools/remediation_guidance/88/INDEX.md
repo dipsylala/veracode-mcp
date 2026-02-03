@@ -4,7 +4,7 @@
 
 Argument Injection occurs when untrusted user input is used to construct command-line arguments, function parameters, or system calls, allowing attackers to inject malicious arguments and alter program behavior. Innocuous installed executables (LOLBins) can be subverted through command-line arguments to perform code execution or filesystem manipulation.
 
-**Remediation Strategy:**
+Remediation Strategy:
 
 - Never allow untrusted input to be parsed as command options or flags
 - Use flag terminators (`--`) to separate options from user-controlled arguments
@@ -12,7 +12,7 @@ Argument Injection occurs when untrusted user input is used to construct command
 - Validate input rigorously using allowlists of permitted values
 - Avoid invoking system commands when safer alternatives exist
 
-**Remediation Steps:**
+Remediation Steps:
 
 - Trace the data path: identify where untrusted data enters (source), how it's used in argument construction, and where it reaches command execution (sink)
 - Review scan results for string concatenation or direct use of user input in command arguments

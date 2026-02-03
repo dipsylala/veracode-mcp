@@ -2,22 +2,25 @@
 
 ## LLM Guidance
 
-Command injection in Python occurs when applications construct system commands using untrusted input, allowing attackers to inject malicious commands through shell metacharacters. The primary defense is using `subprocess.run()` or `subprocess.Popen()` with argument lists (`shell=False`) instead of shell strings, never using `os.system()` or commands with `shell=True` on untrusted input.
+Command injection in Python occurs when applications construct system commands using untrusted input, allowing attackers to inject malicious commands through shell metacharacters.
+
+**Primary Defence:** Use Python native libraries (pathlib, requests, shutil, etc.) instead of executing system commands to eliminate the vulnerability entirely. If system commands are unavoidable, use `subprocess.run()` with argument lists and `shell=False`.
 
 ## Key Principles
 
-- Use parameterized command execution with argument lists instead of shell string interpolation
-- Keep `shell=False` (default) in subprocess calls to prevent shell interpretation
-- Validate and sanitize all user input against strict allowlists before use in commands
-- Avoid legacy functions like `os.system()`, `os.popen()`, and `commands` module
+- **BEST:** Use Python native libraries (pathlib for files, requests for HTTP, shutil for file operations) instead of system commands
+- **If commands unavoidable:** Use `subprocess.run()` with argument lists and `shell=False` (never `shell=True`)
+- Avoid legacy functions like `os.system()`, `os.popen()`, and `commands` module entirely
+- Validate and sanitize all user input against strict allowlists as defence-in-depth
 - Implement least privilege principles for command execution contexts
 
 ## Remediation Steps
 
-- Replace `shell=True` with `shell=False` and convert command strings to argument lists
+- **Replace system commands with Python native libraries** (pathlib, requests, shutil) to eliminate vulnerability
+- If commands are unavoidable, replace `shell=True` with `shell=False` and convert command strings to argument lists
 - Refactor `os.system()` calls to `subprocess.run()` with list arguments
-- Implement input validation using allowlists for all user-controlled parameters
-- Use `shlex.quote()` only as a last resort when shell invocation is unavoidable
+- Implement input validation using allowlists for all user-controlled parameters as additional defence
+- Use `shlex.quote()` only as a last resort when shell invocation is absolutely unavoidable
 - Audit all subprocess and os module usage for untrusted input flow
 - Add security testing to verify commands cannot be manipulated
 

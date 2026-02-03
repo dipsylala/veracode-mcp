@@ -9,7 +9,7 @@ XSS occurs when untrusted data is included in web output without proper encoding
 - Use automatic encoding: Rely on Razor's `@variable` syntax which HTML-encodes by default
 - Avoid raw output: Never use `@Html.Raw()`, `HtmlString`, or `MvcHtmlString` with untrusted data
 - Context-aware encoding: Apply JavaScript encoding for script contexts, URL encoding for URLs, and attribute encoding for HTML attributes
-- Defense in depth: Combine output encoding with CSP headers and input validation
+- Defence in depth: Combine output encoding with CSP headers and input validation
 - Sanitize rich content: Use libraries like HtmlSanitizer for user-submitted HTML
 
 ## Remediation Steps

@@ -2,7 +2,7 @@
 
 ## LLM Guidance
 
-LDAP Injection occurs when untrusted data is used to construct LDAP queries without proper encoding, allowing attackers to manipulate LDAP searches and access unauthorized data. The core fix involves strict allowlist validation of input (e.g., alphanumeric usernames only) and escaping LDAP special characters (`*`, `(`, `)`, `\`, `/`, `NUL`). Never construct Distinguished Names (DNs) directly from user input—instead, search by attribute and use the returned DN for subsequent operations.
+LDAP Injection occurs when untrusted data is used to construct LDAP queries without proper encoding, allowing attackers to manipulate LDAP searches and access unauthorized data. The core fix involves strict allowlist validation of input (e.g., alphanumeric usernames only) and escaping LDAP special characters (`*`, `(`, `)`, `\`, `/`, `NUL`). Never construct Distinguished Names (DNs) directly from user input-instead, search by attribute and use the returned DN for subsequent operations.
 
 ## Key Principles
 

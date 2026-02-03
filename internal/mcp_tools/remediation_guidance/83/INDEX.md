@@ -6,11 +6,11 @@ Cross-Site Scripting (XSS) via improper neutralization of script-related HTML oc
 
 ## Key Principles
 
-- Never trust user input in HTML contexts—treat all user data as untrusted
+- Never trust user input in HTML contexts-treat all user data as untrusted
 - Apply context-appropriate output encoding based on where data is inserted (HTML body, attributes, JavaScript, URL, CSS)
 - Use security-focused encoding libraries rather than building custom solutions
-- Implement Content Security Policy (CSP) as defense-in-depth
-- Validate and sanitize input at boundaries, but rely on output encoding as primary defense
+- Implement Content Security Policy (CSP) as defence-in-depth
+- Validate and sanitize input at boundaries, but rely on output encoding as primary Defence
 
 ## Remediation Steps
 

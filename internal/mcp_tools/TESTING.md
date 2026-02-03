@@ -79,6 +79,7 @@ The tests cover:
 ## Adding Tests for New Tools
 
 When you add a new tool, the existing integration tests will automatically verify it:
+
 1. `TestActualToolsRegistration` will detect it (add to expectedTools list)
 2. `TestToolNamesUnique` will verify name uniqueness
 3. `TestToolsImplementInterface` will verify interface compliance
@@ -87,28 +88,29 @@ You can also add tool-specific tests:
 
 ```go
 func TestMyNewTool(t *testing.T) {
-	tools := GetAllTools()
-	
-	var myTool ToolImplementation
-	for _, tool := range tools {
-		if tool.Name() == "my-new-tool" {
-			myTool = tool
-			break
-		}
-	}
-	
-	if myTool == nil {
-		t.Fatal("my-new-tool not found")
-	}
-	
-	// Test specific behavior
-	// ...
+  tools := GetAllTools()
+  
+  var myTool ToolImplementation
+  for _, tool := range tools {
+    if tool.Name() == "my-new-tool" {
+      myTool = tool
+      break
+    }
+  }
+  
+  if myTool == nil {
+    t.Fatal("my-new-tool not found")
+  }
+  
+  // Test specific behavior
+  // ...
 }
 ```
 
 ## Continuous Integration
 
 These tests should be run in CI/CD pipelines to ensure:
+
 - New tools register correctly
 - No duplicate names are introduced
 - All tools implement the interface properly

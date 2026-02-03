@@ -6,9 +6,9 @@ SQL Injection occurs when untrusted data is incorporated into SQL queries withou
 
 ## Key Principles
 
-- Always use parameterized queries or prepared statements—never concatenate user input into SQL strings
+- Always use parameterized queries or prepared statements-never concatenate user input into SQL strings
 - Prefer ORM frameworks (JPA/Hibernate) with bound parameters over raw JDBC
-- Validate and sanitize input as a secondary defense layer
+- Validate and sanitize input as a secondary defence layer
 - Apply least privilege principles to database accounts
 - Use stored procedures with parameterized inputs where appropriate
 
@@ -16,7 +16,7 @@ SQL Injection occurs when untrusted data is incorporated into SQL queries withou
 
 - Locate - Identify the source (user input entry points like `request.getParameter()`, `@RequestParam`) and sink (SQL execution like `executeQuery()`, `createNativeQuery()`)
 - Trace data flow - Check if string concatenation or `String.format()` is used to build SQL queries
-- Replace concatenation - Convert string-based queries to `PreparedStatement` with `?` placeholders or JPA named parameters (` -paramName`)
+- Replace concatenation - Convert string-based queries to `PreparedStatement` with `?` placeholders or JPA named parameters (`-paramName`)
 - Bind parameters - Use `setString()`, `setInt()` or similar methods to bind user input to placeholders
 - Test - Verify the fix handles special characters and injection attempts correctly
 - Review - Ensure all similar patterns in the codebase are addressed

@@ -7,6 +7,7 @@ This guide shows how to add new tools to the Veracode MCP server using the auto-
 The tool system uses **auto-registration** - tools register themselves on import using `init()` functions. This provides a clean plugin-style architecture where each tool is a self-contained, independently developed module.
 
 **To add a new tool, you only need to:**
+
 1. Define the tool in `tools.json` (optional, for rich LLM-friendly descriptions)
 2. Create a new file in `tools/`
 3. Implement the `ToolImplementation` interface
@@ -151,11 +152,13 @@ func errorResponse(message string) map[string]interface{} {
     }
 }
 ```
+
 ### Step 2: Supported JSON Schema Types
 
 The `GetInputSchema()` method returns a standard JSON Schema. Common patterns:
 
 **String parameter:**
+
 ```go
 "param_name": map[string]interface{}{
     "type":        "string",
@@ -164,6 +167,7 @@ The `GetInputSchema()` method returns a standard JSON Schema. Common patterns:
 ```
 
 **Enum (limited values):**
+
 ```go
 "status": map[string]interface{}{
     "type":        "string",
@@ -173,6 +177,7 @@ The `GetInputSchema()` method returns a standard JSON Schema. Common patterns:
 ```
 
 **Number with constraints:**
+
 ```go
 "page_size": map[string]interface{}{
     "type":        "integer",
@@ -184,6 +189,7 @@ The `GetInputSchema()` method returns a standard JSON Schema. Common patterns:
 ```
 
 **Boolean:**
+
 ```go
 "include_resolved": map[string]interface{}{
     "type":        "boolean",
@@ -192,6 +198,7 @@ The `GetInputSchema()` method returns a standard JSON Schema. Common patterns:
 ```
 
 **Array of strings:**
+
 ```go
 "severities": map[string]interface{}{
     "type":        "array",
@@ -424,6 +431,7 @@ return errorResponse("Failed to fetch data: " + err.Error()), nil
 ## Examples
 
 See existing tools for reference:
+
 - [tools/api_health.go](../tools/api_health.go) - Simple tool calling generated client
 - [tools/dynamic_findings.go](../tools/dynamic_findings.go) - Using API helpers
 - [tools/static_findings.go](../tools/static_findings.go) - Parameter extraction patterns

@@ -6,10 +6,10 @@ Using RSA encryption without OAEP (Optimal Asymmetric Encryption Padding) enable
 
 ## Key Principles
 
-- **Always specify OAEP padding** when using RSA encryption with SHA-256 or better (not SHA-1) and MGF1 mask generation function
-- **Use hybrid encryption** for large data: generate random AES-256 key, encrypt data with AES-GCM/ChaCha20-Poly1305, encrypt symmetric key with RSA-OAEP
-- **Never use "default" RSA** without explicitly specifying OAEP padding mode
-- **Choose appropriate key sizes** with minimum 2048-bit RSA keys for current security requirements
+- Always specify OAEP padding when using RSA encryption with SHA-256 or better (not SHA-1) and MGF1 mask generation function
+- Use hybrid encryption for large data: generate random AES-256 key, encrypt data with AES-GCM/ChaCha20-Poly1305, encrypt symmetric key with RSA-OAEP
+- Never use "default" RSA without explicitly specifying OAEP padding mode
+- Choose appropriate key sizes with minimum 2048-bit RSA keys for current security requirements
 
 ## Remediation Steps
 

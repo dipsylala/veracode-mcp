@@ -6,11 +6,11 @@ Unsafe reflection occurs when applications use untrusted input to select classes
 
 ## Key Principles
 
-- **Allowlist over blacklist:** Define explicit permitted classes/methods; reject all others
-- **Indirect mapping:** Map user input to safe identifiers, not class/method names directly
-- **Avoid reflection:** Use polymorphism, factory patterns, or strategy patterns instead
-- **Input validation:** If reflection required, validate against strict allowlist before use
-- **Least privilege:** Restrict reflection to minimum required classes/methods
+- Allowlist over blacklist: Define explicit permitted classes/methods; reject all others
+- Indirect mapping: Map user input to safe identifiers, not class/method names directly
+- Avoid reflection: Use polymorphism, factory patterns, or strategy patterns instead
+- Input validation: If reflection required, validate against strict allowlist before use
+- Least privilege: Restrict reflection to minimum required classes/methods
 
 ## Remediation Steps
 

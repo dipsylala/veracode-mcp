@@ -6,11 +6,11 @@ Improper signature verification occurs when applications accept unsigned data, f
 
 ## Key Principles
 
-- **Verify all signatures before trusting data** - Never skip verification or accept unsigned data
-- **Use strong, approved signature algorithms** - Reject weak algorithms (MD5, SHA1) and "alg=none"
-- **Validate complete certificate chains** - Check validity, revocation status, and trust anchors
-- **Fail securely on verification errors** - Reject data immediately on any verification failure
-- **Apply canonical forms before verification** - Prevent signature bypass via data manipulation
+- Verify all signatures before trusting data - Never skip verification or accept unsigned data
+- Use strong, approved signature algorithms - Reject weak algorithms (MD5, SHA1) and "alg=none"
+- Validate complete certificate chains - Check validity, revocation status, and trust anchors
+- Fail securely on verification errors - Reject data immediately on any verification failure
+- Apply canonical forms before verification - Prevent signature bypass via data manipulation
 
 ## Remediation Steps
 

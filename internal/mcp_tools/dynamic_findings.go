@@ -36,47 +36,52 @@ type DynamicFindingsRequest struct {
 
 // parseDynamicFindingsRequest extracts and validates parameters from the raw args map
 func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsRequest, error) {
-	req := &DynamicFindingsRequest{
-		Size: 10,
-		Page: 0,
+	req := &DynamicFindingsRequest{}
+
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
 
-	// Extract fields directly
-	if appPath, ok := args["application_path"].(string); ok {
-		req.ApplicationPath = appPath
+	// Extract optional fields
+	req.AppProfile, _ = extractOptionalString(args, "app_profile")
+	req.Sandbox, _ = extractOptionalString(args, "sandbox")
+	req.Size = extractInt(args, "size", 10)
+	req.Page = extractInt(args, "page", 0)
+
+	// Extract optional int32 pointers with validation
+	req.Severity, _, err = extractOptionalInt32Ptr(args, "severity")
+	if err != nil {
+		return nil, err
 	}
-	if appProfile, ok := args["app_profile"].(string); ok {
-		req.AppProfile = appProfile
-	}
-	if sandbox, ok := args["sandbox"].(string); ok {
-		req.Sandbox = sandbox
-	}
-	if size, ok := args["size"].(float64); ok {
-		req.Size = int(size)
-	}
-	if page, ok := args["page"].(float64); ok {
-		req.Page = int(page)
-	}
-	if severity, ok := args["severity"].(float64); ok {
-		sev := int32(severity)
-		req.Severity = &sev
-	}
-	if severityGte, ok := args["severity_gte"].(float64); ok {
-		sev := int32(severityGte)
-		req.SeverityGte = &sev
-	}
-	if violatesPolicy, ok := args["violates_policy"].(bool); ok {
-		req.ViolatesPolicy = &violatesPolicy
-	}
-	if includeMitigations, ok := args["include_mitigations"].(bool); ok {
-		req.IncludeMitigations = includeMitigations
-	}
-	if cweIdsRaw, ok := args["cwe_ids"]; ok {
-		req.CWEIDs = convertCWEIDsToStrings(cweIdsRaw)
+	req.SeverityGte, _, err = extractOptionalInt32Ptr(args, "severity_gte")
+	if err != nil {
+		return nil, err
 	}
 
-	if req.ApplicationPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be an absolute path")
+	// Extract optional booleans
+	violatesPolicy, _ := extractOptionalBool(args, "violates_policy")
+	req.ViolatesPolicy = violatesPolicy
+	if includeMitigations, ok := extractOptionalBool(args, "include_mitigations"); ok {
+		req.IncludeMitigations = *includeMitigations
+	}
+
+	// Extract CWE IDs
+	req.CWEIDs = extractCWEIDs(args)
+
+	// Validate pagination bounds
+	if err := validatePaginationParams(req.Size, req.Page); err != nil {
+		return nil, err
+	}
+
+	// Validate severity bounds
+	if err := validateSeverity(req.Severity, "severity"); err != nil {
+		return nil, err
+	}
+	if err := validateSeverity(req.SeverityGte, "severity_gte"); err != nil {
+		return nil, err
 	}
 
 	return req, nil

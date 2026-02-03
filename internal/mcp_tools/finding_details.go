@@ -29,25 +29,20 @@ type FindingDetailsRequest struct {
 func parseFindingDetailsRequest(args map[string]interface{}) (*FindingDetailsRequest, error) {
 	req := &FindingDetailsRequest{}
 
-	if appPath, ok := args["application_path"].(string); ok {
-		req.ApplicationPath = appPath
-	}
-	if appProfile, ok := args["app_profile"].(string); ok {
-		req.AppProfile = appProfile
-	}
-	if flawID, ok := args["flaw_id"].(float64); ok {
-		req.FlawID = int(flawID)
-	} else if flawID, ok := args["flaw_id"].(int); ok {
-		req.FlawID = flawID
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
 
-	if req.ApplicationPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be an absolute path")
+	req.FlawID, err = extractFlawID(args)
+	if err != nil {
+		return nil, err
 	}
 
-	if req.FlawID == 0 {
-		return nil, fmt.Errorf("flaw_id is required and must be a non-zero integer")
-	}
+	// Extract optional fields
+	req.AppProfile, _ = extractOptionalString(args, "app_profile")
 
 	return req, nil
 }

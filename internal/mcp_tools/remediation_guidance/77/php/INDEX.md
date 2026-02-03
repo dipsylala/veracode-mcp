@@ -2,22 +2,25 @@
 
 ## LLM Guidance
 
-Command injection in PHP occurs when applications construct system commands using untrusted input through functions like `system()`, `exec()`, `shell_exec()`, or backticks. The primary defense is eliminating shell execution entirely by using PHP built-in functions or libraries for specific tasks. When shell execution is unavoidable, properly escape all user input with `escapeshellarg()` for arguments and `escapeshellcmd()` for entire commands.
+Command injection in PHP occurs when applications construct system commands using untrusted input through functions like `system()`, `exec()`, `shell_exec()`, or backticks.
+
+**Primary Defence:** Use PHP native functions (file_get_contents, unlink, copy, etc.) instead of executing system commands to eliminate the vulnerability entirely. If shell execution is absolutely unavoidable, properly escape all user input with `escapeshellarg()` for arguments.
 
 ## Key Principles
 
-- Eliminate shell execution functions entirely; use native PHP functions for file operations, network requests, and system tasks
-- Implement strict input validation with whitelists of allowed values before any processing
-- Apply proper escaping with `escapeshellarg()` for all user-supplied arguments when shell execution is unavoidable
+- **BEST:** Use PHP native functions (file_get_contents, unlink, copy, curl_exec) instead of system commands to eliminate command injection risk
+- **If commands unavoidable:** Wrap all user input with `escapeshellarg()` before passing to command functions
+- Implement strict allowlist validation for any parameters that determine command behavior as defence-in-depth
+- Never use dynamic command construction through string concatenation or interpolation
 - Enforce least privilege by running PHP processes with minimal system permissions
-- Avoid dynamic command construction through string concatenation or interpolation
+- Avoid shell execution functions (`system()`, `exec()`, `shell_exec()`, backticks, `passthru()`) entirely
 
 ## Remediation Steps
 
 - Audit code for all instances of `system()`, `exec()`, `shell_exec()`, backticks, `passthru()`, `proc_open()`, and `popen()`
-- Replace shell commands with PHP alternatives (e.g., `file_get_contents()` instead of `cat`, `unlink()` instead of `rm`)
-- For unavoidable shell usage, wrap all user input with `escapeshellarg()` before passing to command functions
-- Implement whitelist validation for any parameters that determine command behavior
+- **Replace shell commands with PHP native functions** (file_get_contents, unlink, copy) to eliminate vulnerability
+- If shell usage is unavoidable, wrap all user input with `escapeshellarg()` before passing to command functions
+- Implement allowlist validation for any parameters that determine command behavior as additional defence
 - Remove or restrict user control over command structure, file paths, and executable names
 - Configure PHP with `disable_functions` in php.ini to block dangerous functions in production
 

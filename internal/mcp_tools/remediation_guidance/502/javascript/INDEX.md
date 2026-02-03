@@ -4,7 +4,7 @@
 
 JavaScript deserialization vulnerabilities occur when `eval()`, `Function()`, `vm.runInNewContext()`, or vulnerable libraries (node-serialize, serialize-javascript) parse untrusted data, allowing attackers to execute arbitrary code. Node.js applications are particularly vulnerable when deserializing from cookies, external APIs, or user uploads.
 
-**Primary Defense:** Use `JSON.parse()` exclusively for deserialization and validate input against strict schemas.
+**Primary Defence**: Use `JSON.parse()` exclusively for deserialization and validate input against strict schemas.
 
 ## Key Principles
 

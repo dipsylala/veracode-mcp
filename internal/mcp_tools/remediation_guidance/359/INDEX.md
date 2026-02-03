@@ -6,7 +6,7 @@ Privacy violations occur when applications expose PII (names, SSN, medical data,
 
 ## Key Principles
 
-- Minimize PII collection and retention—only collect what's necessary
+- Minimize PII collection and retention-only collect what's necessary
 - Enforce authorization and least privilege for all PII access
 - Control exposure channels: logs, errors, APIs, URLs, analytics, UI
 - Delete PII promptly when no longer needed

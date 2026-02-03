@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-SSRF in Node.js occurs when applications fetch remote resources using user-supplied URLs without validation, enabling attackers to access internal services, cloud metadata endpoints, and bypass firewalls. The primary defense is validating URLs against an allowlist of permitted domains before making any HTTP requests.
+SSRF in Node.js occurs when applications fetch remote resources using user-supplied URLs without validation, enabling attackers to access internal services, cloud metadata endpoints, and bypass firewalls.
+
+**Primary Defence:** Validate URLs against an allowlist of permitted domains before making any HTTP requests.
 
 ## Key Principles
 

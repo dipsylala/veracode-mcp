@@ -7,7 +7,7 @@ CSRF vulnerabilities occur when state-changing endpoints don't verify that reque
 ## Key Principles
 
 - Implement CSRF tokens for all state-changing operations (POST, PUT, DELETE, PATCH)
-- Use SameSite cookie attribute (`SameSite=Lax` or `Strict`) as defense-in-depth
+- Use SameSite cookie attribute (`SameSite=Lax` or `Strict`) as defence-in-depth
 - Validate Origin/Referer headers for additional protection on critical endpoints
 - Never rely solely on cookies for authentication without CSRF protection
 - For REST APIs consumed by native apps, use token-based auth instead of cookies

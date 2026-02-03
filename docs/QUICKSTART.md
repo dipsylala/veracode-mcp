@@ -36,43 +36,43 @@ Create `mcp_tools/your_tool.go`:
 package mcp_tools
 
 import (
-	"context"
-	"log"
+  "context"
+  "log"
 )
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterTool("your-tool-name", func() ToolImplementation {
-		return NewYourTool()
-	})
+  RegisterTool("your-tool-name", func() ToolImplementation {
+    return NewYourTool()
+  })
 }
 
 type YourTool struct{}
 
 func NewYourTool() *YourTool {
-	return &YourTool{}
+  return &YourTool{}
 }
 
 func (t *YourTool) Initialize() error {
-	log.Printf("Initializing tool: your-tool-name")
-	return nil
+  log.Printf("Initializing tool: your-tool-name")
+  return nil
 }
 
 func (t *YourTool) Shutdown() error { return nil }
 
 func (t *YourTool) RegisterHandlers(registry HandlerRegistry) error {
-	registry.RegisterHandler("your-tool-name", t.handleYourTool)
-	return nil
+  registry.RegisterHandler("your-tool-name", t.handleYourTool)
+  return nil
 }
 
 func (t *YourTool) handleYourTool(ctx context.Context, args map[string]interface{}) (interface{}, error) {
-	// Your implementation here
-	return map[string]interface{}{
-		"content": []map[string]string{{
-			"type": "text",
-			"text": "Success",
-		}},
-	}, nil
+  // Your implementation here
+  return map[string]interface{}{
+    "content": []map[string]string{{
+      "type": "text",
+      "text": "Success",
+    }},
+  }, nil
 }
 ```
 
@@ -90,9 +90,10 @@ Tools automatically register themselves when you import the tools package! No ma
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | .\mcp-server.exe -mode stdio
 ```
 
-## That's It!
+## That's It
 
 Two files to touch:
+
 1. `tools.json` - Define parameters and description
 2. `mcp_tools/your_tool.go` - Implement the logic with auto-registration
 

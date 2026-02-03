@@ -2,7 +2,9 @@
 
 ## LLM Guidance
 
-SQL Injection occurs when untrusted user input is incorporated into SQL queries without proper sanitization, allowing attackers to manipulate query logic, extract data, or execute administrative operations. Node.js database libraries (mysql, pg, better-sqlite3, etc.) all support parameterized queries as the primary defense against this vulnerability.
+SQL Injection occurs when untrusted user input is incorporated into SQL queries without proper sanitization, allowing attackers to manipulate query logic, extract data, or execute administrative operations.
+
+**Primary Defence:** Use parameterized queries provided by Node.js database libraries (mysql, pg, better-sqlite3, etc.)
 
 ## Key Principles
 

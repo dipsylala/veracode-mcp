@@ -19,4 +19,4 @@ Path Traversal occurs when applications use user-supplied input to construct fil
 - Canonicalize paths - Convert all paths to absolute canonical form, resolving symlinks and relative references before any validation
 - Enforce root containment - After canonicalization, verify the path starts with an approved root directory prefix
 - Reject suspicious patterns - Block or sanitize inputs containing `..`, absolute paths, or encoded traversal sequences before path construction
-- Apply defense in depth - Combine indirect references, canonicalization, allowlist validation, and filesystem permissions as layered controls
+- Apply defence in depth - Combine indirect references, canonicalization, allowlist validation, and filesystem permissions as layered controls

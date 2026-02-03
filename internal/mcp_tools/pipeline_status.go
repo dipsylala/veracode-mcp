@@ -29,12 +29,12 @@ type PipelineStatusRequest struct {
 func parsePipelineStatusRequest(args map[string]interface{}) (*PipelineStatusRequest, error) {
 	req := &PipelineStatusRequest{}
 
-	// Extract application_path (required)
-	appPath, ok := args["application_path"].(string)
-	if !ok || appPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
-	req.ApplicationPath = appPath
 
 	return req, nil
 }
