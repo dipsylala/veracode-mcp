@@ -104,6 +104,18 @@ function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
   // Define severity order (5 to 0)
   const severityOrder = ['Very High', 'High', 'Medium', 'Low', 'Very Low', 'Info'];
 
+  // If no findings, show simple message
+  if (findings.length === 0) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1>Dynamic Findings: {application.name}</h1>
+        </div>
+        <div className={styles.empty}>No findings to display</div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -142,11 +154,8 @@ function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
         </div>
       </div>
 
-      {findings.length === 0 ? (
-        <div className={styles.empty}>No findings to display</div>
-      ) : (
-        <div className={styles.tableContainer}>
-          <table className={styles.table}>
+      <div className={styles.tableContainer}>
+        <table className={styles.table}>
             <thead>
               <tr>
                 <th className={styles.expanderHeader}></th>
@@ -165,8 +174,7 @@ function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
