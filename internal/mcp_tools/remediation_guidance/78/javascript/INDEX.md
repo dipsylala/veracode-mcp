@@ -1,56 +1,125 @@
-# CWE-78: OS Command Injection - JavaScript
+# CWE-78: OS Command Injection - JavaScript/Node.js
 
 ## LLM Guidance
 
 OS Command Injection occurs when untrusted input is passed to system command execution functions like `child_process.exec()`, allowing attackers to execute arbitrary commands.
 
-**Primary Defence:** Use Node.js native modules (fs, https, stream, path, etc.) instead of executing system commands to eliminate the vulnerability entirely. If system commands are unavoidable, use `execFile()` or `spawn()` with argument arrays to avoid shell invocation.
+**CRITICAL: DO NOT suggest input validation as the primary fix.** The correct remediation is to **ELIMINATE system command execution** by using Node.js built-in modules. Input validation alone is insufficient.
+
+**Primary Defence:** Replace ALL system commands with Node.js native modules. Common replacements:
+
+- **file operations → fs/fs.promises** instead of cp, mv, rm commands
+- **HTTP requests → fetch or https module** instead of curl/wget
+- **archive operations → archiver, adm-zip** instead of tar/unzip commands
+
+Only if no module alternative exists, use `execFile()` or `spawn()` with argument arrays (never `exec()` with strings).
 
 ## Key Principles
 
-- **BEST:** Use Node.js native modules (fs, https, path, zlib) instead of system commands to eliminate command injection risk
-- **If commands unavoidable:** Use `execFile()` or `spawn()` with argument arrays to bypass the shell
-- Never pass user input directly to shell command interpreters
-- Use argument arrays instead of string concatenation for commands
-- Validate and sanitize all external input against strict allowlists as defence-in-depth
-- Apply principle of least privilege to child processes
+- **ALWAYS prefer Node.js built-in modules over system commands** - eliminates injection risk entirely
+- For file operations, use **fs module** instead of system commands
+- For archives, use **archiver** or **adm-zip** packages instead of system tar/zip
+- **Input validation is NOT a remediation** - it's only defense-in-depth after eliminating command execution
+- If child_process is unavoidable, use `execFile()` or `spawn()` with argument arrays
+- Never use `child_process.exec()` or `shell: true` option
 
 ## Remediation Steps
 
 - Identify all `child_process.exec()`, `child_process.spawn()`, and `child_process.execFile()` calls
-- **Replace system commands with Node.js native modules** (fs for files, https for requests, etc.) to eliminate vulnerability
-- If commands are unavoidable, replace `child_process.exec()` with `execFile()` or `spawn()`
-- Pass command arguments as array elements, not concatenated strings
-- Implement strict input validation using allowlists as additional defence
-- Run commands with minimal privileges using appropriate user contexts
-- Log all command executions for security monitoring
+- **First, determine the Node.js module alternative** - do not default to "secure" exec patterns
+- Replace system commands with Node.js built-in or npm package equivalents
+- For any truly unavoidable commands, refactor to use `execFile()` or `spawn()` with argument arrays
+- Remove all `child_process.exec()` usage and `{shell: true}` options
+- Apply strict allowlist validation only as defense-in-depth
 
 ## Safe Pattern
 
 ```javascript
-const fs = require('fs');
-const https = require('https');
+const { exec } = require('child_process');
+const net = require('net');
+const dns = require('dns').promises;
 
-// BEST: Use Node.js native modules
-function processFile(userFilename) {
-  const allowedChars = /^[a-zA-Z0-9_.-]+$/;
-  if (!allowedChars.test(userFilename)) {
-    throw new Error('Invalid filename');
-  }
-  const data = fs.readFileSync(userFilename, 'utf8');
-  // Process with native APIs
+// ❌ VULNERABLE: System command with user input
+exec(`ping -c 1 ${host}`, (error, stdout) => {
+  console.log(stdout);
+});
+
+// ❌ STILL BAD: Validation doesn't fix the root problem
+if (/^[a-zA-Z0-9.-]+$/.test(host)) {  // Insufficient protection!
+  exec(`ping -c 1 ${host}`, callback);
 }
 
-// If unavoidable: Arguments passed as array, no shell interpretation
-const { execFile } = require('child_process');
-function convertFile(userFilename) {
-  const allowedChars = /^[a-zA-Z0-9_.-]+$/;
-  if (!allowedChars.test(userFilename)) {
-    throw new Error('Invalid filename');
-  }
-  execFile('convert', [userFilename, 'output.png'], (error, stdout) => {
-    if (error) throw error;
-    console.log(stdout);
+// ✅ CORRECT: Use Node.js net module instead of ping command
+function isHostReachable(host, port = 80, timeout = 5000) {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    
+    socket.setTimeout(timeout);
+    socket.on('connect', () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.on('timeout', () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.on('error', () => {
+      resolve(false);
+    });
+    
+    socket.connect(port, host);
   });
 }
+
+// Alternative: DNS resolution test
+async function canResolveHost(host) {
+  try {
+    await dns.lookup(host);
+    return true;
+  } catch (error) {
+    console.error(`Cannot resolve ${host}:`, error.message);
+    return false;
+  }
+}
+
+// ✅ OTHER MODULE-BASED SOLUTIONS:
+
+// File operations: Use fs module, not cp/mv commands
+const fs = require('fs').promises;
+await fs.copyFile(userSourcePath, '/backup/data.txt');
+
+// HTTP requests: Use fetch or https, not curl command
+const response = await fetch(validatedUrl, { timeout: 10000 });
+const data = await response.text();
+
+// Alternative HTTP with https module
+const https = require('https');
+https.get(validatedUrl, (res) => {
+  let data = '';
+  res.on('data', chunk => data += chunk);
+  res.on('end', () => console.log(data));
+});
+
+// Archive extraction: Use adm-zip package, not unzip command
+// npm install adm-zip
+const AdmZip = require('adm-zip');
+const zip = new AdmZip(validatedZipPath);
+zip.extractAllTo('/extract/', true);
+
+// Archive creation: Use archiver package, not tar command
+// npm install archiver
+const archiver = require('archiver');
+const output = fs.createWriteStream('/backup/archive.tar.gz');
+const archive = archiver('tar', { gzip: true });
+archive.pipe(output);
+archive.directory(validatedDirectory, false);
+await archive.finalize();
+
+// ⚠️ LAST RESORT: If no module alternative exists
+// Use execFile with argument array (never exec with strings)
+const { execFile } = require('child_process');
+execFile('/usr/bin/convert', [validatedInput, validatedOutput], (error, stdout) => {
+  if (error) throw error;
+  console.log(stdout);
+});
 ```
