@@ -27,19 +27,19 @@ type PipelineScanRequest struct {
 func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest, error) {
 	req := &PipelineScanRequest{}
 
-	// Extract application_path (required)
-	appPath, ok := args["application_path"].(string)
-	if !ok || appPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
-	req.ApplicationPath = appPath
 
-	// Extract filename (optional) - if just a filename (no path), look in .veracode/packaging
-	if filename, ok := args["filename"].(string); ok && filename != "" {
+	// Extract optional filename
+	if filename, ok := extractOptionalString(args, "filename"); ok && filename != "" {
 		// Check if filename is just a name (no directory separators)
 		if filepath.Base(filename) == filename {
 			// Just a filename - prepend .veracode/packaging directory
-			req.Filename = filepath.Join(appPath, ".veracode", "packaging", filename)
+			req.Filename = filepath.Join(req.ApplicationPath, ".veracode", "packaging", filename)
 		} else {
 			// Full or relative path - use as-is
 			req.Filename = filename

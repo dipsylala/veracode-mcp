@@ -31,37 +31,42 @@ type ScaFindingsRequest struct {
 
 // parseScaFindingsRequest extracts and validates parameters from the raw args map
 func parseScaFindingsRequest(args map[string]interface{}) (*ScaFindingsRequest, error) {
-	req := &ScaFindingsRequest{
-		Size: 50,
-		Page: 0,
+	req := &ScaFindingsRequest{}
+
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
 
-	if appPath, ok := args["application_path"].(string); ok {
-		req.ApplicationPath = appPath
+	// Extract optional fields
+	req.AppProfile, _ = extractOptionalString(args, "app_profile")
+	req.Sandbox, _ = extractOptionalString(args, "sandbox")
+	req.Size = extractInt(args, "size", 50)
+	req.Page = extractInt(args, "page", 0)
+
+	// Extract optional int32 pointers with validation
+	req.Severity, _, err = extractOptionalInt32Ptr(args, "severity")
+	if err != nil {
+		return nil, err
 	}
-	if appProfile, ok := args["app_profile"].(string); ok {
-		req.AppProfile = appProfile
-	}
-	if sandbox, ok := args["sandbox"].(string); ok {
-		req.Sandbox = sandbox
-	}
-	if size, ok := args["size"].(float64); ok {
-		req.Size = int(size)
-	}
-	if page, ok := args["page"].(float64); ok {
-		req.Page = int(page)
-	}
-	if severity, ok := args["severity"].(float64); ok {
-		sev := int32(severity)
-		req.Severity = &sev
-	}
-	if severityGte, ok := args["severity_gte"].(float64); ok {
-		sev := int32(severityGte)
-		req.SeverityGte = &sev
+	req.SeverityGte, _, err = extractOptionalInt32Ptr(args, "severity_gte")
+	if err != nil {
+		return nil, err
 	}
 
-	if req.ApplicationPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be an absolute path")
+	// Validate pagination bounds
+	if err := validatePaginationParams(req.Size, req.Page); err != nil {
+		return nil, err
+	}
+
+	// Validate severity bounds
+	if err := validateSeverity(req.Severity, "severity"); err != nil {
+		return nil, err
+	}
+	if err := validateSeverity(req.SeverityGte, "severity_gte"); err != nil {
+		return nil, err
 	}
 
 	return req, nil

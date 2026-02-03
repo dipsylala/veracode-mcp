@@ -29,26 +29,22 @@ type PipelineResultsRequest struct {
 
 // parsePipelineResultsRequest extracts and validates parameters from the raw args map
 func parsePipelineResultsRequest(args map[string]interface{}) (*PipelineResultsRequest, error) {
-	req := &PipelineResultsRequest{
-		Size: 10,
-		Page: 0,
+	req := &PipelineResultsRequest{}
+
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
 
-	// Extract application path
-	appPath, ok := args["application_path"].(string)
-	if !ok || appPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
-	}
-	req.ApplicationPath = appPath
+	// Extract optional fields with defaults
+	req.Size = extractInt(args, "size", 10)
+	req.Page = extractInt(args, "page", 0)
 
-	// Extract size if provided
-	if size, ok := args["size"].(float64); ok {
-		req.Size = int(size)
-	}
-
-	// Extract page if provided
-	if page, ok := args["page"].(float64); ok {
-		req.Page = int(page)
+	// Validate pagination bounds
+	if err := validatePaginationParams(req.Size, req.Page); err != nil {
+		return nil, err
 	}
 
 	return req, nil

@@ -25,12 +25,14 @@ type PackageWorkspaceRequest struct {
 
 // parsePackageWorkspaceRequest extracts and validates parameters from the raw args map
 func parsePackageWorkspaceRequest(args map[string]interface{}) (*PackageWorkspaceRequest, error) {
-	appPath, ok := args["application_path"].(string)
-	if !ok || appPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be a non-empty string")
-	}
+	req := &PackageWorkspaceRequest{}
 
-	req := &PackageWorkspaceRequest{ApplicationPath: appPath}
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }

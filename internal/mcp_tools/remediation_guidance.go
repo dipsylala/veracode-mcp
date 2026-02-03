@@ -33,25 +33,16 @@ type RemediationGuidanceRequest struct {
 func parseRemediationGuidanceRequest(args map[string]interface{}) (*RemediationGuidanceRequest, error) {
 	req := &RemediationGuidanceRequest{}
 
-	// Extract application_path
-	if appPath, ok := args["application_path"].(string); ok {
-		req.ApplicationPath = appPath
+	// Extract required fields
+	var err error
+	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+	if err != nil {
+		return nil, err
 	}
 
-	// Extract flaw_id (comes as float64 from JSON)
-	if flawID, ok := args["flaw_id"].(float64); ok {
-		req.FlawID = int(flawID)
-	} else if flawID, ok := args["flaw_id"].(int); ok {
-		req.FlawID = flawID
-	}
-
-	// Validate required fields
-	if req.ApplicationPath == "" {
-		return nil, fmt.Errorf("application_path is required and must be an absolute path")
-	}
-
-	if req.FlawID == 0 {
-		return nil, fmt.Errorf("flaw_id is required and must be a non-zero integer")
+	req.FlawID, err = extractFlawID(args)
+	if err != nil {
+		return nil, err
 	}
 
 	return req, nil
