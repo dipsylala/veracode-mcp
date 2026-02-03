@@ -118,7 +118,7 @@ See [credentials/README.md](credentials/README.md) for detailed information.
 ### Command Line Options
 
 ```bash
-.\dist\veracode-mcp.exe [options]
+.\path\to\veracode-mcp.exe [options]
 
 Options:
   -verbose
@@ -135,17 +135,17 @@ Bear in mind, this will typically not be run from the command-line directly, but
 
 ```bash
 # Basic usage (silent mode, stdio transport)
-.\dist\veracode-mcp.exe
+.\path\to\veracode-mcp.exe
 
 # With debug logging to file (recommended for troubleshooting)
-.\dist\veracode-mcp.exe -log veracode-mcp.log
+.\path\path\to\veracode-mcp.exe -log \path\to\veracode-mcp.log
 
-# With verbose logging to stderr (avoid in stdio mode with MCP clients)
-.\dist\veracode-mcp.exe -verbose
+# With verbose logging to stderr (avoid in stdio mode as some MCP clients can react badly)
+.\path\to\veracode-mcp.exe -verbose
 
 ```
 
-**Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, use `-log <filepath>` to write debug information to a file.
+**Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, add `-log <filepath>` to write debug information to a file.
 
 ### Stdio Mode
 
