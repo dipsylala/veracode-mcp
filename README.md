@@ -14,13 +14,14 @@ A Model Context Protocol (MCP) server implementation in Go that provides Veracod
   - Protocol version negotiation (supports 2024-11-05 and newer including 2025-06-18)
   
 - **Veracode Integration**
-  - Dynamic (DAST) findings
-  - Static (SAST) findings
-  - SCA (Software Composition Analysis) findings
-  - Pipeline scan results
-  - API health checks
-  - Finding details
-  - Workspace packaging
+  - Platform Dynamic (DAST) findings
+  - Platform Static (SAST) findings
+  - Platform SCA (Software Composition Analysis) findings
+  - Workspace packaging for scan preparation
+  - Static Pipeline and scan results
+  - Remediation Guidance for Pipeline results
+  - Finding details - Data paths and dynamic request/responses
+  
 
 ## Installation
 
@@ -28,9 +29,7 @@ A Model Context Protocol (MCP) server implementation in Go that provides Veracod
 
 Download the latest pre-built binary from the [Releases page](https://github.com/dipsylala/veracodemcp-go/releases):
 
-- **Windows**: `veracode-mcp-windows-amd64.exe` or `veracode-mcp-windows-arm64.exe`
-- **macOS**: `veracode-mcp-darwin-amd64` or `veracode-mcp-darwin-arm64`
-- **Linux**: `veracode-mcp-linux-amd64`
+Windows · macOS · Linux | x64 · ARM64
 
 Extract and place the executable in a directory of your choice (e.g., `C:\Program Files\VeracodeMCP\` on Windows or `/usr/local/bin/` on macOS/Linux).
 
@@ -201,7 +200,7 @@ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 }
 ```
 
-## Available Tools
+## Available MCP Tools
 
 The server provides these Veracode-specific tools:
 
