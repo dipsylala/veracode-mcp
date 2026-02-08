@@ -184,7 +184,7 @@
     },
     {
       "name": "remediation-guidance",
-      "description": "Get language-specific guidance and code examples to fix a pipeline scan flaw",
+      "description": "Fix flaws, vulnerabilities, or security issues found in pipeline scan results. Provides language-specific remediation guidance, secure code examples, and step-by-step fix instructions for any pipeline scan finding. Use this when user wants to fix, remediate, or resolve a specific flaw ID or issue from pipeline results.",
       "category": "veracode",
       "params": [
         {
