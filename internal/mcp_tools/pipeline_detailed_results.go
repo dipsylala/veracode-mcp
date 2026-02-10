@@ -246,8 +246,22 @@ func formatPipelineDetailedResultsResponse(appPath, resultsFile string, flaw *Pi
 	var cweID int32
 	_, _ = fmt.Sscanf(flaw.CWEID, "%d", &cweID)
 
-	// Clean the display text
+	// Extract references and clean the display text
+	references := ExtractReferences(flaw.DisplayText)
 	cleanDesc := CleanDescription(flaw.DisplayText)
+
+	// Build references section
+	referencesSection := ""
+	if len(references) > 0 {
+		referencesSection = "\nReferences:\n"
+		for _, ref := range references {
+			if ref.Name != ref.URL {
+				referencesSection += fmt.Sprintf("- [%s](%s)\n", ref.Name, ref.URL)
+			} else {
+				referencesSection += fmt.Sprintf("- %s\n", ref.URL)
+			}
+		}
+	}
 
 	// Build header with flaw info
 	header := fmt.Sprintf(`Pipeline Detailed Results
@@ -264,7 +278,7 @@ Severity: %s
 
 Description:
 %s
-
+%s
 Source File: %s
 Line: %d
 Function: %s
@@ -274,6 +288,8 @@ Data Paths: %d
 IMPORTANT: When presenting this data to the user, create clickable markdown links for all file references.
 For each source file and line number in the data paths below, format as: [filename:line](filepath#Lline)
 Example: [UserController.java:165](com/veracode/verademo/controller/UserController.java#L165)
+
+Offer to explain the datapath and flaw in more detail, or to provide remediation guidance.
 `,
 		appPath,
 		filepath.Base(resultsFile),
@@ -283,6 +299,7 @@ Example: [UserController.java:165](com/veracode/verademo/controller/UserControll
 		flaw.IssueType,
 		transformPipelineSeverity(flaw.Severity),
 		cleanDesc,
+		referencesSection,
 		flaw.Files.SourceFile.File,
 		flaw.Files.SourceFile.Line,
 		flaw.Files.SourceFile.FunctionName,

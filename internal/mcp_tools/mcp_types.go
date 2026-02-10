@@ -1,5 +1,11 @@
 package mcp_tools
 
+// Reference represents a reference link with name and URL
+type Reference struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
 // MCPFindingsResponse represents the complete MCP response for findings
 type MCPFindingsResponse struct {
 	Application MCPApplication     `json:"application"`
@@ -34,11 +40,11 @@ type MCPFinding struct {
 	ViolatesPolicy   bool   `json:"violates_policy"`
 
 	// Security details
-	Severity      string   `json:"severity"`       // CRITICAL, HIGH, MEDIUM, LOW, INFORMATIONAL
-	SeverityScore int32    `json:"severity_score"` // 0-5
-	CweId         int32    `json:"cwe_id"`         // CWE ID number (e.g., 78 for CWE-78)
-	Description   string   `json:"description"`
-	References    []string `json:"references,omitempty"`
+	Severity      string      `json:"severity"`       // CRITICAL, HIGH, MEDIUM, LOW, INFORMATIONAL
+	SeverityScore int32       `json:"severity_score"` // 0-5
+	CweId         int32       `json:"cwe_id"`         // CWE ID number (e.g., 78 for CWE-78)
+	Description   string      `json:"description"`
+	References    []Reference `json:"references,omitempty"`
 
 	// Location (STATIC only)
 	FilePath   string `json:"file_path,omitempty"`

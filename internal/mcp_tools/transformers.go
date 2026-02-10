@@ -167,84 +167,84 @@ func ProcessBase64Description(description string) string {
 
 // CleanDescription removes HTML tags and cleans up the description
 func CleanDescription(description string) string {
-	// Remove HTML tags
-	re := regexp.MustCompile(`<[^>]*>`)
-	cleaned := re.ReplaceAllString(description, "")
+	// First, remove the entire "References:" section with all its links
+	cleaned := referencesSectionPattern.ReplaceAllString(description, "")
 
-	// Clean up whitespace
+	// Then remove all remaining HTML tags
+	cleaned = htmlTagPattern.ReplaceAllString(cleaned, "")
+
+	// Finally, clean up whitespace
 	cleaned = strings.TrimSpace(cleaned)
-	cleaned = regexp.MustCompile(`\s+`).ReplaceAllString(cleaned, " ")
+	cleaned = whitespacePattern.ReplaceAllString(cleaned, " ")
 
 	return cleaned
 }
 
-// ExtractReferences extracts reference URLs from description and returns cleaned description
-type ReferenceResult struct {
-	CleanedDescription string
-	References         []string
-}
+// Pre-compiled regex patterns for performance
+var (
+	// Matches HTML anchor tags: <a href=\"url\">name</a> or <a href="url">name</a>
+	anchorTagPattern = regexp.MustCompile(`<a\s+href=\\?"([^"\\]+)\\?"[^>]*>([^<]+)</a>`)
+	// Matches plain URLs as fallback
+	plainURLPattern = regexp.MustCompile(`https?://[^\s<>"\\]+`)
+	// Matches "References:" section with anchor tags (to be removed from descriptions)
+	// Example: "References: <a href=\"...\">CWE</a> <a href=\"...\">OWASP</a>"
+	// Or: "<span>References: <a ...>...</a> <a ...>...</a></span>"
+	referencesSectionPattern = regexp.MustCompile(`(?:<[^>]*>)?\s*(?i)references?:\s*(?:<a\s+[^>]*>.*?</a>\s*)+\s*(?:</[^>]*>)?`)
+	// Matches all HTML tags
+	htmlTagPattern = regexp.MustCompile(`<[^>]*>`)
+	// Matches multiple whitespace characters
+	whitespacePattern = regexp.MustCompile(`\s+`)
+)
 
-// ExtractStaticReferences extracts references from STATIC findings
-func ExtractStaticReferences(description string) ReferenceResult {
-	result := ReferenceResult{
-		CleanedDescription: description,
-		References:         []string{},
-	}
+// ExtractReferences extracts reference links from descriptions
+// Handles both HTML anchor tags and plain URLs. Does not modify the input.
+func ExtractReferences(description string) []Reference {
+	references := []Reference{}
 
-	// Extract URLs from description
-	urlPattern := regexp.MustCompile(`https?://[^\s<>"]+`)
-	matches := urlPattern.FindAllString(description, -1)
-
-	if len(matches) > 0 {
-		result.References = matches
-		// Remove URLs from description
-		result.CleanedDescription = urlPattern.ReplaceAllString(description, "")
-	}
-
-	return result
-}
-
-// ExtractDynamicReferences extracts references from DAST findings
-func ExtractDynamicReferences(description string) ReferenceResult {
-	result := ReferenceResult{
-		CleanedDescription: description,
-		References:         []string{},
-	}
-
-	// Extract URLs from description (similar to static but may have different patterns)
-	urlPattern := regexp.MustCompile(`https?://[^\s<>"]+`)
-	matches := urlPattern.FindAllString(description, -1)
+	// First, try to extract HTML anchor tags: <a href=\"url\">name</a>
+	// Handle both escaped quotes (\") and regular quotes (")
+	matches := anchorTagPattern.FindAllStringSubmatch(description, -1)
 
 	if len(matches) > 0 {
-		result.References = matches
-		// Remove URLs from description
-		result.CleanedDescription = urlPattern.ReplaceAllString(description, "")
+		for _, match := range matches {
+			if len(match) >= 3 {
+				references = append(references, Reference{
+					URL:  match[1],
+					Name: match[2],
+				})
+			}
+		}
+	} else {
+		// Fallback: Extract plain URLs without names
+		urlMatches := plainURLPattern.FindAllString(description, -1)
+		for _, url := range urlMatches {
+			references = append(references, Reference{
+				URL:  url,
+				Name: url,
+			})
+		}
 	}
 
-	return result
+	return references
 }
 
 // TransformDescription processes description based on scan type
-func TransformDescription(description string, scanType string) (cleanedDesc string, references []string) {
+func TransformDescription(description string, scanType string) (cleanedDesc string, references []Reference) {
 	if description == "" {
 		return "No description available", nil
 	}
 
-	var result ReferenceResult
-
 	switch strings.ToUpper(scanType) {
 	case "DAST", "DYNAMIC":
-		// For DAST: decode base64 first, then extract references
+		// For DAST: decode base64 first, then extract references and clean
 		decoded := ProcessBase64Description(description)
-		result = ExtractDynamicReferences(decoded)
-		cleanedDesc = CleanDescription(result.CleanedDescription)
-		references = result.References
+		references = ExtractReferences(decoded)
+		cleanedDesc = CleanDescription(decoded)
 
 	case "STATIC", "SAST":
 		// For STATIC: extract references and clean
-		result = ExtractStaticReferences(description)
-		cleanedDesc = CleanDescription(result.CleanedDescription)
-		references = result.References
+		references = ExtractReferences(description)
+		cleanedDesc = CleanDescription(description)
 
 	default:
 		// For SCA and others: just clean
