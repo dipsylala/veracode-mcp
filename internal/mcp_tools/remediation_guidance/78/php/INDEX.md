@@ -32,105 +32,65 @@ Only if no PHP function alternative exists, use `proc_open()` with argument arra
 - Remove all exec(), system(), shell_exec() usage
 - Disable dangerous functions in php.ini (disable_functions directive)
 
-## Safe Pattern
+## Remediation Pattern
+
+**The transformation pattern:** System Command → PHP Built-in Function
+
+This applies to ALL system commands - if you find exec(), shell_exec(), or backticks executing a command, there is almost always a PHP function alternative.
 
 ```php
-// ❌ VULNERABLE: System command with user input
+// ❌ VULNERABLE: System command execution with user input
 $output = shell_exec("ping -c 1 " . $host);
 
-// ❌ STILL BAD: escapeshellarg() doesn't fix the root problem
+// ❌ STILL BAD: escapeshellarg() doesn't eliminate injection risk
 $output = shell_exec("ping -c 1 " . escapeshellarg($host));  // Still vulnerable!
 
-// ✅ CORRECT: Use PHP socket functions instead of ping command
-function isHostReachable($host, $port = 80, $timeout = 5) {
-    $errno = 0;
-    $errstr = '';
-    
-    // Suppress warnings and handle errors explicitly
+// ✅ CORRECT: Replace command with PHP function
+function checkConnectivity($host, $port = 80, $timeout = 5) {
     $socket = @fsockopen($host, $port, $errno, $errstr, $timeout);
-    
     if ($socket) {
         fclose($socket);
         return true;
     }
-    
-    error_log("Host unreachable: $errstr ($errno)");
+    error_log("Host unreachable: $errstr");
     return false;
 }
+```
 
-// Alternative: Socket extension for more control
-function checkConnection($host, $port = 80, $timeout = 5) {
-    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
-    
-    $result = @socket_connect($socket, $host, $port);
-    socket_close($socket);
-    
-    return $result !== false;
-}
+## Common Command → Function Replacements
 
-// ✅ OTHER FUNCTION-BASED SOLUTIONS:
+Apply the same pattern for ANY system command:
 
-// File operations: Use PHP functions, not cp/mv commands
-copy($userSourcePath, '/backup/data.txt');
-rename($oldPath, $newPath);
-unlink($filePath);
+```php
+// File operations → PHP file functions
+copy($source, $dest);                   // instead of: cp, copy
+rename($old, $new);                     // instead of: mv, move
+unlink($file);                          // instead of: rm, del
 
-// HTTP requests: Use cURL, not wget/curl commands  
-$ch = curl_init($validatedUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-$response = curl_exec($ch);
-curl_close($ch);
+// Network → cURL, file_get_contents, fsockopen
+curl_exec(curl_init($url));             // instead of: curl, wget
+file_get_contents($url);                // instead of: wget, curl
+fsockopen($host, $port);                // instead of: telnet, nc
 
-// Alternative HTTP: file_get_contents with context
-$context = stream_context_create([
-    'http' => [
-        'timeout' => 10,
-        'ignore_errors' => true
-    ]
-]);
-$response = file_get_contents($validatedUrl, false, $context);
+// Archives → ZipArchive, PharData
+$zip = new ZipArchive();                // instead of: unzip, tar -xf
+$zip->open($path);
+$zip->extractTo($dest);
+$phar = new PharData($path);            // instead of: tar
+$phar->extractTo($dest);
+```
 
-// Archive extraction: Use ZipArchive, not unzip command
-$zip = new ZipArchive();
-if ($zip->open($validatedZipPath) === true) {
-    $zip->extractTo('/extract/');
-    $zip->close();
-}
+## When No Function Exists (Rare)
 
-// Archive creation: Use ZipArchive, not tar/zip commands
-$zip = new ZipArchive();
-if ($zip->open('/backup/archive.zip', ZipArchive::CREATE) === true) {
-    $zip->addFile($validatedFilePath, basename($validatedFilePath));
-    $zip->close();
-}
+Only use proc_open() if there is genuinely no PHP function for the operation:
 
-// Tar archives: Use PharData class
-$phar = new PharData('/backup/archive.tar');
-$phar->buildFromDirectory($validatedDirectory);
-$phar->compress(Phar::GZ);
-
-// ⚠️ LAST RESORT: If no PHP function alternative exists
-// Use proc_open with argument array and bypass_shell
-$descriptors = [
-    0 => ['pipe', 'r'],
-    1 => ['pipe', 'w'],
-    2 => ['pipe', 'w']
-];
-
+```php
+// ⚠️ LAST RESORT: Use argument array with bypass_shell
 $process = proc_open(
-    ['/usr/bin/convert', $validatedInput, $validatedOutput],  // Argument array
+    ['/usr/bin/imagemagick-convert', $validatedInput, $validatedOutput],
     $descriptors,
     $pipes,
-    null,
-    null,
-    ['bypass_shell' => true]  // CRITICAL: bypasses shell interpretation
+    null, null,
+    ['bypass_shell' => true]  // CRITICAL: bypasses shell
 );
-
-if (is_resource($process)) {
-    $output = stream_get_contents($pipes[1]);
-    fclose($pipes[1]);
-    proc_close($process);
-}
 ```

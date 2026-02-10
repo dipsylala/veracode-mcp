@@ -32,75 +32,68 @@ Only if no library alternative exists, then use ProcessBuilder with separate arg
 - Remove all shell invocation patterns (Runtime.exec("sh -c"), Runtime.exec("bash -c"), Runtime.exec("cmd /c"))
 - Configure minimal OS permissions for any remaining process executions
 
-## Safe Pattern
+## Remediation Pattern
+
+**The transformation pattern:** System Command → Java Library API
+
+This applies to ALL system commands - if you find Runtime.exec() or ProcessBuilder executing a command, there is almost always a Java library alternative.
 
 ```java
-// ❌ VULNERABLE: System command with user input
+// ❌ VULNERABLE: System command execution with user input
 proc = Runtime.getRuntime().exec(new String[] { "bash", "-c", "ping -c1 " + host });
 
-// ❌ STILL BAD: Validation doesn't fix command injection
+// ❌ STILL BAD: Validation doesn't eliminate injection risk
 if (host.matches("[a-zA-Z0-9.-]+")) {  // Insufficient protection!
     proc = Runtime.getRuntime().exec("ping -c1 " + host);
 }
 
-// ✅ CORRECT: Use Java library instead of system command
+// ✅ CORRECT: Replace command with Java library
 import java.net.InetAddress;
 
-private boolean isHostReachable(String host) {
+private boolean checkConnectivity(String host) {
     try {
-        InetAddress address = InetAddress.getByName(host);
-        // Test connectivity with 5 second timeout
-        return address.isReachable(5000);
-    } catch (UnknownHostException e) {
-        logger.error("Unknown host: " + host, e);
-        return false;
+        return InetAddress.getByName(host).isReachable(5000);
     } catch (IOException e) {
-        logger.error("Network error checking host: " + host, e);
+        logger.error("Connectivity check failed: " + host, e);
         return false;
     }
 }
+```
 
-// Alternative: Socket-based connectivity test
-private boolean isPortReachable(String host, int port, int timeoutMs) {
-    try (Socket socket = new Socket()) {
-        socket.connect(new InetSocketAddress(host, port), timeoutMs);
-        return true;
-    } catch (IOException e) {
-        return false;
-    }
-}
+## Common Command → Library Replacements
 
-// ✅ OTHER LIBRARY-BASED SOLUTIONS:
+Apply the same pattern for ANY system command:
 
-// File copy: Use Files API, not cp command
-Path source = Paths.get(validatedPath);
-Path dest = Paths.get("/backup/data.txt");
-Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING);
+```java
+// File operations → java.nio.file.Files
+Files.copy(sourcePath, destPath);           // instead of: cp, copy
+Files.move(sourcePath, destPath);           // instead of: mv, move
+Files.delete(filePath);                     // instead of: rm, del
 
-// HTTP request: Use HttpClient, not curl/wget
-HttpClient client = HttpClient.newHttpClient();
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create(validatedUrl))
-    .build();
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+// Network → HttpClient, InetAddress, Socket
+HttpClient.send(request, handler);          // instead of: curl, wget
+InetAddress.getByName(host).isReachable();  // instead of: ping
+Socket.connect(address, timeout);           // instead of: telnet, nc
 
-// Archive extraction: Use ZipFile, not unzip command
-try (ZipFile zipFile = new ZipFile(validatedZipPath)) {
-    Enumeration<? extends ZipEntry> entries = zipFile.entries();
-    while (entries.hasMoreElements()) {
-        ZipEntry entry = entries.nextElement();
-        Path entryPath = Paths.get("/extract/" + entry.getName());
-        Files.copy(zipFile.getInputStream(entry), entryPath);
-    }
-}
+// Archives → java.util.zip, java.util.jar
+ZipFile.extractAll(zipPath, destDir);       // instead of: unzip, tar -xf
+ZipOutputStream.putNextEntry(entry);        // instead of: zip, tar -cf
 
-// ⚠️ LAST RESORT: If no library alternative exists
-// Use ProcessBuilder with separated arguments (never shell invocation)
+// Process management → ProcessHandle
+ProcessHandle.current().pid();              // instead of: ps, tasklist
+ProcessHandle.allProcesses();               // instead of: ps aux, tasklist
+```
+
+## When No Library Exists (Rare)
+
+Only use ProcessBuilder if there is genuinely no Java library for the operation:
+
+```java
+// ⚠️ LAST RESORT: Use argument array, never shell invocation
 ProcessBuilder pb = new ProcessBuilder(
-    "/usr/bin/convert",  // absolute path to command
-    validatedInputFile,   // argument 1
-    validatedOutputFile   // argument 2
+    "/usr/bin/imagemagick-convert",  // absolute path
+    validatedInput,
+    validatedOutput
 );
-pb.redirectErrorStream(true);
-Process process = pb.start();
+Process process = pb.start();  // No shell, no string concatenation
 ```

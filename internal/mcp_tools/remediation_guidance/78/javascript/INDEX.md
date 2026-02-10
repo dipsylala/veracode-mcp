@@ -32,94 +32,75 @@ Only if no module alternative exists, use `execFile()` or `spawn()` with argumen
 - Remove all `child_process.exec()` usage and `{shell: true}` options
 - Apply strict allowlist validation only as defense-in-depth
 
-## Safe Pattern
+## Remediation Pattern
+
+**The transformation pattern:** System Command → Node.js Module
+
+This applies to ALL system commands - if you find child_process.exec() executing a command, there is almost always a Node.js module alternative.
 
 ```javascript
 const { exec } = require('child_process');
 const net = require('net');
-const dns = require('dns').promises;
 
-// ❌ VULNERABLE: System command with user input
+// ❌ VULNERABLE: System command execution with user input
 exec(`ping -c 1 ${host}`, (error, stdout) => {
   console.log(stdout);
 });
 
-// ❌ STILL BAD: Validation doesn't fix the root problem
+// ❌ STILL BAD: Validation doesn't eliminate injection risk
 if (/^[a-zA-Z0-9.-]+$/.test(host)) {  // Insufficient protection!
   exec(`ping -c 1 ${host}`, callback);
 }
 
-// ✅ CORRECT: Use Node.js net module instead of ping command
-function isHostReachable(host, port = 80, timeout = 5000) {
+// ✅ CORRECT: Replace command with Node.js module
+function checkConnectivity(host, port = 80, timeout = 5000) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
-    
     socket.setTimeout(timeout);
-    socket.on('connect', () => {
-      socket.destroy();
-      resolve(true);
-    });
-    socket.on('timeout', () => {
-      socket.destroy();
-      resolve(false);
-    });
-    socket.on('error', () => {
-      resolve(false);
-    });
-    
+    socket.on('connect', () => { socket.destroy(); resolve(true); });
+    socket.on('timeout', () => { socket.destroy(); resolve(false); });
+    socket.on('error', () => resolve(false));
     socket.connect(port, host);
   });
 }
+```
 
-// Alternative: DNS resolution test
-async function canResolveHost(host) {
-  try {
-    await dns.lookup(host);
-    return true;
-  } catch (error) {
-    console.error(`Cannot resolve ${host}:`, error.message);
-    return false;
-  }
-}
+## Common Command → Module Replacements
 
-// ✅ OTHER MODULE-BASED SOLUTIONS:
+Apply the same pattern for ANY system command:
 
-// File operations: Use fs module, not cp/mv commands
-const fs = require('fs').promises;
-await fs.copyFile(userSourcePath, '/backup/data.txt');
+```javascript
+// File operations → fs/fs.promises
+fs.copyFile(source, dest)               // instead of: cp, copy
+fs.rename(source, dest)                 // instead of: mv, move
+fs.unlink(file)                         // instead of: rm, del
 
-// HTTP requests: Use fetch or https, not curl command
-const response = await fetch(validatedUrl, { timeout: 10000 });
-const data = await response.text();
+// Network → fetch, https module
+fetch(url, { timeout: 10000 })          // instead of: curl, wget  
+https.get(url, callback)                // instead of: curl, wget
+net.connect(port, host)                 // instead of: telnet, nc
 
-// Alternative HTTP with https module
-const https = require('https');
-https.get(validatedUrl, (res) => {
-  let data = '';
-  res.on('data', chunk => data += chunk);
-  res.on('end', () => console.log(data));
-});
+// Archives → adm-zip, archiver (npm packages)
+const zip = new AdmZip(zipPath);        // instead of: unzip
+zip.extractAllTo(destDir);              
+archiver('tar').directory(dir)          // instead of: tar
 
-// Archive extraction: Use adm-zip package, not unzip command
-// npm install adm-zip
-const AdmZip = require('adm-zip');
-const zip = new AdmZip(validatedZipPath);
-zip.extractAllTo('/extract/', true);
+// Process info → process module (built-in)
+process.pid                             // instead of: ps, tasklist
+```
 
-// Archive creation: Use archiver package, not tar command
-// npm install archiver
-const archiver = require('archiver');
-const output = fs.createWriteStream('/backup/archive.tar.gz');
-const archive = archiver('tar', { gzip: true });
-archive.pipe(output);
-archive.directory(validatedDirectory, false);
-await archive.finalize();
+## When No Module Exists (Rare)
 
-// ⚠️ LAST RESORT: If no module alternative exists
-// Use execFile with argument array (never exec with strings)
+Only use child_process if there is genuinely no Node.js module for the operation:
+
+```javascript
+// ⚠️ LAST RESORT: Use execFile with argument array
 const { execFile } = require('child_process');
-execFile('/usr/bin/convert', [validatedInput, validatedOutput], (error, stdout) => {
-  if (error) throw error;
-  console.log(stdout);
-});
+execFile('/usr/bin/imagemagick-convert', 
+  [validatedInput, validatedOutput],
+  (error, stdout) => {
+    if (error) throw error;
+    console.log(stdout);
+  }
+);
 ```

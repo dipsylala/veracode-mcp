@@ -32,101 +32,81 @@ Only if no .NET class exists, use `ProcessStartInfo.ArgumentList` with `UseShell
 - Remove all `UseShellExecute = true` usage and cmd.exe/bash invocations
 - Apply strict allowlist validation only as defense-in-depth
 
-## Safe Pattern
+## Remediation Pattern
+
+**The transformation pattern:** System Command → .NET Framework Class
+
+This applies to ALL system commands - if you find Process.Start() executing a command, there is almost always a .NET class alternative.
 
 ```csharp
-using System.Diagnostics;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-// ❌ VULNERABLE: System command with user input
+// ❌ VULNERABLE: System command execution with user input
 var startInfo = new ProcessStartInfo
 {
     FileName = "cmd.exe",
-    Arguments = $"/c ping {host}",
-    UseShellExecute = false
+    Arguments = $"/c ping {host}"
 };
 Process.Start(startInfo);
 
-// ❌ STILL BAD: ArgumentList with validation doesn't fix the root problem
-if (Regex.IsMatch(host, @"^[a-zA-Z0-9.-]+$"))  // Insufficient protection!
+// ❌ STILL BAD: ArgumentList with validation doesn't eliminate injection risk
+if (Regex.IsMatch(host, @"^[a-zA-Z0-9.-]+$"))  // Insufficient!
 {
     var start = new ProcessStartInfo("ping");
     start.ArgumentList.Add(host);
     Process.Start(start);
 }
 
-// ✅ CORRECT: Use .NET Ping class instead of ping command
-using System.Net.NetworkInformation;
-
-public async Task<bool> IsHostReachableAsync(string host, int timeout = 5000)
+// ✅ CORRECT: Replace command with .NET class
+public async Task<bool> CheckConnectivity(string host, int timeout = 5000)
 {
-    try
-    {
+    try {
         using var ping = new Ping();
         var reply = await ping.SendPingAsync(host, timeout);
         return reply.Status == IPStatus.Success;
-    }
-    catch (PingException ex)
-    {
-        Console.WriteLine($"Ping failed: {ex.Message}");
+    } catch (PingException) {
         return false;
     }
 }
+```
 
-// Alternative: TcpClient for port connectivity test
-public async Task<bool> IsPortReachableAsync(string host, int port, int timeoutMs = 5000)
-{
-    try
-    {
-        using var client = new TcpClient();
-        using var cts = new CancellationTokenSource(timeoutMs);
-        await client.ConnectAsync(host, port, cts.Token);
-        return true;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Connection failed: {ex.Message}");
-        return false;
-    }
-}
+## Common Command → Class Replacements
 
-// ✅ OTHER FRAMEWORK-BASED SOLUTIONS:
+Apply the same pattern for ANY system command:
 
-// File operations: Use File/Directory classes, not system commands
-File.Copy(userSourcePath, @"C:\backup\data.txt", overwrite: true);
-Directory.Move(oldPath, newPath);
-File.Delete(filePath);
+```csharp
+// File operations → File, Directory classes
+File.Copy(source, dest);                // instead of: copy, xcopy
+Directory.Move(source, dest);           // instead of: move, mv
+File.Delete(file);                      // instead of: del, rm
 
-// HTTP requests: Use HttpClient, not curl/wget commands
-using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-var response = await httpClient.GetAsync(validatedUrl);
-var content = await response.Content.ReadAsStringAsync();
+// Network → HttpClient, Ping, TcpClient
+await httpClient.GetAsync(url);         // instead of: curl, wget
+await ping.SendPingAsync(host);         // instead of: ping
+await tcpClient.ConnectAsync(host, port); // instead of: telnet
 
-// Archive extraction: Use ZipFile, not unzip command
-using System.IO.Compression;
+// Archives → ZipFile, ZipArchive
+ZipFile.ExtractToDirectory(zip, dest);  // instead of: unzip, tar -xf  
+ZipFile.CreateFromDirectory(src, zip);  // instead of: zip, tar -cf
 
-ZipFile.ExtractToDirectory(validatedZipPath, @"C:\extract\");
+// Process info → Process class
+Process.GetProcesses();                 // instead of: tasklist, ps
+Process.GetCurrentProcess().Id;         // instead of: echo $$
+```
 
-// Archive creation: Use ZipArchive
-using (var archive = ZipFile.Open(@"C:\backup\archive.zip", ZipArchiveMode.Create))
-{
-    archive.CreateEntryFromFile(validatedFilePath, Path.GetFileName(validatedFilePath));
-}
+## When No Class Exists (Rare)
 
-// ⚠️ LAST RESORT: If no .NET framework class exists
-// Use ProcessStartInfo.ArgumentList with UseShellExecute = false
+Only use Process if there is genuinely no .NET class for the operation:
+
+```csharp
+// ⚠️ LAST RESORT: Use ArgumentList with UseShellExecute = false
 var startInfo = new ProcessStartInfo
 {
-    FileName = @"C:\tools\convert.exe",  // Absolute path
-    UseShellExecute = false,              // NEVER use true
-    RedirectStandardOutput = true,
-    RedirectStandardError = true
+    FileName = @"C:\tools\imagemagick.exe",
+    UseShellExecute = false  // NEVER use true
 };
 startInfo.ArgumentList.Add(validatedInput);
 startInfo.ArgumentList.Add(validatedOutput);
-
 using var process = Process.Start(startInfo);
-await process.WaitForExitAsync();
 ```

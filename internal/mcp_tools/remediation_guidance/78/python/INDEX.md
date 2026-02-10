@@ -32,66 +32,66 @@ Only if no library alternative exists, use `subprocess.run()` with argument list
 - Remove all `shell=True` usage and string-based command construction
 - Apply strict allowlist validation only as defense-in-depth
 
-## Safe Pattern
+## Remediation Pattern
+
+**The transformation pattern:** System Command → Python Standard Library
+
+This applies to ALL system commands - if you find subprocess, os.system(), or os.popen() executing a command, there is almost always a Python library alternative.
 
 ```python
-# ❌ VULNERABLE: System command with user input
+# ❌ VULNERABLE: System command execution with user input
 import subprocess
 output = subprocess.check_output(f"ping -c 1 {host}", shell=True)
 
-# ❌ STILL BAD: Validation doesn't fix the root problem
+# ❌ STILL BAD: Validation doesn't eliminate injection risk
 if re.match(r'^[a-zA-Z0-9.-]+$', host):  # Insufficient protection!
     output = subprocess.check_output(f"ping -c 1 {host}", shell=True)
 
-# ✅ CORRECT: Use Python socket library instead of ping command
+# ✅ CORRECT: Replace command with Python library
 import socket
 
-def is_host_reachable(host, port=80, timeout=5):
-    """Test network connectivity using socket, not ping command"""
+def check_connectivity(host, port=80, timeout=5):
     try:
         socket.create_connection((host, port), timeout=timeout)
         return True
-    except (socket.timeout, socket.error) as e:
-        print(f"Host unreachable: {e}")
+    except (socket.timeout, socket.error):
         return False
+```
 
-# Alternative: ICMP ping using third-party library (no subprocess needed)
-# pip install ping3
-from ping3 import ping
-response_time = ping(host, timeout=5)
-is_reachable = response_time is not None
+## Common Command → Library Replacements
 
-# ✅ OTHER LIBRARY-BASED SOLUTIONS:
+Apply the same pattern for ANY system command:
 
-# File operations: Use pathlib/shutil, not cp/mv commands
-from pathlib import Path
-import shutil
+```python
+# File operations → pathlib, shutil
+shutil.copy2(source, dest)              # instead of: cp, copy
+shutil.move(source, dest)               # instead of: mv, move  
+Path(file).unlink()                     # instead of: rm, del
 
-source = Path(user_path).resolve()
-dest = Path("/backup/data.txt")
-shutil.copy2(source, dest)
+# Network → requests, urllib, socket
+requests.get(url, timeout=10)           # instead of: curl, wget
+socket.create_connection((host, port))  # instead of: ping, telnet
 
-# HTTP requests: Use requests, not curl/wget
-import requests
-response = requests.get(validated_url, timeout=10)
+# Archives → zipfile, tarfile
+zipfile.ZipFile(path).extractall()      # instead of: unzip, tar -xf
+tarfile.open(path).extractall()         # instead of: tar -xf
+zipfile.ZipFile(path, 'w').write()      # instead of: zip, tar -cf
 
-# Archive extraction: Use zipfile, not unzip command
-import zipfile
-with zipfile.ZipFile(validated_zip_path, 'r') as zip_ref:
-    zip_ref.extractall('/extract/')
+# Process info → psutil (third-party)
+import psutil
+psutil.Process(pid).name()              # instead of: ps, tasklist
+```
 
-# Archive creation: Use tarfile, not tar command  
-import tarfile
-with tarfile.open('/backup/archive.tar.gz', 'w:gz') as tar:
-    tar.add(validated_directory)
+## When No Library Exists (Rare)
 
-# ⚠️ LAST RESORT: If no library alternative exists
-# Use subprocess with list args and shell=False
+Only use subprocess if there is genuinely no Python library for the operation:
+
+```python
+# ⚠️ LAST RESORT: Use argument list with shell=False
 result = subprocess.run(
-    ['/usr/bin/convert', validated_input, validated_output],  # argument list
-    shell=False,  # NEVER use shell=True
+    ['/usr/bin/imagemagick-convert', validated_input, validated_output],
+    shell=False,  # NEVER shell=True
     capture_output=True,
-    text=True,
     timeout=30
 )
 ```
