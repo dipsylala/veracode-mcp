@@ -56,7 +56,7 @@ func getAppProfileName(req *FindingDetailsRequest) (string, error) {
 }
 
 // lookupApplicationGUID looks up the application GUID by profile name
-func lookupApplicationGUID(ctx context.Context, client api.VeracodeClient, appProfile string) (string, error) {
+func lookupApplicationGUID(ctx context.Context, client api.Client, appProfile string) (string, error) {
 	authCtx := client.GetAuthContext(ctx)
 	app, err := client.GetApplicationByName(authCtx, appProfile)
 	if err != nil {
@@ -66,7 +66,7 @@ func lookupApplicationGUID(ctx context.Context, client api.VeracodeClient, appPr
 }
 
 // tryGetStaticFlaw attempts to retrieve static flaw details
-func tryGetStaticFlaw(ctx context.Context, client api.VeracodeClient, appGUID string, flawID int) (interface{}, error) {
+func tryGetStaticFlaw(ctx context.Context, client api.Client, appGUID string, flawID int) (interface{}, error) {
 	authCtx := client.GetAuthContext(ctx)
 	issueIDStr := strconv.Itoa(flawID)
 
@@ -91,7 +91,7 @@ func tryGetStaticFlaw(ctx context.Context, client api.VeracodeClient, appGUID st
 }
 
 // tryGetDynamicFlaw attempts to retrieve dynamic flaw details
-func tryGetDynamicFlaw(ctx context.Context, client api.VeracodeClient, appGUID string, flawID int) (interface{}, error) {
+func tryGetDynamicFlaw(ctx context.Context, client api.Client, appGUID string, flawID int) (interface{}, error) {
 	authCtx := client.GetAuthContext(ctx)
 	issueIDStr := strconv.Itoa(flawID)
 
@@ -172,7 +172,7 @@ func handleGetFindingDetails(ctx context.Context, args map[string]interface{}) (
 	}
 
 	// Create Veracode API client
-	client, err := api.NewVeracodeClient()
+	client, err := api.NewClient()
 	if err != nil {
 		return map[string]interface{}{"error": fmt.Sprintf("Failed to create Veracode API client: %v", err)}, nil
 	}

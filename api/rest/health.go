@@ -15,7 +15,7 @@ type HealthStatus struct {
 
 // CheckHealth verifies that Veracode API services are operational
 // Returns the health status of the API
-func (c *VeracodeClient) CheckHealth(ctx context.Context) (*HealthStatus, error) {
+func (c *Client) CheckHealth(ctx context.Context) (*HealthStatus, error) {
 	// Get authenticated context
 	authCtx := c.GetAuthContext(ctx)
 
@@ -51,7 +51,7 @@ func (c *VeracodeClient) CheckHealth(ctx context.Context) (*HealthStatus, error)
 }
 
 // CheckHealthSimple returns just a boolean indicating if the API is available
-func (c *VeracodeClient) CheckHealthSimple(ctx context.Context) bool {
+func (c *Client) CheckHealthSimple(ctx context.Context) bool {
 	status, err := c.CheckHealth(ctx)
 	if err != nil {
 		return false

@@ -15,8 +15,8 @@ import (
 	veracodehmac "github.com/dipsylala/veracodemcp-go/hmac"
 )
 
-// VeracodeClient wraps the generated API clients with authentication and configuration
-type VeracodeClient struct {
+// Client wraps the generated API clients with authentication and configuration
+type Client struct {
 	healthcheckClient           *healthcheck.APIClient
 	findingsClient              *findings.APIClient
 	dynamicFlawClient           *dynamic_flaw.APIClient
@@ -72,13 +72,13 @@ func newHMACHTTPClient(apiID, apiKey string) *http.Client {
 	}
 }
 
-// NewVeracodeClient creates a new Veracode API client
+// NewClient creates a new Veracode API client
 // Credentials are loaded from:
 // 1. ~/.veracode/veracode.yml (preferred)
 // 2. Environment variables VERACODE_API_ID and VERACODE_API_KEY (fallback)
 // Base URL is auto-detected from API key ID prefix (vera01ei-* → EU, otherwise → US)
 // Can be overridden via override-api-base-url in veracode.yml or VERACODE_OVERRIDE_API_BASE_URL environment variable
-func NewVeracodeClient() (*VeracodeClient, error) {
+func NewClient() (*Client, error) {
 	apiID, apiKey, baseURL, err := credentials.GetCredentials()
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func NewVeracodeClient() (*VeracodeClient, error) {
 	applicationsCfg.HTTPClient = httpClient
 	applicationsCfg.Servers[0].URL = baseURL
 
-	return &VeracodeClient{
+	return &Client{
 		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
 		findingsClient:              findings.NewAPIClient(findingsCfg),
 		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
@@ -120,9 +120,9 @@ func NewVeracodeClient() (*VeracodeClient, error) {
 	}, nil
 }
 
-// NewVeracodeClientUnconfigured creates a client without checking credentials
+// NewClientUnconfigured creates a client without checking credentials
 // Useful for testing or when credentials will be set later
-func NewVeracodeClientUnconfigured() *VeracodeClient {
+func NewClientUnconfigured() *Client {
 	apiID, apiKey, baseURL, err := credentials.GetCredentials()
 
 	// Create HTTP client with HMAC authentication if credentials are available
@@ -157,7 +157,7 @@ func NewVeracodeClientUnconfigured() *VeracodeClient {
 	applicationsCfg.HTTPClient = httpClient
 	applicationsCfg.Servers[0].URL = baseURL
 
-	return &VeracodeClient{
+	return &Client{
 		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
 		findingsClient:              findings.NewAPIClient(findingsCfg),
 		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
@@ -170,14 +170,14 @@ func NewVeracodeClientUnconfigured() *VeracodeClient {
 }
 
 // IsConfigured returns true if API credentials are set
-func (c *VeracodeClient) IsConfigured() bool {
+func (c *Client) IsConfigured() bool {
 	return c.apiID != "" && c.apiKey != ""
 }
 
 // GetAuthContext returns a context with Veracode API authentication
 // This should be passed to all API calls
 // Note: HMAC authentication is handled automatically by the HTTP client transport
-func (c *VeracodeClient) GetAuthContext(ctx context.Context) context.Context {
+func (c *Client) GetAuthContext(ctx context.Context) context.Context {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -188,17 +188,17 @@ func (c *VeracodeClient) GetAuthContext(ctx context.Context) context.Context {
 }
 
 // StaticFindingDataPathClient returns the static finding data path API client
-func (c *VeracodeClient) StaticFindingDataPathClient() *static_finding_data_path.APIClient {
+func (c *Client) StaticFindingDataPathClient() *static_finding_data_path.APIClient {
 	return c.staticFindingDataPathClient
 }
 
 // DynamicFlawClient returns the dynamic flaw API client
-func (c *VeracodeClient) DynamicFlawClient() *dynamic_flaw.APIClient {
+func (c *Client) DynamicFlawClient() *dynamic_flaw.APIClient {
 	return c.dynamicFlawClient
 }
 
 // RawGet performs a raw GET request to the specified endpoint
-func (c *VeracodeClient) RawGet(ctx context.Context, endpoint string) (string, error) {
+func (c *Client) RawGet(ctx context.Context, endpoint string) (string, error) {
 	if !c.IsConfigured() {
 		return "", fmt.Errorf("API credentials not configured")
 	}

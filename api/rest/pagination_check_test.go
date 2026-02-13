@@ -103,7 +103,7 @@ func comparePaginationResults(t *testing.T, findings1, findings2, findings3 int)
 
 // TestCheckPaginationSupport tests if the Findings API supports undocumented pagination parameters
 func TestCheckPaginationSupport(t *testing.T) {
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping test: %v", err)
 	}

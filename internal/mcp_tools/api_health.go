@@ -20,7 +20,7 @@ func handleAPIHealth(ctx context.Context, args map[string]interface{}) (interfac
 	timestamp := time.Now().Format(time.RFC3339)
 
 	// Try to create API client (will check credentials)
-	client, err := api.NewVeracodeClient()
+	client, err := api.NewClient()
 	if err != nil {
 		return map[string]interface{}{
 			"content": []map[string]string{{

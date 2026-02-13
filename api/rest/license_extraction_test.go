@@ -12,7 +12,7 @@ func TestLicenseExtraction(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping test: %v", err)
 	}

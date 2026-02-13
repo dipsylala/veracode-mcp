@@ -35,7 +35,7 @@ func safeInt64ToInt(val int64) int {
 }
 
 // buildFindingsAPIRequest creates a configured API request with common parameters
-func buildFindingsAPIRequest(client *VeracodeClient, ctx context.Context, req FindingsRequest, scanType string) findings.ApiGetFindingsUsingGETRequest {
+func buildFindingsAPIRequest(client *Client, ctx context.Context, req FindingsRequest, scanType string) findings.ApiGetFindingsUsingGETRequest {
 	apiReq := client.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(ctx, req.AppProfile).
 		ScanType([]string{scanType}).
 		IncludeAnnot(req.IncludeMitigations)
@@ -194,7 +194,7 @@ type FindingsResponse struct {
 }
 
 // GetDynamicFindings retrieves DAST (Dynamic Analysis) findings
-func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+func (c *Client) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
 	if !c.IsConfigured() {
 		return nil, fmt.Errorf("API credentials not configured. Set VERACODE_API_ID and VERACODE_API_KEY")
 	}
@@ -205,7 +205,7 @@ func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsReq
 }
 
 // GetStaticFindings retrieves SAST (Static Analysis) findings
-func (c *VeracodeClient) GetStaticFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+func (c *Client) GetStaticFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
 	if !c.IsConfigured() {
 		return nil, fmt.Errorf("API credentials not configured. Set VERACODE_API_ID and VERACODE_API_KEY")
 	}
@@ -216,7 +216,7 @@ func (c *VeracodeClient) GetStaticFindings(ctx context.Context, req FindingsRequ
 }
 
 // GetScaFindings retrieves SCA findings for an application
-func (c *VeracodeClient) GetScaFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+func (c *Client) GetScaFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
 	if !c.IsConfigured() {
 		return nil, fmt.Errorf("API credentials not configured. Set VERACODE_API_ID and VERACODE_API_KEY")
 	}
@@ -227,7 +227,7 @@ func (c *VeracodeClient) GetScaFindings(ctx context.Context, req FindingsRequest
 }
 
 // GetFindingByID retrieves a specific finding by ID
-func (c *VeracodeClient) GetFindingByID(ctx context.Context, findingID string, isDynamic bool) (*Finding, error) {
+func (c *Client) GetFindingByID(ctx context.Context, findingID string, isDynamic bool) (*Finding, error) {
 	if !c.IsConfigured() {
 		return nil, fmt.Errorf("API credentials not configured")
 	}

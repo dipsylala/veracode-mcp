@@ -12,7 +12,7 @@ func TestVerifyMCPVerademoStaticFindings(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping test: %v", err)
 	}
@@ -32,7 +32,7 @@ func TestVerifyMCPVerademoStaticFindings(t *testing.T) {
 	}
 }
 
-func checkStaticFindings(t *testing.T, ctx context.Context, client *VeracodeClient, appGUID string) {
+func checkStaticFindings(t *testing.T, ctx context.Context, client *Client, appGUID string) {
 	// Get first page to check total
 	req := FindingsRequest{
 		AppProfile: appGUID,

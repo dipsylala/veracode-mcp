@@ -7,7 +7,7 @@ import (
 
 // TestPaginationWithGeneratedClient tests pagination using the updated generated client
 func TestPaginationWithGeneratedClient(t *testing.T) {
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping test: %v", err)
 	}

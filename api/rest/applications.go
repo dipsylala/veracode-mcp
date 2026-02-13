@@ -11,7 +11,7 @@ import (
 )
 
 // GetApplication retrieves a single application by its GUID
-func (c *VeracodeClient) GetApplication(ctx context.Context, applicationGUID string) (*applications.Application, error) {
+func (c *Client) GetApplication(ctx context.Context, applicationGUID string) (*applications.Application, error) {
 	if !c.IsConfigured() {
 		return nil, fmt.Errorf("API credentials not configured. Set VERACODE_API_ID and VERACODE_API_KEY")
 	}
@@ -39,7 +39,7 @@ func (c *VeracodeClient) GetApplication(ctx context.Context, applicationGUID str
 
 // GetApplicationByName retrieves an application by searching for its name
 // Returns the first matching application or nil if not found
-func (c *VeracodeClient) GetApplicationByName(ctx context.Context, name string) (*applications.Application, error) {
+func (c *Client) GetApplicationByName(ctx context.Context, name string) (*applications.Application, error) {
 	if !c.IsConfigured() {
 		return nil, fmt.Errorf("API credentials not configured. Set VERACODE_API_ID and VERACODE_API_KEY")
 	}
@@ -99,7 +99,7 @@ func findExactApplicationMatch(apps []applications.Application, name string) *ap
 }
 
 // ListApplications retrieves a paginated list of applications
-func (c *VeracodeClient) ListApplications(ctx context.Context, page, size int) (*applications.PagedResourceOfApplication, error) {
+func (c *Client) ListApplications(ctx context.Context, page, size int) (*applications.PagedResourceOfApplication, error) {
 	if !c.IsConfigured() {
 		return nil, fmt.Errorf("API credentials not configured. Set VERACODE_API_ID and VERACODE_API_KEY")
 	}

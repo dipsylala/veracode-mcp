@@ -95,7 +95,7 @@ func handleGetScaFindings(ctx context.Context, args map[string]interface{}) (int
 	}
 
 	// Step 2: Create API client
-	client, err := api.NewVeracodeClient()
+	client, err := api.NewClient()
 	if err != nil {
 		responseText := fmt.Sprintf(`SCA Findings Analysis - Error
 ========================

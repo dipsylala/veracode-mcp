@@ -110,7 +110,7 @@ func handleGetStaticFindings(ctx context.Context, args map[string]interface{}) (
 	}
 
 	// Step 2: Create API client
-	client, err := api.NewVeracodeClient()
+	client, err := api.NewClient()
 	if err != nil {
 		responseText := fmt.Sprintf(`Static Findings Analysis - Error
 ========================

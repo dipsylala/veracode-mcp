@@ -67,7 +67,7 @@ import healthcheck "github.com/dipsylala/veracodemcp-go/api/generated/healthchec
 // ✅ GOOD - Use the api wrapper
 import "github.com/dipsylala/veracodemcp-go/api"
 
-client, err := api.NewVeracodeClient()
+client, err := api.NewClient()
 status, err := client.CheckHealth(ctx)
 ```
 

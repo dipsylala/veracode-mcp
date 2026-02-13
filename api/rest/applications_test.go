@@ -20,7 +20,7 @@ func TestGetApplication_Integration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping integration test: %v", err)
 	}
@@ -55,7 +55,7 @@ func TestGetApplicationByName_Integration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping integration test: %v", err)
 	}
@@ -92,7 +92,7 @@ func TestListApplications_Integration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping integration test: %v", err)
 	}
@@ -137,7 +137,7 @@ func TestGetApplication_WithInvalidGUID(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping integration test: %v", err)
 	}
@@ -164,7 +164,7 @@ func TestGetApplicationByName_NotFound(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping integration test: %v", err)
 	}
@@ -218,7 +218,7 @@ func TestGetApplication_WithoutAuthorization(t *testing.T) {
 		}
 	}()
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}

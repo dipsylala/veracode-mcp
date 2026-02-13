@@ -15,7 +15,7 @@ func TestGetStaticFlawDetails_Integration(t *testing.T) {
 		t.Skip("Skipping integration test - no Veracode credentials")
 	}
 
-	client, err := rest.NewVeracodeClient()
+	client, err := rest.NewClient()
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}

@@ -26,17 +26,17 @@ api/
 import "github.com/dipsylala/veracodemcp-go/api"
 
 // Get a client (currently returns REST, future can auto-select)
-client, err := api.NewVeracodeClient()
+client, err := api.NewClient()
 
 // Or explicitly choose protocol (for future)
-client, err := api.NewVeracodeClient(api.WithProtocol("rest"))
-client, err := api.NewVeracodeClient(api.WithProtocol("xml")) // Future
+client, err := api.NewClient(api.WithProtocol("rest"))
+client, err := api.NewClient(api.WithProtocol("xml")) // Future
 ```
 
 ### 2. Interface Definition (`api/client.go`)
 
 ```go
-type VeracodeClient interface {
+type Client interface {
     // Core methods all implementations must support
     IsConfigured() bool
     GetAuthContext(ctx context.Context) context.Context
@@ -52,7 +52,7 @@ type VeracodeClient interface {
 ### 3. Factory Selects Implementation
 
 ```go
-func NewVeracodeClient(opts ...ClientOption) (VeracodeClient, error) {
+func NewClient(opts ...ClientOption) (Client, error) {
     cfg := &clientConfig{protocol: "rest"} // Default
     
     for _, opt := range opts {
@@ -61,9 +61,9 @@ func NewVeracodeClient(opts ...ClientOption) (VeracodeClient, error) {
     
     switch cfg.protocol {
     case "rest":
-        return rest.NewVeracodeClient()  // ← Returns REST implementation
+        return rest.NewClient()  // ← Returns REST implementation
     case "xml":
-        return xml.NewVeracodeClient()   // ← Future: Returns XML implementation
+        return xml.NewClient()   // ← Future: Returns XML implementation
     default:
         return nil, fmt.Errorf("unknown protocol")
     }
@@ -115,11 +115,11 @@ type Client struct {
     // ... XML-specific fields
 }
 
-func NewVeracodeClient() (*Client, error) {
+func NewClient() (*Client, error) {
     // XML implementation
 }
 
-// Implement all VeracodeClient interface methods
+// Implement all Client interface methods
 func (c *Client) CheckHealth(ctx context.Context) (*api.HealthStatus, error) {
     // XML API call
 }
@@ -135,14 +135,14 @@ func (c *Client) GetStaticFindings(ctx context.Context, req api.FindingsRequest)
 // api/client.go
 import "github.com/dipsylala/veracodemcp-go/api/xml"
 
-func NewVeracodeClient(opts ...ClientOption) (VeracodeClient, error) {
+func NewClient(opts ...ClientOption) (Client, error) {
     // ... config setup ...
     
     switch cfg.protocol {
     case "rest":
-        return rest.NewVeracodeClient()
+        return rest.NewClient()
     case "xml":
-        return xml.NewVeracodeClient()  // ← Add this
+        return xml.NewClient()  // ← Add this
     default:
         return nil, fmt.Errorf("unknown protocol")
     }
@@ -152,7 +152,7 @@ func NewVeracodeClient(opts ...ClientOption) (VeracodeClient, error) {
 ### Step 3: Tools Just Work!
 ```go
 // No changes needed in tools!
-client, err := api.NewVeracodeClient(api.WithProtocol("xml"))
+client, err := api.NewClient(api.WithProtocol("xml"))
 status, err := client.CheckHealth(ctx) // Works with XML now
 ```
 
@@ -192,7 +192,7 @@ status, err := client.CheckHealth(ctx) // Works with XML now
 The adapter pattern is NOW COMPLETE:
 
 ```
-Tools → api.NewVeracodeClient() → api.VeracodeClient interface
+Tools → api.NewClient() → api.Client interface
                                           ↓
                                    Factory decides:
                                    - api/rest (current)

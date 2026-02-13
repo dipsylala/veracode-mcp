@@ -10,9 +10,9 @@ import (
 	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/rest/generated/static_finding_data_path"
 )
 
-// VeracodeClient is the main interface for interacting with Veracode APIs
+// Client is the main interface for interacting with Veracode APIs
 // It abstracts the underlying implementation (REST, XML, etc.)
-type VeracodeClient interface {
+type Client interface {
 	// Authentication & Configuration
 	IsConfigured() bool
 	GetAuthContext(ctx context.Context) context.Context
@@ -53,13 +53,13 @@ func WithProtocol(protocol string) ClientOption {
 	}
 }
 
-// NewVeracodeClient creates a new Veracode API client
+// NewClient creates a new Veracode API client
 // By default, uses REST API. In the future, can auto-select or use XML.
 //
 // Credentials are loaded from:
 // 1. ~/.veracode/veracode.yml (preferred)
 // 2. Environment variables VERACODE_API_ID and VERACODE_API_KEY (fallback)
-func NewVeracodeClient(opts ...ClientOption) (VeracodeClient, error) {
+func NewClient(opts ...ClientOption) (Client, error) {
 	cfg := &clientConfig{
 		protocol: "rest", // Default to REST
 	}
@@ -70,7 +70,7 @@ func NewVeracodeClient(opts ...ClientOption) (VeracodeClient, error) {
 
 	switch cfg.protocol {
 	case "rest":
-		return rest.NewVeracodeClient()
+		return rest.NewClient()
 	case "xml":
 		return nil, fmt.Errorf("XML API not yet implemented")
 	default:
@@ -78,9 +78,9 @@ func NewVeracodeClient(opts ...ClientOption) (VeracodeClient, error) {
 	}
 }
 
-// NewVeracodeClientUnconfigured creates a client without checking credentials
+// NewClientUnconfigured creates a client without checking credentials
 // Useful for testing or when credentials will be set later
-func NewVeracodeClientUnconfigured(opts ...ClientOption) VeracodeClient {
+func NewClientUnconfigured(opts ...ClientOption) Client {
 	cfg := &clientConfig{
 		protocol: "rest",
 	}
@@ -91,10 +91,10 @@ func NewVeracodeClientUnconfigured(opts ...ClientOption) VeracodeClient {
 
 	switch cfg.protocol {
 	case "rest":
-		return rest.NewVeracodeClientUnconfigured()
+		return rest.NewClientUnconfigured()
 	default:
 		// Fall back to REST
-		return rest.NewVeracodeClientUnconfigured()
+		return rest.NewClientUnconfigured()
 	}
 }
 

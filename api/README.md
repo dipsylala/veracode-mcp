@@ -29,7 +29,7 @@ api/
 
 Manages all API clients and authentication:
 
-- `NewVeracodeClient()` - Creates client with all 4 API clients initialized
+- `NewClient()` - Creates client with all 4 API clients initialized
 - `GetAuthContext()` - Adds Veracode HMAC authentication to requests
 - `IsConfigured()` - Checks if credentials are set
 - Holds: healthcheckClient, findingsClient, dynamicFlawClient, staticFindingDataPathClient
@@ -79,7 +79,7 @@ import (
 
 func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]interface{}) (interface{}, error) {
     // Create API client
-    client, err := api.NewVeracodeClient()
+    client, err := api.NewClient()
     if err != nil {
         return errorResponse(err.Error()), nil
     }
@@ -147,16 +147,16 @@ To add a new Swagger-generated API:
    ```go
    import new_api "github.com/dipsylala/veracodemcp-go/api/generated/new_api"
    
-   type VeracodeClient struct {
+   type Client struct {
        // ... existing clients ...
        newApiClient *new_api.APIClient
    }
    
-   func NewVeracodeClient() (*VeracodeClient, error) {
+   func NewClient() (*Client, error) {
        // ... existing clients ...
        newApiCfg := new_api.NewConfiguration()
        
-       return &VeracodeClient{
+       return &Client{
            // ... existing clients ...
            newApiClient: new_api.NewAPIClient(newApiCfg),
        }
@@ -169,7 +169,7 @@ To add a new Swagger-generated API:
    // api/helpers/new_feature.go
    package api
    
-   func (c *VeracodeClient) DoSomething(ctx context.Context, params Request) (*Response, error) {
+   func (c *Client) DoSomething(ctx context.Context, params Request) (*Response, error) {
        authCtx := c.GetAuthContext(ctx)
        resp, _, err := c.newApiClient.SomeApi.SomeMethod(authCtx, ...)
        // Add filtering, type conversion, business logic
@@ -182,7 +182,7 @@ To add a new Swagger-generated API:
    ```go
    import "github.com/dipsylala/veracodemcp-go/api"
    
-   client, _ := api.NewVeracodeClient()
+   client, _ := api.NewClient()
    result, err := client.DoSomething(ctx, params)
    ```
 

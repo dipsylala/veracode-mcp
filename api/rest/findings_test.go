@@ -20,7 +20,7 @@ func TestGetStaticFindings_Integration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping integration test: %v", err)
 	}
@@ -79,7 +79,7 @@ func TestGetDynamicFindings_Integration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping integration test: %v", err)
 	}
@@ -160,7 +160,7 @@ func TestGetStaticFindings_WithoutAuthorization(t *testing.T) {
 		}
 	}()
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
@@ -234,7 +234,7 @@ func TestGetDynamicFindings_WithoutAuthorization(t *testing.T) {
 		}
 	}()
 
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}

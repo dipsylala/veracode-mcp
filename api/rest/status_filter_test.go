@@ -116,7 +116,7 @@ func testStatusFilter(t *testing.T, baseURL, appGUID, statusValue, apiID, apiKey
 
 // TestStatusFilterSupport tests if the Findings API supports undocumented status parameter
 func TestStatusFilterSupport(t *testing.T) {
-	client, err := NewVeracodeClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Skipf("Skipping test: %v", err)
 	}
