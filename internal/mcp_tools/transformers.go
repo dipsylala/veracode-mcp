@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	findings "github.com/dipsylala/veracodemcp-go/api/generated/findings"
+	"github.com/dipsylala/veracodemcp-go/api/rest"
+	findings "github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
 )
 
 // SeverityLevel represents the severity of a finding
@@ -289,7 +289,7 @@ type FindingsSummary struct {
 }
 
 // GenerateSummary generates summary statistics from findings array
-func GenerateSummary(findings []api.Finding) FindingsSummary {
+func GenerateSummary(findings []rest.Finding) FindingsSummary {
 	summary := FindingsSummary{
 		TotalFindings: len(findings),
 		BySeverity: map[string]int{

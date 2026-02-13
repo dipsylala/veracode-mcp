@@ -95,7 +95,7 @@ $apis = @(
 if (-not $SkipClean) {
     Write-Step "Cleaning existing generated code..."
     foreach ($api in $apis) {
-        $outputDir = "api/generated/$($api.Name)"
+        $outputDir = "api/rest/generated/$($api.Name)"
         if (Test-Path $outputDir) {
             # Keep README.md if it exists
             if (Test-Path "$outputDir/README.md") {
@@ -127,7 +127,7 @@ foreach ($api in $apis) {
     
     Write-Host "`n  Generating $($api.Name)..." -ForegroundColor Yellow
     
-    $outputDir = "api/generated/$($api.Name)"
+    $outputDir = "api/rest/generated/$($api.Name)"
     
     # Generate based on which tool is available
     if ($generator -eq "openapi-generator-cli" -or $generator -eq "openapi-generator") {
@@ -162,7 +162,7 @@ foreach ($api in $apis) {
 if ($generator -eq "swagger-codegen") {
     Write-Step "Updating package names..."
     foreach ($api in $apis) {
-        $outputDir = "api/generated/$($api.Name)"
+        $outputDir = "api/rest/generated/$($api.Name)"
         if (Test-Path $outputDir) {
             Get-ChildItem -Path $outputDir -Recurse -Include "*.go" | ForEach-Object {
                 (Get-Content $_.FullName) -replace 'package swagger', "package $($api.Package)" | Set-Content $_.FullName
@@ -183,7 +183,7 @@ if ($LASTEXITCODE -eq 0) {
 
 # Apply post-generation patches
 Write-Step "Applying post-generation patches..."
-$findingDetailsFile = "api/generated/findings/model_finding_finding_details.go"
+$findingDetailsFile = "api/rest/generated/findings/model_finding_finding_details.go"
 if (Test-Path $findingDetailsFile) {
     $content = Get-Content -Path $findingDetailsFile -Raw
     
@@ -277,7 +277,7 @@ if ($generated -lt $apis.Count) {
 }
 
 Write-Host "`nNext steps:" -ForegroundColor Cyan
-Write-Host "  1. Review generated code in api/generated/" -ForegroundColor White
+Write-Host "  1. Review generated code in api/rest/generated/" -ForegroundColor White
 Write-Host "  2. Run: .\build.ps1 -Quick" -ForegroundColor White
 Write-Host "  3. Update api/client.go if new clients were added" -ForegroundColor White
 Write-Host ""

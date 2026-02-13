@@ -1,10 +1,10 @@
-package api
+package rest
 
 import (
 	"encoding/json"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/api/generated/findings"
+	"github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
 )
 
 func TestUnmarshalFindingDetails(t *testing.T) {

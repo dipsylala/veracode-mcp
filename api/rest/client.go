@@ -1,4 +1,4 @@
-package api
+package rest
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	applications "github.com/dipsylala/veracodemcp-go/api/generated/applications"
-	dynamic_flaw "github.com/dipsylala/veracodemcp-go/api/generated/dynamic_flaw"
-	findings "github.com/dipsylala/veracodemcp-go/api/generated/findings"
-	healthcheck "github.com/dipsylala/veracodemcp-go/api/generated/healthcheck"
-	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/generated/static_finding_data_path"
+	applications "github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
+	dynamic_flaw "github.com/dipsylala/veracodemcp-go/api/rest/generated/dynamic_flaw"
+	findings "github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
+	healthcheck "github.com/dipsylala/veracodemcp-go/api/rest/generated/healthcheck"
+	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/rest/generated/static_finding_data_path"
 	"github.com/dipsylala/veracodemcp-go/credentials"
 	veracodehmac "github.com/dipsylala/veracodemcp-go/hmac"
 )

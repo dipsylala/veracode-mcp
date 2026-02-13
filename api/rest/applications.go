@@ -1,4 +1,4 @@
-package api
+package rest
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"math"
 	"strings"
 
-	applications "github.com/dipsylala/veracodemcp-go/api/generated/applications"
+	applications "github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
 )
 
 // GetApplication retrieves a single application by its GUID

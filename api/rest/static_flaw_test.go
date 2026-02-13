@@ -1,11 +1,11 @@
-package api_test
+package rest_test
 
 import (
 	"context"
 	"os"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/api"
+	"github.com/dipsylala/veracodemcp-go/api/rest"
 )
 
 // TestGetStaticFlawDetails_Integration tests retrieving static flaw details from the API
@@ -15,7 +15,7 @@ func TestGetStaticFlawDetails_Integration(t *testing.T) {
 		t.Skip("Skipping integration test - no Veracode credentials")
 	}
 
-	client, err := api.NewVeracodeClient()
+	client, err := rest.NewVeracodeClient()
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}

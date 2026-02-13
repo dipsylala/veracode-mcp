@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	"github.com/dipsylala/veracodemcp-go/api/generated/applications"
+	"github.com/dipsylala/veracodemcp-go/api/rest"
+	"github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
@@ -95,7 +95,7 @@ func handleGetScaFindings(ctx context.Context, args map[string]interface{}) (int
 	}
 
 	// Step 2: Create API client
-	client, err := api.NewVeracodeClient()
+	client, err := rest.NewVeracodeClient()
 	if err != nil {
 		responseText := fmt.Sprintf(`SCA Findings Analysis - Error
 ========================
@@ -173,7 +173,7 @@ Please verify:
 	}
 
 	// Step 4: Build the findings request
-	findingsReq := api.FindingsRequest{
+	findingsReq := rest.FindingsRequest{
 		AppProfile:  applicationGUID,
 		Sandbox:     req.Sandbox,
 		Size:        req.Size,
@@ -218,7 +218,7 @@ Please verify:
 }
 
 // formatScaFindingsResponse formats the findings API response into an MCP tool response
-func formatScaFindingsResponse(appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+func formatScaFindingsResponse(appProfile, applicationGUID, sandbox string, findings *rest.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
@@ -311,7 +311,7 @@ func formatScaFindingsResponse(appProfile, applicationGUID, sandbox string, find
 }
 
 // processScaFinding transforms a single API finding into an MCP finding
-func processScaFinding(finding api.Finding) MCPFinding {
+func processScaFinding(finding rest.Finding) MCPFinding {
 	// Use severity score from API extraction
 	severityNum := finding.SeverityScore
 	transformedSeverity := TransformSeverity(&severityNum)

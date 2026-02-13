@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/api"
+	"github.com/dipsylala/veracodemcp-go/api/rest"
 )
 
 // TestScaFindingsLicenseInclusion verifies that license information is included in the MCP response
@@ -16,7 +16,7 @@ func TestScaFindingsLicenseInclusion(t *testing.T) {
 	}
 
 	// Create a test SCA finding with license information
-	finding := api.Finding{
+	finding := rest.Finding{
 		ID:                "12345",
 		Status:            "OPEN",
 		ResolutionStatus:  "NONE",
@@ -28,7 +28,7 @@ func TestScaFindingsLicenseInclusion(t *testing.T) {
 		ComponentFilename: "test-component-1.0.0.jar",
 		ComponentVersion:  "1.0.0",
 		CVE:               "CVE-2024-12345",
-		Licenses: []api.License{
+		Licenses: []rest.License{
 			{
 				LicenseID:  "apache-2.0",
 				RiskRating: "2",

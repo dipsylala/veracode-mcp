@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	"github.com/dipsylala/veracodemcp-go/api/generated/applications"
+	"github.com/dipsylala/veracodemcp-go/api/rest"
+	"github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
 
@@ -110,7 +110,7 @@ func handleGetDynamicFindings(ctx context.Context, args map[string]interface{}) 
 	}
 
 	// Step 2: Create API client
-	client, err := api.NewVeracodeClient()
+	client, err := rest.NewVeracodeClient()
 	if err != nil {
 		responseText := fmt.Sprintf(`Dynamic Findings Analysis - Error
 ========================
@@ -188,7 +188,7 @@ Please verify:
 	}
 
 	// Step 4: Build the findings request
-	findingsReq := api.FindingsRequest{
+	findingsReq := rest.FindingsRequest{
 		AppProfile:         applicationGUID,
 		Sandbox:            req.Sandbox,
 		Size:               req.Size,
@@ -236,7 +236,7 @@ Please verify:
 }
 
 // formatDynamicFindingsResponse formats the findings API response into an MCP tool response
-func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *rest.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
@@ -344,7 +344,7 @@ func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationG
 }
 
 // processDynamicFinding transforms a single API finding into an MCP finding
-func processDynamicFinding(finding api.Finding) MCPFinding {
+func processDynamicFinding(finding rest.Finding) MCPFinding {
 	// Use severity score from API extraction
 	severityNum := finding.SeverityScore
 	transformedSeverity := TransformSeverity(&severityNum)
@@ -407,7 +407,7 @@ func processDynamicFinding(finding api.Finding) MCPFinding {
 }
 
 // convertDynamicMitigations converts API mitigations to MCP mitigations
-func convertDynamicMitigations(apiMitigations []api.Mitigation) []MCPMitigation {
+func convertDynamicMitigations(apiMitigations []rest.Mitigation) []MCPMitigation {
 	if len(apiMitigations) == 0 {
 		return nil
 	}

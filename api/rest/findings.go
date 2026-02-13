@@ -1,4 +1,4 @@
-package api
+package rest
 
 // NOTE ON POLYMORPHIC UNMARSHALING WORKAROUND:
 // The generated OpenAPI client has issues with FindingFindingDetails (oneOf: StaticFinding, DynamicFinding, ManualFinding, ScaFinding).
@@ -20,7 +20,7 @@ import (
 	"log"
 	"math"
 
-	findings "github.com/dipsylala/veracodemcp-go/api/generated/findings"
+	findings "github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
 )
 
 // safeInt64ToInt safely converts int64 to int, capping at MaxInt if overflow would occur
