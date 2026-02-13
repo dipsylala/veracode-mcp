@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/dipsylala/veracodemcp-go/api/rest"
+	"github.com/dipsylala/veracodemcp-go/api"
 	"github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
 	"github.com/dipsylala/veracodemcp-go/workspace"
 )
@@ -110,7 +110,7 @@ func handleGetStaticFindings(ctx context.Context, args map[string]interface{}) (
 	}
 
 	// Step 2: Create API client
-	client, err := rest.NewVeracodeClient()
+	client, err := api.NewVeracodeClient()
 	if err != nil {
 		responseText := fmt.Sprintf(`Static Findings Analysis - Error
 ========================
@@ -188,7 +188,7 @@ Please verify:
 	}
 
 	// Step 4: Build the findings request
-	findingsReq := rest.FindingsRequest{
+	findingsReq := api.FindingsRequest{
 		AppProfile:         applicationGUID,
 		Sandbox:            req.Sandbox,
 		Size:               req.Size,
@@ -236,7 +236,7 @@ Please verify:
 }
 
 // formatStaticFindingsResponse formats the findings API response into an MCP tool response
-func formatStaticFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *rest.FindingsResponse) map[string]interface{} {
+func formatStaticFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
@@ -344,7 +344,7 @@ func formatStaticFindingsResponse(ctx context.Context, appProfile, applicationGU
 }
 
 // processStaticFinding transforms a single API finding into an MCP finding
-func processStaticFinding(finding rest.Finding) MCPFinding {
+func processStaticFinding(finding api.Finding) MCPFinding {
 	// Use severity score from API extraction
 	severityNum := finding.SeverityScore
 	transformedSeverity := TransformSeverity(&severityNum)
@@ -385,7 +385,7 @@ func processStaticFinding(finding rest.Finding) MCPFinding {
 }
 
 // convertMitigations converts API mitigations to MCP mitigations
-func convertMitigations(apiMitigations []rest.Mitigation) []MCPMitigation {
+func convertMitigations(apiMitigations []api.Mitigation) []MCPMitigation {
 	if len(apiMitigations) == 0 {
 		return nil
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dipsylala/veracodemcp-go/api/rest"
+	"github.com/dipsylala/veracodemcp-go/api"
 )
 
 const APIHealthToolName = "api-health"
@@ -20,7 +20,7 @@ func handleAPIHealth(ctx context.Context, args map[string]interface{}) (interfac
 	timestamp := time.Now().Format(time.RFC3339)
 
 	// Try to create API client (will check credentials)
-	client, err := rest.NewVeracodeClient()
+	client, err := api.NewVeracodeClient()
 	if err != nil {
 		return map[string]interface{}{
 			"content": []map[string]string{{
@@ -71,7 +71,7 @@ Timestamp: %s
 
 Timestamp: %s
 
-%s Veracode API (rest.veracode.com)
+%s Veracode API (api.veracode.com)
 Status: %s
 HTTP Status: %d
 

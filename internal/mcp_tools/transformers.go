@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dipsylala/veracodemcp-go/api/rest"
+	"github.com/dipsylala/veracodemcp-go/api"
 	findings "github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
 )
 
@@ -289,7 +289,7 @@ type FindingsSummary struct {
 }
 
 // GenerateSummary generates summary statistics from findings array
-func GenerateSummary(findings []rest.Finding) FindingsSummary {
+func GenerateSummary(findings []api.Finding) FindingsSummary {
 	summary := FindingsSummary{
 		TotalFindings: len(findings),
 		BySeverity: map[string]int{
