@@ -358,6 +358,7 @@ func processScaFinding(finding api.Finding) MCPFinding {
 
 	mcpFinding := MCPFinding{
 		FlawID:           finding.ID,
+		BuildID:          finding.BuildID,
 		ScanType:         "SCA",
 		Status:           string(transformedStatus),
 		MitigationStatus: mitigationStatus,

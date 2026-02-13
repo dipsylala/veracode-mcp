@@ -192,9 +192,10 @@ func TestCheckHealth_WithoutAuthorization(t *testing.T) {
 
 	// The health check endpoint is publicly accessible - it returns 200 even without valid auth
 	// This is expected behavior for health check endpoints
-	if status.StatusCode == 200 {
+	switch status.StatusCode {
+	case 200:
 		t.Logf("Health check endpoint is publicly accessible (no authentication required)")
-	} else if status.StatusCode == 401 || status.StatusCode == 403 {
+	case 401, 403:
 		t.Logf("Health check endpoint requires authentication")
 	}
 }

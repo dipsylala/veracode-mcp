@@ -73,12 +73,6 @@
           "type": "boolean",
           "isRequired": false,
           "description": "Filter by policy violation status"
-        },
-        {
-          "name": "include_mitigations",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Include mitigation details (default false)"
         }
       ]
     },
@@ -149,12 +143,6 @@
           "type": "boolean",
           "isRequired": false,
           "description": "Filter by policy violation status"
-        },
-        {
-          "name": "include_mitigations",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Include mitigation details (default false)"
         }
       ]
     },

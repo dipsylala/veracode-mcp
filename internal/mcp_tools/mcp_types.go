@@ -32,7 +32,8 @@ type MCPSandbox struct {
 type MCPFinding struct {
 	// Core identification
 	FlawID   string `json:"flaw_id"`
-	ScanType string `json:"scan_type"` // STATIC, DAST, SCA
+	BuildID  int64  `json:"build_id,omitempty"` // Build/scan ID where this finding was discovered
+	ScanType string `json:"scan_type"`          // STATIC, DAST, SCA
 
 	// Status
 	Status           string `json:"status"`            // OPEN, CLOSED, UNKNOWN

@@ -8,7 +8,11 @@ import (
 	applications "github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
 	dynamic_flaw "github.com/dipsylala/veracodemcp-go/api/rest/generated/dynamic_flaw"
 	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/rest/generated/static_finding_data_path"
+	"github.com/dipsylala/veracodemcp-go/api/xml"
 )
+
+// Compile-time check to ensure unifiedClient implements the Client interface
+var _ Client = (*unifiedClient)(nil)
 
 // Client is the main interface for interacting with Veracode APIs
 // It abstracts the underlying implementation (REST, XML, etc.)
@@ -37,64 +41,175 @@ type Client interface {
 
 	// Raw API access
 	RawGet(ctx context.Context, endpoint string) (string, error)
+
+	// XML API Methods
+	// GetMitigationInfo retrieves mitigation information for specific flaws in a build
+	GetMitigationInfo(ctx context.Context, buildID int64, flawIDs []int64) (*MitigationInfo, error)
+
+	// GetMitigationInfoForSingleFlaw is a convenience method to get mitigation info for a single flaw
+	GetMitigationInfoForSingleFlaw(ctx context.Context, buildID, flawID int64) (*MitigationIssue, error)
 }
 
-// ClientOption configures the client
-type ClientOption func(*clientConfig)
-
-type clientConfig struct {
-	protocol string // "rest", "xml", "auto" (future)
-}
-
-// WithProtocol specifies which API protocol to use
-func WithProtocol(protocol string) ClientOption {
-	return func(c *clientConfig) {
-		c.protocol = protocol
-	}
+// unifiedClient wraps both REST and XML API clients to provide transparent access
+type unifiedClient struct {
+	restClient *rest.Client
+	xmlClient  *xml.Client
 }
 
 // NewClient creates a new Veracode API client
-// By default, uses REST API. In the future, can auto-select or use XML.
+// The client transparently uses both REST and XML APIs as needed.
 //
 // Credentials are loaded from:
 // 1. ~/.veracode/veracode.yml (preferred)
 // 2. Environment variables VERACODE_API_ID and VERACODE_API_KEY (fallback)
-func NewClient(opts ...ClientOption) (Client, error) {
-	cfg := &clientConfig{
-		protocol: "rest", // Default to REST
+func NewClient() (Client, error) {
+	restClient, err := rest.NewClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create REST client: %w", err)
 	}
 
-	for _, opt := range opts {
-		opt(cfg)
+	xmlClient, err := xml.NewClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create XML client: %w", err)
 	}
 
-	switch cfg.protocol {
-	case "rest":
-		return rest.NewClient()
-	case "xml":
-		return nil, fmt.Errorf("XML API not yet implemented")
-	default:
-		return nil, fmt.Errorf("unknown protocol: %s", cfg.protocol)
-	}
+	return &unifiedClient{
+		restClient: restClient,
+		xmlClient:  xmlClient,
+	}, nil
 }
 
 // NewClientUnconfigured creates a client without checking credentials
 // Useful for testing or when credentials will be set later
-func NewClientUnconfigured(opts ...ClientOption) Client {
-	cfg := &clientConfig{
-		protocol: "rest",
+func NewClientUnconfigured() Client {
+	return &unifiedClient{
+		restClient: rest.NewClientUnconfigured(),
+		xmlClient:  xml.NewClientUnconfigured(),
+	}
+}
+
+// REST API methods - delegate to restClient
+
+func (c *unifiedClient) IsConfigured() bool {
+	return c.restClient.IsConfigured()
+}
+
+func (c *unifiedClient) GetAuthContext(ctx context.Context) context.Context {
+	return c.restClient.GetAuthContext(ctx)
+}
+
+func (c *unifiedClient) CheckHealth(ctx context.Context) (*HealthStatus, error) {
+	return c.restClient.CheckHealth(ctx)
+}
+
+func (c *unifiedClient) GetApplication(ctx context.Context, applicationGUID string) (*applications.Application, error) {
+	return c.restClient.GetApplication(ctx, applicationGUID)
+}
+
+func (c *unifiedClient) GetApplicationByName(ctx context.Context, name string) (*applications.Application, error) {
+	return c.restClient.GetApplicationByName(ctx, name)
+}
+
+func (c *unifiedClient) ListApplications(ctx context.Context, page, size int) (*applications.PagedResourceOfApplication, error) {
+	return c.restClient.ListApplications(ctx, page, size)
+}
+
+func (c *unifiedClient) GetStaticFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+	return c.restClient.GetStaticFindings(ctx, req)
+}
+
+func (c *unifiedClient) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+	return c.restClient.GetDynamicFindings(ctx, req)
+}
+
+func (c *unifiedClient) GetScaFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+	return c.restClient.GetScaFindings(ctx, req)
+}
+
+func (c *unifiedClient) GetFindingByID(ctx context.Context, findingID string, isDynamic bool) (*Finding, error) {
+	return c.restClient.GetFindingByID(ctx, findingID, isDynamic)
+}
+
+func (c *unifiedClient) StaticFindingDataPathClient() *static_finding_data_path.APIClient {
+	return c.restClient.StaticFindingDataPathClient()
+}
+
+func (c *unifiedClient) DynamicFlawClient() *dynamic_flaw.APIClient {
+	return c.restClient.DynamicFlawClient()
+}
+
+func (c *unifiedClient) RawGet(ctx context.Context, endpoint string) (string, error) {
+	return c.restClient.RawGet(ctx, endpoint)
+}
+
+// XML API methods - delegate to xmlClient
+
+func (c *unifiedClient) GetMitigationInfo(ctx context.Context, buildID int64, flawIDs []int64) (*MitigationInfo, error) {
+	xmlInfo, err := c.xmlClient.GetMitigationInfo(ctx, buildID, flawIDs)
+	if err != nil {
+		return nil, err
+	}
+	// Convert xml.MitigationInfo to api.MitigationInfo
+	return convertXMLMitigationInfo(xmlInfo), nil
+}
+
+func (c *unifiedClient) GetMitigationInfoForSingleFlaw(ctx context.Context, buildID, flawID int64) (*MitigationIssue, error) {
+	xmlIssue, err := c.xmlClient.GetMitigationInfoForSingleFlaw(ctx, buildID, flawID)
+	if err != nil {
+		return nil, err
+	}
+	// Convert xml.Issue to api.MitigationIssue
+	return convertXMLIssue(xmlIssue), nil
+}
+
+// Helper functions to convert XML types to API types
+
+func convertXMLMitigationInfo(xmlInfo *xml.MitigationInfo) *MitigationInfo {
+	if xmlInfo == nil {
+		return nil
 	}
 
-	for _, opt := range opts {
-		opt(cfg)
+	issues := make([]MitigationIssue, len(xmlInfo.Issues))
+	for i := range xmlInfo.Issues {
+		issues[i] = *convertXMLIssue(&xmlInfo.Issues[i])
 	}
 
-	switch cfg.protocol {
-	case "rest":
-		return rest.NewClientUnconfigured()
-	default:
-		// Fall back to REST
-		return rest.NewClientUnconfigured()
+	errors := make([]MitigationError, len(xmlInfo.Errors))
+	for i, err := range xmlInfo.Errors {
+		errors[i] = MitigationError{
+			Type:       err.Type,
+			FlawIDList: err.FlawIDList,
+		}
+	}
+
+	return &MitigationInfo{
+		Version: xmlInfo.Version,
+		BuildID: xmlInfo.BuildID,
+		Issues:  issues,
+		Errors:  errors,
+	}
+}
+
+func convertXMLIssue(xmlIssue *xml.Issue) *MitigationIssue {
+	if xmlIssue == nil {
+		return nil
+	}
+
+	actions := make([]MitigationAction, len(xmlIssue.MitigationActions))
+	for i, action := range xmlIssue.MitigationActions {
+		actions[i] = MitigationAction{
+			Action:   action.Action,
+			Desc:     action.Desc,
+			Reviewer: action.Reviewer,
+			Date:     action.Date,
+			Comment:  action.Comment,
+		}
+	}
+
+	return &MitigationIssue{
+		FlawID:            xmlIssue.FlawID,
+		Category:          xmlIssue.Category,
+		MitigationActions: actions,
 	}
 }
 
@@ -117,4 +232,37 @@ type (
 
 	// License represents license information for SCA findings
 	License = rest.License
+)
+
+// XML API types (re-exported for convenience)
+type (
+	// MitigationInfo represents the root element of the mitigation info response
+	MitigationInfo struct {
+		Version string
+		BuildID int64
+		Issues  []MitigationIssue
+		Errors  []MitigationError
+	}
+
+	// MitigationIssue represents a flaw with its mitigation actions
+	MitigationIssue struct {
+		FlawID            int64
+		Category          string
+		MitigationActions []MitigationAction
+	}
+
+	// MitigationAction represents a single mitigation action for a flaw
+	MitigationAction struct {
+		Action   string
+		Desc     string
+		Reviewer string
+		Date     string
+		Comment  string
+	}
+
+	// MitigationError represents an error for flaws that could not be processed
+	MitigationError struct {
+		Type       string
+		FlawIDList string
+	}
 )

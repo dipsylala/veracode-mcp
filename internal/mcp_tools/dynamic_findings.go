@@ -22,16 +22,15 @@ func init() {
 
 // DynamicFindingsRequest represents the parsed parameters for dynamic-findings
 type DynamicFindingsRequest struct {
-	ApplicationPath    string   `json:"application_path"`
-	AppProfile         string   `json:"app_profile,omitempty"`
-	Sandbox            string   `json:"sandbox,omitempty"`
-	Size               int      `json:"size,omitempty"`
-	Page               int      `json:"page,omitempty"`
-	Severity           *int32   `json:"severity,omitempty"`
-	SeverityGte        *int32   `json:"severity_gte,omitempty"`
-	CWEIDs             []string `json:"cwe_ids,omitempty"`
-	ViolatesPolicy     *bool    `json:"violates_policy,omitempty"`
-	IncludeMitigations bool     `json:"include_mitigations,omitempty"`
+	ApplicationPath string   `json:"application_path"`
+	AppProfile      string   `json:"app_profile,omitempty"`
+	Sandbox         string   `json:"sandbox,omitempty"`
+	Size            int      `json:"size,omitempty"`
+	Page            int      `json:"page,omitempty"`
+	Severity        *int32   `json:"severity,omitempty"`
+	SeverityGte     *int32   `json:"severity_gte,omitempty"`
+	CWEIDs          []string `json:"cwe_ids,omitempty"`
+	ViolatesPolicy  *bool    `json:"violates_policy,omitempty"`
 }
 
 // parseDynamicFindingsRequest extracts and validates parameters from the raw args map
@@ -64,9 +63,6 @@ func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsR
 	// Extract optional booleans
 	violatesPolicy, _ := extractOptionalBool(args, "violates_policy")
 	req.ViolatesPolicy = violatesPolicy
-	if includeMitigations, ok := extractOptionalBool(args, "include_mitigations"); ok {
-		req.IncludeMitigations = *includeMitigations
-	}
 
 	// Extract CWE IDs
 	req.CWEIDs = extractCWEIDs(args)
@@ -189,15 +185,14 @@ Please verify:
 
 	// Step 4: Build the findings request
 	findingsReq := api.FindingsRequest{
-		AppProfile:         applicationGUID,
-		Sandbox:            req.Sandbox,
-		Size:               req.Size,
-		Page:               req.Page,
-		Severity:           req.Severity,
-		SeverityGte:        req.SeverityGte,
-		CWEIDs:             req.CWEIDs,
-		ViolatesPolicy:     req.ViolatesPolicy,
-		IncludeMitigations: req.IncludeMitigations,
+		AppProfile:     applicationGUID,
+		Sandbox:        req.Sandbox,
+		Size:           req.Size,
+		Page:           req.Page,
+		Severity:       req.Severity,
+		SeverityGte:    req.SeverityGte,
+		CWEIDs:         req.CWEIDs,
+		ViolatesPolicy: req.ViolatesPolicy,
 	}
 
 	// Step 5: Call the API to get dynamic findings
@@ -391,6 +386,7 @@ func processDynamicFinding(finding api.Finding) MCPFinding {
 
 	return MCPFinding{
 		FlawID:           finding.ID,
+		BuildID:          finding.BuildID,
 		ScanType:         "DAST",
 		Status:           string(transformedStatus),
 		MitigationStatus: mitigationStatus,

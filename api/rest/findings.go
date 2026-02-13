@@ -37,8 +37,7 @@ func safeInt64ToInt(val int64) int {
 // buildFindingsAPIRequest creates a configured API request with common parameters
 func buildFindingsAPIRequest(client *Client, ctx context.Context, req FindingsRequest, scanType string) findings.ApiGetFindingsUsingGETRequest {
 	apiReq := client.findingsClient.ApplicationFindingsInformationAPI.GetFindingsUsingGET(ctx, req.AppProfile).
-		ScanType([]string{scanType}).
-		IncludeAnnot(req.IncludeMitigations)
+		ScanType([]string{scanType})
 
 	// Add pagination parameters
 
@@ -135,23 +134,23 @@ func executeFindingsRequest(apiReq findings.ApiGetFindingsUsingGETRequest, req F
 
 // FindingsRequest represents common parameters for findings queries
 type FindingsRequest struct {
-	AppProfile         string   `json:"app_profile"`
-	Sandbox            string   `json:"sandbox,omitempty"`
-	Severity           *int32   `json:"severity,omitempty"`     // Filter for exact severity value (0-5)
-	SeverityGte        *int32   `json:"severity_gte,omitempty"` // Filter for severity >= value (0-5)
-	Status             []string `json:"status,omitempty"`
-	CWEIDs             []string `json:"cwe_ids,omitempty"`
-	ViolatesPolicy     *bool    `json:"violates_policy,omitempty"`
-	Page               int      `json:"page,omitempty"`
-	Size               int      `json:"size,omitempty"`
-	IncludeMitigations bool     `json:"include_mitigations,omitempty"`
+	AppProfile     string   `json:"app_profile"`
+	Sandbox        string   `json:"sandbox,omitempty"`
+	Severity       *int32   `json:"severity,omitempty"`     // Filter for exact severity value (0-5)
+	SeverityGte    *int32   `json:"severity_gte,omitempty"` // Filter for severity >= value (0-5)
+	Status         []string `json:"status,omitempty"`
+	CWEIDs         []string `json:"cwe_ids,omitempty"`
+	ViolatesPolicy *bool    `json:"violates_policy,omitempty"`
+	Page           int      `json:"page,omitempty"`
+	Size           int      `json:"size,omitempty"`
 }
 
 // Finding represents a security finding (SAST, DAST, or SCA)
 type Finding struct {
 	ID                string                 `json:"id"`
-	Severity          string                 `json:"severity"`       // Numeric severity as string for backward compatibility
-	SeverityScore     int32                  `json:"severity_score"` // Numeric severity score (0-5)
+	BuildID           int64                  `json:"build_id,omitempty"` // Build/scan ID where this finding was discovered
+	Severity          string                 `json:"severity"`           // Numeric severity as string for backward compatibility
+	SeverityScore     int32                  `json:"severity_score"`     // Numeric severity score (0-5)
 	CWE               string                 `json:"cwe"`
 	Status            string                 `json:"status"`
 	ResolutionStatus  string                 `json:"resolution_status"` // Mitigation status (PROPOSED, APPROVED, REJECTED, etc.)
@@ -299,6 +298,9 @@ func convertSingleFinding(apiFinding findings.Finding, scanType string) Finding 
 func extractBasicFields(finding *Finding, apiFinding *findings.Finding) {
 	if apiFinding.IssueId != nil {
 		finding.ID = fmt.Sprintf("%d", *apiFinding.IssueId)
+	}
+	if apiFinding.BuildId != nil {
+		finding.BuildID = *apiFinding.BuildId
 	}
 	if apiFinding.Description != nil {
 		finding.Description = *apiFinding.Description
