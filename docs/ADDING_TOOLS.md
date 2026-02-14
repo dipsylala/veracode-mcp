@@ -215,7 +215,7 @@ The `GetInputSchema()` method returns a standard JSON Schema. Common patterns:
 To call Veracode APIs, use the `api` package:
 
 ```go
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 func (t *YourTool) Handle(ctx context.Context, params map[string]interface{}) (interface{}, error) {
     // Create API client

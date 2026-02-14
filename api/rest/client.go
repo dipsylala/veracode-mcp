@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"strings"
 
-	applications "github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
-	dynamic_flaw "github.com/dipsylala/veracodemcp-go/api/rest/generated/dynamic_flaw"
-	findings "github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
-	healthcheck "github.com/dipsylala/veracodemcp-go/api/rest/generated/healthcheck"
-	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/rest/generated/static_finding_data_path"
-	"github.com/dipsylala/veracodemcp-go/credentials"
-	veracodehmac "github.com/dipsylala/veracodemcp-go/hmac"
+	applications "github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
+	dynamic_flaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
+	findings "github.com/dipsylala/veracode-mcp/api/rest/generated/findings"
+	healthcheck "github.com/dipsylala/veracode-mcp/api/rest/generated/healthcheck"
+	static_finding_data_path "github.com/dipsylala/veracode-mcp/api/rest/generated/static_finding_data_path"
+	"github.com/dipsylala/veracode-mcp/credentials"
+	veracodehmac "github.com/dipsylala/veracode-mcp/hmac"
 )
 
 // Client wraps the generated API clients with authentication and configuration

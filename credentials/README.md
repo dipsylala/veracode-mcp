@@ -23,7 +23,7 @@ This package handles loading Veracode API credentials from multiple sources.
 ## Usage
 
 ```go
-import "github.com/dipsylala/veracodemcp-go/credentials"
+import "github.com/dipsylala/veracode-mcp/credentials"
 
 // Get credentials from file or environment
 apiID, apiSecret, baseURL, err := credentials.GetCredentials()

@@ -20,7 +20,7 @@ import (
 	"log"
 	"math"
 
-	findings "github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
+	findings "github.com/dipsylala/veracode-mcp/api/rest/generated/findings"
 )
 
 // safeInt64ToInt safely converts int64 to int, capping at MaxInt if overflow would occur
@@ -457,15 +457,15 @@ func extractDynamicFromSca(finding *Finding, scaDetails *findings.ScaFinding) {
 		return
 	}
 
-	// Extract CWE - ScaFinding has CWE with ID as float32
+	// Extract CWE - ScaFinding has CWE with ID as int32
 	if scaDetails.Cwe != nil && scaDetails.Cwe.Id != nil {
-		finding.CWE = fmt.Sprintf("CWE-%d", int32(*scaDetails.Cwe.Id))
+		finding.CWE = fmt.Sprintf("CWE-%d", *scaDetails.Cwe.Id)
 	}
 
-	// Extract severity - ScaFinding has severity as float32
+	// Extract severity - ScaFinding has severity as int32
 	if scaDetails.Severity != nil {
-		finding.SeverityScore = int32(*scaDetails.Severity)
-		finding.Severity = fmt.Sprintf("%d", int32(*scaDetails.Severity))
+		finding.SeverityScore = *scaDetails.Severity
+		finding.Severity = fmt.Sprintf("%d", *scaDetails.Severity)
 	}
 
 	// URL is not in ScaFinding, so it won't be extracted
@@ -478,15 +478,15 @@ func extractScaFindingDetails(finding *Finding, scaDetails *findings.ScaFinding)
 		return
 	}
 
-	// Extract CWE - ScaFinding has CWE with ID as float32
+	// Extract CWE - ScaFinding has CWE with ID as int32
 	if scaDetails.Cwe != nil && scaDetails.Cwe.Id != nil {
-		finding.CWE = fmt.Sprintf("CWE-%d", int32(*scaDetails.Cwe.Id))
+		finding.CWE = fmt.Sprintf("CWE-%d", *scaDetails.Cwe.Id)
 	}
 
-	// Extract severity - ScaFinding has severity as float32
+	// Extract severity - ScaFinding has severity as int32
 	if scaDetails.Severity != nil {
-		finding.SeverityScore = int32(*scaDetails.Severity)
-		finding.Severity = fmt.Sprintf("%d", int32(*scaDetails.Severity))
+		finding.SeverityScore = *scaDetails.Severity
+		finding.Severity = fmt.Sprintf("%d", *scaDetails.Severity)
 	}
 
 	// Extract SCA-specific component information

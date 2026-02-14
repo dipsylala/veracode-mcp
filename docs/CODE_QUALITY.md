@@ -169,7 +169,7 @@ linters-settings:
   gofmt:
     simplify: true
   goimports:
-    local-prefixes: github.com/dipsylala/veracodemcp-go
+    local-prefixes: github.com/dipsylala/veracode-mcp
   govet:
     check-shadowing: true
   errcheck:

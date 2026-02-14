@@ -11,11 +11,11 @@ foreach ($file in $toolFiles) {
     $content = Get-Content -Path $file.FullName -Raw
     
     # Change import from api/rest to api
-    $newContent = $content -replace '"github\.com/dipsylala/veracodemcp-go/api/rest"', '"github.com/dipsylala/veracodemcp-go/api"'
+    $newContent = $content -replace '"github\.com/dipsylala/veracode-mcp/api/rest"', '"github.com/dipsylala/veracode-mcp/api"'
     
     # Change generated package imports back to not include rest/
     # (they're re-exported through the api package)
-    $newContent = $newContent -replace 'github\.com/dipsylala/veracodemcp-go/api/rest/generated/', 'github.com/dipsylala/veracodemcp-go/api/rest/generated/'
+    $newContent = $newContent -replace 'github\.com/dipsylala/veracode-mcp/api/rest/generated/', 'github.com/dipsylala/veracode-mcp/api/rest/generated/'
     
     # Change rest.TypeName back to api.TypeName
     $newContent = $newContent -replace '\*rest\.([A-Z][a-zA-Z0-9]*)', '*api.$1'

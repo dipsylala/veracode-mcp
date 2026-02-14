@@ -47,8 +47,8 @@ func main() {
 	severity := int32(56) // int32 | This filter returns all findings with this severity value (0-5). (optional)
 	severityGte := int32(56) // int32 | This filter returns all scan findings with a severity value greater than or equal to the value of the filter (0-5). (optional)
 	violatesPolicy := true // bool | Use this flag to filter the results based on whether the results violate the policy associated with the application. True means the results negatively impact the policy and should be fixed. Not valid for the SCA scan type. (optional)
-	page := int32(56) // int32 | Page number. The default is 0. (optional)
-	size := int32(56) // int32 | Page size (0-500). The default is 100. (optional)
+	page := int32(56) // int32 | Page number. Defaults to 0. (optional)
+	size := int32(56) // int32 | Page size, up to 500. The default is 50. (optional)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
@@ -94,8 +94,8 @@ Name | Type | Description  | Notes
  **severity** | **int32** | This filter returns all findings with this severity value (0-5). | 
  **severityGte** | **int32** | This filter returns all scan findings with a severity value greater than or equal to the value of the filter (0-5). | 
  **violatesPolicy** | **bool** | Use this flag to filter the results based on whether the results violate the policy associated with the application. True means the results negatively impact the policy and should be fixed. Not valid for the SCA scan type. | 
- **page** | **int32** | Page number. The default is 0. | 
- **size** | **int32** | Page size (0-500). The default is 100. | 
+ **page** | **int32** | Page number. Defaults to 0. | 
+ **size** | **int32** | Page size, up to 500. The default is 50. | 
 
 ### Return type
 

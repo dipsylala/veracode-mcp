@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/api"
+	"github.com/dipsylala/veracode-mcp/api"
 )
 
 // TestScaFindingsLicenseInclusion verifies that license information is included in the MCP response

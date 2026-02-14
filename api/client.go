@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dipsylala/veracodemcp-go/api/rest"
-	applications "github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
-	dynamic_flaw "github.com/dipsylala/veracodemcp-go/api/rest/generated/dynamic_flaw"
-	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/rest/generated/static_finding_data_path"
-	"github.com/dipsylala/veracodemcp-go/api/xml"
+	"github.com/dipsylala/veracode-mcp/api/rest"
+	applications "github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
+	dynamic_flaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
+	static_finding_data_path "github.com/dipsylala/veracode-mcp/api/rest/generated/static_finding_data_path"
+	"github.com/dipsylala/veracode-mcp/api/xml"
 )
 
 // Compile-time check to ensure unifiedClient implements the Client interface

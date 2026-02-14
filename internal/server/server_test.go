@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
-	"github.com/dipsylala/veracodemcp-go/internal/types"
+	tools "github.com/dipsylala/veracode-mcp/internal/tool_registry"
+	"github.com/dipsylala/veracode-mcp/internal/types"
 )
 
 // TestMain sets up test fixtures before running tests

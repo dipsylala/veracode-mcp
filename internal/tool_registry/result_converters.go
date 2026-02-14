@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/dipsylala/veracodemcp-go/internal/types"
+	"github.com/dipsylala/veracode-mcp/internal/types"
 )
 
 // Tool result conversion utilities for transforming various result formats

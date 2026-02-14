@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | Pointer to **float32** | The canonical numeric ID of the CWE. | [optional] 
+**Id** | Pointer to **int32** | The canonical numeric ID of the CWE. | [optional] 
 **Name** | Pointer to **string** | The canonical description of the CWE. | [optional] 
 **Href** | Pointer to **string** | Finding CWE href | [optional] 
 
@@ -29,20 +29,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *ScaFindingCwe) GetId() float32`
+`func (o *ScaFindingCwe) GetId() int32`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *ScaFindingCwe) GetIdOk() (*float32, bool)`
+`func (o *ScaFindingCwe) GetIdOk() (*int32, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *ScaFindingCwe) SetId(v float32)`
+`func (o *ScaFindingCwe) SetId(v int32)`
 
 SetId sets Id field to given value.
 

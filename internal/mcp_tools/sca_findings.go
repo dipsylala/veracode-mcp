@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	"github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
-	"github.com/dipsylala/veracodemcp-go/workspace"
+	"github.com/dipsylala/veracode-mcp/api"
+	"github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
+	"github.com/dipsylala/veracode-mcp/workspace"
 )
 
 const ScaFindingsToolName = "get-sca-findings"

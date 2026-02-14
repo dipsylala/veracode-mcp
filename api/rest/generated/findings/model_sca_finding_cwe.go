@@ -20,7 +20,7 @@ var _ MappedNullable = &ScaFindingCwe{}
 // ScaFindingCwe struct for ScaFindingCwe
 type ScaFindingCwe struct {
 	// The canonical numeric ID of the CWE.
-	Id *float32 `json:"id,omitempty"`
+	Id *int32 `json:"id,omitempty"`
 	// The canonical description of the CWE.
 	Name *string `json:"name,omitempty"`
 	// Finding CWE href
@@ -45,9 +45,9 @@ func NewScaFindingCweWithDefaults() *ScaFindingCwe {
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *ScaFindingCwe) GetId() float32 {
+func (o *ScaFindingCwe) GetId() int32 {
 	if o == nil || IsNil(o.Id) {
-		var ret float32
+		var ret int32
 		return ret
 	}
 	return *o.Id
@@ -55,7 +55,7 @@ func (o *ScaFindingCwe) GetId() float32 {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ScaFindingCwe) GetIdOk() (*float32, bool) {
+func (o *ScaFindingCwe) GetIdOk() (*int32, bool) {
 	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
@@ -71,8 +71,8 @@ func (o *ScaFindingCwe) HasId() bool {
 	return false
 }
 
-// SetId gets a reference to the given float32 and assigns it to the Id field.
-func (o *ScaFindingCwe) SetId(v float32) {
+// SetId gets a reference to the given int32 and assigns it to the Id field.
+func (o *ScaFindingCwe) SetId(v int32) {
 	o.Id = &v
 }
 

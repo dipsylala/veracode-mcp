@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	dynamicflaw "github.com/dipsylala/veracodemcp-go/api/rest/generated/dynamic_flaw"
-	staticfindingdatapath "github.com/dipsylala/veracodemcp-go/api/rest/generated/static_finding_data_path"
-	"github.com/dipsylala/veracodemcp-go/workspace"
+	"github.com/dipsylala/veracode-mcp/api"
+	dynamicflaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
+	staticfindingdatapath "github.com/dipsylala/veracode-mcp/api/rest/generated/static_finding_data_path"
+	"github.com/dipsylala/veracode-mcp/workspace"
 )
 
 const FindingDetailsToolName = "get-finding-details"

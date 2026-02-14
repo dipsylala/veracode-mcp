@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/dipsylala/veracodemcp-go/credentials"
-	veracodehmac "github.com/dipsylala/veracodemcp-go/hmac"
+	"github.com/dipsylala/veracode-mcp/credentials"
+	veracodehmac "github.com/dipsylala/veracode-mcp/hmac"
 )
 
 const (

@@ -1,7 +1,7 @@
 package transport
 
 import (
-	"github.com/dipsylala/veracodemcp-go/internal/types"
+	"github.com/dipsylala/veracode-mcp/internal/types"
 )
 
 // RequestHandler defines the interface that MCP servers must implement

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	findings "github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
+	"github.com/dipsylala/veracode-mcp/api"
+	findings "github.com/dipsylala/veracode-mcp/api/rest/generated/findings"
 )
 
 // SeverityLevel represents the severity of a finding

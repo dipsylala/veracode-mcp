@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/credentials"
-	"github.com/dipsylala/veracodemcp-go/hmac"
+	"github.com/dipsylala/veracode-mcp/credentials"
+	"github.com/dipsylala/veracode-mcp/hmac"
 )
 
 // findingsAPIResponse represents the structure of the Findings API response

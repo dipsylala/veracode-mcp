@@ -7,8 +7,8 @@ import (
 	"log"
 	"strings"
 
-	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
-	"github.com/dipsylala/veracodemcp-go/internal/types"
+	tools "github.com/dipsylala/veracode-mcp/internal/tool_registry"
+	"github.com/dipsylala/veracode-mcp/internal/types"
 )
 
 // MCP protocol method handlers that process specific JSON-RPC requests

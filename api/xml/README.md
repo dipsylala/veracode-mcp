@@ -26,7 +26,7 @@ Retrieves mitigation information for specific flaws in a build.
 ```go
 import (
     "context"
-    "github.com/dipsylala/veracodemcp-go/api/xml"
+    "github.com/dipsylala/veracode-mcp/api/xml"
 )
 
 client, err := xml.NewClient()

@@ -3,7 +3,7 @@ package tools
 import (
 	"log"
 
-	"github.com/dipsylala/veracodemcp-go/internal/mcp_tools"
+	"github.com/dipsylala/veracode-mcp/internal/mcp_tools"
 )
 
 // ToolImplRegistry manages all loaded tool implementations

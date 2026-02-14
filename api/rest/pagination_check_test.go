@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/credentials"
-	"github.com/dipsylala/veracodemcp-go/hmac"
+	"github.com/dipsylala/veracode-mcp/credentials"
+	"github.com/dipsylala/veracode-mcp/hmac"
 )
 
 // paginationTestResponse represents the API response structure for pagination tests

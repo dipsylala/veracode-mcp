@@ -74,7 +74,7 @@ Tools import and use the API package:
 package tools
 
 import (
-    "github.com/dipsylala/veracodemcp-go/api"
+    "github.com/dipsylala/veracode-mcp/api"
 )
 
 func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]interface{}) (interface{}, error) {
@@ -145,7 +145,7 @@ To add a new Swagger-generated API:
 3. **Integrate into client.go**:
 
    ```go
-   import new_api "github.com/dipsylala/veracodemcp-go/api/generated/new_api"
+   import new_api "github.com/dipsylala/veracode-mcp/api/generated/new_api"
    
    type Client struct {
        // ... existing clients ...
@@ -180,7 +180,7 @@ To add a new Swagger-generated API:
 5. **Use in tools**:
 
    ```go
-   import "github.com/dipsylala/veracodemcp-go/api"
+   import "github.com/dipsylala/veracode-mcp/api"
    
    client, _ := api.NewClient()
    result, err := client.DoSomething(ctx, params)

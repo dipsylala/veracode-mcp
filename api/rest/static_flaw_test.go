@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/api/rest"
+	"github.com/dipsylala/veracode-mcp/api/rest"
 )
 
 // TestGetStaticFlawDetails_Integration tests retrieving static flaw details from the API

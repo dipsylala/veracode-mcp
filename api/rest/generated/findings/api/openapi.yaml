@@ -398,7 +398,7 @@ paths:
           type: boolean
         style: form
       - allowEmptyValue: false
-        description: Page number. The default is 0.
+        description: Page number. Defaults to 0.
         explode: true
         in: query
         name: page
@@ -408,7 +408,7 @@ paths:
           type: integer
         style: form
       - allowEmptyValue: false
-        description: Page size (0-500). The default is 100.
+        description: "Page size, up to 500. The default is 50."
         explode: true
         in: query
         name: size
@@ -1416,7 +1416,7 @@ components:
       type: object
     Cwe:
       description: The CWE (Common Weakness Enumeration) of the finding.
-      type: string
+      type: integer
     Cvss:
       description: The CVSS associated with the finding.
       type: string
@@ -1561,7 +1561,7 @@ components:
         severity:
           description: An assigned severity for the vulnerability.
           example: 4
-          type: number
+          type: integer
         component_id:
           description: Unique ID for the component.
           type: string
@@ -1603,7 +1603,7 @@ components:
         id:
           description: The canonical numeric ID of the CWE.
           example: 399
-          type: number
+          type: integer
         name:
           description: The canonical description of the CWE.
           example: Resource Management Errors
@@ -1644,7 +1644,7 @@ components:
     ScaFindingSeverity:
       description: An assigned severity for the vulnerability.
       example: 4
-      type: number
+      type: integer
     Finding:
       example:
         grace_period_expires_date: 2000-01-23T04:56:07.000+00:00

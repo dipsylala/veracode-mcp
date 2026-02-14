@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dipsylala/veracodemcp-go/api"
+	"github.com/dipsylala/veracode-mcp/api"
 )
 
 const APIHealthToolName = "api-health"

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	dynamicflaw "github.com/dipsylala/veracodemcp-go/api/rest/generated/dynamic_flaw"
+	"github.com/dipsylala/veracode-mcp/api"
+	dynamicflaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
 )
 
 // This test demonstrates what the LLM-optimized output looks like for a dynamic flaw

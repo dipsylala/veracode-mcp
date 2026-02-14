@@ -7,7 +7,7 @@ This document describes how REST API calls are integrated with the MCP server to
 ## Package Structure
 
 ```text
-VeracodeMCP-Go/
+Veracode-MCP/
 ├── api/                        # API package
 │   ├── client.go              # Client orchestrator (manages all API clients)
 │   ├── findings.go            # Findings endpoints (SAST/DAST) with filtering and business logic
@@ -96,7 +96,7 @@ api.GetDynamicFindings()
 package api
 
 import (
-    "github.com/dipsylala/veracodemcp-go/api/generated/findings"
+    "github.com/dipsylala/veracode-mcp/api/generated/findings"
 )
 
 func (c *Client) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
@@ -131,7 +131,7 @@ func (c *Client) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*
 
 ```go
 // tools/dynamic_findings.go
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 func (t *DynamicFindingsTool) handleGetDynamicFindings(ctx context.Context, params map[string]interface{}) (interface{}, error) {
     // Create API client
@@ -221,7 +221,7 @@ This will:
 - Run `go mod tidy`
 
 ```go
-import new_api "github.com/dipsylala/veracodemcp-go/api/generated/new_api"
+import new_api "github.com/dipsylala/veracode-mcp/api/generated/new_api"
 
 type Client struct {
     healthcheckClient           *healthcheck.APIClient
@@ -308,7 +308,7 @@ func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]i
 
 ```go
 // tools/api_health.go
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]interface{}) (interface{}, error) {
     client, err := api.NewClient()

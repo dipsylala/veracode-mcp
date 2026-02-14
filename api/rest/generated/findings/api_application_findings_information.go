@@ -144,13 +144,13 @@ func (r ApiGetFindingsUsingGETRequest) ViolatesPolicy(violatesPolicy bool) ApiGe
 	return r
 }
 
-// Page number. The default is 0.
+// Page number. Defaults to 0.
 func (r ApiGetFindingsUsingGETRequest) Page(page int32) ApiGetFindingsUsingGETRequest {
 	r.page = &page
 	return r
 }
 
-// Page size (0-500). The default is 100.
+// Page size, up to 500. The default is 50.
 func (r ApiGetFindingsUsingGETRequest) Size(size int32) ApiGetFindingsUsingGETRequest {
 	r.size = &size
 	return r

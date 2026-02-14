@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Cwe** | Pointer to [**ScaFindingCwe**](ScaFindingCwe.md) |  | [optional] 
 **Cvss** | Pointer to **float64** | The CVSS score. | [optional] 
-**Severity** | Pointer to **float32** | An assigned severity for the vulnerability. | [optional] 
+**Severity** | Pointer to **int32** | An assigned severity for the vulnerability. | [optional] 
 **Exploitability** | Pointer to **int32** | Exploitability of the finding. | [optional] 
 **AttackVector** | Pointer to **string** | URL or some input parameter. | [optional] 
 **FileLineNumber** | Pointer to **int32** | The line number where the finding exists in the file. | [optional] 
@@ -116,20 +116,20 @@ HasCvss returns a boolean if a field has been set.
 
 ### GetSeverity
 
-`func (o *FindingFindingDetails) GetSeverity() float32`
+`func (o *FindingFindingDetails) GetSeverity() int32`
 
 GetSeverity returns the Severity field if non-nil, zero value otherwise.
 
 ### GetSeverityOk
 
-`func (o *FindingFindingDetails) GetSeverityOk() (*float32, bool)`
+`func (o *FindingFindingDetails) GetSeverityOk() (*int32, bool)`
 
 GetSeverityOk returns a tuple with the Severity field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSeverity
 
-`func (o *FindingFindingDetails) SetSeverity(v float32)`
+`func (o *FindingFindingDetails) SetSeverity(v int32)`
 
 SetSeverity sets Severity field to given value.
 

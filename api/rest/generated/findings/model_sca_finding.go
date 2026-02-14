@@ -21,7 +21,7 @@ var _ MappedNullable = &ScaFinding{}
 type ScaFinding struct {
 	Cwe *ScaFindingCwe `json:"cwe,omitempty"`
 	// An assigned severity for the vulnerability.
-	Severity *float32 `json:"severity,omitempty"`
+	Severity *int32 `json:"severity,omitempty"`
 	// Unique ID for the component.
 	ComponentId *string `json:"component_id,omitempty"`
 	// Displays all licenses found for a component with the specified risk rating.
@@ -91,9 +91,9 @@ func (o *ScaFinding) SetCwe(v ScaFindingCwe) {
 }
 
 // GetSeverity returns the Severity field value if set, zero value otherwise.
-func (o *ScaFinding) GetSeverity() float32 {
+func (o *ScaFinding) GetSeverity() int32 {
 	if o == nil || IsNil(o.Severity) {
-		var ret float32
+		var ret int32
 		return ret
 	}
 	return *o.Severity
@@ -101,7 +101,7 @@ func (o *ScaFinding) GetSeverity() float32 {
 
 // GetSeverityOk returns a tuple with the Severity field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ScaFinding) GetSeverityOk() (*float32, bool) {
+func (o *ScaFinding) GetSeverityOk() (*int32, bool) {
 	if o == nil || IsNil(o.Severity) {
 		return nil, false
 	}
@@ -117,8 +117,8 @@ func (o *ScaFinding) HasSeverity() bool {
 	return false
 }
 
-// SetSeverity gets a reference to the given float32 and assigns it to the Severity field.
-func (o *ScaFinding) SetSeverity(v float32) {
+// SetSeverity gets a reference to the given int32 and assigns it to the Severity field.
+func (o *ScaFinding) SetSeverity(v int32) {
 	o.Severity = &v
 }
 

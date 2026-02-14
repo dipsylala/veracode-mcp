@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dipsylala/veracodemcp-go/credentials"
-	"github.com/dipsylala/veracodemcp-go/hmac"
+	"github.com/dipsylala/veracode-mcp/credentials"
+	"github.com/dipsylala/veracode-mcp/hmac"
 )
 
 // TestStaticFindings_DebugRawResponse captures the raw API response to diagnose deserialization issues

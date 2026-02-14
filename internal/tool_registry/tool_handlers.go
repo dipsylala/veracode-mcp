@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"github.com/dipsylala/veracodemcp-go/internal/mcp_tools"
+	"github.com/dipsylala/veracode-mcp/internal/mcp_tools"
 )
 
 // ToolHandlerRegistry manages the mapping of tool names to their handler functions

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/dipsylala/veracodemcp-go/api/rest/generated/findings"
+	"github.com/dipsylala/veracode-mcp/api/rest/generated/findings"
 )
 
 func TestUnmarshalFindingDetails(t *testing.T) {

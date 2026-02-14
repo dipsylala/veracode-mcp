@@ -7,7 +7,7 @@ import (
 	"math"
 	"strings"
 
-	applications "github.com/dipsylala/veracodemcp-go/api/rest/generated/applications"
+	applications "github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
 )
 
 // GetApplication retrieves a single application by its GUID

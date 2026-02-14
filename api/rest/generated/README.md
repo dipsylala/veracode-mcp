@@ -62,10 +62,10 @@ Instead, use the `api/` package which wraps these clients:
 
 ```go
 // ❌ BAD - Don't do this in tools
-import healthcheck "github.com/dipsylala/veracodemcp-go/api/generated/healthcheck"
+import healthcheck "github.com/dipsylala/veracode-mcp/api/generated/healthcheck"
 
 // ✅ GOOD - Use the api wrapper
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 client, err := api.NewClient()
 status, err := client.CheckHealth(ctx)

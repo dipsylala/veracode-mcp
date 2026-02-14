@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Cwe** | Pointer to [**ScaFindingCwe**](ScaFindingCwe.md) |  | [optional] 
-**Severity** | Pointer to **float32** | An assigned severity for the vulnerability. | [optional] 
+**Severity** | Pointer to **int32** | An assigned severity for the vulnerability. | [optional] 
 **ComponentId** | Pointer to **string** | Unique ID for the component. | [optional] 
 **Licenses** | Pointer to [**[]ScaFindingLicensesInner**](ScaFindingLicensesInner.md) | Displays all licenses found for a component with the specified risk rating. | [optional] 
 **Cve** | Pointer to [**ScaFindingCve**](ScaFindingCve.md) |  | [optional] 
@@ -62,20 +62,20 @@ HasCwe returns a boolean if a field has been set.
 
 ### GetSeverity
 
-`func (o *ScaFinding) GetSeverity() float32`
+`func (o *ScaFinding) GetSeverity() int32`
 
 GetSeverity returns the Severity field if non-nil, zero value otherwise.
 
 ### GetSeverityOk
 
-`func (o *ScaFinding) GetSeverityOk() (*float32, bool)`
+`func (o *ScaFinding) GetSeverityOk() (*int32, bool)`
 
 GetSeverityOk returns a tuple with the Severity field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSeverity
 
-`func (o *ScaFinding) SetSeverity(v float32)`
+`func (o *ScaFinding) SetSeverity(v int32)`
 
 SetSeverity sets Severity field to given value.
 

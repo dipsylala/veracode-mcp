@@ -23,7 +23,7 @@ api/
 ### 1. Tools Import Top-Level Package
 
 ```go
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 // Get a client (currently returns REST, future can auto-select)
 client, err := api.NewClient()
@@ -133,7 +133,7 @@ func (c *Client) GetStaticFindings(ctx context.Context, req api.FindingsRequest)
 ### Step 2: Update Factory
 ```go
 // api/client.go
-import "github.com/dipsylala/veracodemcp-go/api/xml"
+import "github.com/dipsylala/veracode-mcp/api/xml"
 
 func NewClient(opts ...ClientOption) (Client, error) {
     // ... config setup ...

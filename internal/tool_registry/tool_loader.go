@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/dipsylala/veracodemcp-go/internal/types"
+	"github.com/dipsylala/veracode-mcp/internal/types"
 )
 
 var toolsJSON []byte
