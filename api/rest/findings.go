@@ -132,66 +132,6 @@ func executeFindingsRequest(apiReq findings.ApiGetFindingsUsingGETRequest, req F
 	}, nil
 }
 
-// FindingsRequest represents common parameters for findings queries
-type FindingsRequest struct {
-	AppProfile     string   `json:"app_profile"`
-	Sandbox        string   `json:"sandbox,omitempty"`
-	Severity       *int32   `json:"severity,omitempty"`     // Filter for exact severity value (0-5)
-	SeverityGte    *int32   `json:"severity_gte,omitempty"` // Filter for severity >= value (0-5)
-	Status         []string `json:"status,omitempty"`
-	CWEIDs         []string `json:"cwe_ids,omitempty"`
-	ViolatesPolicy *bool    `json:"violates_policy,omitempty"`
-	Page           int      `json:"page,omitempty"`
-	Size           int      `json:"size,omitempty"`
-}
-
-// Finding represents a security finding (SAST, DAST, or SCA)
-type Finding struct {
-	ID                string                 `json:"id"`
-	BuildID           int64                  `json:"build_id,omitempty"` // Build/scan ID where this finding was discovered
-	Severity          string                 `json:"severity"`           // Numeric severity as string for backward compatibility
-	SeverityScore     int32                  `json:"severity_score"`     // Numeric severity score (0-5)
-	CWE               string                 `json:"cwe"`
-	Status            string                 `json:"status"`
-	ResolutionStatus  string                 `json:"resolution_status"` // Mitigation status (PROPOSED, APPROVED, REJECTED, etc.)
-	Description       string                 `json:"description"`
-	FilePath          string                 `json:"file_path,omitempty"`     // SAST only
-	LineNumber        int                    `json:"line_number,omitempty"`   // SAST only
-	Module            string                 `json:"module,omitempty"`        // SAST only
-	Procedure         string                 `json:"procedure,omitempty"`     // SAST only
-	AttackVector      string                 `json:"attack_vector,omitempty"` // SAST only
-	URL               string                 `json:"url,omitempty"`           // DAST only
-	ViolatesPolicy    bool                   `json:"violates_policy"`
-	Mitigations       []Mitigation           `json:"mitigations,omitempty"`
-	AdditionalInfo    map[string]interface{} `json:"additional_info,omitempty"`
-	ComponentFilename string                 `json:"component_filename,omitempty"` // SCA only
-	ComponentVersion  string                 `json:"component_version,omitempty"`  // SCA only
-	CVE               string                 `json:"cve,omitempty"`                // SCA only
-	Licenses          []License              `json:"licenses,omitempty"`           // SCA only
-}
-
-// License represents SCA component license information
-type License struct {
-	LicenseID  string `json:"license_id"`
-	RiskRating string `json:"risk_rating,omitempty"`
-}
-
-// Mitigation represents a proposed fix or risk acceptance
-type Mitigation struct {
-	Action    string `json:"action"`
-	Comment   string `json:"comment"`
-	Submitter string `json:"submitter"`
-	Date      string `json:"date"`
-}
-
-// FindingsResponse represents a paginated list of findings
-type FindingsResponse struct {
-	Findings   []Finding `json:"findings"`
-	TotalCount int       `json:"total_count"`
-	Page       int       `json:"page"`
-	Size       int       `json:"size"`
-}
-
 // GetDynamicFindings retrieves DAST (Dynamic Analysis) findings
 func (c *Client) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
 	if !c.IsConfigured() {
@@ -316,27 +256,6 @@ func extractBasicFields(finding *Finding, apiFinding *findings.Finding) {
 		}
 		if apiFinding.FindingStatus.ResolutionStatus != nil {
 			finding.ResolutionStatus = *apiFinding.FindingStatus.ResolutionStatus
-		}
-	}
-
-	// Extract annotations (mitigations)
-	if len(apiFinding.Annotations) > 0 {
-		finding.Mitigations = make([]Mitigation, 0, len(apiFinding.Annotations))
-		for _, annotation := range apiFinding.Annotations {
-			mitigation := Mitigation{}
-			if annotation.Action != nil {
-				mitigation.Action = *annotation.Action
-			}
-			if annotation.Comment != nil {
-				mitigation.Comment = *annotation.Comment
-			}
-			if annotation.UserName != nil {
-				mitigation.Submitter = *annotation.UserName
-			}
-			if annotation.Created != nil {
-				mitigation.Date = annotation.Created.Format("2006-01-02T15:04:05Z")
-			}
-			finding.Mitigations = append(finding.Mitigations, mitigation)
 		}
 	}
 }

@@ -398,26 +398,7 @@ func processDynamicFinding(finding api.Finding) MCPFinding {
 		References:       references,
 		URL:              finding.URL,
 		AttackVector:     finding.AttackVector,
-		Mitigations:      convertDynamicMitigations(finding.Mitigations),
 	}
-}
-
-// convertDynamicMitigations converts API mitigations to MCP mitigations
-func convertDynamicMitigations(apiMitigations []api.Mitigation) []MCPMitigation {
-	if len(apiMitigations) == 0 {
-		return nil
-	}
-
-	mitigations := make([]MCPMitigation, len(apiMitigations))
-	for i, m := range apiMitigations {
-		mitigations[i] = MCPMitigation{
-			Action:    m.Action,
-			Comment:   m.Comment,
-			Submitter: m.Submitter,
-			Date:      m.Date,
-		}
-	}
-	return mitigations
 }
 
 // updateSummaryCounters updates the response summary based on a finding

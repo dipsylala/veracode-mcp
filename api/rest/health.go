@@ -6,13 +6,6 @@ import (
 	"log"
 )
 
-// HealthStatus represents the result of a health check
-type HealthStatus struct {
-	Available  bool   `json:"available"`
-	Message    string `json:"message"`
-	StatusCode int    `json:"status_code"`
-}
-
 // CheckHealth verifies that Veracode API services are operational
 // Returns the health status of the API
 func (c *Client) CheckHealth(ctx context.Context) (*HealthStatus, error) {

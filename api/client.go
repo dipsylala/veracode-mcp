@@ -149,7 +149,6 @@ func (c *unifiedClient) GetMitigationInfo(ctx context.Context, buildID int64, fl
 	if err != nil {
 		return nil, err
 	}
-	// Convert xml.MitigationInfo to api.MitigationInfo
 	return convertXMLMitigationInfo(xmlInfo), nil
 }
 
@@ -158,111 +157,5 @@ func (c *unifiedClient) GetMitigationInfoForSingleFlaw(ctx context.Context, buil
 	if err != nil {
 		return nil, err
 	}
-	// Convert xml.Issue to api.MitigationIssue
 	return convertXMLIssue(xmlIssue), nil
 }
-
-// Helper functions to convert XML types to API types
-
-func convertXMLMitigationInfo(xmlInfo *xml.MitigationInfo) *MitigationInfo {
-	if xmlInfo == nil {
-		return nil
-	}
-
-	issues := make([]MitigationIssue, len(xmlInfo.Issues))
-	for i := range xmlInfo.Issues {
-		issues[i] = *convertXMLIssue(&xmlInfo.Issues[i])
-	}
-
-	errors := make([]MitigationError, len(xmlInfo.Errors))
-	for i, err := range xmlInfo.Errors {
-		errors[i] = MitigationError{
-			Type:       err.Type,
-			FlawIDList: err.FlawIDList,
-		}
-	}
-
-	return &MitigationInfo{
-		Version: xmlInfo.Version,
-		BuildID: xmlInfo.BuildID,
-		Issues:  issues,
-		Errors:  errors,
-	}
-}
-
-func convertXMLIssue(xmlIssue *xml.Issue) *MitigationIssue {
-	if xmlIssue == nil {
-		return nil
-	}
-
-	actions := make([]MitigationAction, len(xmlIssue.MitigationActions))
-	for i, action := range xmlIssue.MitigationActions {
-		actions[i] = MitigationAction{
-			Action:   action.Action,
-			Desc:     action.Desc,
-			Reviewer: action.Reviewer,
-			Date:     action.Date,
-			Comment:  action.Comment,
-		}
-	}
-
-	return &MitigationIssue{
-		FlawID:            xmlIssue.FlawID,
-		Category:          xmlIssue.Category,
-		MitigationActions: actions,
-	}
-}
-
-// Re-export types from rest package so tools can import just "api"
-type (
-	// HealthStatus represents the health check response
-	HealthStatus = rest.HealthStatus
-
-	// FindingsResponse represents a response containing security findings
-	FindingsResponse = rest.FindingsResponse
-
-	// FindingsRequest contains parameters for querying findings
-	FindingsRequest = rest.FindingsRequest
-
-	// Finding represents a single security finding (SAST/DAST/SCA)
-	Finding = rest.Finding
-
-	// Mitigation represents mitigation information for a finding
-	Mitigation = rest.Mitigation
-
-	// License represents license information for SCA findings
-	License = rest.License
-)
-
-// XML API types (re-exported for convenience)
-type (
-	// MitigationInfo represents the root element of the mitigation info response
-	MitigationInfo struct {
-		Version string
-		BuildID int64
-		Issues  []MitigationIssue
-		Errors  []MitigationError
-	}
-
-	// MitigationIssue represents a flaw with its mitigation actions
-	MitigationIssue struct {
-		FlawID            int64
-		Category          string
-		MitigationActions []MitigationAction
-	}
-
-	// MitigationAction represents a single mitigation action for a flaw
-	MitigationAction struct {
-		Action   string
-		Desc     string
-		Reviewer string
-		Date     string
-		Comment  string
-	}
-
-	// MitigationError represents an error for flaws that could not be processed
-	MitigationError struct {
-		Type       string
-		FlawIDList string
-	}
-)

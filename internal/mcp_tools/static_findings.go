@@ -376,26 +376,7 @@ func processStaticFinding(finding api.Finding) MCPFinding {
 		Module:           finding.Module,
 		Procedure:        finding.Procedure,
 		AttackVector:     finding.AttackVector,
-		Mitigations:      convertMitigations(finding.Mitigations),
 	}
-}
-
-// convertMitigations converts API mitigations to MCP mitigations
-func convertMitigations(apiMitigations []api.Mitigation) []MCPMitigation {
-	if len(apiMitigations) == 0 {
-		return nil
-	}
-
-	mitigations := make([]MCPMitigation, len(apiMitigations))
-	for i, m := range apiMitigations {
-		mitigations[i] = MCPMitigation{
-			Action:    m.Action,
-			Comment:   m.Comment,
-			Submitter: m.Submitter,
-			Date:      m.Date,
-		}
-	}
-	return mitigations
 }
 
 // updateStaticSummaryCounters updates the response summary based on a static finding
