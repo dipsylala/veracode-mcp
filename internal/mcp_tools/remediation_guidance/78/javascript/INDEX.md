@@ -2,65 +2,41 @@
 
 ## LLM Guidance
 
-**STOP. Before doing anything else: DO NOT execute system processes.**
+OS Command Injection occurs when untrusted data is incorporated into operating system commands without proper validation, allowing attackers to execute arbitrary commands on the host. In Node.js, eliminate child_process module usage entirely by using native Node.js modules (fs, net, http/https) for file operations, HTTP requests, and network operations.
 
-OS Command Injection occurs when OS commands are executed with untrusted data. The ONLY correct remediation is to **ELIMINATE ALL calls to child_process.exec(), child_process.spawn(), and process execution entirely**.
+## Key Principles
 
-## ⛔ FORBIDDEN APPROACHES
+- Replace all child_process.exec(), child_process.spawn(), and child_process.execFile() calls with Node.js module alternatives
+- Use fs or fs.promises for file operations instead of system commands
+- Use fetch, http, or https modules for HTTP requests instead of curl/wget
+- Use net module for network checks instead of ping commands
+- Never concatenate user input into command strings
+- Never use shell: true - it enables shell injection
+- Only use child_process as a last resort with argument arrays and shell: false
 
-These are **NEVER acceptable remediations**:
+## Remediation Steps
 
-- ❌ Input validation/sanitization
-- ❌ Input filtering or allowlists
-- ❌ Using `child_process.execFile()` with arguments
-- ❌ Using `child_process.spawn()` with `shell: false`
-- ❌ Escaping shell characters
-- ❌ Any approach that still executes system processes
+- Locate command execution - Identify all child_process.exec(), spawn(), execFile() instances
+- Determine the operation's purpose - Understand what the command is trying to accomplish
+- Find the Node.js module alternative - Use fs for file ops, fetch/https for HTTP, net for network
+- Replace process execution - Delete child_process code and use the appropriate Node.js module
+- For unavoidable commands - Use execFile() with argument array and no shell option, validate all inputs
+- Test thoroughly - Verify the Node.js module replacement provides the same functionality
 
-**Why?** Because Node.js has native module alternatives for virtually every operation. Process execution is almost never necessary.
-
-## ✅ REQUIRED APPROACH: Replace with Node.js Modules
-
-**Your task:** Find the Node.js module that replaces the system command, then delete the process execution code entirely.
-
-## Common Command → Module Replacements
-
-**Use this table to find the replacement.** If the code executes ANY of these commands, replace them with the Node.js module shown:
-
-| System Command | Node.js Module Alternative | Method |
-| ---------------- | ------------------------- | -------- |
-| `ping` | `net` module | `net.Socket().connect(port, host)` |
-| `curl`, `wget` | `fetch` or `https` | `fetch(url)` or `https.get(url)` |
-| `cp`, `copy` | `fs` or `fs.promises` | `fs.copyFile(source, dest)` |
-| `mv`, `move` | `fs` or `fs.promises` | `fs.rename(source, dest)` |
-| `rm`, `del` | `fs` or `fs.promises` | `fs.unlink(file)` |
-| `mkdir` | `fs` or `fs.promises` | `fs.mkdir(dir, { recursive: true })` |
-| `unzip`, `tar -xf` | `adm-zip`, `tar-fs` | `new AdmZip(path).extractAllTo(dest)` |
-| `zip`, `tar -cf` | `archiver` | `archiver('zip').directory(dir)` |
-| `cat`, `type` | `fs` or `fs.promises` | `fs.readFileSync(file, 'utf8')` |
-| `grep`, `findstr` | JavaScript String | `str.includes()`, `str.match()` |
-
-**If the command is not in this table:** Research the Node.js module that provides the same functionality. There is almost certainly one.
-
-## Example: Replacing ping with net module
+## Safe Pattern
 
 ```javascript
-// ❌ WRONG: Executing ping command
+// UNSAFE: Executing ping command
 const { exec } = require('child_process');
 exec(`ping -c 1 ${host}`, (error, stdout) => {
   console.log(stdout);
 });
 
-// ❌ STILL WRONG: Adding validation doesn't fix the root problem
-if (/^[a-zA-Z0-9.-]+$/.test(host)) {
-  exec(`ping -c 1 ${host}`, callback);  // Still executing a process!
-}
-
-// ❌ STILL WRONG: Using execFile or spawn is still executing a process
+// UNSAFE: Even with execFile
 const { execFile } = require('child_process');
-execFile('ping', ['-c', '1', host], callback);  // NO! Don't execute processes!
+execFile('ping', ['-c', '1', host], callback);
 
-// ✅ CORRECT: No process execution at all - use Node.js module
+// SAFE: Use net module for reachability check
 const net = require('net');
 
 function isHostReachable(host, port = 80, timeout = 5000) {
@@ -73,61 +49,18 @@ function isHostReachable(host, port = 80, timeout = 5000) {
     socket.connect(port, host);
   });
 }
-```
 
-**Notice:** The correct solution deletes all child_process code completely.
-
-## More Examples: File Operations
-
-```javascript
-// ❌ WRONG: Executing cp command
-exec(`cp ${source} ${dest}`);
-
-// ✅ CORRECT: Use fs module
+// SAFE: File copy with fs.promises
 const fs = require('fs').promises;
 await fs.copyFile(source, dest);
-```
 
-## More Examples: HTTP Requests
-
-```javascript
-// ❌ WRONG: Executing curl command
-exec(`curl ${url}`);
-
-// ✅ CORRECT: Use fetch or https module
+// SAFE: HTTP request with fetch
 const response = await fetch(url, { timeout: 10000 });
 const text = await response.text();
+
+// SAFE: File operations with fs
+const fs = require('fs');
+await fs.promises.unlink(file);  // Delete file
+await fs.promises.mkdir(directory, { recursive: true });  // Create directory
+const content = await fs.promises.readFile(file, 'utf8');  // Read file
 ```
-
----
-
-## ⚠️ EXTREMELY RARE EXCEPTION: No Node.js Module Exists
-
-**STOP.** Before reading this section, ask yourself: "Have I thoroughly researched Node.js built-in modules (fs, net, http, https) and npm packages?"
-
-**If you're executing a standard command like ping, curl, cp, mv, tar, zip, cat, grep - STOP. Go back to the replacement table above. These all have Node.js module alternatives.**
-
-Only proceed if:
-
-1. The operation is highly specialized (e.g., hardware-specific tool, vendor CLI)
-2. You've confirmed no Node.js module exists
-3. You cannot install an npm package that provides this functionality
-
-In this extremely rare case, use argument arrays (never `exec()` or `shell: true`):
-
-```javascript
-// ⚠️ LAST RESORT ONLY - Almost always wrong to use this
-const { execFile } = require('child_process');
-execFile('/usr/bin/specialized-tool', 
-  [validated_arg1, validated_arg2],
-  { timeout: 30000 },
-  (error, stdout, stderr) => {
-    if (error) throw error;
-    console.log(stdout);
-  }
-);
-
-// Note: NO exec(), NO {shell: true}, NO string concatenation
-```
-
-**Re-check:** Are you absolutely certain there's no Node.js module? child_process should appear in less than 1% of CWE-78 remediations.

@@ -416,6 +416,7 @@ func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID in
 	remediationGuidance := map[string]interface{}{
 		"summary":           summary,
 		"key_principles":    keyPrinciples,
+		"remediation_steps": remediationSteps,
 		"language_specific": language != "",
 	}
 
