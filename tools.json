@@ -73,12 +73,6 @@
           "type": "boolean",
           "isRequired": false,
           "description": "Filter by policy violation status"
-        },
-        {
-          "name": "include_mitigations",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Include mitigation details (default false)"
         }
       ]
     },
@@ -149,12 +143,6 @@
           "type": "boolean",
           "isRequired": false,
           "description": "Filter by policy violation status"
-        },
-        {
-          "name": "include_mitigations",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Include mitigation details (default false)"
         }
       ]
     },
@@ -341,7 +329,7 @@
     },
     {
       "name": "pipeline-detailed-results",
-      "description": "Get detailed pipeline scan flaw with data flow paths",
+      "description": "Get detailed pipeline scan flaw with data flow paths. Most commonly used after viewing pipeline results",
       "params": [
         {
           "name": "application_path",

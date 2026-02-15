@@ -3,246 +3,159 @@ package api
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"strings"
 
-	applications "github.com/dipsylala/veracodemcp-go/api/generated/applications"
-	dynamic_flaw "github.com/dipsylala/veracodemcp-go/api/generated/dynamic_flaw"
-	findings "github.com/dipsylala/veracodemcp-go/api/generated/findings"
-	healthcheck "github.com/dipsylala/veracodemcp-go/api/generated/healthcheck"
-	static_finding_data_path "github.com/dipsylala/veracodemcp-go/api/generated/static_finding_data_path"
-	"github.com/dipsylala/veracodemcp-go/credentials"
-	veracodehmac "github.com/dipsylala/veracodemcp-go/hmac"
+	"github.com/dipsylala/veracode-mcp/api/rest"
+	applications "github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
+	dynamic_flaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
+	static_finding_data_path "github.com/dipsylala/veracode-mcp/api/rest/generated/static_finding_data_path"
+	"github.com/dipsylala/veracode-mcp/api/xml"
 )
 
-// VeracodeClient wraps the generated API clients with authentication and configuration
-type VeracodeClient struct {
-	healthcheckClient           *healthcheck.APIClient
-	findingsClient              *findings.APIClient
-	dynamicFlawClient           *dynamic_flaw.APIClient
-	staticFindingDataPathClient *static_finding_data_path.APIClient
-	applicationsClient          *applications.APIClient
-	apiID                       string
-	apiKey                      string
-	baseURL                     string
+// Compile-time check to ensure unifiedClient implements the Client interface
+var _ Client = (*unifiedClient)(nil)
+
+// Client is the main interface for interacting with Veracode APIs
+// It abstracts the underlying implementation (REST, XML, etc.)
+type Client interface {
+	// Authentication & Configuration
+	IsConfigured() bool
+	GetAuthContext(ctx context.Context) context.Context
+
+	// Health Check
+	CheckHealth(ctx context.Context) (*HealthStatus, error)
+
+	// Applications
+	GetApplication(ctx context.Context, applicationGUID string) (*applications.Application, error)
+	GetApplicationByName(ctx context.Context, name string) (*applications.Application, error)
+	ListApplications(ctx context.Context, page, size int) (*applications.PagedResourceOfApplication, error)
+
+	// Findings (SAST/DAST/SCA)
+	GetStaticFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error)
+	GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error)
+	GetScaFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error)
+	GetFindingByID(ctx context.Context, findingID string, isDynamic bool) (*Finding, error)
+
+	// Direct access to generated clients (for advanced use cases)
+	StaticFindingDataPathClient() *static_finding_data_path.APIClient
+	DynamicFlawClient() *dynamic_flaw.APIClient
+
+	// Raw API access
+	RawGet(ctx context.Context, endpoint string) (string, error)
+
+	// XML API Methods
+	// GetMitigationInfo retrieves mitigation information for specific flaws in a build
+	GetMitigationInfo(ctx context.Context, buildID int64, flawIDs []int64) (*MitigationInfo, error)
+
+	// GetMitigationInfoForSingleFlaw is a convenience method to get mitigation info for a single flaw
+	GetMitigationInfoForSingleFlaw(ctx context.Context, buildID, flawID int64) (*MitigationIssue, error)
 }
 
-// hmacTransport is an HTTP RoundTripper that adds Veracode HMAC authentication to every request
-type hmacTransport struct {
-	apiID     string
-	apiKey    string
-	transport http.RoundTripper
+// unifiedClient wraps both REST and XML API clients to provide transparent access
+type unifiedClient struct {
+	restClient *rest.Client
+	xmlClient  *xml.Client
 }
 
-// RoundTrip implements the http.RoundTripper interface, adding HMAC authentication to each request
-func (t *hmacTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	// Veracode's API expects query parameters to use %20 for spaces, not +
-	// Go's url.Values.Encode() uses + for spaces (per application/x-www-form-urlencoded spec)
-	// We need to normalize the query string to use %20 for proper HMAC calculation and HTTP transmission
-	if req.URL.RawQuery != "" {
-		normalizedQuery := strings.ReplaceAll(req.URL.RawQuery, "+", "%20")
-		req.URL.RawQuery = normalizedQuery
-	}
-
-	// Calculate the HMAC Authorization header
-	authHeader, err := veracodehmac.CalculateAuthorizationHeader(req.URL, req.Method, t.apiID, t.apiKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to calculate HMAC authorization: %w", err)
-	}
-
-	// Add the Authorization header to the request
-	req.Header.Set("Authorization", authHeader)
-
-	// Use the wrapped transport (or default) to execute the request
-	transport := t.transport
-	if transport == nil {
-		transport = http.DefaultTransport
-	}
-	return transport.RoundTrip(req)
-}
-
-// newHMACHTTPClient creates an HTTP client that automatically adds HMAC authentication to all requests
-func newHMACHTTPClient(apiID, apiKey string) *http.Client {
-	return &http.Client{
-		Transport: &hmacTransport{
-			apiID:     apiID,
-			apiKey:    apiKey,
-			transport: http.DefaultTransport,
-		},
-	}
-}
-
-// NewVeracodeClient creates a new Veracode API client
+// NewClient creates a new Veracode API client
+// The client transparently uses both REST and XML APIs as needed.
+//
 // Credentials are loaded from:
 // 1. ~/.veracode/veracode.yml (preferred)
 // 2. Environment variables VERACODE_API_ID and VERACODE_API_KEY (fallback)
-// Base URL is auto-detected from API key ID prefix (vera01ei-* → EU, otherwise → US)
-// Can be overridden via override-api-base-url in veracode.yml or VERACODE_OVERRIDE_API_BASE_URL environment variable
-func NewVeracodeClient() (*VeracodeClient, error) {
-	apiID, apiKey, baseURL, err := credentials.GetCredentials()
+func NewClient() (Client, error) {
+	restClient, err := rest.NewClient()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create REST client: %w", err)
 	}
 
-	// Create HTTP client with HMAC authentication
-	httpClient := newHMACHTTPClient(apiID, apiKey)
+	xmlClient, err := xml.NewClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create XML client: %w", err)
+	}
 
-	// Configure all API clients to use the HMAC-authenticated HTTP client and base URL
-	healthcheckCfg := healthcheck.NewConfiguration()
-	healthcheckCfg.HTTPClient = httpClient
-	healthcheckCfg.Servers[0].URL = baseURL
-
-	findingsCfg := findings.NewConfiguration()
-	findingsCfg.HTTPClient = httpClient
-	findingsCfg.Servers[0].URL = baseURL
-
-	dynamicFlawCfg := dynamic_flaw.NewConfiguration()
-	dynamicFlawCfg.HTTPClient = httpClient
-	dynamicFlawCfg.Servers[0].URL = baseURL
-
-	staticFindingDataPathCfg := static_finding_data_path.NewConfiguration()
-	staticFindingDataPathCfg.HTTPClient = httpClient
-	staticFindingDataPathCfg.Servers[0].URL = baseURL
-
-	applicationsCfg := applications.NewConfiguration()
-	applicationsCfg.HTTPClient = httpClient
-	applicationsCfg.Servers[0].URL = baseURL
-
-	return &VeracodeClient{
-		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
-		findingsClient:              findings.NewAPIClient(findingsCfg),
-		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
-		staticFindingDataPathClient: static_finding_data_path.NewAPIClient(staticFindingDataPathCfg),
-		applicationsClient:          applications.NewAPIClient(applicationsCfg),
-		apiID:                       apiID,
-		apiKey:                      apiKey,
-		baseURL:                     baseURL,
+	return &unifiedClient{
+		restClient: restClient,
+		xmlClient:  xmlClient,
 	}, nil
 }
 
-// NewVeracodeClientUnconfigured creates a client without checking credentials
+// NewClientUnconfigured creates a client without checking credentials
 // Useful for testing or when credentials will be set later
-func NewVeracodeClientUnconfigured() *VeracodeClient {
-	apiID, apiKey, baseURL, err := credentials.GetCredentials()
-
-	// Create HTTP client with HMAC authentication if credentials are available
-	var httpClient *http.Client
-	if err == nil && apiID != "" && apiKey != "" {
-		httpClient = newHMACHTTPClient(apiID, apiKey)
-	} else {
-		httpClient = http.DefaultClient
-		apiID = ""
-		apiKey = ""
-		baseURL = credentials.DefaultBaseURL
-	}
-
-	// Configure all API clients
-	healthcheckCfg := healthcheck.NewConfiguration()
-	healthcheckCfg.HTTPClient = httpClient
-	healthcheckCfg.Servers[0].URL = baseURL
-
-	findingsCfg := findings.NewConfiguration()
-	findingsCfg.HTTPClient = httpClient
-	findingsCfg.Servers[0].URL = baseURL
-
-	dynamicFlawCfg := dynamic_flaw.NewConfiguration()
-	dynamicFlawCfg.HTTPClient = httpClient
-	dynamicFlawCfg.Servers[0].URL = baseURL
-
-	staticFindingDataPathCfg := static_finding_data_path.NewConfiguration()
-	staticFindingDataPathCfg.HTTPClient = httpClient
-	staticFindingDataPathCfg.Servers[0].URL = baseURL
-
-	applicationsCfg := applications.NewConfiguration()
-	applicationsCfg.HTTPClient = httpClient
-	applicationsCfg.Servers[0].URL = baseURL
-
-	return &VeracodeClient{
-		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
-		findingsClient:              findings.NewAPIClient(findingsCfg),
-		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
-		staticFindingDataPathClient: static_finding_data_path.NewAPIClient(staticFindingDataPathCfg),
-		applicationsClient:          applications.NewAPIClient(applicationsCfg),
-		apiID:                       apiID,
-		apiKey:                      apiKey,
-		baseURL:                     baseURL,
+func NewClientUnconfigured() Client {
+	return &unifiedClient{
+		restClient: rest.NewClientUnconfigured(),
+		xmlClient:  xml.NewClientUnconfigured(),
 	}
 }
 
-// IsConfigured returns true if API credentials are set
-func (c *VeracodeClient) IsConfigured() bool {
-	return c.apiID != "" && c.apiKey != ""
+// REST API methods - delegate to restClient
+
+func (c *unifiedClient) IsConfigured() bool {
+	return c.restClient.IsConfigured()
 }
 
-// GetAuthContext returns a context with Veracode API authentication
-// This should be passed to all API calls
-// Note: HMAC authentication is handled automatically by the HTTP client transport
-func (c *VeracodeClient) GetAuthContext(ctx context.Context) context.Context {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-
-	// HMAC authentication is now handled automatically by the hmacTransport
-	// in the HTTP client, so no need to add anything to the context
-	return ctx
+func (c *unifiedClient) GetAuthContext(ctx context.Context) context.Context {
+	return c.restClient.GetAuthContext(ctx)
 }
 
-// StaticFindingDataPathClient returns the static finding data path API client
-func (c *VeracodeClient) StaticFindingDataPathClient() *static_finding_data_path.APIClient {
-	return c.staticFindingDataPathClient
+func (c *unifiedClient) CheckHealth(ctx context.Context) (*HealthStatus, error) {
+	return c.restClient.CheckHealth(ctx)
 }
 
-// DynamicFlawClient returns the dynamic flaw API client
-func (c *VeracodeClient) DynamicFlawClient() *dynamic_flaw.APIClient {
-	return c.dynamicFlawClient
+func (c *unifiedClient) GetApplication(ctx context.Context, applicationGUID string) (*applications.Application, error) {
+	return c.restClient.GetApplication(ctx, applicationGUID)
 }
 
-// RawGet performs a raw GET request to the specified endpoint
-func (c *VeracodeClient) RawGet(ctx context.Context, endpoint string) (string, error) {
-	if !c.IsConfigured() {
-		return "", fmt.Errorf("API credentials not configured")
-	}
+func (c *unifiedClient) GetApplicationByName(ctx context.Context, name string) (*applications.Application, error) {
+	return c.restClient.GetApplicationByName(ctx, name)
+}
 
-	// Create HTTP client with HMAC authentication
-	httpClient := newHMACHTTPClient(c.apiID, c.apiKey)
+func (c *unifiedClient) ListApplications(ctx context.Context, page, size int) (*applications.PagedResourceOfApplication, error) {
+	return c.restClient.ListApplications(ctx, page, size)
+}
 
-	// Build the full URL
-	fullURL := c.baseURL + endpoint
+func (c *unifiedClient) GetStaticFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+	return c.restClient.GetStaticFindings(ctx, req)
+}
 
-	// Create the request
-	req, err := http.NewRequestWithContext(ctx, "GET", fullURL, nil)
+func (c *unifiedClient) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+	return c.restClient.GetDynamicFindings(ctx, req)
+}
+
+func (c *unifiedClient) GetScaFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+	return c.restClient.GetScaFindings(ctx, req)
+}
+
+func (c *unifiedClient) GetFindingByID(ctx context.Context, findingID string, isDynamic bool) (*Finding, error) {
+	return c.restClient.GetFindingByID(ctx, findingID, isDynamic)
+}
+
+func (c *unifiedClient) StaticFindingDataPathClient() *static_finding_data_path.APIClient {
+	return c.restClient.StaticFindingDataPathClient()
+}
+
+func (c *unifiedClient) DynamicFlawClient() *dynamic_flaw.APIClient {
+	return c.restClient.DynamicFlawClient()
+}
+
+func (c *unifiedClient) RawGet(ctx context.Context, endpoint string) (string, error) {
+	return c.restClient.RawGet(ctx, endpoint)
+}
+
+// XML API methods - delegate to xmlClient
+
+func (c *unifiedClient) GetMitigationInfo(ctx context.Context, buildID int64, flawIDs []int64) (*MitigationInfo, error) {
+	xmlInfo, err := c.xmlClient.GetMitigationInfo(ctx, buildID, flawIDs)
 	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
+		return nil, err
 	}
+	return convertXMLMitigationInfo(xmlInfo), nil
+}
 
-	// Execute the request
-	resp, err := httpClient.Do(req)
+func (c *unifiedClient) GetMitigationInfoForSingleFlaw(ctx context.Context, buildID, flawID int64) (*MitigationIssue, error) {
+	xmlIssue, err := c.xmlClient.GetMitigationInfoForSingleFlaw(ctx, buildID, flawID)
 	if err != nil {
-		return "", fmt.Errorf("failed to execute request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	// Read the response body
-	body := make([]byte, 0)
-	buf := make([]byte, 1024)
-	for {
-		n, err := resp.Body.Read(buf)
-		if n > 0 {
-			body = append(body, buf[:n]...)
-		}
-		if err != nil {
-			break
-		}
-	}
-
-	// Check status code
-	if resp.StatusCode != http.StatusOK {
-		bodyStr := string(body)
-		if len(bodyStr) == 0 {
-			bodyStr = "(empty response)"
-		}
-		return bodyStr, fmt.Errorf("API returned status %d: %s", resp.StatusCode, bodyStr)
-	}
-
-	return string(body), nil
+	return convertXMLIssue(xmlIssue), nil
 }

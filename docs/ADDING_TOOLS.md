@@ -127,7 +127,7 @@ func (t *YourTool) Handle(ctx context.Context, params map[string]interface{}) (i
 
     // TODO: Implement your tool logic
     // Example: Call API
-    // client, err := api.NewVeracodeClient()
+    // client, err := api.NewClient()
     // if err != nil {
     //     return errorResponse(err.Error()), nil
     // }
@@ -215,11 +215,11 @@ The `GetInputSchema()` method returns a standard JSON Schema. Common patterns:
 To call Veracode APIs, use the `api` package:
 
 ```go
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 func (t *YourTool) Handle(ctx context.Context, params map[string]interface{}) (interface{}, error) {
     // Create API client
-    client, err := api.NewVeracodeClient()
+    client, err := api.NewClient()
     if err != nil {
         return errorResponse("API not configured: " + err.Error()), nil
     }
@@ -332,7 +332,7 @@ Use initialization patterns for expensive resources:
 
 ```go
 type YourTool struct {
-    client *api.VeracodeClient
+    client *api.Client
 }
 
 func NewYourTool() *YourTool {
@@ -340,7 +340,7 @@ func NewYourTool() *YourTool {
 }
 
 func (t *YourTool) Initialize() error {
-    client, err := api.NewVeracodeClient()
+    client, err := api.NewClient()
     if err != nil {
         return fmt.Errorf("failed to initialize API client: %w", err)
     }

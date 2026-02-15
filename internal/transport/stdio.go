@@ -11,7 +11,7 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/dipsylala/veracodemcp-go/internal/types"
+	"github.com/dipsylala/veracode-mcp/internal/types"
 )
 
 // StdioTransport handles JSON-RPC over stdin/stdout

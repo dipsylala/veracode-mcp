@@ -29,7 +29,7 @@ This is my 4th version, after writing it in TypeScript, Python, as a set of [Age
 
 ### Download from Releases
 
-Download the latest pre-built binary from the [Releases page](https://github.com/dipsylala/veracodemcp-go/releases):
+Download the latest pre-built binary from the [Releases page](https://github.com/dipsylala/veracode-mcp/releases):
 
 Windows · macOS · Linux | x64 · ARM64
 
@@ -244,8 +244,8 @@ If you want to build from source instead of using the pre-built releases:
 
 ```bash
 # Clone the repository
-git clone https://github.com/dipsylala/veracodemcp-go.git
-cd veracodemcp-go
+git clone https://github.com/dipsylala/veracode-mcp.git
+cd veracode-mcp
 
 # Install dependencies
 go mod download

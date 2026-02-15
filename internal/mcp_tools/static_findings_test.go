@@ -29,16 +29,15 @@ func TestParseStaticFindingsRequest_Success(t *testing.T) {
 
 func TestParseStaticFindingsRequest_AllParameters(t *testing.T) {
 	args := map[string]interface{}{
-		"application_path":    "/path/to/app",
-		"app_profile":         "MyApp",
-		"sandbox":             "Dev",
-		"size":                float64(50),
-		"page":                float64(2),
-		"severity":            float64(4),
-		"severity_gte":        float64(2),
-		"violates_policy":     true,
-		"include_mitigations": true,
-		"cwe_ids":             []interface{}{float64(79), float64(89)},
+		"application_path": "/path/to/app",
+		"app_profile":      "MyApp",
+		"sandbox":          "Dev",
+		"size":             float64(50),
+		"page":             float64(2),
+		"severity":         float64(4),
+		"severity_gte":     float64(2),
+		"violates_policy":  true,
+		"cwe_ids":          []interface{}{float64(79), float64(89)},
 	}
 
 	req, err := parseStaticFindingsRequest(args)

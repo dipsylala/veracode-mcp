@@ -1,0 +1,3691 @@
+openapi: 3.0.3
+info:
+  contact: {}
+  description: |-
+    Veracode Findings API Documentation
+
+    Use one of the following base URLs depending on the region for your account:
+    * https://api.veracode.com/ - Veracode US Region (default)
+    * https://api.veracode.eu/ - Veracode European Region
+    * https://api.veracode.us/ - Veracode US Federal Region
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+  termsOfService: urn:tos
+  title: Veracode Findings API Specification
+  version: "2.1"
+servers:
+- url: https://api.veracode.com
+tags:
+- description: Returns findings information from Veracode scans.
+  name: Application findings information.
+- description: Returns CWE information for the findings in the scan.
+  name: CWE API information
+- description: Returns manual testing findings information from the Veracode Manual
+    Penetration Testing (MPT) scan.
+  name: Manual scans information.
+paths:
+  /appsec/v1/categories:
+    get:
+      deprecated: false
+      description: Returns a list of CWE categories.
+      operationId: getCategoriesUsingGET
+      parameters:
+      - allowEmptyValue: false
+        description: Page number. The default is 0.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Page size (0-500). The default is 100.
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResourceOfCategory"
+          description: You have successfully submitted your request.
+        "400":
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          description: You are not authorized to perform this action.
+        "403":
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          description: Category page not found. Verify the URI and try again.
+        "429":
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          description: Server-side error. Please try again later.
+      summary: getCategories
+      tags:
+      - CWE API information
+  /appsec/v1/categories/{category}:
+    get:
+      deprecated: false
+      description: Returns CWE Category information and links to associated resources.
+      operationId: getCategoryUsingGET
+      parameters:
+      - description: The CWE category identifier.
+        explode: false
+        in: path
+        name: category
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+          description: You have successfully submitted your request.
+        "401":
+          description: You are not authorized to perform this action.
+        "403":
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          description: Category details page not found. Verify the URI and try again.
+        "429":
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          description: Server-side error. Please try again later.
+      summary: getCategory
+      tags:
+      - CWE API information
+  /appsec/v1/cwes:
+    get:
+      deprecated: false
+      description: Returns a list of CWEs.
+      operationId: getCwesUsingGET
+      parameters:
+      - allowEmptyValue: false
+        description: Page number. The default is 0.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Page size (0-500). The default is 100.
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResourceOfCwe"
+          description: You have successfully submitted your request.
+        "400":
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          description: You are not authorized to perform this action.
+        "403":
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          description: CWE page not found. Verify the URI and try again.
+        "429":
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          description: Server-side error. Please try again later.
+      summary: getCwes
+      tags:
+      - CWE API information
+  /appsec/v1/cwes/{cwe}:
+    get:
+      deprecated: false
+      description: Returns CWE information and links to associated resources.
+      operationId: getCweUsingGET
+      parameters:
+      - description: The CWE ID.
+        explode: false
+        in: path
+        name: cwe
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CweDetail"
+          description: You have successfully submitted your request.
+        "401":
+          description: You are not authorized to perform this action.
+        "403":
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          description: CWE details page not found. Verify the URI and try again.
+        "429":
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          description: Server-side error. Please try again later.
+      summary: getCwe
+      tags:
+      - CWE API information
+  /appsec/v2/applications/{application_guid}/findings:
+    get:
+      deprecated: false
+      description: Returns findings information from Veracode scans.
+      operationId: getFindingsUsingGET
+      parameters:
+      - description: The application identifier.
+        explode: false
+        in: path
+        name: application_guid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - allowEmptyValue: false
+        description: "Context type, which filters results to show only the findings\
+          \ of this specific context type. The findings status parameter is relative\
+          \ to this context parameter."
+        explode: true
+        in: query
+        name: context
+        required: false
+        schema:
+          type: string
+        style: form
+      - allowEmptyValue: false
+        description: CVE ID.
+        explode: true
+        in: query
+        name: cve
+        required: false
+        schema:
+          type: string
+        style: form
+      - allowEmptyValue: false
+        description: "CVSS ID (0-10), which can be double (decimal) values. This filter\
+          \ returns all findings with a CVSS value equal to the provided value."
+        explode: true
+        in: query
+        name: cvss
+        required: false
+        schema:
+          format: double
+          type: number
+        style: form
+      - allowEmptyValue: false
+        description: "CVSS ID (0-10), which can be double (decimal) values. This filter\
+          \ returns all findings with a CVSS value greater than or equal to the provided\
+          \ value."
+        explode: true
+        in: query
+        name: cvss_gte
+        required: false
+        schema:
+          format: double
+          type: number
+        style: form
+      - description: CWE ID (single or comma-delimited).
+        explode: true
+        in: query
+        name: cwe
+        required: false
+        schema:
+          items:
+            format: int32
+            type: integer
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Category of finding (single or comma-delimited). Not valid for
+          the SCA scan type.
+        explode: true
+        in: query
+        name: finding_category
+        required: false
+        schema:
+          items:
+            format: int32
+            type: integer
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Use this flag to include the annotations in the response. Not
+          valid for the SCA scan type.
+        explode: true
+        in: query
+        name: include_annot
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - allowEmptyValue: false
+        description: Use this flag to include findings grace period expiry date in
+          the response.
+        explode: true
+        in: query
+        name: include_exp_date
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - allowEmptyValue: false
+        description: "Return all findings with annotations mitigated after the specified\
+          \ date. Does not apply to the SCA scan type. Use date format: yyyy-MM-dd"
+        explode: true
+        in: query
+        name: mitigated_after
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - allowEmptyValue: false
+        description: Use this flag to include only new findings in the current context
+          (policy or sandbox) in the response.
+        explode: true
+        in: query
+        name: new
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - allowEmptyValue: false
+        description: Return all findings with the specified SCA dependency mode. Only
+          valid for the SCA scan type.
+        explode: true
+        in: query
+        name: sca_dep_mode
+        required: false
+        schema:
+          enum:
+          - UNKNOWN
+          - DIRECT
+          - TRANSITIVE
+          - BOTH
+          type: string
+        style: form
+      - allowEmptyValue: false
+        description: Return all findings from SCA scans of the specified scan mode.
+          Only valid for the SCA scan type.
+        explode: true
+        in: query
+        name: sca_scan_mode
+        required: false
+        schema:
+          enum:
+          - UPLOAD
+          - AGENT
+          - BOTH
+          type: string
+        style: form
+      - allowEmptyValue: false
+        description: Type of scan in which the finding was found (single or comma-delimited).
+        explode: true
+        in: query
+        name: scan_type
+        required: false
+        schema:
+          items:
+            enum:
+            - STATIC
+            - DYNAMIC
+            - MANUAL
+            - SCA
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: This filter returns all findings with this severity value (0-5).
+        explode: true
+        in: query
+        name: severity
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: This filter returns all scan findings with a severity value greater
+          than or equal to the value of the filter (0-5).
+        explode: true
+        in: query
+        name: severity_gte
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Use this flag to filter the results based on whether the results
+          violate the policy associated with the application. True means the results
+          negatively impact the policy and should be fixed. Not valid for the SCA
+          scan type.
+        explode: true
+        in: query
+        name: violates_policy
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - allowEmptyValue: false
+        description: Page number. Defaults to 0.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: "Page size, up to 500. The default is 50."
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                SCAFinding:
+                  $ref: "#/components/examples/FindingsSCAExample"
+              schema:
+                $ref: "#/components/schemas/PagedResourceOfFinding"
+          description: You have successfully submitted your request.
+        "400":
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          description: You are not authorized to perform this action.
+        "403":
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          description: Finding page not found. Verify the URI and try again.
+        "429":
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          description: Server-side error. Please try again later.
+      summary: getFindings
+      tags:
+      - Application findings information.
+  /mpt/v1/scans:
+    get:
+      description: Returns a list of pointers to the manual scans performed on the
+        application.
+      operationId: getManualScans
+      parameters:
+      - description: The application GUID.
+        explode: true
+        in: query
+        name: application
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: "The page number, which defaults to zero."
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The page size (0-500). Defaults to 100.
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelOfScan"
+          description: Successful request. Returns an array of scans.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelScan"
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelScan"
+          description: You are not authorized to perform this action.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelScan"
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelScan"
+          description: This page does not exist. Verify the URI and try again.
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelScan"
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelScan"
+          description: Server-side error. Please try again later.
+      summary: Get Manual Scans
+      tags:
+      - Manual scans information.
+  /mpt/v1/scans/{scan}:
+    get:
+      description: Returns manual scan information and links to associated resources.
+      operationId: getManualScan
+      parameters:
+      - description: The manual scan ID.
+        explode: false
+        in: path
+        name: scan
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scan"
+          description: Successful request. Returns a scan.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelScan"
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelScan"
+          description: You are not authorized to perform this action.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelScan"
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelScan"
+          description: This page does not exist. Verify the URI and try again.
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelScan"
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelScan"
+          description: Server-side error. Please try again later.
+      summary: get a Manual Scan
+      tags:
+      - Manual scans information.
+  /mpt/v1/scans/{scan_id}/findings:
+    get:
+      description: Returns findings information from Veracode scans.
+      operationId: getScanFindings
+      parameters:
+      - description: The manual scan identifier.
+        explode: false
+        in: path
+        name: scan_id
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: simple
+      - description: "Include the artifacts, such as code samples and screenshots,\
+          \ in the manual finding response."
+        explode: true
+        in: query
+        name: include_artifacts
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelOfManualFinding"
+          description: Successful request. Returns an array of manual testing findings.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelManualFinding"
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelManualFinding"
+          description: You are not authorized to perform this action.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelManualFinding"
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelManualFinding"
+          description: This page does not exist. Verify the URI and try again.
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelManualFinding"
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelEntityModelManualFinding"
+          description: Server-side error. Please try again later.
+      summary: getFindings
+      tags:
+      - Manual scans information.
+  /mpt/v1/findings/{finding}:
+    get:
+      description: Returns manual testing finding information and links to associated
+        resources.
+      operationId: getManualFinding
+      parameters:
+      - description: The manual finding identifier.
+        explode: false
+        in: path
+        name: finding
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: "Include the artifacts, such as code samples and screenshots,\
+          \ in the manual finding response."
+        explode: true
+        in: query
+        name: include_artifacts
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualFinding"
+          description: Successful request. Returns a manual testing finding.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelManualFinding"
+          description: Invalid request. Verify all the components of your request
+            and try again.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelManualFinding"
+          description: You are not authorized to perform this action.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelManualFinding"
+          description: Access denied. You are not authorized to make this request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelManualFinding"
+          description: This page does not exist. Verify the URI and try again.
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelManualFinding"
+          description: Request limit exceeded. You have sent too many requests in
+            a single time period. Submit your request again later.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityModelManualFinding"
+          description: Server-side error. Please try again later.
+      summary: getFinding
+      tags:
+      - Manual scans information.
+components:
+  examples:
+    FindingsSCAExample:
+      description: A getFindings response with a single finding of scan_type=SCA.
+      summary: scan_type=SCA finding
+      value:
+        _embedded:
+          findings:
+          - scan_type: SCA
+            description: "console-io is a module that allows users to implement a\
+              \ web console in their application. A malicious user could bypass the\
+              \ authentication and execute any command that the user who is running\
+              \ the console-io application 2.2.13 and earlier is able to run. This\
+              \ means that if console-io was running from root, the attacker would\
+              \ have full access to the system. This vulnerability exists because\
+              \ the console-io application does not configure socket.io to require\
+              \ authentication, which allows a malicious user to connect via a websocket\
+              \ to send commands and receive the response."
+            count: 1
+            context_type: APPLICATION
+            context_guid: 9873e434-7056-4203-bf85-4625e0139768
+            violates_policy: false
+            finding_status:
+              first_found_date: 2023-04-20T16:35:49.354Z
+              status: OPEN
+              resolution: UNRESOLVED
+              new: false
+              resolution_status: NONE
+              last_seen_date: 2023-04-20T20:57:09.927Z
+            finding_details:
+              severity: 5
+              cwe:
+                id: 287
+                name: Improper Authentication
+                href: https://api.veracode.com/appsec/v1/cwes/287
+              component_id: 01234567-43e4-4286-9db4-1a3e24f8e835
+              licenses:
+              - license_id: mit
+                risk_rating: "2"
+              metadata:
+                sca_scan_mode: UPLOAD
+                sca_dep_mode: UNKNOWN
+              cve:
+                name: CVE-2016-10532
+                cvss: 10
+                href: http://nvd.nist.gov/vuln/detail/CVE-2016-10532
+                severity: Very High
+                vector: AV:N/AC:L/Au:N/C:C/I:C/A:C
+                cvss3:
+                  score: 9.8
+                  severity: Very High
+                  vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+                exploitability:
+                  full_cve: CVE-2023-4863
+                  epss_score: 0.38328
+                  epss_percentile: 0.96873
+                  epss_score_date: 2023-12-20
+                  epss_model_version: v2023.03.01
+                  epss_citation: See EPSS at https://www.first.org/epss
+                  epss_status: match found
+                  exploit_service_status: available
+                  exploit_observed: true
+                  exploit_source: KEV
+                  exploit_note: See https://www.veracode.com/blog/security-news/resolving-webp-zero-day-vulnerability-cve-2023-4863
+                    for details on this known exploited vulnerability.
+              product_id: 01234567-6456-4bcc-b1c1-9411d3939dc5
+              component_filename: console-io
+              language: JAVASCRIPT
+              component_path:
+              - path: file330108_1682024184933_html/master-binary/javascript/yarn/yarn-lock-with-dev-dependencies/node_modules/console-io
+              - path: file330108_1682024184933_html/master-binary/javascript/yarn/yarn-scopes/node_modules/console-io
+              version: 2.6.3
+  parameters:
+    Page:
+      allowEmptyValue: false
+      description: Page number. The default is 0.
+      explode: true
+      in: query
+      name: page
+      required: false
+      schema:
+        format: int32
+        type: integer
+      style: form
+    Size:
+      allowEmptyValue: false
+      description: Page size (0-500). The default is 100.
+      explode: true
+      in: query
+      name: size
+      required: false
+      schema:
+        format: int32
+        type: integer
+      style: form
+    Category:
+      description: The CWE category identifier.
+      explode: false
+      in: path
+      name: category
+      required: true
+      schema:
+        format: int32
+        type: integer
+      style: simple
+    Cwe:
+      description: The CWE ID.
+      explode: false
+      in: path
+      name: cwe
+      required: true
+      schema:
+        format: int32
+        type: integer
+      style: simple
+    ApplicationGuid:
+      description: The application identifier.
+      explode: false
+      in: path
+      name: application_guid
+      required: true
+      schema:
+        type: string
+      style: simple
+    Context:
+      allowEmptyValue: false
+      description: "Context type, which filters results to show only the findings\
+        \ of this specific context type. The findings status parameter is relative\
+        \ to this context parameter."
+      explode: true
+      in: query
+      name: context
+      required: false
+      schema:
+        type: string
+      style: form
+    Cve:
+      allowEmptyValue: false
+      description: CVE ID.
+      explode: true
+      in: query
+      name: cve
+      required: false
+      schema:
+        type: string
+      style: form
+    Cvss:
+      allowEmptyValue: false
+      description: "CVSS ID (0-10), which can be double (decimal) values. This filter\
+        \ returns all findings with a CVSS value equal to the provided value."
+      explode: true
+      in: query
+      name: cvss
+      required: false
+      schema:
+        format: double
+        type: number
+      style: form
+    CvssGte:
+      allowEmptyValue: false
+      description: "CVSS ID (0-10), which can be double (decimal) values. This filter\
+        \ returns all findings with a CVSS value greater than or equal to the provided\
+        \ value."
+      explode: true
+      in: query
+      name: cvss_gte
+      required: false
+      schema:
+        format: double
+        type: number
+      style: form
+    CweList:
+      description: CWE ID (single or comma-delimited).
+      explode: true
+      in: query
+      name: cwe
+      required: false
+      schema:
+        items:
+          format: int32
+          type: integer
+        type: array
+      style: form
+    FindingCategory:
+      allowEmptyValue: false
+      description: Category of finding (single or comma-delimited). Not valid for
+        the SCA scan type.
+      explode: true
+      in: query
+      name: finding_category
+      required: false
+      schema:
+        items:
+          format: int32
+          type: integer
+        type: array
+      style: form
+    IncludeAnnotations:
+      allowEmptyValue: false
+      description: Use this flag to include the annotations in the response. Not valid
+        for the SCA scan type.
+      explode: true
+      in: query
+      name: include_annot
+      required: false
+      schema:
+        type: boolean
+      style: form
+    IncludeExpirationDate:
+      allowEmptyValue: false
+      description: Use this flag to include findings grace period expiry date in the
+        response.
+      explode: true
+      in: query
+      name: include_exp_date
+      required: false
+      schema:
+        type: boolean
+      style: form
+    MitigatedAfter:
+      allowEmptyValue: false
+      description: "Return all findings with annotations mitigated after the specified\
+        \ date. Does not apply to the SCA scan type. Use date format: yyyy-MM-dd"
+      explode: true
+      in: query
+      name: mitigated_after
+      required: false
+      schema:
+        format: date-time
+        type: string
+      style: form
+    NewFindingsOnly:
+      allowEmptyValue: false
+      description: Use this flag to include only new findings in the current context
+        (policy or sandbox) in the response.
+      explode: true
+      in: query
+      name: new
+      required: false
+      schema:
+        type: boolean
+      style: form
+    ScaDependencyMode:
+      allowEmptyValue: false
+      description: Return all findings with the specified SCA dependency mode. Only
+        valid for the SCA scan type.
+      explode: true
+      in: query
+      name: sca_dep_mode
+      required: false
+      schema:
+        enum:
+        - UNKNOWN
+        - DIRECT
+        - TRANSITIVE
+        - BOTH
+        type: string
+      style: form
+    ScaScanMode:
+      allowEmptyValue: false
+      description: Return all findings from SCA scans of the specified scan mode.
+        Only valid for the SCA scan type.
+      explode: true
+      in: query
+      name: sca_scan_mode
+      required: false
+      schema:
+        enum:
+        - UPLOAD
+        - AGENT
+        - BOTH
+        type: string
+      style: form
+    ScanType:
+      allowEmptyValue: false
+      description: Type of scan in which the finding was found (single or comma-delimited).
+      explode: true
+      in: query
+      name: scan_type
+      required: false
+      schema:
+        items:
+          enum:
+          - STATIC
+          - DYNAMIC
+          - MANUAL
+          - SCA
+          type: string
+        type: array
+      style: form
+    FindingsSeverity:
+      allowEmptyValue: false
+      description: This filter returns all findings with this severity value (0-5).
+      explode: true
+      in: query
+      name: severity
+      required: false
+      schema:
+        format: int32
+        type: integer
+      style: form
+    FindingsSeverityGte:
+      allowEmptyValue: false
+      description: This filter returns all scan findings with a severity value greater
+        than or equal to the value of the filter (0-5).
+      explode: true
+      in: query
+      name: severity_gte
+      required: false
+      schema:
+        format: int32
+        type: integer
+      style: form
+    PolicyViolation:
+      allowEmptyValue: false
+      description: Use this flag to filter the results based on whether the results
+        violate the policy associated with the application. True means the results
+        negatively impact the policy and should be fixed. Not valid for the SCA scan
+        type.
+      explode: true
+      in: query
+      name: violates_policy
+      required: false
+      schema:
+        type: boolean
+      style: form
+  schemas:
+    Links:
+      additionalProperties:
+        $ref: "#/components/schemas/Link"
+      type: object
+    Annotation:
+      example:
+        created: 2000-01-23T04:56:07.000+00:00
+        user_name: user_name
+        action: COMMENT
+        technique: technique
+        comment: comment
+        remaining_risk: remaining_risk
+        verification: verification
+        specifics: specifics
+      properties:
+        action:
+          description: The mitigation action that was applied to the finding.
+          enum:
+          - COMMENT
+          - FP
+          - APPDESIGN
+          - OSENV
+          - NETENV
+          - REJECTED
+          - APPROVED
+          - CONFORMS
+          - DEVIATES
+          - CUSTOMCLEANSERAPPROVED
+          - REMEDIATED
+          - NOACTIONTAKEN
+          - REOPENED
+          - CUSTOMCLEANSERPROPOSED
+          - CUSTOMCLEANSERUSERCOMMENT
+          - LIBRARY
+          - ACCEPTRISK
+          - DEFER
+          - BYENV
+          - BYDESIGN
+          - REJECT
+          - APPROVE
+          type: string
+        comment:
+          description: All comments associated with the mitigation action.
+          type: string
+        created:
+          description: "The date the annotation was added. The date/time format is\
+            \ per RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z."
+          format: date-time
+          type: string
+        remaining_risk:
+          description: The value in the Remaining Risk field from the Comment column.
+          type: string
+        specifics:
+          description: The value in the Specifics field from the Comment column.
+          type: string
+        technique:
+          description: The value in the Technique field from the Comment column.
+          type: string
+        user_name:
+          description: The user who added the comment.
+          type: string
+        verification:
+          description: The value of the Verification field in the Comment column.
+          type: string
+      type: object
+    CWEReference:
+      example:
+        name: name
+        url: url
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+      type: object
+    Category:
+      example:
+        name: name
+        description: description
+        recommendation: recommendation
+        id: 0
+      properties:
+        description:
+          description: The CWE category.
+          type: string
+        id:
+          description: Unique ID of the category.
+          format: int32
+          type: integer
+        name:
+          description: Category name.
+          type: string
+        recommendation:
+          description: Category recommendation.
+          type: string
+      type: object
+    CweDetail:
+      example:
+        severity: 1
+        references:
+        - name: name
+          url: url
+        - name: name
+          url: url
+        name: name
+        description: description
+        recommendation: recommendation
+        remediation_effort: 6
+        id: 0
+      properties:
+        description:
+          description: CWE description.
+          type: string
+        id:
+          description: The unique CWE ID.
+          format: int32
+          type: integer
+        name:
+          description: CWE name.
+          type: string
+        recommendation:
+          description: CWE recommendation.
+          type: string
+        references:
+          description: CWE reference name and URL.
+          items:
+            $ref: "#/components/schemas/CWEReference"
+          type: array
+        remediation_effort:
+          description: "The level of effort it will take to fix this finding. Values:\
+            \ 1=Trivial, 2=Implementation error, 3=Complex implementation error, 4=Simple\
+            \ design error, 5=Complex design error."
+          format: int32
+          type: integer
+        severity:
+          description: CWE severity.
+          format: int32
+          type: integer
+      type: object
+    EmbeddedCategory:
+      example:
+        categories:
+        - name: name
+          description: description
+          recommendation: recommendation
+          id: 0
+        - name: name
+          description: description
+          recommendation: recommendation
+          id: 0
+      properties:
+        categories:
+          items:
+            $ref: "#/components/schemas/Category"
+          type: array
+      type: object
+    EmbeddedCwe:
+      example:
+        cwes:
+        - severity: 1
+          references:
+          - name: name
+            url: url
+          - name: name
+            url: url
+          name: name
+          description: description
+          recommendation: recommendation
+          remediation_effort: 6
+          id: 0
+        - severity: 1
+          references:
+          - name: name
+            url: url
+          - name: name
+            url: url
+          name: name
+          description: description
+          recommendation: recommendation
+          remediation_effort: 6
+          id: 0
+      properties:
+        cwes:
+          items:
+            $ref: "#/components/schemas/CweDetail"
+          type: array
+      type: object
+    EmbeddedFinding:
+      example:
+        findings:
+        - grace_period_expires_date: 2000-01-23T04:56:07.000+00:00
+          context_guid: context_guid
+          issue_id: 3
+          build_id: 0
+          count: 6
+          annotations:
+          - created: 2000-01-23T04:56:07.000+00:00
+            user_name: user_name
+            action: COMMENT
+            technique: technique
+            comment: comment
+            remaining_risk: remaining_risk
+            verification: verification
+            specifics: specifics
+          - created: 2000-01-23T04:56:07.000+00:00
+            user_name: user_name
+            action: COMMENT
+            technique: technique
+            comment: comment
+            remaining_risk: remaining_risk
+            verification: verification
+            specifics: specifics
+          context_type: APPLICATION
+          description: description
+          scan_type: STATIC
+          finding_status:
+            new: true
+            first_found_date: 2000-01-23T04:56:07.000+00:00
+            last_seen_date: 2000-01-23T04:56:07.000+00:00
+            mitigation_review_status: mitigation_review_status
+            resolution_status: resolution_status
+            resolution: resolution
+            status: status
+          finding_details:
+            cwe:
+              name: name
+              id: 1
+              href: href
+            severity: 5
+            file_path: file_path
+            file_name: file_name
+            module: module
+            relative_location: 9
+            finding_category:
+              name: name
+              id: 7
+              href: href
+            procedure: procedure
+            cvss: cvss
+            exploitability: 5
+            attack_vector: attack_vector
+            file_line_number: 2
+          violates_policy: true
+        - grace_period_expires_date: 2000-01-23T04:56:07.000+00:00
+          context_guid: context_guid
+          issue_id: 3
+          build_id: 0
+          count: 6
+          annotations:
+          - created: 2000-01-23T04:56:07.000+00:00
+            user_name: user_name
+            action: COMMENT
+            technique: technique
+            comment: comment
+            remaining_risk: remaining_risk
+            verification: verification
+            specifics: specifics
+          - created: 2000-01-23T04:56:07.000+00:00
+            user_name: user_name
+            action: COMMENT
+            technique: technique
+            comment: comment
+            remaining_risk: remaining_risk
+            verification: verification
+            specifics: specifics
+          context_type: APPLICATION
+          description: description
+          scan_type: STATIC
+          finding_status:
+            new: true
+            first_found_date: 2000-01-23T04:56:07.000+00:00
+            last_seen_date: 2000-01-23T04:56:07.000+00:00
+            mitigation_review_status: mitigation_review_status
+            resolution_status: resolution_status
+            resolution: resolution
+            status: status
+          finding_details:
+            cwe:
+              name: name
+              id: 1
+              href: href
+            severity: 5
+            file_path: file_path
+            file_name: file_name
+            module: module
+            relative_location: 9
+            finding_category:
+              name: name
+              id: 7
+              href: href
+            procedure: procedure
+            cvss: cvss
+            exploitability: 5
+            attack_vector: attack_vector
+            file_line_number: 2
+          violates_policy: true
+      properties:
+        findings:
+          items:
+            $ref: "#/components/schemas/Finding"
+          type: array
+      type: object
+    ScaFindingExploitability:
+      description: Exploitability data for the associated vulnerability.
+      properties:
+        exploit_service_status:
+          description: The response status of the service that provides the exploitability
+            data. Valid values are "available" and "temporarily unavailable".
+          example: available
+          type: string
+        cve_full:
+          description: The canonical format of the CVE for which exploitability data
+            is being provided. This value is blank if no data for the CVE is available.
+          example: CVE-2019-0201
+          type: string
+        epss_status:
+          description: The status of the EPSS data lookup for the given cve_full.
+            Valid values are "match found" or "no match found".
+          example: match found
+          type: string
+        epss_score:
+          description: The EPSS score for the given cve_full.
+          example: 0.00107
+          type: number
+        epss_percentile:
+          description: The EPSS percentile for the given cve_full.
+          example: 0.42186
+          type: number
+        epss_score_date:
+          description: The date the EPSS score was generated.
+          example: 2023-06-05
+          type: string
+        epss_model_version:
+          description: The EPSS identifier for the model used to generate the score.
+          example: v2023.03.01
+          type: string
+        epss_citation:
+          description: Reference citation for the EPSS data.
+          example: See EPSS at https://www.first.org/epss
+          type: string
+        exploit_observed:
+          description: "`true` when the vulnerability has an exploit that is publicly\
+            \ available, regardless of whether the exploit is a proof of concept or\
+            \ is actively being exploited in the wild."
+          example: false
+          type: boolean
+        exploit_source:
+          description: "The source for the `exploit_observed` data. If `exploit_observed`\
+            \ is `false`, this field is typically empty or omitted."
+          example: KEV
+          type: string
+        exploit_note:
+          description: "Descriptive information about the `exploit_observed` value,\
+            \ if available."
+          example: See https://www.veracode.com/blog/security-news/resolving-webp-zero-day-vulnerability-cve-2023-4863
+            for details on this known exploited vulnerability.
+          type: string
+      type: object
+    Cwe:
+      description: The CWE (Common Weakness Enumeration) of the finding.
+      type: integer
+    Cvss:
+      description: The CVSS associated with the finding.
+      type: string
+    Severity:
+      description: Severity of the finding.
+      type: integer
+    StaticFinding:
+      example:
+        cwe:
+          name: name
+          id: 1
+          href: href
+        severity: 5
+        file_path: file_path
+        file_name: file_name
+        module: module
+        relative_location: 9
+        finding_category:
+          name: name
+          id: 7
+          href: href
+        procedure: procedure
+        cvss: cvss
+        exploitability: 5
+        attack_vector: attack_vector
+        file_line_number: 2
+      properties:
+        cwe:
+          $ref: "#/components/schemas/StaticFinding_cwe"
+        cvss:
+          description: The CVSS associated with the finding.
+          type: string
+        severity:
+          type: integer
+        exploitability:
+          description: "The likelihood that this finding could be exploited by an\
+            \ attacker. Values: -2: Very Unlikely, -1: Unlikely, 0: Neutral, 1: Likely,\
+            \ 2: Very Likely."
+          type: integer
+        attack_vector:
+          description: The function or class where the finding exists.
+          type: string
+        file_line_number:
+          description: The line number where the finding exists in the file.
+          type: integer
+        file_name:
+          description: The name of the file where the finding exists.
+          type: string
+        file_path:
+          description: The path to the file where the finding exists.
+          type: string
+        finding_category:
+          $ref: "#/components/schemas/StaticFinding_finding_category"
+        module:
+          description: The name of the module where the finding exists.
+          type: string
+        procedure:
+          description: The name of the procedure where the finding exists.
+          type: string
+        relative_location:
+          description: The relative location of the finding in the procedure.
+          type: integer
+      type: object
+    DynamicFinding:
+      properties:
+        cwe:
+          $ref: "#/components/schemas/StaticFinding_cwe"
+        cvss:
+          description: The CVSS associated with the finding.
+          type: string
+        severity:
+          type: integer
+        attack_vector:
+          description: URL or some input parameter.
+          type: string
+        hostname:
+          description: The hostname of the URL that contains the vulnerability.
+          type: string
+        port:
+          description: The port of the hostname that was attacked.
+          type: string
+        path:
+          description: The URI path.
+          type: string
+        plugin:
+          description: The type of attack sent.
+          type: string
+        finding_category:
+          $ref: "#/components/schemas/StaticFinding_finding_category"
+        URL:
+          description: The URL of the location where the finding exists.
+          type: string
+        vulnerable_parameter:
+          description: The parameter that contains a vulnerability.
+          type: string
+        discovered_by_vsa:
+          description: Whether the finding was discovered by Virtual Scan Appliance.
+          type: integer
+      type: object
+    ManualFindingV2:
+      properties:
+        cwe:
+          $ref: "#/components/schemas/StaticFinding_cwe"
+        cvss:
+          description: The CVSS associated with the finding.
+          type: string
+        severity:
+          type: integer
+        capec_id:
+          description: "Attack category, which contains subcategories, such as abuse\
+            \ of functionality, spoofing, probabilistic techniques, exploitation of\
+            \ authentication, resource depletion, exploitation of privilege/trust,\
+            \ injection, data structure attacks, data leakage attacks, resource manipulation,\
+            \ time and state attacks."
+          type: string
+        exploit_desc:
+          description: Description of the cause of the finding.
+          type: string
+        exploit_difficulty:
+          description: Category of the level of effort needed to fix the finding.
+          type: string
+        input_vector:
+          description: URL for the attack vector.
+          type: string
+        location:
+          description: The relative location of finding.
+          type: string
+        module:
+          description: The module where the finding exists.
+          type: string
+        remediation_desc:
+          description: Description of the remediation needed for the attack vector.
+          type: string
+        severity_desc:
+          description: Description of the severity of finding.
+          type: string
+      type: object
+    ScaFinding:
+      properties:
+        cwe:
+          $ref: "#/components/schemas/ScaFindingCwe"
+        severity:
+          description: An assigned severity for the vulnerability.
+          example: 4
+          type: integer
+        component_id:
+          description: Unique ID for the component.
+          type: string
+        licenses:
+          description: Displays all licenses found for a component with the specified
+            risk rating.
+          items:
+            $ref: "#/components/schemas/ScaFinding_licenses_inner"
+          type: array
+        cve:
+          $ref: "#/components/schemas/ScaFindingCve"
+        version:
+          description: The version of the third-party component.
+          example: 1.0.2.c1
+          type: string
+        product_id:
+          description: The product ID containing the vulnerability.
+          example: 92900924-a921-446a-9542-83a007b718a0
+          format: UUID
+          type: string
+        component_filename:
+          description: The component filename.
+          type: string
+        language:
+          description: The coding language.
+          type: string
+        component_path(s):
+          description: The list of component paths containing this vulnerability.
+          items:
+            $ref: "#/components/schemas/ScaFinding_component_path_s__inner"
+          type: array
+        metadata:
+          description: "Displays metadata values, such as the SCA scan mode and dependency\
+            \ mode."
+          type: object
+      type: object
+    ScaFindingCwe:
+      properties:
+        id:
+          description: The canonical numeric ID of the CWE.
+          example: 399
+          type: integer
+        name:
+          description: The canonical description of the CWE.
+          example: Resource Management Errors
+          type: string
+        href:
+          description: Finding CWE href
+          type: string
+      type: object
+    ScaFindingCve:
+      properties:
+        name:
+          description: "The identifier for this vulnerability. While typically a CVE,\
+            \ this field can also identify non-CVE assigned vulnerabilities, such\
+            \ as SRCCLR-SID-23134."
+          example: CVE-2016-2515
+          type: string
+        cvss:
+          description: The Common Vulnerability Scoring System score for this CVE.
+          example: 7.8
+          type: number
+        href:
+          description: A link to the CVE in the NVD or other database.
+          example: http://nvd.nist.gov/vuln/detail/CVE-2016-2515"
+          type: string
+        severity:
+          description: The assigned severity of this vulnerability.
+          example: High
+          type: string
+        vector:
+          description: The assigned vector for this vulnerability.
+          example: AV:N/AC:L/Au:N/C:N/I:N/A:C
+          type: string
+        cvss3:
+          $ref: "#/components/schemas/ScaFindingCve_cvss3"
+        exploitability:
+          $ref: "#/components/schemas/ScaFindingExploitability"
+      type: object
+    ScaFindingSeverity:
+      description: An assigned severity for the vulnerability.
+      example: 4
+      type: integer
+    Finding:
+      example:
+        grace_period_expires_date: 2000-01-23T04:56:07.000+00:00
+        context_guid: context_guid
+        issue_id: 3
+        build_id: 0
+        count: 6
+        annotations:
+        - created: 2000-01-23T04:56:07.000+00:00
+          user_name: user_name
+          action: COMMENT
+          technique: technique
+          comment: comment
+          remaining_risk: remaining_risk
+          verification: verification
+          specifics: specifics
+        - created: 2000-01-23T04:56:07.000+00:00
+          user_name: user_name
+          action: COMMENT
+          technique: technique
+          comment: comment
+          remaining_risk: remaining_risk
+          verification: verification
+          specifics: specifics
+        context_type: APPLICATION
+        description: description
+        scan_type: STATIC
+        finding_status:
+          new: true
+          first_found_date: 2000-01-23T04:56:07.000+00:00
+          last_seen_date: 2000-01-23T04:56:07.000+00:00
+          mitigation_review_status: mitigation_review_status
+          resolution_status: resolution_status
+          resolution: resolution
+          status: status
+        finding_details:
+          cwe:
+            name: name
+            id: 1
+            href: href
+          severity: 5
+          file_path: file_path
+          file_name: file_name
+          module: module
+          relative_location: 9
+          finding_category:
+            name: name
+            id: 7
+            href: href
+          procedure: procedure
+          cvss: cvss
+          exploitability: 5
+          attack_vector: attack_vector
+          file_line_number: 2
+        violates_policy: true
+      properties:
+        annotations:
+          description: All comments and explanatory notes related to this application
+            finding.
+          items:
+            $ref: "#/components/schemas/Annotation"
+          type: array
+        build_id:
+          description: The build ID.
+          format: int64
+          type: integer
+        context_guid:
+          description: The context ID.
+          type: string
+        context_type:
+          description: "Context type, which filters results to show only the findings\
+            \ of this specific context type. The findings status parameter is relative\
+            \ to this context parameter."
+          enum:
+          - APPLICATION
+          - SANDBOX
+          type: string
+        count:
+          description: "Number of times a finding occurs in an application, often\
+            \ referred to as prevalence."
+          format: int32
+          type: integer
+        description:
+          description: The detailed description of the finding.
+          type: string
+        finding_details:
+          $ref: "#/components/schemas/Finding_finding_details"
+        finding_status:
+          $ref: "#/components/schemas/FindingStatus"
+        grace_period_expires_date:
+          description: "The date on which a grace period expires for the finding.\
+            \ Veracode calculates this date based on the last date a finding was opened\
+            \ (First Found or Last Reopened date), and based on the grace period provided\
+            \ in the security policy assigned to the application. This date only applies\
+            \ to findings that impact policy compliance. The date/time format is per\
+            \ RFC3339 and ISO-8601, and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z."
+          format: date-time
+          type: string
+        issue_id:
+          description: Unique ID within the context of this application.
+          format: int64
+          type: integer
+        scan_type:
+          description: "The type of scan that Veracode used to discover this finding:\
+            \ static, dynamic, manual, SCA."
+          enum:
+          - STATIC
+          - DYNAMIC
+          - MANUAL
+          - SCA
+          type: string
+        violates_policy:
+          description: Policy is violated or not.
+          type: boolean
+      type: object
+    FindingStatus:
+      example:
+        new: true
+        first_found_date: 2000-01-23T04:56:07.000+00:00
+        last_seen_date: 2000-01-23T04:56:07.000+00:00
+        mitigation_review_status: mitigation_review_status
+        resolution_status: resolution_status
+        resolution: resolution
+        status: status
+      properties:
+        first_found_date:
+          description: "Date when the finding was first found. For SCA findings, this\
+            \ date may reference the latest of either the date the vulnerability was\
+            \ published to the Veracode vulnerability database or the date the library\
+            \ was found in a scan. The date/time format is per RFC3339 and ISO-8601,\
+            \ and the timezone is UTC. Example: 2019-04-12T23:20:50.52Z."
+          format: date-time
+          type: string
+        last_seen_date:
+          description: "The date and time when the finding was last seen. The date/time\
+            \ format is per RFC3339 and ISO-8601, and the timezone is UTC. Example:\
+            \ 2019-04-12T23:20:50.52Z."
+          format: date-time
+          type: string
+        mitigation_review_status:
+          description: Field indicating if the mitigation applied to the finding conforms
+            to or deviates from industry standards.
+          type: string
+        new:
+          description: Use this flag to indicate if this is the first time this finding
+            appeared in any context of the latest scan.
+          type: boolean
+        resolution:
+          description: Resolution of the finding.
+          type: string
+        resolution_status:
+          description: The resolution status of the finding.
+          type: string
+        status:
+          description: "Status of the finding: open or closed."
+          type: string
+      type: object
+    PagedResourceOfCategory:
+      example:
+        _link:
+          hreflang: hreflang
+          templated: true
+          rel: rel
+          href: href
+          media: media
+          deprecation: deprecation
+          title: title
+          type: type
+        _embedded:
+          categories:
+          - name: name
+            description: description
+            recommendation: recommendation
+            id: 0
+          - name: name
+            description: description
+            recommendation: recommendation
+            id: 0
+        page:
+          number: 6
+          size: 1
+          total_elements: 5
+          total_pages: 5
+      properties:
+        _embedded:
+          $ref: "#/components/schemas/EmbeddedCategory"
+        _link:
+          $ref: "#/components/schemas/Link"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+      type: object
+    PagedResourceOfCwe:
+      example:
+        _link:
+          hreflang: hreflang
+          templated: true
+          rel: rel
+          href: href
+          media: media
+          deprecation: deprecation
+          title: title
+          type: type
+        _embedded:
+          cwes:
+          - severity: 1
+            references:
+            - name: name
+              url: url
+            - name: name
+              url: url
+            name: name
+            description: description
+            recommendation: recommendation
+            remediation_effort: 6
+            id: 0
+          - severity: 1
+            references:
+            - name: name
+              url: url
+            - name: name
+              url: url
+            name: name
+            description: description
+            recommendation: recommendation
+            remediation_effort: 6
+            id: 0
+        page:
+          number: 6
+          size: 1
+          total_elements: 5
+          total_pages: 5
+      properties:
+        _embedded:
+          $ref: "#/components/schemas/EmbeddedCwe"
+        _link:
+          $ref: "#/components/schemas/Link"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+      title: PagedResourceOfCwe
+      type: object
+    PagedResourceOfFinding:
+      example:
+        _link:
+          hreflang: hreflang
+          templated: true
+          rel: rel
+          href: href
+          media: media
+          deprecation: deprecation
+          title: title
+          type: type
+        _embedded:
+          findings:
+          - grace_period_expires_date: 2000-01-23T04:56:07.000+00:00
+            context_guid: context_guid
+            issue_id: 3
+            build_id: 0
+            count: 6
+            annotations:
+            - created: 2000-01-23T04:56:07.000+00:00
+              user_name: user_name
+              action: COMMENT
+              technique: technique
+              comment: comment
+              remaining_risk: remaining_risk
+              verification: verification
+              specifics: specifics
+            - created: 2000-01-23T04:56:07.000+00:00
+              user_name: user_name
+              action: COMMENT
+              technique: technique
+              comment: comment
+              remaining_risk: remaining_risk
+              verification: verification
+              specifics: specifics
+            context_type: APPLICATION
+            description: description
+            scan_type: STATIC
+            finding_status:
+              new: true
+              first_found_date: 2000-01-23T04:56:07.000+00:00
+              last_seen_date: 2000-01-23T04:56:07.000+00:00
+              mitigation_review_status: mitigation_review_status
+              resolution_status: resolution_status
+              resolution: resolution
+              status: status
+            finding_details:
+              cwe:
+                name: name
+                id: 1
+                href: href
+              severity: 5
+              file_path: file_path
+              file_name: file_name
+              module: module
+              relative_location: 9
+              finding_category:
+                name: name
+                id: 7
+                href: href
+              procedure: procedure
+              cvss: cvss
+              exploitability: 5
+              attack_vector: attack_vector
+              file_line_number: 2
+            violates_policy: true
+          - grace_period_expires_date: 2000-01-23T04:56:07.000+00:00
+            context_guid: context_guid
+            issue_id: 3
+            build_id: 0
+            count: 6
+            annotations:
+            - created: 2000-01-23T04:56:07.000+00:00
+              user_name: user_name
+              action: COMMENT
+              technique: technique
+              comment: comment
+              remaining_risk: remaining_risk
+              verification: verification
+              specifics: specifics
+            - created: 2000-01-23T04:56:07.000+00:00
+              user_name: user_name
+              action: COMMENT
+              technique: technique
+              comment: comment
+              remaining_risk: remaining_risk
+              verification: verification
+              specifics: specifics
+            context_type: APPLICATION
+            description: description
+            scan_type: STATIC
+            finding_status:
+              new: true
+              first_found_date: 2000-01-23T04:56:07.000+00:00
+              last_seen_date: 2000-01-23T04:56:07.000+00:00
+              mitigation_review_status: mitigation_review_status
+              resolution_status: resolution_status
+              resolution: resolution
+              status: status
+            finding_details:
+              cwe:
+                name: name
+                id: 1
+                href: href
+              severity: 5
+              file_path: file_path
+              file_name: file_name
+              module: module
+              relative_location: 9
+              finding_category:
+                name: name
+                id: 7
+                href: href
+              procedure: procedure
+              cvss: cvss
+              exploitability: 5
+              attack_vector: attack_vector
+              file_line_number: 2
+            violates_policy: true
+        page:
+          number: 6
+          size: 1
+          total_elements: 5
+          total_pages: 5
+      properties:
+        _embedded:
+          $ref: "#/components/schemas/EmbeddedFinding"
+        _link:
+          $ref: "#/components/schemas/Link"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+      title: PagedResourceOfFinding
+      type: object
+    Scan:
+      description: Details about a scan.
+      example:
+        submitted: 2000-01-23T04:56:07.000+00:00
+        created: 2000-01-23T04:56:07.000+00:00
+        name: name
+        id: 0
+        applicationGuid: applicationGuid
+        completed: 2000-01-23T04:56:07.000+00:00
+        published: 2000-01-23T04:56:07.000+00:00
+        scanType: scanType
+        applicationId: 6
+        status: incomplete
+      properties:
+        id:
+          description: Unique identifier of the scan.
+          format: int32
+          type: integer
+        applicationId:
+          description: Unique identifier of the application.
+          format: int32
+          type: integer
+        applicationGuid:
+          description: Application identifier (UUID).
+          type: string
+        name:
+          description: Name of the scan.
+          type: string
+        created:
+          description: Date and time of scan creation.
+          format: date-time
+          type: string
+        submitted:
+          description: Date and time of scan submission.
+          format: date-time
+          type: string
+        completed:
+          description: Date and time the scan completed.
+          format: date-time
+          type: string
+        published:
+          description: Date and time of scan publication.
+          format: date-time
+          type: string
+        status:
+          description: Current scan status.
+          enum:
+          - incomplete
+          - not_submitted_to_engine
+          - submitted_to_engine
+          - scan_errors
+          - scan_in_process
+          - scan_cancelled
+          - scan_internal_error
+          - pending_internal_review
+          - results_ready
+          - pre_scan_submitted
+          - pre_scan_failed
+          - pre_scan_success
+          - no_modules_defined
+          - pending_vendor_confirmation
+          - pre_scan_cancelled
+          - scan_on_hold
+          - timeframe_pending
+          - paused
+          - stopping
+          - pausing
+          type: string
+        scanType:
+          description: Scan type.
+          type: string
+      type: object
+    EntityModelScan:
+      example:
+        submitted: 2000-01-23T04:56:07.000+00:00
+        created: 2000-01-23T04:56:07.000+00:00
+        name: name
+        id: 1
+        applicationGuid: applicationGuid
+        completed: 2000-01-23T04:56:07.000+00:00
+        published: 2000-01-23T04:56:07.000+00:00
+        scanType: scanType
+        applicationId: 5
+        status: incomplete
+      properties:
+        id:
+          description: Unique identifier of the scan.
+          format: int32
+          type: integer
+        applicationId:
+          description: Unique identifier of the application.
+          format: int32
+          type: integer
+        applicationGuid:
+          description: Application identifier (UUID).
+          type: string
+        name:
+          description: Name of the scan.
+          type: string
+        created:
+          description: Date and time of scan creation.
+          format: date-time
+          type: string
+        submitted:
+          description: Date and time of scan submission.
+          format: date-time
+          type: string
+        completed:
+          description: Date and time the scan completed.
+          format: date-time
+          type: string
+        published:
+          description: Date and time of scan publication.
+          format: date-time
+          type: string
+        status:
+          description: Current scan status.
+          enum:
+          - incomplete
+          - not_submitted_to_engine
+          - submitted_to_engine
+          - scan_errors
+          - scan_in_process
+          - scan_cancelled
+          - scan_internal_error
+          - pending_internal_review
+          - results_ready
+          - pre_scan_submitted
+          - pre_scan_failed
+          - pre_scan_success
+          - no_modules_defined
+          - pending_vendor_confirmation
+          - pre_scan_cancelled
+          - scan_on_hold
+          - timeframe_pending
+          - paused
+          - stopping
+          - pausing
+          type: string
+        scanType:
+          description: Scan type.
+          type: string
+      type: object
+    EmbeddedScan:
+      example:
+        scans:
+        - submitted: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 0
+          applicationGuid: applicationGuid
+          completed: 2000-01-23T04:56:07.000+00:00
+          published: 2000-01-23T04:56:07.000+00:00
+          scanType: scanType
+          applicationId: 6
+          status: incomplete
+        - submitted: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 0
+          applicationGuid: applicationGuid
+          completed: 2000-01-23T04:56:07.000+00:00
+          published: 2000-01-23T04:56:07.000+00:00
+          scanType: scanType
+          applicationId: 6
+          status: incomplete
+      properties:
+        scans:
+          items:
+            $ref: "#/components/schemas/Scan"
+          type: array
+      type: object
+    PagedModelOfScan:
+      example:
+        _page:
+          number: 6
+          size: 1
+          total_elements: 5
+          total_pages: 5
+        __link:
+          hreflang: hreflang
+          templated: true
+          rel: rel
+          href: href
+          media: media
+          deprecation: deprecation
+          title: title
+          type: type
+        __embedded:
+          scans:
+          - submitted: 2000-01-23T04:56:07.000+00:00
+            created: 2000-01-23T04:56:07.000+00:00
+            name: name
+            id: 0
+            applicationGuid: applicationGuid
+            completed: 2000-01-23T04:56:07.000+00:00
+            published: 2000-01-23T04:56:07.000+00:00
+            scanType: scanType
+            applicationId: 6
+            status: incomplete
+          - submitted: 2000-01-23T04:56:07.000+00:00
+            created: 2000-01-23T04:56:07.000+00:00
+            name: name
+            id: 0
+            applicationGuid: applicationGuid
+            completed: 2000-01-23T04:56:07.000+00:00
+            published: 2000-01-23T04:56:07.000+00:00
+            scanType: scanType
+            applicationId: 6
+            status: incomplete
+      properties:
+        __embedded:
+          $ref: "#/components/schemas/EmbeddedScan"
+        __link:
+          $ref: "#/components/schemas/Link"
+        _page:
+          $ref: "#/components/schemas/PageMetadata"
+      type: object
+    ManualFinding:
+      description: Details of a Manual Penetration Testing (MPT) finding.
+      example:
+        severity: 5
+        date: 2000-01-23T04:56:07.000+00:00
+        appendix:
+        - codeSamples:
+          - codeSamples
+          - codeSamples
+          description: description
+          screenshots:
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+        - codeSamples:
+          - codeSamples
+          - codeSamples
+          description: description
+          screenshots:
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+        scanId: 1
+        count: 5
+        externalId: 6
+        description: description
+        source:
+          note: note
+          capecId: 4
+          appendix_views:
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          scanId: 2
+          exploitDesc: exploitDesc
+          module: module
+          exploitDifficulty: 7
+          inputVector: inputVector
+          location: location
+          id: 3
+          remediationDesc: remediationDesc
+          severityDesc: severityDesc
+        type: type
+        resolution: resolution
+        cwe: 7
+        id: 0
+        state: Open
+        exploitability: 2
+        cvss: 9.301444243932576
+        matchedId: 1
+      properties:
+        id:
+          description: Unique identifier (Long).
+          format: int64
+          type: integer
+        externalId:
+          description: Alternative identifier of application finding that is unique
+            to this application.
+          format: int64
+          type: integer
+        scanId:
+          description: Scan identifier of this finding.
+          format: int32
+          type: integer
+        type:
+          description: Internal classification of the finding.
+          type: string
+        description:
+          description: Detailed description of the finding.
+          type: string
+        count:
+          description: Number of duplicate findings found in all modules.
+          format: int32
+          type: integer
+        severity:
+          description: Severity of the finding.
+          format: int32
+          type: integer
+        exploitability:
+          description: Exploitability of the finding.
+          format: int32
+          type: integer
+        cwe:
+          description: The CWE identifier.
+          format: int32
+          type: integer
+        cvss:
+          description: The CVSS score.
+          format: double
+          type: number
+        resolution:
+          description: Resolution of the finding.
+          type: string
+        state:
+          enum:
+          - Open
+          - Valid
+          - False Positive
+          - Incomplete
+          - Internal
+          - Escalate
+          type: string
+        date:
+          description: Date the scan finding was found.
+          format: date-time
+          type: string
+        source:
+          $ref: "#/components/schemas/Source"
+        matchedId:
+          description: Identifier that matches this finding.
+          format: int64
+          type: integer
+        appendix:
+          items:
+            $ref: "#/components/schemas/Appendix"
+          type: array
+      type: object
+    EmbeddedManualFinding:
+      example:
+        manualFindings:
+        - severity: 5
+          date: 2000-01-23T04:56:07.000+00:00
+          appendix:
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          scanId: 1
+          count: 5
+          externalId: 6
+          description: description
+          source:
+            note: note
+            capecId: 4
+            appendix_views:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 2
+            exploitDesc: exploitDesc
+            module: module
+            exploitDifficulty: 7
+            inputVector: inputVector
+            location: location
+            id: 3
+            remediationDesc: remediationDesc
+            severityDesc: severityDesc
+          type: type
+          resolution: resolution
+          cwe: 7
+          id: 0
+          state: Open
+          exploitability: 2
+          cvss: 9.301444243932576
+          matchedId: 1
+        - severity: 5
+          date: 2000-01-23T04:56:07.000+00:00
+          appendix:
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          scanId: 1
+          count: 5
+          externalId: 6
+          description: description
+          source:
+            note: note
+            capecId: 4
+            appendix_views:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 2
+            exploitDesc: exploitDesc
+            module: module
+            exploitDifficulty: 7
+            inputVector: inputVector
+            location: location
+            id: 3
+            remediationDesc: remediationDesc
+            severityDesc: severityDesc
+          type: type
+          resolution: resolution
+          cwe: 7
+          id: 0
+          state: Open
+          exploitability: 2
+          cvss: 9.301444243932576
+          matchedId: 1
+      properties:
+        manualFindings:
+          items:
+            $ref: "#/components/schemas/ManualFinding"
+          type: array
+      type: object
+    PagedModelOfManualFinding:
+      example:
+        _page:
+          number: 6
+          size: 1
+          total_elements: 5
+          total_pages: 5
+        __link:
+          hreflang: hreflang
+          templated: true
+          rel: rel
+          href: href
+          media: media
+          deprecation: deprecation
+          title: title
+          type: type
+        __embedded:
+          manualFindings:
+          - severity: 5
+            date: 2000-01-23T04:56:07.000+00:00
+            appendix:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 1
+            count: 5
+            externalId: 6
+            description: description
+            source:
+              note: note
+              capecId: 4
+              appendix_views:
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              scanId: 2
+              exploitDesc: exploitDesc
+              module: module
+              exploitDifficulty: 7
+              inputVector: inputVector
+              location: location
+              id: 3
+              remediationDesc: remediationDesc
+              severityDesc: severityDesc
+            type: type
+            resolution: resolution
+            cwe: 7
+            id: 0
+            state: Open
+            exploitability: 2
+            cvss: 9.301444243932576
+            matchedId: 1
+          - severity: 5
+            date: 2000-01-23T04:56:07.000+00:00
+            appendix:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 1
+            count: 5
+            externalId: 6
+            description: description
+            source:
+              note: note
+              capecId: 4
+              appendix_views:
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              scanId: 2
+              exploitDesc: exploitDesc
+              module: module
+              exploitDifficulty: 7
+              inputVector: inputVector
+              location: location
+              id: 3
+              remediationDesc: remediationDesc
+              severityDesc: severityDesc
+            type: type
+            resolution: resolution
+            cwe: 7
+            id: 0
+            state: Open
+            exploitability: 2
+            cvss: 9.301444243932576
+            matchedId: 1
+      properties:
+        __embedded:
+          $ref: "#/components/schemas/EmbeddedManualFinding"
+        __link:
+          $ref: "#/components/schemas/Link"
+        _page:
+          $ref: "#/components/schemas/PageMetadata"
+      type: object
+    PagedModelEntityModelScan:
+      example:
+        _embedded:
+          scans:
+          - submitted: 2000-01-23T04:56:07.000+00:00
+            created: 2000-01-23T04:56:07.000+00:00
+            name: name
+            id: 1
+            applicationGuid: applicationGuid
+            completed: 2000-01-23T04:56:07.000+00:00
+            published: 2000-01-23T04:56:07.000+00:00
+            scanType: scanType
+            applicationId: 5
+            status: incomplete
+          - submitted: 2000-01-23T04:56:07.000+00:00
+            created: 2000-01-23T04:56:07.000+00:00
+            name: name
+            id: 1
+            applicationGuid: applicationGuid
+            completed: 2000-01-23T04:56:07.000+00:00
+            published: 2000-01-23T04:56:07.000+00:00
+            scanType: scanType
+            applicationId: 5
+            status: incomplete
+        page:
+          number: 6
+          size: 1
+          total_elements: 5
+          total_pages: 5
+      properties:
+        _embedded:
+          $ref: "#/components/schemas/PagedModelEntityModelScan__embedded"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+      type: object
+    Appendix:
+      description: "An add-on item for the manual finding, which contains associated\
+        \ artifacts for a manual finding."
+      example:
+        codeSamples:
+        - codeSamples
+        - codeSamples
+        description: description
+        screenshots:
+        - data:
+          - data
+          - data
+          format: format
+          description: description
+        - data:
+          - data
+          - data
+          format: format
+          description: description
+      properties:
+        codeSamples:
+          description: List of code samples associated with a manual finding.
+          items:
+            description: List of code samples associated with a manual finding.
+            type: string
+          type: array
+        description:
+          description: Appendix description.
+          type: string
+        screenshots:
+          description: List of screenshots associated with a manual finding.
+          items:
+            $ref: "#/components/schemas/Screenshot"
+          type: array
+      type: object
+    Screenshot:
+      description: A screenshot associated with the manual finding.
+      example:
+        data:
+        - data
+        - data
+        format: format
+        description: description
+      properties:
+        data:
+          description: The screenshot file data.
+          items:
+            description: The screenshot file data.
+            format: byte
+            type: string
+          type: array
+        format:
+          description: File format of the screenshot.
+          type: string
+        description:
+          description: Description of the screenshot.
+          type: string
+      type: object
+    Source:
+      description: Object representation of the source of a manual finding.
+      example:
+        note: note
+        capecId: 4
+        appendix_views:
+        - codeSamples:
+          - codeSamples
+          - codeSamples
+          description: description
+          screenshots:
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+        - codeSamples:
+          - codeSamples
+          - codeSamples
+          description: description
+          screenshots:
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+        scanId: 2
+        exploitDesc: exploitDesc
+        module: module
+        exploitDifficulty: 7
+        inputVector: inputVector
+        location: location
+        id: 3
+        remediationDesc: remediationDesc
+        severityDesc: severityDesc
+      properties:
+        id:
+          format: int64
+          type: integer
+        scanId:
+          format: int32
+          type: integer
+        capecId:
+          description: "Unique indentifier for the attack category which contains\
+            \ subcategories as (abuse of functionality, spoofing, probabilistic techniques,\
+            \ exploitation of authentication, resource depletion, exploitation of\
+            \ privilege/trust, injection, data structure attacks, data leakage attacks,\
+            \ resource manipulation, and time and state attacks)."
+          format: int32
+          type: integer
+        exploitDesc:
+          description: Description of the cause of the manual finding.
+          type: string
+        exploitDifficulty:
+          description: Category of level of effort needed to fix the manual finding.
+          format: int32
+          type: integer
+        inputVector:
+          description: URL for the attack vector.
+          type: string
+        location:
+          description: Relative location of the manual finding.
+          type: string
+        module:
+          description: Module where the manual finding exists.
+          type: string
+        remediationDesc:
+          description: Description of remediation needed for the attack vector.
+          type: string
+        severityDesc:
+          description: Description of the severity of the manual finding.
+          type: string
+        note:
+          description: Review note of the manual finding.
+          type: string
+        appendix_views:
+          items:
+            $ref: "#/components/schemas/Appendix"
+          type: array
+          writeOnly: true
+      type: object
+    EntityModelManualFinding:
+      example:
+        severity: 1
+        date: 2000-01-23T04:56:07.000+00:00
+        appendix:
+        - codeSamples:
+          - codeSamples
+          - codeSamples
+          description: description
+          screenshots:
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+        - codeSamples:
+          - codeSamples
+          - codeSamples
+          description: description
+          screenshots:
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+          - data:
+            - data
+            - data
+            format: format
+            description: description
+        scanId: 6
+        count: 7
+        externalId: 1
+        description: description
+        source:
+          note: note
+          capecId: 4
+          appendix_views:
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          scanId: 2
+          exploitDesc: exploitDesc
+          module: module
+          exploitDifficulty: 7
+          inputVector: inputVector
+          location: location
+          id: 3
+          remediationDesc: remediationDesc
+          severityDesc: severityDesc
+        type: type
+        resolution: resolution
+        cwe: 5
+        id: 1
+        state: Open
+        exploitability: 4
+        cvss: 9.965781217890562
+        matchedId: 9
+      properties:
+        id:
+          description: Unique identifier (Long).
+          format: int64
+          type: integer
+        externalId:
+          description: Alternative identifier of application finding that is unique
+            to this application.
+          format: int64
+          type: integer
+        scanId:
+          description: Scan identifier of this finding.
+          format: int32
+          type: integer
+        type:
+          description: Internal classification of the finding.
+          type: string
+        description:
+          description: Detailed description of the finding.
+          type: string
+        count:
+          description: Number of duplicate findings found in all modules.
+          format: int32
+          type: integer
+        severity:
+          description: Severity of the finding.
+          format: int32
+          type: integer
+        exploitability:
+          description: Exploitability of the finding.
+          format: int32
+          type: integer
+        cwe:
+          description: The CWE identifier.
+          format: int32
+          type: integer
+        cvss:
+          description: The CVSS score.
+          format: double
+          type: number
+        resolution:
+          description: Resolution of the finding.
+          type: string
+        state:
+          enum:
+          - Open
+          - Valid
+          - False Positive
+          - Incomplete
+          - Internal
+          - Escalate
+          type: string
+        date:
+          description: Date the scan finding was found.
+          format: date-time
+          type: string
+        source:
+          $ref: "#/components/schemas/Source"
+        matchedId:
+          description: Identifier that matches this finding.
+          format: int64
+          type: integer
+        appendix:
+          items:
+            $ref: "#/components/schemas/Appendix"
+          type: array
+      type: object
+    PagedModelEntityModelManualFinding:
+      example:
+        _embedded:
+          findings:
+          - severity: 1
+            date: 2000-01-23T04:56:07.000+00:00
+            appendix:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 6
+            count: 7
+            externalId: 1
+            description: description
+            source:
+              note: note
+              capecId: 4
+              appendix_views:
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              scanId: 2
+              exploitDesc: exploitDesc
+              module: module
+              exploitDifficulty: 7
+              inputVector: inputVector
+              location: location
+              id: 3
+              remediationDesc: remediationDesc
+              severityDesc: severityDesc
+            type: type
+            resolution: resolution
+            cwe: 5
+            id: 1
+            state: Open
+            exploitability: 4
+            cvss: 9.965781217890562
+            matchedId: 9
+          - severity: 1
+            date: 2000-01-23T04:56:07.000+00:00
+            appendix:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 6
+            count: 7
+            externalId: 1
+            description: description
+            source:
+              note: note
+              capecId: 4
+              appendix_views:
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              - codeSamples:
+                - codeSamples
+                - codeSamples
+                description: description
+                screenshots:
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+                - data:
+                  - data
+                  - data
+                  format: format
+                  description: description
+              scanId: 2
+              exploitDesc: exploitDesc
+              module: module
+              exploitDifficulty: 7
+              inputVector: inputVector
+              location: location
+              id: 3
+              remediationDesc: remediationDesc
+              severityDesc: severityDesc
+            type: type
+            resolution: resolution
+            cwe: 5
+            id: 1
+            state: Open
+            exploitability: 4
+            cvss: 9.965781217890562
+            matchedId: 9
+        page:
+          number: 6
+          size: 1
+          total_elements: 5
+          total_pages: 5
+      properties:
+        _embedded:
+          $ref: "#/components/schemas/PagedModelEntityModelManualFinding__embedded"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+      type: object
+    Link:
+      example:
+        hreflang: hreflang
+        templated: true
+        rel: rel
+        href: href
+        media: media
+        deprecation: deprecation
+        title: title
+        type: type
+      properties:
+        deprecation:
+          type: string
+          xml:
+            attribute: true
+            name: deprecation
+            wrapped: false
+        href:
+          type: string
+          xml:
+            attribute: true
+            name: href
+            wrapped: false
+        hreflang:
+          type: string
+          xml:
+            attribute: true
+            name: hreflang
+            wrapped: false
+        media:
+          type: string
+          xml:
+            attribute: true
+            name: media
+            wrapped: false
+        rel:
+          type: string
+          xml:
+            attribute: true
+            name: rel
+            wrapped: false
+        templated:
+          type: boolean
+        title:
+          type: string
+          xml:
+            attribute: true
+            name: title
+            wrapped: false
+        type:
+          type: string
+          xml:
+            attribute: true
+            name: type
+            wrapped: false
+      type: object
+    PageMetadata:
+      example:
+        number: 6
+        size: 1
+        total_elements: 5
+        total_pages: 5
+      properties:
+        number:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: number
+            wrapped: false
+        size:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: size
+            wrapped: false
+        total_elements:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: total_elements
+            wrapped: false
+        total_pages:
+          format: int64
+          type: integer
+          xml:
+            attribute: true
+            name: total_pages
+            wrapped: false
+      type: object
+    StaticFinding_cwe:
+      example:
+        name: name
+        id: 1
+        href: href
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        href:
+          type: string
+      type: object
+    StaticFinding_finding_category:
+      description: The finding category.
+      example:
+        name: name
+        id: 7
+        href: href
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          type: string
+        href:
+          type: string
+      type: object
+    ScaFinding_licenses_inner:
+      properties:
+        license_id:
+          description: The identifier for the license of the component.
+          example: bsd-3-clause
+          type: string
+        risk_rating:
+          description: The risk score of this license.
+          example: "2"
+          type: string
+      type: object
+    ScaFinding_component_path_s__inner:
+      properties:
+        path:
+          description: The path of the component with the vulnerability.
+          example: file330108_1682024184933_html/master-binary/objective-c/cocoapods/Podfile.lock/OpenSSL-Static
+          type: string
+      type: object
+    ScaFindingCve_cvss3:
+      properties:
+        score:
+          description: The assigned CVSS v3 score for this vulnerability.
+          example: 7.5
+          type: number
+        severity:
+          description: The assigned CVSS v3 severity for this vulnerability.
+          example: High
+          type: string
+        vector:
+          description: The assigned CVSS v3 vector for this vulnerability.
+          example: AV:N/AC:L/Au:N/C:N/I:N/A:C
+          type: string
+      type: object
+    Finding_finding_details:
+      description: Structured data about the finding.
+      oneOf:
+      - $ref: "#/components/schemas/StaticFinding"
+      - $ref: "#/components/schemas/DynamicFinding"
+      - $ref: "#/components/schemas/ManualFinding"
+      - $ref: "#/components/schemas/ScaFinding"
+      type: object
+    PagedModelEntityModelScan__embedded:
+      example:
+        scans:
+        - submitted: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 1
+          applicationGuid: applicationGuid
+          completed: 2000-01-23T04:56:07.000+00:00
+          published: 2000-01-23T04:56:07.000+00:00
+          scanType: scanType
+          applicationId: 5
+          status: incomplete
+        - submitted: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 1
+          applicationGuid: applicationGuid
+          completed: 2000-01-23T04:56:07.000+00:00
+          published: 2000-01-23T04:56:07.000+00:00
+          scanType: scanType
+          applicationId: 5
+          status: incomplete
+      properties:
+        scans:
+          items:
+            $ref: "#/components/schemas/EntityModelScan"
+          type: array
+      type: object
+    PagedModelEntityModelManualFinding__embedded:
+      example:
+        findings:
+        - severity: 1
+          date: 2000-01-23T04:56:07.000+00:00
+          appendix:
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          scanId: 6
+          count: 7
+          externalId: 1
+          description: description
+          source:
+            note: note
+            capecId: 4
+            appendix_views:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 2
+            exploitDesc: exploitDesc
+            module: module
+            exploitDifficulty: 7
+            inputVector: inputVector
+            location: location
+            id: 3
+            remediationDesc: remediationDesc
+            severityDesc: severityDesc
+          type: type
+          resolution: resolution
+          cwe: 5
+          id: 1
+          state: Open
+          exploitability: 4
+          cvss: 9.965781217890562
+          matchedId: 9
+        - severity: 1
+          date: 2000-01-23T04:56:07.000+00:00
+          appendix:
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          - codeSamples:
+            - codeSamples
+            - codeSamples
+            description: description
+            screenshots:
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+            - data:
+              - data
+              - data
+              format: format
+              description: description
+          scanId: 6
+          count: 7
+          externalId: 1
+          description: description
+          source:
+            note: note
+            capecId: 4
+            appendix_views:
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            - codeSamples:
+              - codeSamples
+              - codeSamples
+              description: description
+              screenshots:
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+              - data:
+                - data
+                - data
+                format: format
+                description: description
+            scanId: 2
+            exploitDesc: exploitDesc
+            module: module
+            exploitDifficulty: 7
+            inputVector: inputVector
+            location: location
+            id: 3
+            remediationDesc: remediationDesc
+            severityDesc: severityDesc
+          type: type
+          resolution: resolution
+          cwe: 5
+          id: 1
+          state: Open
+          exploitability: 4
+          cvss: 9.965781217890562
+          matchedId: 9
+      properties:
+        findings:
+          items:
+            $ref: "#/components/schemas/EntityModelManualFinding"
+          type: array
+      type: object

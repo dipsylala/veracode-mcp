@@ -7,7 +7,7 @@ This document describes how REST API calls are integrated with the MCP server to
 ## Package Structure
 
 ```text
-VeracodeMCP-Go/
+Veracode-MCP/
 ├── api/                        # API package
 │   ├── client.go              # Client orchestrator (manages all API clients)
 │   ├── findings.go            # Findings endpoints (SAST/DAST) with filtering and business logic
@@ -96,10 +96,10 @@ api.GetDynamicFindings()
 package api
 
 import (
-    "github.com/dipsylala/veracodemcp-go/api/generated/findings"
+    "github.com/dipsylala/veracode-mcp/api/generated/findings"
 )
 
-func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
+func (c *Client) GetDynamicFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {
     authCtx := c.GetAuthContext(ctx)
     
     // Build options for the generated client
@@ -131,11 +131,11 @@ func (c *VeracodeClient) GetDynamicFindings(ctx context.Context, req FindingsReq
 
 ```go
 // tools/dynamic_findings.go
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 func (t *DynamicFindingsTool) handleGetDynamicFindings(ctx context.Context, params map[string]interface{}) (interface{}, error) {
     // Create API client
-    client, err := api.NewVeracodeClient()
+    client, err := api.NewClient()
     if err != nil {
         return errorResponse("API not configured: " + err.Error()), nil
     }
@@ -167,11 +167,11 @@ Environment variables required:
 - `VERACODE_API_ID` - Your Veracode API ID
 - `VERACODE_API_KEY` - Your Veracode API Secret Key
 
-The `api.VeracodeClient` handles authentication:
+The `api.Client` handles authentication:
 
 ```go
 // Client creation checks credentials
-client, err := api.NewVeracodeClient()
+client, err := api.NewClient()
 if err != nil {
     // Credentials not set or invalid
 }
@@ -221,9 +221,9 @@ This will:
 - Run `go mod tidy`
 
 ```go
-import new_api "github.com/dipsylala/veracodemcp-go/api/generated/new_api"
+import new_api "github.com/dipsylala/veracode-mcp/api/generated/new_api"
 
-type VeracodeClient struct {
+type Client struct {
     healthcheckClient           *healthcheck.APIClient
     findingsClient              *findings.APIClient
     dynamicFlawClient           *dynamic_flaw.APIClient
@@ -233,11 +233,11 @@ type VeracodeClient struct {
     apiKey                      string
 }
 
-func NewVeracodeClient() (*VeracodeClient, error) {
+func NewClient() (*Client, error) {
     // ... existing code ...
     newApiCfg := new_api.NewConfiguration()
     
-    return &VeracodeClient{
+    return &Client{
         // ... existing clients ...
         newApiClient: new_api.NewAPIClient(newApiCfg),
         // ...
@@ -263,7 +263,7 @@ type NewFeatureResponse struct {
     Result string `json:"result"`
 }
 
-func (c *VeracodeClient) NewFeature(ctx context.Context, req NewFeatureRequest) (*NewFeatureResponse, error) {
+func (c *Client) NewFeature(ctx context.Context, req NewFeatureRequest) (*NewFeatureResponse, error) {
     authCtx := c.GetAuthContext(ctx)
     
     resp, _, err := c.newApiClient.SomeApi.SomeMethod(authCtx, req.Param1)
@@ -308,10 +308,10 @@ func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]i
 
 ```go
 // tools/api_health.go
-import "github.com/dipsylala/veracodemcp-go/api"
+import "github.com/dipsylala/veracode-mcp/api"
 
 func (t *APIHealthTool) handleAPIHealth(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-    client, err := api.NewVeracodeClient()
+    client, err := api.NewClient()
     if err != nil {
         return errorResponse(err.Error()), nil
     }

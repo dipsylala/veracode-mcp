@@ -95,7 +95,7 @@ $apis = @(
 if (-not $SkipClean) {
     Write-Step "Cleaning existing generated code..."
     foreach ($api in $apis) {
-        $outputDir = "api/generated/$($api.Name)"
+        $outputDir = "api/rest/generated/$($api.Name)"
         if (Test-Path $outputDir) {
             # Keep README.md if it exists
             if (Test-Path "$outputDir/README.md") {
@@ -115,6 +115,98 @@ if (-not $SkipClean) {
     }
 }
 
+# Apply pre-generation spec fixes
+Write-Step "Applying pre-generation spec fixes..."
+$findingsSpec = "specs/veracode-findings.json"
+if (Test-Path $findingsSpec) {
+    $specContent = Get-Content -Path $findingsSpec -Raw
+    $originalContent = $specContent
+    
+    # Fix OAS 2.0 syntax parameters to OAS 3.0
+    # The inline page and size parameters use old syntax: "type": "integer" instead of "schema": { "type": "integer" }
+    $oldPageParam = @'
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number. Defaults to 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          }
+'@
+    
+    $newPageParam = @'
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number. Defaults to 0.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "allowEmptyValue": false
+          }
+'@
+    
+    $oldSizeParam = @'
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size, up to 500. The default is 50.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          }
+'@
+    
+    $newSizeParam = @'
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size, up to 500. The default is 50.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "allowEmptyValue": false
+          }
+'@
+    
+    $specContent = $specContent -replace [regex]::Escape($oldPageParam), $newPageParam
+    $specContent = $specContent -replace [regex]::Escape($oldSizeParam), $newSizeParam
+    
+    # Fix incorrect "number" types that should be "integer"
+    # These fields return integers from the API but spec says "number" (generates as float32)
+    
+    # Fix generic Cwe type (line 1238)
+    $specContent = $specContent -replace '"Cwe":\s*\{\s*"type":\s*"number",\s*"description":\s*"The CWE \(Common Weakness Enumeration\) of the finding\."', '"Cwe": { "type": "integer", "description": "The CWE (Common Weakness Enumeration) of the finding."'
+    
+    # Fix generic Severity type (line 1246)
+    $specContent = $specContent -replace '"Severity":\s*\{\s*"type":\s*"number",\s*"description":\s*"Severity of the finding\."', '"Severity": { "type": "integer", "description": "Severity of the finding."'
+    
+    # Fix file_line_number (line 1270)
+    $specContent = $specContent -replace '"file_line_number":\s*\{\s*"type":\s*"number",\s*"description":\s*"The line number where the finding exists in the file\."', '"file_line_number": { "type": "integer", "description": "The line number where the finding exists in the file."'
+    
+    # Fix ScaFindingCwe.id (line 1473)
+    $specContent = $specContent -replace '"id":\s*\{\s*"type":\s*"number",\s*"description":\s*"The canonical numeric ID of the CWE\.",\s*"example":\s*399', '"id": { "type": "integer", "description": "The canonical numeric ID of the CWE.", "example": 399'
+    
+    # Fix ScaFindingSeverity (line 1542)
+    $specContent = $specContent -replace '"ScaFindingSeverity":\s*\{\s*"type":\s*"number",\s*"description":\s*"An assigned severity for the vulnerability\.",\s*"example":\s*4', '"ScaFindingSeverity": { "type": "integer", "description": "An assigned severity for the vulnerability.", "example": 4'
+    
+    if ($specContent -ne $originalContent) {
+        Set-Content -Path $findingsSpec -Value $specContent -NoNewline
+        Write-Success "Fixed OAS 2.0 syntax and type mismatches in findings spec"
+    } else {
+        Write-Success "Findings spec already uses correct OAS 3.0 syntax and types"
+    }
+} else {
+    Write-Warning "Findings spec not found - skipping pre-generation fixes"
+}
+
 # Generate API clients
 Write-Step "Generating API clients..."
 $generated = 0
@@ -127,7 +219,7 @@ foreach ($api in $apis) {
     
     Write-Host "`n  Generating $($api.Name)..." -ForegroundColor Yellow
     
-    $outputDir = "api/generated/$($api.Name)"
+    $outputDir = "api/rest/generated/$($api.Name)"
     
     # Generate based on which tool is available
     if ($generator -eq "openapi-generator-cli" -or $generator -eq "openapi-generator") {
@@ -162,7 +254,7 @@ foreach ($api in $apis) {
 if ($generator -eq "swagger-codegen") {
     Write-Step "Updating package names..."
     foreach ($api in $apis) {
-        $outputDir = "api/generated/$($api.Name)"
+        $outputDir = "api/rest/generated/$($api.Name)"
         if (Test-Path $outputDir) {
             Get-ChildItem -Path $outputDir -Recurse -Include "*.go" | ForEach-Object {
                 (Get-Content $_.FullName) -replace 'package swagger', "package $($api.Package)" | Set-Content $_.FullName
@@ -183,7 +275,7 @@ if ($LASTEXITCODE -eq 0) {
 
 # Apply post-generation patches
 Write-Step "Applying post-generation patches..."
-$findingDetailsFile = "api/generated/findings/model_finding_finding_details.go"
+$findingDetailsFile = "api/rest/generated/findings/model_finding_finding_details.go"
 if (Test-Path $findingDetailsFile) {
     $content = Get-Content -Path $findingDetailsFile -Raw
     
@@ -265,6 +357,78 @@ func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
     Write-Warning "Could not find $findingDetailsFile - patch skipped"
 }
 
+# Restore original spec files
+Write-Step "Restoring original spec files..."
+if (Test-Path $findingsSpec) {
+    $specContent = Get-Content -Path $findingsSpec -Raw
+    
+    # Reverse the OAS 3.0 to 2.0 syntax changes to restore original
+    $newPageParam = @'
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number. Defaults to 0.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "allowEmptyValue": false
+          }
+'@
+    
+    $oldPageParam = @'
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number. Defaults to 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          }
+'@
+    
+    $newSizeParam = @'
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size, up to 500. The default is 50.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "allowEmptyValue": false
+          }
+'@
+    
+    $oldSizeParam = @'
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size, up to 500. The default is 50.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          }
+'@
+    
+    $specContent = $specContent -replace [regex]::Escape($newPageParam), $oldPageParam
+    $specContent = $specContent -replace [regex]::Escape($newSizeParam), $oldSizeParam
+    
+    # Reverse type fixes
+    $specContent = $specContent -replace '"Cwe":\s*\{\s*"type":\s*"integer",\s*"description":\s*"The CWE \(Common Weakness Enumeration\) of the finding\."', '"Cwe": { "type": "number", "description": "The CWE (Common Weakness Enumeration) of the finding."'
+    $specContent = $specContent -replace '"Severity":\s*\{\s*"type":\s*"integer",\s*"description":\s*"Severity of the finding\."', '"Severity": { "type": "number", "description": "Severity of the finding."'
+    $specContent = $specContent -replace '"file_line_number":\s*\{\s*"type":\s*"integer",\s*"description":\s*"The line number where the finding exists in the file\."', '"file_line_number": { "type": "number", "description": "The line number where the finding exists in the file."'
+    $specContent = $specContent -replace '"id":\s*\{\s*"type":\s*"integer",\s*"description":\s*"The canonical numeric ID of the CWE\.",\s*"example":\s*399', '"id": { "type": "number", "description": "The canonical numeric ID of the CWE.", "example": 399'
+    $specContent = $specContent -replace '"ScaFindingSeverity":\s*\{\s*"type":\s*"integer",\s*"description":\s*"An assigned severity for the vulnerability\.",\s*"example":\s*4', '"ScaFindingSeverity": { "type": "number", "description": "An assigned severity for the vulnerability.", "example": 4'
+    
+    Set-Content -Path $findingsSpec -Value $specContent -NoNewline
+    Write-Success "Restored original findings spec"
+}
+
 # Summary
 Write-Host "`n╔════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host "║          Generation Complete!          ║" -ForegroundColor Cyan
@@ -277,7 +441,7 @@ if ($generated -lt $apis.Count) {
 }
 
 Write-Host "`nNext steps:" -ForegroundColor Cyan
-Write-Host "  1. Review generated code in api/generated/" -ForegroundColor White
+Write-Host "  1. Review generated code in api/rest/generated/" -ForegroundColor White
 Write-Host "  2. Run: .\build.ps1 -Quick" -ForegroundColor White
 Write-Host "  3. Update api/client.go if new clients were added" -ForegroundColor White
 Write-Host ""

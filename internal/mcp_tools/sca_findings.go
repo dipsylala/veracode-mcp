@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dipsylala/veracodemcp-go/api"
-	"github.com/dipsylala/veracodemcp-go/api/generated/applications"
-	"github.com/dipsylala/veracodemcp-go/workspace"
+	"github.com/dipsylala/veracode-mcp/api"
+	"github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
+	"github.com/dipsylala/veracode-mcp/workspace"
 )
 
 const ScaFindingsToolName = "get-sca-findings"
@@ -95,7 +95,7 @@ func handleGetScaFindings(ctx context.Context, args map[string]interface{}) (int
 	}
 
 	// Step 2: Create API client
-	client, err := api.NewVeracodeClient()
+	client, err := api.NewClient()
 	if err != nil {
 		responseText := fmt.Sprintf(`SCA Findings Analysis - Error
 ========================
@@ -358,6 +358,7 @@ func processScaFinding(finding api.Finding) MCPFinding {
 
 	mcpFinding := MCPFinding{
 		FlawID:           finding.ID,
+		BuildID:          finding.BuildID,
 		ScanType:         "SCA",
 		Status:           string(transformedStatus),
 		MitigationStatus: mitigationStatus,

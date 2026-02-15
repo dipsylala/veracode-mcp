@@ -274,12 +274,26 @@
           },
           {
             "$ref": "#/components/parameters/PolicyViolation"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number. Defaults to 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size, up to 500. The default is 50.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "allowEmptyValue": false
           }
-        ,{
-            "$ref": "#/components/parameters/Page"
-          },{
-            "$ref": "#/components/parameters/Size"
-          }],
+        ],
         "responses": {
           "200": {
             "description": "You have successfully submitted your request.",
@@ -1220,17 +1234,13 @@
           }
         }
       },
-      "Cwe": {
-        "type": "string",
-        "description": "The CWE (Common Weakness Enumeration) of the finding."
+      "Cwe": { "type": "number", "description": "The CWE (Common Weakness Enumeration) of the finding."
       },
       "Cvss": {
         "type": "string",
         "description": "The CVSS associated with the finding."
       },
-      "Severity": {
-        "type": "integer",
-        "description": "Severity of the finding."
+      "Severity": { "type": "number", "description": "Severity of the finding."
       },
       "StaticFinding": {
         "type": "object",
@@ -1252,9 +1262,7 @@
             "type": "string",
             "description": "The function or class where the finding exists."
           },
-          "file_line_number": {
-            "type": "integer",
-            "description": "The line number where the finding exists in the file."
+          "file_line_number": { "type": "number", "description": "The line number where the finding exists in the file."
           },
           "file_name": {
             "type": "string",
@@ -1455,10 +1463,7 @@
       "ScaFindingCwe": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "number",
-            "description": "The canonical numeric ID of the CWE.",
-            "example": 399
+          "id": { "type": "number", "description": "The canonical numeric ID of the CWE.", "example": 399
           },
           "name": {
             "type": "string",
@@ -1524,10 +1529,7 @@
           }
         }
       },
-      "ScaFindingSeverity": {
-        "type": "number",
-        "description": "An assigned severity for the vulnerability.",
-        "example": 4
+      "ScaFindingSeverity": { "type": "number", "description": "An assigned severity for the vulnerability.", "example": 4
       },
       "Finding": {
         "type": "object",
@@ -1894,9 +1896,7 @@
             "description": "Number of duplicate findings found in all modules.",
             "format": "int32"
           },
-          "severity": {
-            "type": "integer",
-            "description": "Severity of the finding.",
+          "Severity": { "type": "number", "description": "Severity of the finding.",
             "format": "int32"
           },
           "exploitability": {
@@ -2134,9 +2134,7 @@
             "description": "Number of duplicate findings found in all modules.",
             "format": "int32"
           },
-          "severity": {
-            "type": "integer",
-            "description": "Severity of the finding.",
+          "Severity": { "type": "number", "description": "Severity of the finding.",
             "format": "int32"
           },
           "exploitability": {

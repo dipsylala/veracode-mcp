@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dipsylala/veracodemcp-go/internal/cli"
-	"github.com/dipsylala/veracodemcp-go/internal/server"
-	tools "github.com/dipsylala/veracodemcp-go/internal/tool_registry"
+	"github.com/dipsylala/veracode-mcp/internal/cli"
+	"github.com/dipsylala/veracode-mcp/internal/server"
+	tools "github.com/dipsylala/veracode-mcp/internal/tool_registry"
 )
 
 //go:embed tools.json

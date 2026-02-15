@@ -7,7 +7,7 @@ The MCP server now uses a proper Go package structure with all tool implementati
 ## Structure
 
 ```text
-VeracodeMCP-Go/
+Veracode-MCP/
 ├── go.mod                       # Module definition
 ├── main.go                      # Entry point
 ├── server.go                    # MCP server core
@@ -33,7 +33,7 @@ VeracodeMCP-Go/
    - Contains all tool implementations
 
 2. **main package**:
-   - Imports `github.com/dipsylala/veracodemcp-go/internal/mcp_tools`
+   - Imports `github.com/dipsylala/veracode-mcp/internal/mcp_tools`
    - Implements `ToolHandlerRegistry` (satisfies `tools.HandlerRegistry`)
    - Calls `LoadAllTools()` to initialize and register tools
 

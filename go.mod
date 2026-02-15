@@ -1,4 +1,4 @@
-module github.com/dipsylala/veracodemcp-go
+module github.com/dipsylala/veracode-mcp
 
 go 1.23
 

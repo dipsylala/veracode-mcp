@@ -11,7 +11,7 @@ This package allows tools to automatically discover the Veracode application pro
 ### Basic Usage
 
 ```go
-import "github.com/dipsylala/veracodemcp-go/workspace"
+import "github.com/dipsylala/veracode-mcp/workspace"
 
 // Find workspace config in a specific directory
 appName, err := workspace.FindWorkspaceConfig("/path/to/project")
