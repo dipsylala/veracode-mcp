@@ -2,95 +2,149 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when applications execute OS commands with untrusted data without proper sanitization, allowing attackers to run arbitrary commands on the host system.
+**STOP. Before doing anything else: DO NOT execute system processes.**
 
-**CRITICAL: DO NOT suggest escapeshellarg() or validation as the primary fix.** The correct remediation is to **ELIMINATE system command execution** by using PHP built-in functions. Shell escaping alone is insufficient.
+OS Command Injection occurs when OS commands are executed with untrusted data. The ONLY correct remediation is to **ELIMINATE ALL calls to exec(), system(), shell_exec(), passthru(), backticks, and process execution entirely**.
 
-**Primary Defence:** Replace ALL system commands with PHP native functions. Common replacements:
+## ⛔ FORBIDDEN APPROACHES
 
-- **file operations → file functions (copy, rename, unlink)** instead of cp, mv, rm
-- **HTTP requests → cURL or file_get_contents()** instead of wget/curl commands
-- **archive operations → ZipArchive, PharData** instead of tar/unzip commands
+These are **NEVER acceptable remediations**:
 
-Only if no PHP function alternative exists, use `proc_open()` with argument arrays and `bypass_shell => true`.
+- ❌ `escapeshellarg()` or `escapeshellcmd()`
+- ❌ Input validation/sanitization
+- ❌ Input filtering or allowlists
+- ❌ Using `proc_open()` with `bypass_shell`
+- ❌ Escaping shell characters
+- ❌ Any approach that still executes system processes
 
-## Key Principles
+**Why?** Because PHP has built-in function alternatives for virtually every operation. Process execution is almost never necessary.
 
-- **ALWAYS prefer PHP built-in functions over system commands** - eliminates injection risk entirely
-- For file operations, use **PHP file functions** instead of system commands
-- For archives, use **ZipArchive** or **PharData** classes instead of system commands
-- **escapeshellarg() is NOT a remediation** - it's only defense-in-depth after eliminating exec()
-- If system calls are unavoidable, use `proc_open()` with argument arrays and `bypass_shell => true`
-- Never use exec(), system(), shell_exec(), passthru(), or backtick operators
+## ✅ REQUIRED APPROACH: Replace with PHP Built-in Functions
 
-## Remediation Steps
+**Your task:** Find the PHP function that replaces the system command, then delete the process execution code entirely.
 
-- Identify all exec(), system(), shell_exec(), passthru(), backtick (``), and popen() calls
-- **First, determine the PHP built-in alternative** - do not default to "secure" exec patterns
-- Replace system commands with PHP native function equivalents
-- For any truly unavoidable commands, refactor to use `proc_open()` with argument arrays and `bypass_shell => true`
-- Remove all exec(), system(), shell_exec() usage
-- Disable dangerous functions in php.ini (disable_functions directive)
+## Common Command → Function Replacements
 
-## Remediation Pattern
+**Use this table to find the replacement.** If the code executes ANY of these commands, replace them with the PHP function shown:
 
-**The transformation pattern:** System Command → PHP Built-in Function
+| System Command | PHP Function Alternative | Method |
+| ---------------- | ------------------------- | -------- |
+| `ping` | `fsockopen()` | `fsockopen($host, $port, $errno, $errstr, $timeout)` |
+| `curl`, `wget` | `curl_*()` or `file_get_contents()` | `curl_exec(curl_init($url))` |
+| `cp`, `copy` | `copy()` | `copy($source, $dest)` |
+| `mv`, `move` | `rename()` | `rename($old, $new)` |
+| `rm`, `del` | `unlink()` | `unlink($file)` |
+| `mkdir` | `mkdir()` | `mkdir($dir, 0755, true)` |
+| `unzip`, `tar -xf` | `ZipArchive`, `PharData` | `$zip->extractTo($dest)` |
+| `zip`, `tar -cf` | `ZipArchive` | `$zip->addFile($file)` |
+| `cat`, `type` | `file_get_contents()` | `file_get_contents($file)` |
+| `grep`, `findstr` | PHP string functions | `str_contains()`, `preg_match()` |
 
-This applies to ALL system commands - if you find exec(), shell_exec(), or backticks executing a command, there is almost always a PHP function alternative.
+**If the command is not in this table:** Research the PHP function that provides the same functionality. There is almost certainly one.
+
+## Example: Replacing ping with fsockopen
 
 ```php
-// ❌ VULNERABLE: System command execution with user input
+// ❌ WRONG: Executing ping command
 $output = shell_exec("ping -c 1 " . $host);
 
-// ❌ STILL BAD: escapeshellarg() doesn't eliminate injection risk
-$output = shell_exec("ping -c 1 " . escapeshellarg($host));  // Still vulnerable!
+// ❌ STILL WRONG: Adding escapeshellarg() doesn't fix the root problem
+$output = shell_exec("ping -c 1 " . escapeshellarg($host));  // Still executing a process!
 
-// ✅ CORRECT: Replace command with PHP function
-function checkConnectivity($host, $port = 80, $timeout = 5) {
+// ❌ STILL WRONG: Using proc_open with bypass_shell is still executing a process
+$process = proc_open(['ping', '-c', '1', $host], $descriptors, $pipes);  // NO! Don't execute processes!
+
+// ✅ CORRECT: No process execution at all - use PHP function
+function isHostReachable($host, $port = 80, $timeout = 5) {
     $socket = @fsockopen($host, $port, $errno, $errstr, $timeout);
     if ($socket) {
         fclose($socket);
         return true;
     }
-    error_log("Host unreachable: $errstr");
+    error_log("Host unreachable: $errstr ($errno)");
     return false;
 }
 ```
 
-## Common Command → Function Replacements
+**Notice:** The correct solution deletes all exec(), shell_exec(), system(), and backtick code completely.
 
-Apply the same pattern for ANY system command:
+## More Examples: File Operations
 
 ```php
-// File operations → PHP file functions
-copy($source, $dest);                   // instead of: cp, copy
-rename($old, $new);                     // instead of: mv, move
-unlink($file);                          // instead of: rm, del
+// ❌ WRONG: Executing cp command
+exec("cp $source $dest");
 
-// Network → cURL, file_get_contents, fsockopen
-curl_exec(curl_init($url));             // instead of: curl, wget
-file_get_contents($url);                // instead of: wget, curl
-fsockopen($host, $port);                // instead of: telnet, nc
-
-// Archives → ZipArchive, PharData
-$zip = new ZipArchive();                // instead of: unzip, tar -xf
-$zip->open($path);
-$zip->extractTo($dest);
-$phar = new PharData($path);            // instead of: tar
-$phar->extractTo($dest);
+// ✅ CORRECT: Use copy() function
+copy($source, $dest);
 ```
 
-## When No Function Exists (Rare)
-
-Only use proc_open() if there is genuinely no PHP function for the operation:
+## More Examples: HTTP Requests
 
 ```php
-// ⚠️ LAST RESORT: Use argument array with bypass_shell
+// ❌ WRONG: Executing curl command
+$output = shell_exec("curl " . escapeshellarg($url));
+
+// ✅ CORRECT: Use cURL functions
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+$response = curl_exec($ch);
+curl_close($ch);
+```
+
+---
+
+## ⚠️ EXTREMELY RARE EXCEPTION: No PHP Function Exists
+
+**STOP.** Before reading this section, ask yourself: "Have I thoroughly researched PHP built-in functions, cURL, file functions, and PEAR/Composer packages?"
+
+**If you're executing a standard command like ping, curl, cp, mv, tar, zip, cat, grep - STOP. Go back to the replacement table above. These all have PHP function alternatives.**
+
+Only proceed if:
+
+1. The operation is highly specialized (e.g., hardware-specific tool, vendor CLI)
+2. You've confirmed no PHP function exists
+3. You cannot install a Composer package that provides this functionality
+
+In this extremely rare case, use argument arrays with `bypass_shell`:
+
+```php
+// ⚠️ LAST RESORT ONLY - Almost always wrong to use this
+$descriptorspec = [
+    0 => ['pipe', 'r'],
+    1 => ['pipe', 'w'],
+    2 => ['pipe', 'w']
+];
+
 $process = proc_open(
-    ['/usr/bin/imagemagick-convert', $validatedInput, $validatedOutput],
-    $descriptors,
+    ['/usr/bin/specialized-tool', $validated_arg1, $validated_arg2],
+    $descriptorspec,
     $pipes,
-    null, null,
+    null,
+    null,
     ['bypass_shell' => true]  // CRITICAL: bypasses shell
 );
+
+if (is_resource($process)) {
+    fclose($pipes[0]);
+    $output = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+    proc_close($process);
+}
+
+// Note: NO exec(), NO shell_exec(), NO system(), NO backticks, NO passthru()
 ```
+
+**Re-check:** Are you absolutely certain there's no PHP function? proc_open() should appear in less than 1% of CWE-78 remediations.
+
+## Additional Security
+
+After eliminating all system command execution:
+
+1. **Disable dangerous functions in php.ini:**
+
+   ```ini
+   disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
+   ```
+
+2. **Use strict type checking and validation on all inputs** (defense-in-depth only)

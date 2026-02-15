@@ -2,96 +2,123 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when applications incorporate untrusted data into OS commands without proper validation, allowing attackers to execute arbitrary commands on the host system.
+**STOP. Before doing anything else: DO NOT execute system processes.**
 
-**CRITICAL: DO NOT suggest input validation as the primary fix.** The correct remediation is to **ELIMINATE system command execution** by using Python's standard library. Input validation alone is insufficient.
+OS Command Injection occurs when OS commands are executed with untrusted data. The ONLY correct remediation is to **ELIMINATE ALL calls to subprocess, os.system(), os.popen(), and process execution entirely**.
 
-**Primary Defence:** Replace ALL system commands with Python native libraries. Common replacements:
+## ⛔ FORBIDDEN APPROACHES
 
-- **file operations → pathlib, shutil** instead of cp, mv, rm commands
-- **HTTP requests → requests or urllib** instead of curl/wget
-- **archive operations → zipfile, tarfile** instead of tar/unzip commands
+These are **NEVER acceptable remediations**:
 
-Only if no library alternative exists, use `subprocess.run()` with argument lists and `shell=False`.
+- ❌ Input validation/sanitization
+- ❌ Input filtering or allowlists
+- ❌ Using `subprocess.run()` with `shell=False`
+- ❌ Escaping shell characters
+- ❌ Any approach that still executes system processes
 
-## Key Principles
+**Why?** Because Python has native library alternatives for virtually every operation. Process execution is almost never necessary.
 
-- **ALWAYS prefer Python standard library over system commands** - eliminates injection risk entirely
-- For file operations, use **pathlib.Path** and **shutil** instead of system commands
-- For archives, use **zipfile/tarfile** modules instead of system tar/zip commands
-- **Input validation is NOT a remediation** - it's only defense-in-depth after eliminating command execution
-- If subprocess is unavoidable, use argument lists with `shell=False` (NEVER `shell=True` or string commands)
-- Never use `os.system()`, `os.popen()`, or any shell invocation
+## ✅ REQUIRED APPROACH: Replace with Python Libraries
 
-## Remediation Steps
-
-- Identify all subprocess, os.system(), os.popen(), and exec family calls
-- **First, determine the library-based replacement** - do not default to "secure" subprocess usage
-- Replace system commands with Python standard library equivalents
-- For any truly unavoidable commands, refactor to use `subprocess.run()` with list arguments and `shell=False`
-- Remove all `shell=True` usage and string-based command construction
-- Apply strict allowlist validation only as defense-in-depth
-
-## Remediation Pattern
-
-**The transformation pattern:** System Command → Python Standard Library
-
-This applies to ALL system commands - if you find subprocess, os.system(), or os.popen() executing a command, there is almost always a Python library alternative.
-
-```python
-# ❌ VULNERABLE: System command execution with user input
-import subprocess
-output = subprocess.check_output(f"ping -c 1 {host}", shell=True)
-
-# ❌ STILL BAD: Validation doesn't eliminate injection risk
-if re.match(r'^[a-zA-Z0-9.-]+$', host):  # Insufficient protection!
-    output = subprocess.check_output(f"ping -c 1 {host}", shell=True)
-
-# ✅ CORRECT: Replace command with Python library
-import socket
-
-def check_connectivity(host, port=80, timeout=5):
-    try:
-        socket.create_connection((host, port), timeout=timeout)
-        return True
-    except (socket.timeout, socket.error):
-        return False
-```
+**Your task:** Find the Python library that replaces the system command, then delete the process execution code entirely.
 
 ## Common Command → Library Replacements
 
-Apply the same pattern for ANY system command:
+**Use this table to find the replacement.** If the code executes ANY of these commands, replace them with the Python library shown:
+
+| System Command | Python Library Alternative | Method |
+| ---------------- | ------------------------- | -------- |
+| `ping` | `socket` module | `socket.create_connection((host, port), timeout)` |
+| `curl`, `wget` | `requests` or `urllib` | `requests.get(url, timeout=10)` |
+| `cp`, `copy` | `shutil` module | `shutil.copy2(source, dest)` |
+| `mv`, `move` | `shutil` module | `shutil.move(source, dest)` |
+| `rm`, `del` | `pathlib` module | `Path(file).unlink()` |
+| `mkdir` | `pathlib` module | `Path(dir).mkdir(parents=True)` |
+| `unzip`, `tar -xf` | `zipfile`, `tarfile` | `zipfile.ZipFile(path).extractall()` |
+| `zip`, `tar -cf` | `zipfile`, `tarfile` | `zipfile.ZipFile(path, 'w').write()` |
+| `ps`, `tasklist` | `psutil` (3rd party) | `psutil.Process().name()` |
+| `cat`, `type` | `pathlib` module | `Path(file).read_text()` |
+| `grep`, `findstr` | Python string/regex | `'text' in str`, `re.search()` |
+
+**If the command is not in this table:** Research the Python library that provides the same functionality. There is almost certainly one.
+
+## Example: Replacing ping with socket
 
 ```python
-# File operations → pathlib, shutil
-shutil.copy2(source, dest)              # instead of: cp, copy
-shutil.move(source, dest)               # instead of: mv, move  
-Path(file).unlink()                     # instead of: rm, del
+# ❌ WRONG: Executing ping command
+import subprocess
+output = subprocess.check_output(f"ping -c 1 {host}", shell=True)
 
-# Network → requests, urllib, socket
-requests.get(url, timeout=10)           # instead of: curl, wget
-socket.create_connection((host, port))  # instead of: ping, telnet
+# ❌ STILL WRONG: Adding validation doesn't fix the root problem
+if re.match(r'^[a-zA-Z0-9.-]+$', host):
+    output = subprocess.check_output(f"ping -c 1 {host}", shell=True)  # Still executing a process!
 
-# Archives → zipfile, tarfile
-zipfile.ZipFile(path).extractall()      # instead of: unzip, tar -xf
-tarfile.open(path).extractall()         # instead of: tar -xf
-zipfile.ZipFile(path, 'w').write()      # instead of: zip, tar -cf
+# ❌ STILL WRONG: Using subprocess.run with shell=False is still executing a process
+result = subprocess.run(["ping", "-c", "1", host], capture_output=True)  # NO! Don't execute processes!
 
-# Process info → psutil (third-party)
-import psutil
-psutil.Process(pid).name()              # instead of: ps, tasklist
+# ✅ CORRECT: No process execution at all - use Python library
+import socket
+
+def is_host_reachable(host, port=80, timeout=5):
+    try:
+        socket.create_connection((host, port), timeout=timeout)
+        return True
+    except (socket.timeout, socket.error) as e:
+        print(f"Host unreachable: {e}")
+        return False
 ```
 
-## When No Library Exists (Rare)
+**Notice:** The correct solution deletes all subprocess, os.system(), and os.popen() code completely.
 
-Only use subprocess if there is genuinely no Python library for the operation:
+## More Examples: File Operations
 
 ```python
-# ⚠️ LAST RESORT: Use argument list with shell=False
+# ❌ WRONG: Executing cp command
+os.system(f"cp {source} {dest}")
+
+# ✅ CORRECT: Use shutil module
+import shutil
+shutil.copy2(source, dest)
+```
+
+## More Examples: HTTP Requests
+
+```python
+# ❌ WRONG: Executing curl command
+subprocess.run(["curl", url])
+
+# ✅ CORRECT: Use requests library
+import requests
+response = requests.get(url, timeout=10)
+content = response.text
+```
+
+---
+
+## ⚠️ EXTREMELY RARE EXCEPTION: No Python Library Exists
+
+**STOP.** Before reading this section, ask yourself: "Have I thoroughly researched Python standard library, requests, pathlib, shutil, zipfile, tarfile, and psutil?"
+
+**If you're executing a standard command like ping, curl, cp, mv, tar, zip, ps, cat, grep - STOP. Go back to the replacement table above. These all have Python library alternatives.**
+
+Only proceed if:
+
+1. The operation is highly specialized (e.g., hardware-specific tool, vendor CLI)
+2. You've confirmed no Python library exists
+3. You cannot install a Python library that provides this functionality
+
+In this extremely rare case, use argument lists with `shell=False`:
+
+```python
+# ⚠️ LAST RESORT ONLY - Almost always wrong to use this
 result = subprocess.run(
-    ['/usr/bin/imagemagick-convert', validated_input, validated_output],
+    ['/usr/bin/specialized-tool', validated_arg1, validated_arg2],
     shell=False,  # NEVER shell=True
     capture_output=True,
     timeout=30
 )
+
+# Note: NO shell invocation, NO string concatenation, NO f-strings with commands
 ```
+
+**Re-check:** Are you absolutely certain there's no Python library? subprocess should appear in less than 1% of CWE-78 remediations.

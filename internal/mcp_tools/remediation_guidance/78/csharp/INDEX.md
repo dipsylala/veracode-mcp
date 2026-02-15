@@ -2,111 +2,146 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when untrusted data is incorporated into operating system commands without proper validation, allowing attackers to execute arbitrary commands.
+**STOP. Before doing anything else: DO NOT execute system processes.**
 
-**CRITICAL: DO NOT suggest input validation as the primary fix.** The correct remediation is to **ELIMINATE Process.Start() calls** by using .NET framework classes. Input validation alone is insufficient.
+OS Command Injection occurs when OS commands are executed with untrusted data. The ONLY correct remediation is to **ELIMINATE ALL calls to Process.Start(), ProcessStartInfo, and process execution entirely**.
 
-**Primary Defence:** Replace ALL system commands with .NET framework classes. Common replacements:
+## ⛔ FORBIDDEN APPROACHES
 
-- **file operations → File, Directory classes** instead of system commands
-- **HTTP requests → HttpClient** instead of curl/wget commands
-- **archive operations → ZipFile, ZipArchive** instead of tar/unzip commands
+These are **NEVER acceptable remediations**:
 
-Only if no .NET class exists, use `ProcessStartInfo.ArgumentList` with `UseShellExecute = false`.
+- ❌ Input validation/sanitization
+- ❌ Input filtering or allowlists
+- ❌ Using `ProcessStartInfo.ArgumentList` with validated inputs
+- ❌ Using `UseShellExecute = false`
+- ❌ Escaping shell characters
+- ❌ Any approach that still executes system processes
 
-## Key Principles
+**Why?** Because .NET has framework class alternatives for virtually every operation. Process execution is almost never necessary.
 
-- **ALWAYS prefer .NET framework classes over Process.Start()** - eliminates injection risk entirely
-- For file operations, use **File** and **Directory** classes instead of system commands
-- For archives, use **System.IO.Compression.ZipFile** instead of system commands
-- **Input validation is NOT a remediation** - it's only defense-in-depth after eliminating Process.Start()
-- If Process is unavoidable, use `ProcessStartInfo.ArgumentList` (.NET 6+) with `UseShellExecute = false`
-- Never use `UseShellExecute = true` or string-based command construction
+## ✅ REQUIRED APPROACH: Replace with .NET Framework Classes
 
-## Remediation Steps
+**Your task:** Find the .NET class that replaces the system command, then delete the process execution code entirely.
 
-- Identify all Process.Start(), Process.Run, and ProcessStartInfo usages
-- **First, determine the .NET framework class alternative** - do not default to "secure" Process patterns
-- Replace system commands with .NET framework classes
-- For any truly unavoidable commands, refactor to use `ProcessStartInfo.ArgumentList` with `UseShellExecute = false`
-- Remove all `UseShellExecute = true` usage and cmd.exe/bash invocations
-- Apply strict allowlist validation only as defense-in-depth
+## Common Command → Class Replacements
 
-## Remediation Pattern
+**Use this table to find the replacement.** If the code executes ANY of these commands, replace them with the .NET class shown:
 
-**The transformation pattern:** System Command → .NET Framework Class
+| System Command | .NET Class Alternative | Method |
+| ---------------- | ------------------------- | -------- |
+| `ping` | `System.Net.NetworkInformation.Ping` | `ping.SendPingAsync(host)` |
+| `curl`, `wget` | `System.Net.Http.HttpClient` | `await httpClient.GetAsync(url)` |
+| `copy`, `xcopy` | `System.IO.File` | `File.Copy(source, dest)` |
+| `move`, `mv` | `System.IO.Directory` | `Directory.Move(source, dest)` |
+| `del`, `rm` | `System.IO.File` | `File.Delete(file)` |
+| `mkdir` | `System.IO.Directory` | `Directory.CreateDirectory(path)` |
+| `unzip`, `tar -xf` | `System.IO.Compression.ZipFile` | `ZipFile.ExtractToDirectory(zip, dest)` |
+| `zip`, `tar -cf` | `System.IO.Compression.ZipFile` | `ZipFile.CreateFromDirectory(src, zip)` |
+| `tasklist`, `ps` | `System.Diagnostics.Process` | `Process.GetProcesses()` |
+| `type`, `cat` | `System.IO.File` | `File.ReadAllText(file)` |
+| `findstr`, `grep` | .NET String/LINQ | `str.Contains()`, `Regex.Match()` |
 
-This applies to ALL system commands - if you find Process.Start() executing a command, there is almost always a .NET class alternative.
+**If the command is not in this table:** Research the .NET class that provides the same functionality. There is almost certainly one.
+
+## Example: Replacing ping with Ping class
 
 ```csharp
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-
-// ❌ VULNERABLE: System command execution with user input
-var startInfo = new ProcessStartInfo
+// ❌ WRONG: Executing ping command
+var startInfo = new ProcessStartInfo 
 {
     FileName = "cmd.exe",
     Arguments = $"/c ping {host}"
 };
 Process.Start(startInfo);
 
-// ❌ STILL BAD: ArgumentList with validation doesn't eliminate injection risk
-if (Regex.IsMatch(host, @"^[a-zA-Z0-9.-]+$"))  // Insufficient!
+// ❌ STILL WRONG: Adding validation doesn't fix the root problem
+if (Regex.IsMatch(host, @"^[a-zA-Z0-9.-]+$")) 
 {
     var start = new ProcessStartInfo("ping");
-    start.ArgumentList.Add(host);
+    start.ArgumentList.Add(host);  // Still executing a process!
     Process.Start(start);
 }
 
-// ✅ CORRECT: Replace command with .NET class
-public async Task<bool> CheckConnectivity(string host, int timeout = 5000)
+// ❌ STILL WRONG: Using ArgumentList with UseShellExecute=false is still executing a process
+var psi = new ProcessStartInfo("ping") { UseShellExecute = false };
+psi.ArgumentList.Add(host);  // NO! Don't execute processes!
+
+// ✅ CORRECT: No process execution at all - use .NET class
+using System.Net.NetworkInformation;
+
+public async Task<bool> IsHostReachable(string host, int timeout = 5000)
 {
-    try {
+    try 
+    {
         using var ping = new Ping();
         var reply = await ping.SendPingAsync(host, timeout);
         return reply.Status == IPStatus.Success;
-    } catch (PingException) {
+    } 
+    catch (PingException ex) 
+    {
+        Console.WriteLine($"Ping failed: {ex.Message}");
         return false;
     }
 }
 ```
 
-## Common Command → Class Replacements
+**Notice:** The correct solution deletes all Process.Start() and ProcessStartInfo code completely.
 
-Apply the same pattern for ANY system command:
+## More Examples: File Operations
 
 ```csharp
-// File operations → File, Directory classes
-File.Copy(source, dest);                // instead of: copy, xcopy
-Directory.Move(source, dest);           // instead of: move, mv
-File.Delete(file);                      // instead of: del, rm
+// ❌ WRONG: Executing copy command
+Process.Start("cmd.exe", $"/c copy {source} {dest}");
 
-// Network → HttpClient, Ping, TcpClient
-await httpClient.GetAsync(url);         // instead of: curl, wget
-await ping.SendPingAsync(host);         // instead of: ping
-await tcpClient.ConnectAsync(host, port); // instead of: telnet
-
-// Archives → ZipFile, ZipArchive
-ZipFile.ExtractToDirectory(zip, dest);  // instead of: unzip, tar -xf  
-ZipFile.CreateFromDirectory(src, zip);  // instead of: zip, tar -cf
-
-// Process info → Process class
-Process.GetProcesses();                 // instead of: tasklist, ps
-Process.GetCurrentProcess().Id;         // instead of: echo $$
+// ✅ CORRECT: Use File class
+using System.IO;
+File.Copy(source, dest, overwrite: true);
 ```
 
-## When No Class Exists (Rare)
-
-Only use Process if there is genuinely no .NET class for the operation:
+## More Examples: HTTP Requests
 
 ```csharp
-// ⚠️ LAST RESORT: Use ArgumentList with UseShellExecute = false
+// ❌ WRONG: Executing curl command
+Process.Start("curl", url);
+
+// ✅ CORRECT: Use HttpClient
+using System.Net.Http;
+using var httpClient = new HttpClient();
+var response = await httpClient.GetAsync(url);
+var content = await response.Content.ReadAsStringAsync();
+```
+
+---
+
+## ⚠️ EXTREMELY RARE EXCEPTION: No .NET Class Exists
+
+**STOP.** Before reading this section, ask yourself: "Have I thoroughly researched System.IO, System.Net, System.Net.Http, and System.IO.Compression namespaces?"
+
+**If you're executing a standard command like ping, curl, copy, move, del, zip, tasklist, type, findstr - STOP. Go back to the replacement table above. These all have .NET class alternatives.**
+
+Only proceed if:
+
+1. The operation is highly specialized (e.g., hardware-specific tool, vendor CLI)
+2. You've confirmed no .NET class exists
+3. You cannot install a NuGet package that provides this functionality
+
+In this extremely rare case, use ArgumentList with UseShellExecute = false:
+
+```csharp
+// ⚠️ LAST RESORT ONLY - Almost always wrong to use this
 var startInfo = new ProcessStartInfo
 {
-    FileName = @"C:\tools\imagemagick.exe",
-    UseShellExecute = false  // NEVER use true
+    FileName = @"C:\tools\specialized-tool.exe",  // Absolute path
+    UseShellExecute = false,  // NEVER use true
+    RedirectStandardOutput = true
 };
-startInfo.ArgumentList.Add(validatedInput);
-startInfo.ArgumentList.Add(validatedOutput);
+startInfo.ArgumentList.Add(validated_arg1);
+startInfo.ArgumentList.Add(validated_arg2);
+
 using var process = Process.Start(startInfo);
+await process.WaitForExitAsync();
+
+// Note: NO cmd.exe, NO bash, NO UseShellExecute = true
 ```
+
+**Re-check:** Are you absolutely certain there's no .NET class? Process.Start() should appear in less than 1% of CWE-78 remediations.

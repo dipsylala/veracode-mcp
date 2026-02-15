@@ -2,98 +2,133 @@
 
 ## LLM Guidance
 
-OS Command Injection occurs when untrusted data is incorporated into OS commands without proper validation, allowing attackers to execute arbitrary commands on the host system.
+**STOP. Before doing anything else: DO NOT execute system processes.**
 
-**CRITICAL: DO NOT suggest input validation/sanitization as the primary fix.** The correct remediation is to **ELIMINATE the system command entirely** by using Java's built-in APIs. Input validation alone is insufficient and error-prone.
+OS Command Injection occurs when OS commands are executed with untrusted data. The ONLY correct remediation is to **ELIMINATE ALL calls to Runtime.exec(), ProcessBuilder, and process execution entirely**.
 
-**Primary Defence:** Replace ALL system command calls with Java native library alternatives. Common replacements:
+## ⛔ FORBIDDEN APPROACHES
 
-- **file operations → java.nio.file.Files API**
-- **network requests → HttpClient or HttpURLConnection**
-- **archive operations → java.util.zip or Apache Commons Compress**
+These are **NEVER acceptable remediations**:
 
-Only if no library alternative exists, then use ProcessBuilder with separate argument arrays (never Runtime.exec() or shell invocation).
+- ❌ Input validation/sanitization
+- ❌ Input filtering or allowlists
+- ❌ Using ProcessBuilder with "safe" arguments
+- ❌ Escaping special characters
+- ❌ Any approach that still executes system processes
 
-## Key Principles
+**Why?** Because Java has native library alternatives for virtually every operation. Process execution is almost never necessary.
 
-- **ALWAYS prefer library-based solutions over system commands** - this eliminates injection risk entirely
-- For file operations, use **java.nio.file.Files** API instead of system commands like cp, mv, chmod
-- For archives, use **java.util.zip** or **Apache Commons Compress** instead of tar/zip commands
-- **Input validation is NOT a remediation** - it's only defense-in-depth after eliminating command execution
-- If commands are truly unavoidable, use ProcessBuilder with argument arrays - never concatenate strings or invoke shells (sh, bash, cmd.exe)
-- Run with least privilege by configuring minimal OS permissions for processes
+## ✅ REQUIRED APPROACH: Replace with Java Libraries
 
-## Remediation Steps
+**Your task:** Find the Java library that replaces the system command, then delete the process execution code entirely.
 
-- Identify all Runtime.exec(), ProcessBuilder, and exec family calls
-- **First, determine the library-based replacement** (see mapping below) - do not default to "secure" command execution
-- Replace system commands with appropriate Java APIs
-- For any remaining unavoidable commands, refactor to use ProcessBuilder with separate argument array parameters (command and arguments separated)
-- Remove all shell invocation patterns (Runtime.exec("sh -c"), Runtime.exec("bash -c"), Runtime.exec("cmd /c"))
-- Configure minimal OS permissions for any remaining process executions
+## Common Command → Library Replacements
 
-## Remediation Pattern
+**Use this table to find the replacement.** If the code executes ANY of these commands, replace them with the Java library shown:
 
-**The transformation pattern:** System Command → Java Library API
+| System Command | Java Library Alternative | Method |
+| ---------------- | ------------------------- | -------- |
+| `ping` | `java.net.InetAddress` | `InetAddress.getByName(host).isReachable(timeout)` |
+| `curl`, `wget` | `java.net.http.HttpClient` | `HttpClient.send(request, handler)` |
+| `cp`, `copy` | `java.nio.file.Files` | `Files.copy(source, dest)` |
+| `mv`, `move` | `java.nio.file.Files` | `Files.move(source, dest)` |
+| `rm`, `del` | `java.nio.file.Files` | `Files.delete(path)` |
+| `mkdir` | `java.nio.file.Files` | `Files.createDirectory(path)` |
+| `unzip`, `tar -xf` | `java.util.zip.ZipFile` | `ZipFile.extractAll()` |
+| `zip`, `tar -cf` | `java.util.zip.ZipOutputStream` | `ZipOutputStream.putNextEntry()` |
+| `ps`, `tasklist` | `java.lang.ProcessHandle` | `ProcessHandle.allProcesses()` |
+| `cat`, `type` | `java.nio.file.Files` | `Files.readString(path)` |
+| `grep`, `findstr` | Java String/Stream API | `str.contains()`, `Pattern.matcher()` |
 
-This applies to ALL system commands - if you find Runtime.exec() or ProcessBuilder executing a command, there is almost always a Java library alternative.
+**If the command is not in this table:** Research the Java library that provides the same functionality. There is almost certainly one.
+
+## Example: Replacing ping with InetAddress
 
 ```java
-// ❌ VULNERABLE: System command execution with user input
+// ❌ WRONG: Executing ping command
 proc = Runtime.getRuntime().exec(new String[] { "bash", "-c", "ping -c1 " + host });
 
-// ❌ STILL BAD: Validation doesn't eliminate injection risk
-if (host.matches("[a-zA-Z0-9.-]+")) {  // Insufficient protection!
-    proc = Runtime.getRuntime().exec("ping -c1 " + host);
+// ❌ STILL WRONG: Adding validation doesn't fix the root problem
+if (host.matches("[a-zA-Z0-9.-]+")) {
+    proc = Runtime.getRuntime().exec("ping -c1 " + host);  // Still executing a process!
 }
 
-// ✅ CORRECT: Replace command with Java library
+// ❌ STILL WRONG: Using ProcessBuilder is still executing a process
+ProcessBuilder pb = new ProcessBuilder("ping", "-c1", host);  // NO! Don't execute processes!
+
+// ✅ CORRECT: No process execution at all - use Java library
 import java.net.InetAddress;
 
-private boolean checkConnectivity(String host) {
+private boolean isHostReachable(String host) {
     try {
-        return InetAddress.getByName(host).isReachable(5000);
+        return InetAddress.getByName(host).isReachable(5000);  // Pure Java, no subprocess
     } catch (IOException e) {
-        logger.error("Connectivity check failed: " + host, e);
+        logger.error("Connectivity check failed for: " + host, e);
         return false;
     }
 }
 ```
 
-## Common Command → Library Replacements
+**Notice:** The correct solution deletes all Runtime.exec() and ProcessBuilder code completely.
 
-Apply the same pattern for ANY system command:
+## More Examples: File Operations
 
 ```java
-// File operations → java.nio.file.Files
-Files.copy(sourcePath, destPath);           // instead of: cp, copy
-Files.move(sourcePath, destPath);           // instead of: mv, move
-Files.delete(filePath);                     // instead of: rm, del
+// ❌ WRONG: Executing cp command
+Runtime.getRuntime().exec("cp " + source + " " + dest);
 
-// Network → HttpClient, InetAddress, Socket
-HttpClient.send(request, handler);          // instead of: curl, wget
-InetAddress.getByName(host).isReachable();  // instead of: ping
-Socket.connect(address, timeout);           // instead of: telnet, nc
+// ✅ CORRECT: Use Files API
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-// Archives → java.util.zip, java.util.jar
-ZipFile.extractAll(zipPath, destDir);       // instead of: unzip, tar -xf
-ZipOutputStream.putNextEntry(entry);        // instead of: zip, tar -cf
-
-// Process management → ProcessHandle
-ProcessHandle.current().pid();              // instead of: ps, tasklist
-ProcessHandle.allProcesses();               // instead of: ps aux, tasklist
+Files.copy(Paths.get(source), Paths.get(dest), StandardCopyOption.REPLACE_EXISTING);
 ```
 
-## When No Library Exists (Rare)
-
-Only use ProcessBuilder if there is genuinely no Java library for the operation:
+## More Examples: HTTP Requests
 
 ```java
-// ⚠️ LAST RESORT: Use argument array, never shell invocation
+// ❌ WRONG: Executing curl command  
+Runtime.getRuntime().exec("curl " + url);
+
+// ✅ CORRECT: Use HttpClient
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+HttpClient client = HttpClient.newHttpClient();
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create(url))
+    .build();
+String response = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+```
+
+---
+
+## ⚠️ EXTREMELY RARE EXCEPTION: No Java Library Exists
+
+**STOP.** Before reading this section, ask yourself: "Have I thoroughly researched Java libraries, Apache Commons, and other standard libraries?"
+
+**If you're executing a standard command like ping, curl, cp, mv, tar, zip, ps, cat, grep - STOP. Go back to the replacement table above. These all have Java library alternatives.**
+
+Only proceed if:
+
+1. The operation is highly specialized (e.g., hardware-specific tool, vendor CLI)
+2. You've confirmed no Java library exists
+3. You cannot install a Java library that provides this functionality
+
+In this extremely rare case, use argument arrays (never shell invocation):
+
+```java
+// ⚠️ LAST RESORT ONLY - Almost always wrong to use this
 ProcessBuilder pb = new ProcessBuilder(
-    "/usr/bin/imagemagick-convert",  // absolute path
-    validatedInput,
-    validatedOutput
+    "/usr/bin/specialized-tool",  // Absolute path to avoid PATH manipulation
+    validatedArg1,                 // Each argument separately
+    validatedArg2
 );
-Process process = pb.start();  // No shell, no string concatenation
+pb.redirectErrorStream(true);
+Process process = pb.start();
+
+// Note: NO shell (no "sh", "bash", "cmd"), NO string concatenation
 ```
+
+**Re-check:** Are you absolutely certain there's no Java library? ProcessBuilder should appear in less than 1% of CWE-78 remediations.
