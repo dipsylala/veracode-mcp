@@ -9,36 +9,109 @@ import (
 	"regexp"
 )
 
-const PipelineDetailedResultsToolName = "pipeline-detailed-results"
-
-// Auto-register this tool when the package is imported
-func init() {
-	RegisterMCPTool(PipelineDetailedResultsToolName, handlePipelineDetailedResults)
-}
-
-// PipelineDetailedResultsRequest represents the parsed parameters for pipeline-detailed-results
-type PipelineDetailedResultsRequest struct {
-	ApplicationPath string
-	FlawID          *FlawIDComponents
-}
-
-// parsePipelineDetailedResultsRequest extracts and validates parameters from the raw args map
-func parsePipelineDetailedResultsRequest(args map[string]interface{}) (*PipelineDetailedResultsRequest, error) {
-	req := &PipelineDetailedResultsRequest{}
-
-	// Extract required fields
-	var err error
-	req.ApplicationPath, err = extractRequiredString(args, "application_path")
+// handlePipelineFindingDetails handles pipeline scan flaws from local results files
+func handlePipelineFindingDetails(ctx context.Context, req *FindingDetailsRequest) (interface{}, error) {
+	// Parse the pipeline flaw ID (format: "1234-1")
+	flawIDComponents, err := parsePipelineFlawIDString(req.FlawID)
 	if err != nil {
-		return nil, err
+		return map[string]interface{}{
+			"error": fmt.Sprintf("Invalid pipeline flaw ID '%s': %v", req.FlawID, err),
+		}, nil
 	}
 
-	req.FlawID, err = extractFlawIDString(args)
+	// Locate the results directory
+	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
+
+	// Find the most recent results file
+	resultsFile, err := findMostRecentResultsFile(outputDir)
 	if err != nil {
-		return nil, err
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": fmt.Sprintf(`Pipeline Finding Details
+========================
+
+Application Path: %s
+Results Directory: %s
+
+❌ No results found
+
+%v
+
+To generate results, run a pipeline scan using the pipeline-scan tool.
+`, req.ApplicationPath, outputDir, err),
+			}},
+		}, nil
 	}
 
-	return req, nil
+	// Read and parse the results file
+	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
+	resultsData, err := os.ReadFile(resultsFile)
+	if err != nil {
+		return pipelineErrorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil
+	}
+
+	// Parse the full results to extract findings
+	var scanResults struct {
+		Findings []PipelineFlawWithStackDumps `json:"findings"`
+	}
+	if err = json.Unmarshal(resultsData, &scanResults); err != nil {
+		return pipelineErrorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
+	}
+
+	// Find all flaws with the matching issue_id (there may be duplicates)
+	var matches []PipelineFlawWithStackDumps
+	for i := range scanResults.Findings {
+		if scanResults.Findings[i].IssueID == flawIDComponents.IssueID {
+			matches = append(matches, scanResults.Findings[i])
+		}
+	}
+
+	if len(matches) == 0 {
+		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Finding Details
+========================
+
+Application Path: %s
+Flaw ID: %s
+
+❌ Flaw not found
+
+The specified flaw ID was not found in the pipeline scan results.
+`, req.ApplicationPath, req.FlawID)), nil
+	}
+
+	// Check if the requested occurrence exists
+	if flawIDComponents.Occurrence > len(matches) {
+		occurrenceList := ""
+		for i := 0; i < len(matches); i++ {
+			flawIDStr := fmt.Sprintf("%d-%d", flawIDComponents.IssueID, i+1)
+			occurrenceList += fmt.Sprintf("- flaw_id %s: CWE-%s at %s:%d\n",
+				flawIDStr, matches[i].CWEID, matches[i].Files.SourceFile.File, matches[i].Files.SourceFile.Line)
+		}
+
+		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Finding Details
+========================
+
+Application Path: %s
+Flaw ID: %s
+
+❌ Occurrence not found
+
+Issue ID %d has %d occurrence(s), but you requested occurrence %d.
+
+Available occurrences:
+%s
+`, req.ApplicationPath, req.FlawID, flawIDComponents.IssueID, len(matches), flawIDComponents.Occurrence, occurrenceList)), nil
+	}
+
+	// Get the requested occurrence (occurrence is 1-based)
+	targetFlaw := &matches[flawIDComponents.Occurrence-1]
+
+	// Transform stack dumps to data paths
+	detailedFlaw := transformToDetailedFlaw(targetFlaw)
+
+	// Format and return the response
+	return formatPipelineDetailedResultsResponse(req.ApplicationPath, resultsFile, &detailedFlaw, flawIDComponents.IssueID, flawIDComponents.Occurrence), nil
 }
 
 // PipelineDetailedFlaw represents a detailed finding with data paths
@@ -71,14 +144,6 @@ type Step struct {
 	QualifiedFunctionName string `json:"qualified_function_name,omitempty"`
 	FunctionPrototype     string `json:"function_prototype,omitempty"`
 	RelativeLocation      string `json:"relative_location,omitempty"`
-}
-
-// cleanVeracodeAnnotations removes Veracode's internal annotation markers from strings
-// Removes patterns like /**X-VC ... */ (may appear multiple times)
-func cleanVeracodeAnnotations(input string) string {
-	// Pattern matches /**X-VC followed by anything until the first */
-	re := regexp.MustCompile(`/\*\*X-VC\s[^*]*\*/`)
-	return re.ReplaceAllString(input, "")
 }
 
 // StackDumps represents the stack_dumps structure in the JSON
@@ -117,115 +182,6 @@ type PipelineFlawWithStackDumps struct {
 	Files           FileInfo   `json:"files"`
 	FlawDetailsLink string     `json:"flaw_details_link"`
 	StackDumps      StackDumps `json:"stack_dumps"`
-}
-
-// handlePipelineDetailedResults retrieves detailed information about a specific flaw
-func handlePipelineDetailedResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
-	// Parse and validate request parameters
-	req, err := parsePipelineDetailedResultsRequest(args)
-	if err != nil {
-		return map[string]interface{}{
-			"error": err.Error(),
-		}, nil
-	}
-
-	// Locate the results directory
-	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
-
-	// Find the most recent results file
-	resultsFile, err := findMostRecentResultsFile(outputDir)
-	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf(`Pipeline Detailed Results
-========================
-
-Application Path: %s
-Results Directory: %s
-
-❌ No results found
-
-%v
-
-To generate results, run a pipeline scan using the pipeline-static-scan tool.
-`, req.ApplicationPath, outputDir, err),
-			}},
-		}, nil
-	}
-
-	// Read and parse the results file
-	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
-	resultsData, err := os.ReadFile(resultsFile)
-	if err != nil {
-		return pipelineErrorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil
-	}
-
-	// Parse the full results to extract findings
-	var scanResults struct {
-		Findings []PipelineFlawWithStackDumps `json:"findings"`
-	}
-	if err = json.Unmarshal(resultsData, &scanResults); err != nil {
-		return pipelineErrorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
-	}
-
-	// Find all flaws with the matching issue_id (there may be duplicates)
-	var matches []PipelineFlawWithStackDumps
-	for i := range scanResults.Findings {
-		if scanResults.Findings[i].IssueID == req.FlawID.IssueID {
-			matches = append(matches, scanResults.Findings[i])
-		}
-	}
-
-	if len(matches) == 0 {
-		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Detailed Results
-========================
-
-Application Path: %s
-Flaw ID: %d-%d
-
-❌ Flaw not found
-
-The specified flaw ID was not found in the pipeline scan results.
-`, req.ApplicationPath, req.FlawID.IssueID, req.FlawID.Occurrence)), nil
-	}
-
-	// Select the correct occurrence
-	if req.FlawID.Occurrence > len(matches) {
-		occurrenceList := ""
-		for i := 0; i < len(matches); i++ {
-			flawIDStr := fmt.Sprintf("%d", req.FlawID.IssueID)
-			if i > 0 {
-				flawIDStr = fmt.Sprintf("%d-%d", req.FlawID.IssueID, i+1)
-			}
-			occurrenceList += fmt.Sprintf("- flaw_id %s: CWE-%s at %s:%d\n",
-				flawIDStr, matches[i].CWEID, matches[i].Files.SourceFile.File, matches[i].Files.SourceFile.Line)
-		}
-
-		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Detailed Results
-========================
-
-Application Path: %s
-Flaw ID: %d-%d
-
-❌ Occurrence not found
-
-Issue ID %d has %d occurrence(s), but you requested occurrence %d.
-
-Available occurrences:
-%s
-`, req.ApplicationPath, req.FlawID.IssueID, req.FlawID.Occurrence,
-			req.FlawID.IssueID, len(matches), req.FlawID.Occurrence, occurrenceList)), nil
-	}
-
-	// Get the requested occurrence (occurrence is 1-based)
-	targetFlaw := &matches[req.FlawID.Occurrence-1]
-
-	// Transform stack dumps to data paths
-	detailedFlaw := transformToDetailedFlaw(targetFlaw)
-
-	// Format and return the response
-	return formatPipelineDetailedResultsResponse(req.ApplicationPath, resultsFile, &detailedFlaw, req.FlawID.IssueID, req.FlawID.Occurrence), nil
 }
 
 // transformToDetailedFlaw converts a flaw with stack dumps to a detailed flaw with data paths
@@ -268,6 +224,14 @@ func transformToDetailedFlaw(flaw *PipelineFlawWithStackDumps) PipelineDetailedF
 	}
 
 	return detailed
+}
+
+// cleanVeracodeAnnotations removes Veracode's internal annotation markers from strings
+// Removes patterns like /**X-VC ... */ (may appear multiple times)
+func cleanVeracodeAnnotations(input string) string {
+	// Pattern matches /**X-VC followed by anything until the first */
+	re := regexp.MustCompile(`/\*\*X-VC\s[^*]*\*/`)
+	return re.ReplaceAllString(input, "")
 }
 
 // formatPipelineDetailedResultsResponse formats the detailed results into an MCP response

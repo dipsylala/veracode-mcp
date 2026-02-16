@@ -148,7 +148,7 @@
     },
     {
       "name": "get-finding-details",
-      "description": "Get detailed information about a specific flaw from DYNAMIC or STATIC platform scan. For pipeline scan flaw details, use the pipeline-detailed-results tool",
+      "description": "Get detailed information about any flaw from platform scans (static/dynamic) or pipeline scans. Returns complete flaw details including data flow paths or request/response info for dynamic flaws. Use this to get more context on any specific flaw ID from scan results.",
       "params": [
         {
           "name": "application_path",
@@ -160,13 +160,13 @@
           "name": "app_profile",
           "type": "string",
           "isRequired": false,
-          "description": "Application name (auto-detected if not provided)"
+          "description": "Application name (auto-detected if not provided). Only used for platform scans."
         },
         {
           "name": "flaw_id",
-          "type": "number",
+          "type": "string",
           "isRequired": true,
-          "description": "Flaw ID to retrieve"
+          "description": "Flaw ID to retrieve. Format: '1234' for platform scans, '1234-1' for pipeline scans with occurrence number."
         }
       ]
     },
@@ -182,7 +182,7 @@
           "description": "Absolute path to the application workspace"
         },
         {
-          "name": "pipeline_flaw_id",
+          "name": "flaw_id",
           "type": "string",
           "isRequired": true,
           "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-results output."
@@ -324,24 +324,6 @@
             "max": 500
           },
           "description": "Page number (0-based, default 0)"
-        }
-      ]
-    },
-    {
-      "name": "pipeline-detailed-results",
-      "description": "Get detailed pipeline scan flaw with data flow paths. Most commonly used after viewing pipeline results.",
-      "params": [
-        {
-          "name": "application_path",
-          "type": "string",
-          "isRequired": true,
-          "description": "Absolute path to the application workspace"
-        },
-        {
-          "name": "pipeline_flaw_id",
-          "type": "string",
-          "isRequired": true,
-          "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-results output."
         }
       ]
     },

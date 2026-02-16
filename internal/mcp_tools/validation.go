@@ -100,34 +100,24 @@ type FlawIDComponents struct {
 	Occurrence int // 1-based, defaults to 1 for non-suffixed IDs
 }
 
-// extractFlawIDString extracts and parses a pipeline_flaw_id parameter (pipeline tools only).
-// Only accepts strings in format "1000" or "1000-2".
+// parsePipelineFlawIDString parses a pipeline flaw ID string directly.
+// Accepts formats: "1000" or "1000-2".
 // Returns the parsed components (issue_id and occurrence) or an error if invalid.
-func extractFlawIDString(args map[string]interface{}) (*FlawIDComponents, error) {
-	val, exists := args["pipeline_flaw_id"]
-	if !exists {
-		return nil, fmt.Errorf("pipeline_flaw_id is required")
-	}
-
-	flawIDStr, ok := val.(string)
-	if !ok {
-		return nil, fmt.Errorf("pipeline_flaw_id must be a string (e.g., \"1000\" or \"1000-2\")")
-	}
-
+func parsePipelineFlawIDString(flawIDStr string) (*FlawIDComponents, error) {
 	if flawIDStr == "" {
-		return nil, fmt.Errorf("pipeline_flaw_id cannot be empty")
+		return nil, fmt.Errorf("flaw_id cannot be empty")
 	}
 
 	// Parse string format "1000" or "1000-2"
 	parts := strings.Split(flawIDStr, "-")
 	if len(parts) > 2 {
-		return nil, fmt.Errorf("invalid pipeline_flaw_id format: %s (expected '1000' or '1000-2')", flawIDStr)
+		return nil, fmt.Errorf("invalid flaw_id format: %s (expected '1000' or '1000-2')", flawIDStr)
 	}
 
 	// Parse the base issue_id
 	issueID, err := strconv.Atoi(parts[0])
 	if err != nil || issueID <= 0 {
-		return nil, fmt.Errorf("invalid pipeline_flaw_id: must be a positive integer (got '%s')", parts[0])
+		return nil, fmt.Errorf("invalid flaw_id: must be a positive integer (got '%s')", parts[0])
 	}
 
 	// Parse the occurrence suffix if present
@@ -135,11 +125,29 @@ func extractFlawIDString(args map[string]interface{}) (*FlawIDComponents, error)
 	if len(parts) == 2 {
 		occurrence, err = strconv.Atoi(parts[1])
 		if err != nil || occurrence <= 0 {
-			return nil, fmt.Errorf("invalid pipeline_flaw_id: occurrence must be a positive integer (got '%s')", parts[1])
+			return nil, fmt.Errorf("invalid flaw_id: occurrence must be a positive integer (got '%s')", parts[1])
 		}
 	}
 
 	return &FlawIDComponents{IssueID: issueID, Occurrence: occurrence}, nil
+}
+
+// extractFlawIDString extracts and parses a flaw_id parameter (pipeline tools only).
+// Only accepts strings in format "1000" or "1000-2".
+// Returns the parsed components (issue_id and occurrence) or an error if invalid.
+func extractFlawIDString(args map[string]interface{}) (*FlawIDComponents, error) {
+	val, exists := args["flaw_id"]
+	if !exists {
+		return nil, fmt.Errorf("flaw_id is required")
+	}
+
+	flawIDStr, ok := val.(string)
+	if !ok {
+		return nil, fmt.Errorf("flaw_id must be a string (e.g., \"1000\" or \"1000-2\")")
+	}
+
+	// Reuse the parsing logic
+	return parsePipelineFlawIDString(flawIDStr)
 }
 
 // validateIntRange validates that an integer is within the specified range (inclusive).
