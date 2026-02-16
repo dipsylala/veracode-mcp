@@ -182,12 +182,12 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 ========================
 
 Application Path: %s
-Flaw ID: %d
+Flaw ID: %d-%d
 
 ❌ Flaw not found
 
 The specified flaw ID was not found in the pipeline scan results.
-`, req.ApplicationPath, req.FlawID.IssueID)), nil
+`, req.ApplicationPath, req.FlawID.IssueID, req.FlawID.Occurrence)), nil
 	}
 
 	// Select the correct occurrence
@@ -225,7 +225,7 @@ Available occurrences:
 	detailedFlaw := transformToDetailedFlaw(targetFlaw)
 
 	// Format and return the response
-	return formatPipelineDetailedResultsResponse(req.ApplicationPath, resultsFile, &detailedFlaw), nil
+	return formatPipelineDetailedResultsResponse(req.ApplicationPath, resultsFile, &detailedFlaw, req.FlawID.IssueID, req.FlawID.Occurrence), nil
 }
 
 // transformToDetailedFlaw converts a flaw with stack dumps to a detailed flaw with data paths
@@ -271,7 +271,7 @@ func transformToDetailedFlaw(flaw *PipelineFlawWithStackDumps) PipelineDetailedF
 }
 
 // formatPipelineDetailedResultsResponse formats the detailed results into an MCP response
-func formatPipelineDetailedResultsResponse(appPath, resultsFile string, flaw *PipelineDetailedFlaw) map[string]interface{} {
+func formatPipelineDetailedResultsResponse(appPath, resultsFile string, flaw *PipelineDetailedFlaw, issueID, occurrence int) map[string]interface{} {
 	// Parse CWE ID
 	var cweID int32
 	_, _ = fmt.Sscanf(flaw.CWEID, "%d", &cweID)
@@ -300,7 +300,7 @@ func formatPipelineDetailedResultsResponse(appPath, resultsFile string, flaw *Pi
 Application Path: %s
 Results File: %s
 
-Flaw ID: %d
+Flaw ID: %d-%d
 Title: %s
 CWE: CWE-%d
 Issue Type: %s
@@ -323,7 +323,8 @@ Offer to explain the datapath and flaw in more detail, or to provide remediation
 `,
 		appPath,
 		filepath.Base(resultsFile),
-		flaw.IssueID,
+		issueID,
+		occurrence,
 		flaw.Title,
 		cweID,
 		flaw.IssueType,
