@@ -12,7 +12,7 @@ import (
 func TestParseRemediationGuidanceRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          "555",
+		"pipeline_flaw_id": "555",
 	}
 
 	req, err := parseRemediationGuidanceRequest(args)
@@ -31,7 +31,7 @@ func TestParseRemediationGuidanceRequest_Success(t *testing.T) {
 func TestParseRemediationGuidanceRequest_LargeFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          "987654321",
+		"pipeline_flaw_id": "987654321",
 	}
 
 	req, err := parseRemediationGuidanceRequest(args)
@@ -51,37 +51,37 @@ func TestParseRemediationGuidanceRequest_MissingFlawID(t *testing.T) {
 
 	_, err := parseRemediationGuidanceRequest(args)
 	if err == nil {
-		t.Fatal("Expected error for missing flaw_id")
+		t.Fatal("Expected error for missing pipeline_flaw_id")
 	}
 }
 
 func TestParseRemediationGuidanceRequest_ZeroFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(0),
+		"pipeline_flaw_id": float64(0),
 	}
 
 	_, err := parseRemediationGuidanceRequest(args)
 	if err == nil {
-		t.Fatal("Expected error for flaw_id=0")
+		t.Fatal("Expected error for pipeline_flaw_id=0")
 	}
 }
 
 func TestParseRemediationGuidanceRequest_NegativeFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(-123),
+		"pipeline_flaw_id": float64(-123),
 	}
 
 	_, err := parseRemediationGuidanceRequest(args)
 	if err == nil {
-		t.Fatal("Expected error for negative flaw_id")
+		t.Fatal("Expected error for negative pipeline_flaw_id")
 	}
 }
 
 func TestParseRemediationGuidanceRequest_MissingApplicationPath(t *testing.T) {
 	args := map[string]interface{}{
-		"flaw_id": float64(555),
+		"pipeline_flaw_id": float64(555),
 	}
 
 	_, err := parseRemediationGuidanceRequest(args)
@@ -135,7 +135,7 @@ func TestRemediationGuidanceTool_HandleMissingFlawID(t *testing.T) {
 	}
 
 	if resultMap["error"] == nil {
-		t.Error("Expected error for missing flaw_id")
+		t.Error("Expected error for missing pipeline_flaw_id")
 	}
 }
 
@@ -144,7 +144,7 @@ func TestRemediationGuidanceTool_HandleInvalidFlawID(t *testing.T) {
 
 	result, err := handleGetRemediationGuidance(ctx, map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(0),
+		"pipeline_flaw_id": float64(0),
 	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -156,7 +156,7 @@ func TestRemediationGuidanceTool_HandleInvalidFlawID(t *testing.T) {
 	}
 
 	if resultMap["error"] == nil {
-		t.Error("Expected error for flaw_id=0")
+		t.Error("Expected error for pipeline_flaw_id=0")
 	}
 }
 
@@ -168,7 +168,7 @@ func TestRemediationGuidanceTool_HandleMissingResultsFile(t *testing.T) {
 
 	result, err := handleGetRemediationGuidance(ctx, map[string]interface{}{
 		"application_path": tempDir,
-		"flaw_id":          float64(12345),
+		"pipeline_flaw_id": float64(12345),
 	})
 
 	if err != nil {

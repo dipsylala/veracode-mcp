@@ -12,7 +12,7 @@ import (
 func TestParsePipelineDetailedResultsRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          "999",
+		"pipeline_flaw_id": "999",
 	}
 
 	req, err := parsePipelineDetailedResultsRequest(args)
@@ -31,7 +31,7 @@ func TestParsePipelineDetailedResultsRequest_Success(t *testing.T) {
 func TestParsePipelineDetailedResultsRequest_LargeFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          "123456789",
+		"pipeline_flaw_id": "123456789",
 	}
 
 	req, err := parsePipelineDetailedResultsRequest(args)
@@ -51,14 +51,14 @@ func TestParsePipelineDetailedResultsRequest_MissingFlawID(t *testing.T) {
 
 	_, err := parsePipelineDetailedResultsRequest(args)
 	if err == nil {
-		t.Fatal("Expected error for missing flaw_id")
+		t.Fatal("Expected error for missing pipeline_flaw_id")
 	}
 }
 
 func TestParsePipelineDetailedResultsRequest_WithOccurrenceSuffix(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          "1000-1",
+		"pipeline_flaw_id": "1000-1",
 	}
 
 	req, err := parsePipelineDetailedResultsRequest(args)
@@ -77,7 +77,7 @@ func TestParsePipelineDetailedResultsRequest_WithOccurrenceSuffix(t *testing.T) 
 func TestParsePipelineDetailedResultsRequest_WithOccurrenceSuffix2(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          "1000-2",
+		"pipeline_flaw_id": "1000-2",
 	}
 
 	req, err := parsePipelineDetailedResultsRequest(args)
@@ -96,30 +96,30 @@ func TestParsePipelineDetailedResultsRequest_WithOccurrenceSuffix2(t *testing.T)
 func TestParsePipelineDetailedResultsRequest_NumericFlawIDRejected(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(1000),
+		"pipeline_flaw_id": float64(1000),
 	}
 
 	_, err := parsePipelineDetailedResultsRequest(args)
 	if err == nil {
-		t.Fatal("Expected error for numeric flaw_id (must be string)")
+		t.Fatal("Expected error for numeric pipeline_flaw_id (must be string)")
 	}
 }
 
 func TestParsePipelineDetailedResultsRequest_ZeroFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          "0",
+		"pipeline_flaw_id": "0",
 	}
 
 	_, err := parsePipelineDetailedResultsRequest(args)
 	if err == nil {
-		t.Fatal("Expected error for flaw_id=0")
+		t.Fatal("Expected error for pipeline_flaw_id=0")
 	}
 }
 
 func TestParsePipelineDetailedResultsRequest_MissingApplicationPath(t *testing.T) {
 	args := map[string]interface{}{
-		"flaw_id": float64(12345),
+		"pipeline_flaw_id": float64(12345),
 	}
 
 	_, err := parsePipelineDetailedResultsRequest(args)
@@ -173,7 +173,7 @@ func TestPipelineDetailedResultsTool_HandleMissingFlawID(t *testing.T) {
 	}
 
 	if resultMap["error"] == nil {
-		t.Error("Expected error for missing flaw_id")
+		t.Error("Expected error for missing pipeline_flaw_id")
 	}
 }
 
@@ -182,7 +182,7 @@ func TestPipelineDetailedResultsTool_HandleInvalidFlawID(t *testing.T) {
 
 	result, err := handlePipelineDetailedResults(ctx, map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(0),
+		"pipeline_flaw_id": float64(0),
 	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -194,7 +194,7 @@ func TestPipelineDetailedResultsTool_HandleInvalidFlawID(t *testing.T) {
 	}
 
 	if resultMap["error"] == nil {
-		t.Error("Expected error for flaw_id=0")
+		t.Error("Expected error for pipeline_flaw_id=0")
 	}
 }
 
@@ -206,7 +206,7 @@ func TestPipelineDetailedResultsTool_HandleMissingResultsFile(t *testing.T) {
 
 	result, err := handlePipelineDetailedResults(ctx, map[string]interface{}{
 		"application_path": tempDir,
-		"flaw_id":          float64(12345),
+		"pipeline_flaw_id": float64(12345),
 	})
 
 	if err != nil {

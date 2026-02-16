@@ -172,7 +172,7 @@
     },
     {
       "name": "remediation-guidance",
-      "description": "Fix flaws, vulnerabilities, or security issues found in pipeline scan results. Provides language-specific remediation guidance, secure code examples, and step-by-step fix instructions for any pipeline scan finding. Use this when user wants to fix, remediate, or resolve a specific flaw ID or issue from pipeline results. IMPORTANT: flaw_id parameter is a STRING (not a number).",
+      "description": "Fix flaws, vulnerabilities, or security issues found in pipeline scan results. Provides language-specific remediation guidance, secure code examples, and step-by-step fix instructions for any pipeline scan finding. Use this when user wants to fix, remediate, or resolve a specific flaw ID or issue from pipeline results.",
       "category": "veracode",
       "params": [
         {
@@ -182,10 +182,10 @@
           "description": "Absolute path to the application workspace"
         },
         {
-          "name": "flaw_id",
+          "name": "pipeline_flaw_id",
           "type": "string",
           "isRequired": true,
-          "description": "STRING flaw ID from pipeline-results, e.g. \"1026-1\", \"1026-2\", or \"999-1\". MUST be passed as a quoted string, never as a number. Do not strip the -N suffix."
+          "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-results output."
         }
       ]
     },
@@ -329,7 +329,7 @@
     },
     {
       "name": "pipeline-detailed-results",
-      "description": "Get detailed pipeline scan flaw with data flow paths. Most commonly used after viewing pipeline results. IMPORTANT: flaw_id parameter is a STRING (not a number).",
+      "description": "Get detailed pipeline scan flaw with data flow paths. Most commonly used after viewing pipeline results.",
       "params": [
         {
           "name": "application_path",
@@ -338,10 +338,10 @@
           "description": "Absolute path to the application workspace"
         },
         {
-          "name": "flaw_id",
+          "name": "pipeline_flaw_id",
           "type": "string",
           "isRequired": true,
-          "description": "STRING flaw ID from pipeline-results, e.g. \"1026-1\", \"1026-2\", or \"999-1\". MUST be passed as a quoted string, never as a number. Do not strip the -N suffix."
+          "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-results output."
         }
       ]
     },
