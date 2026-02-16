@@ -272,93 +272,106 @@ func transformToDetailedFlaw(flaw *PipelineFlawWithStackDumps) PipelineDetailedF
 
 // formatPipelineDetailedResultsResponse formats the detailed results into an MCP response
 func formatPipelineDetailedResultsResponse(appPath, resultsFile string, flaw *PipelineDetailedFlaw, issueID, occurrence int) map[string]interface{} {
+	// Build LLM-optimized JSON structure
+	result := buildPipelineLLMOptimizedResponse(appPath, resultsFile, flaw, issueID, occurrence)
+
+	// Marshal to JSON
+	jsonBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return map[string]interface{}{
+			"content": []map[string]interface{}{
+				{
+					"type": "text",
+					"text": fmt.Sprintf("Error formatting flaw details: %v", err),
+				},
+			},
+		}
+	}
+
+	return map[string]interface{}{
+		"content": []map[string]interface{}{
+			{
+				"type": "text",
+				"text": string(jsonBytes),
+			},
+		},
+	}
+}
+
+// buildPipelineLLMOptimizedResponse creates an LLM-optimized JSON structure for pipeline flaw details
+func buildPipelineLLMOptimizedResponse(appPath, resultsFile string, flaw *PipelineDetailedFlaw, issueID, occurrence int) map[string]interface{} {
 	// Parse CWE ID
-	var cweID int32
+	var cweID int
 	_, _ = fmt.Sscanf(flaw.CWEID, "%d", &cweID)
 
 	// Extract references and clean the display text
 	references := ExtractReferences(flaw.DisplayText)
 	cleanDesc := CleanDescription(flaw.DisplayText)
 
-	// Build references section
-	referencesSection := ""
-	if len(references) > 0 {
-		referencesSection = "\nReferences:\n"
-		for _, ref := range references {
-			if ref.Name != ref.URL {
-				referencesSection += fmt.Sprintf("- [%s](%s)\n", ref.Name, ref.URL)
-			} else {
-				referencesSection += fmt.Sprintf("- %s\n", ref.URL)
-			}
-		}
-	}
-
-	// Build header with flaw info
-	header := fmt.Sprintf(`Pipeline Detailed Results
-========================
-
-Application Path: %s
-Results File: %s
-
-Flaw ID: %d-%d
-Title: %s
-CWE: CWE-%d
-Issue Type: %s
-Severity: %s
-
-Description:
-%s
-%s
-Source File: %s
-Line: %d
-Function: %s
-
-Data Paths: %d
-
-IMPORTANT: When presenting this data to the user, create clickable markdown links for all file references.
-For each source file and line number in the data paths below, format as: [filename:line](filepath#Lline)
-Example: [UserController.java:165](com/veracode/verademo/controller/UserController.java#L165)
-
-Offer to explain the datapath and flaw in more detail, or to provide remediation guidance.
-`,
-		appPath,
-		filepath.Base(resultsFile),
-		issueID,
-		occurrence,
-		flaw.Title,
-		cweID,
-		flaw.IssueType,
-		transformPipelineSeverity(flaw.Severity),
-		cleanDesc,
-		referencesSection,
-		flaw.Files.SourceFile.File,
-		flaw.Files.SourceFile.Line,
-		flaw.Files.SourceFile.FunctionName,
-		len(flaw.DataPaths),
-	)
-
-	// Marshal the detailed flaw to JSON
-	responseJSON, err := json.Marshal(flaw)
-	if err != nil {
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": fmt.Sprintf("Error formatting response: %v", err),
-			}},
-		}
-	}
-
-	// Return MCP response with both text header and JSON data
-	return map[string]interface{}{
-		"content": []map[string]interface{}{
-			{
-				"type": "text",
-				"text": header,
-			},
-			{
-				"type": "text",
-				"text": string(responseJSON),
-			},
+	// Build the response structure
+	response := map[string]interface{}{
+		"flaw_id": fmt.Sprintf("%d-%d", issueID, occurrence),
+		"application": map[string]interface{}{
+			"path":         appPath,
+			"results_file": filepath.Base(resultsFile),
+		},
+		"scan_type":   "PIPELINE",
+		"title":       flaw.Title,
+		"cwe_id":      cweID,
+		"issue_type":  flaw.IssueType,
+		"severity":    transformPipelineSeverity(flaw.Severity),
+		"description": cleanDesc,
+		"location": map[string]interface{}{
+			"source_file": flaw.Files.SourceFile.File,
+			"line":        flaw.Files.SourceFile.Line,
+			"function":    flaw.Files.SourceFile.FunctionName,
 		},
 	}
+
+	// Add references if present
+	if len(references) > 0 {
+		refList := make([]map[string]string, 0, len(references))
+		for _, ref := range references {
+			refList = append(refList, map[string]string{
+				"name": ref.Name,
+				"url":  ref.URL,
+			})
+		}
+		response["references"] = refList
+	}
+
+	// Add data paths
+	if len(flaw.DataPaths) > 0 {
+		dataPaths := make([]map[string]interface{}, 0, len(flaw.DataPaths))
+		for _, path := range flaw.DataPaths {
+			steps := make([]map[string]interface{}, 0, len(path.Steps))
+			for _, step := range path.Steps {
+				stepData := map[string]interface{}{
+					"source_file":   step.SourceFile,
+					"source_line":   step.SourceLine,
+					"function_name": step.FunctionName,
+				}
+				if step.VarNames != "" {
+					stepData["var_names"] = step.VarNames
+				}
+				if step.QualifiedFunctionName != "" {
+					stepData["qualified_function_name"] = step.QualifiedFunctionName
+				}
+				if step.RelativeLocation != "" {
+					stepData["relative_location"] = step.RelativeLocation
+				}
+				steps = append(steps, stepData)
+			}
+			dataPaths = append(dataPaths, map[string]interface{}{
+				"steps": steps,
+			})
+		}
+		response["data_paths"] = dataPaths
+		response["data_path_count"] = len(flaw.DataPaths)
+	}
+
+	// Add helpful instructions for the LLM
+	response["_llm_instructions"] = "When presenting data paths to the user, create clickable markdown links for file references. Format as: [filename:line](filepath#Lline). Example: [UserController.java:165](com/veracode/verademo/controller/UserController.java#L165). Offer to explain the data flow or provide remediation guidance."
+
+	return response
 }
