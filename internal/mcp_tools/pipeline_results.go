@@ -237,6 +237,31 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 		return allFindings[i].FlawID < allFindings[j].FlawID
 	})
 
+	// Calculate total summary counts across ALL findings before pagination
+	for i := range allFindings {
+		mcpFinding := allFindings[i]
+
+		// Update total severity counters
+		severity := strings.ToLower(mcpFinding.Severity)
+		if count, ok := response.Summary.BySeverity[severity]; ok {
+			response.Summary.BySeverity[severity] = count + 1
+		}
+
+		// Update total open findings counter
+		if mcpFinding.Status == "open" || mcpFinding.Status == "OPEN" {
+			response.Summary.OpenFindings++
+		}
+
+		// Update total mitigation status counters
+		mitigationStatus := strings.ToLower(mcpFinding.MitigationStatus)
+		if mitigationStatus == "" {
+			mitigationStatus = "none"
+		}
+		if count, ok := response.Summary.ByMitigation[mitigationStatus]; ok {
+			response.Summary.ByMitigation[mitigationStatus] = count + 1
+		}
+	}
+
 	// Apply pagination
 	startIdx := req.Page * req.Size
 	endIdx := startIdx + req.Size
@@ -247,28 +272,9 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 		endIdx = len(allFindings)
 	}
 
-	// Process paginated findings and update counters
+	// Add paginated findings to response
 	for i := startIdx; i < endIdx; i++ {
-		mcpFinding := allFindings[i]
-		response.Findings = append(response.Findings, mcpFinding)
-
-		// Update summary counters for the current page
-		severity := strings.ToLower(mcpFinding.Severity)
-		if count, ok := response.Summary.BySeverity[severity]; ok {
-			response.Summary.BySeverity[severity] = count + 1
-		}
-
-		if mcpFinding.Status == "open" || mcpFinding.Status == "OPEN" {
-			response.Summary.OpenFindings++
-		}
-
-		mitigationStatus := strings.ToLower(mcpFinding.MitigationStatus)
-		if mitigationStatus == "" {
-			mitigationStatus = "none"
-		}
-		if count, ok := response.Summary.ByMitigation[mitigationStatus]; ok {
-			response.Summary.ByMitigation[mitigationStatus] = count + 1
-		}
+		response.Findings = append(response.Findings, allFindings[i])
 	}
 
 	// Marshal response to JSON for non-UI clients
