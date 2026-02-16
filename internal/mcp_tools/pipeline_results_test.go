@@ -32,7 +32,7 @@ func TestParsePipelineResultsRequest_Success(t *testing.T) {
 func TestParsePipelineResultsRequest_WithPagination(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"size":             float64(50),
+		"page_size":        float64(50),
 		"page":             float64(2),
 	}
 
@@ -52,7 +52,7 @@ func TestParsePipelineResultsRequest_WithPagination(t *testing.T) {
 func TestParsePipelineResultsRequest_SizeValidation(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"size":             float64(501),
+		"page_size":        float64(501),
 	}
 
 	_, err := parsePipelineResultsRequest(args)

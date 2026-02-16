@@ -43,7 +43,7 @@ func parseScaFindingsRequest(args map[string]interface{}) (*ScaFindingsRequest, 
 	// Extract optional fields
 	req.AppProfile, _ = extractOptionalString(args, "app_profile")
 	req.Sandbox, _ = extractOptionalString(args, "sandbox")
-	req.Size = extractInt(args, "size", 50)
+	req.Size = extractInt(args, "page_size", 50)
 	req.Page = extractInt(args, "page", 0)
 
 	// Extract optional int32 pointers with validation

@@ -49,7 +49,7 @@
           "description": "Filter by CWE IDs (e.g., [89, 79] for SQLi and XSS)"
         },
         {
-          "name": "size",
+          "name": "page_size",
           "type": "number",
           "isRequired": false,
           "validation": {
@@ -119,7 +119,7 @@
           "description": "Filter by CWE IDs (e.g., [89, 79] for SQLi and XSS)"
         },
         {
-          "name": "size",
+          "name": "page_size",
           "type": "number",
           "isRequired": false,
           "validation": {
@@ -148,7 +148,7 @@
     },
     {
       "name": "get-finding-details",
-      "description": "Get detailed information about a specific flaw from DYNAMIC or STATIC scan",
+      "description": "Get detailed information about a specific flaw from DYNAMIC or STATIC platform scan. For pipeline scan flaw details, use the pipeline-detailed-results tool",
       "params": [
         {
           "name": "application_path",
@@ -172,7 +172,7 @@
     },
     {
       "name": "remediation-guidance",
-      "description": "Fix flaws, vulnerabilities, or security issues found in pipeline scan results. Provides language-specific remediation guidance, secure code examples, and step-by-step fix instructions for any pipeline scan finding. Use this when user wants to fix, remediate, or resolve a specific flaw ID or issue from pipeline results.",
+      "description": "Fix flaws, vulnerabilities, or security issues found in pipeline scan results. Provides language-specific remediation guidance, secure code examples, and step-by-step fix instructions for any pipeline scan finding. Use this when user wants to fix, remediate, or resolve a specific flaw ID or issue from pipeline results. IMPORTANT: flaw_id parameter is a STRING (not a number).",
       "category": "veracode",
       "params": [
         {
@@ -183,9 +183,9 @@
         },
         {
           "name": "flaw_id",
-          "type": "number",
+          "type": "string",
           "isRequired": true,
-          "description": "Flaw ID from pipeline scan results"
+          "description": "STRING flaw ID from pipeline-results, e.g. \"1026-1\", \"1026-2\", or \"999-1\". MUST be passed as a quoted string, never as a number. Do not strip the -N suffix."
         }
       ]
     },
@@ -226,7 +226,7 @@
           "description": "Minimum severity (0-5)"
         },
         {
-          "name": "size",
+          "name": "page_size",
           "type": "number",
           "isRequired": false,
           "validation": {
@@ -306,7 +306,7 @@
           "description": "Absolute path to the application workspace"
         },
         {
-          "name": "size",
+          "name": "page_size",
           "type": "number",
           "isRequired": false,
           "validation": {
@@ -329,7 +329,7 @@
     },
     {
       "name": "pipeline-detailed-results",
-      "description": "Get detailed pipeline scan flaw with data flow paths. Most commonly used after viewing pipeline results",
+      "description": "Get detailed pipeline scan flaw with data flow paths. Most commonly used after viewing pipeline results. IMPORTANT: flaw_id parameter is a STRING (not a number).",
       "params": [
         {
           "name": "application_path",
@@ -339,13 +339,13 @@
         },
         {
           "name": "flaw_id",
-          "type": "integer",
+          "type": "string",
           "isRequired": true,
-          "description": "Flaw ID to retrieve"
+          "description": "STRING flaw ID from pipeline-results, e.g. \"1026-1\", \"1026-2\", or \"999-1\". MUST be passed as a quoted string, never as a number. Do not strip the -N suffix."
         }
       ]
     },
-        {
+    {
       "name": "run-sca-scan",
       "description": "Run local SCA scan to identify vulnerable dependencies",
       "params": [
@@ -368,7 +368,7 @@
           "description": "Absolute path to the application workspace"
         },
         {
-          "name": "size",
+          "name": "page_size",
           "type": "number",
           "isRequired": false,
           "validation": {

@@ -360,7 +360,7 @@ func TestExtractFlawID_ZeroFromFloat64(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error for zero flaw_id")
 	}
-	expectedMsg := "flaw_id is required and must be a positive integer"
+	expectedMsg := "flaw_id must be a positive integer"
 	if err.Error() != expectedMsg {
 		t.Errorf("Expected error '%s', got '%s'", expectedMsg, err.Error())
 	}
@@ -384,7 +384,7 @@ func TestExtractFlawID_Missing(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error for missing flaw_id")
 	}
-	expectedMsg := "flaw_id is required and must be an integer"
+	expectedMsg := "flaw_id is required"
 	if err.Error() != expectedMsg {
 		t.Errorf("Expected error '%s', got '%s'", expectedMsg, err.Error())
 	}

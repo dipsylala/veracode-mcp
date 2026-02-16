@@ -12,7 +12,7 @@ import (
 func TestParseRemediationGuidanceRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(555),
+		"flaw_id":          "555",
 	}
 
 	req, err := parseRemediationGuidanceRequest(args)
@@ -23,15 +23,15 @@ func TestParseRemediationGuidanceRequest_Success(t *testing.T) {
 	if req.ApplicationPath != "/path/to/app" {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
-	if req.FlawID != 555 {
-		t.Errorf("Expected flaw_id 555, got %d", req.FlawID)
+	if req.FlawID.IssueID != 555 {
+		t.Errorf("Expected flaw_id 555, got %d", req.FlawID.IssueID)
 	}
 }
 
 func TestParseRemediationGuidanceRequest_LargeFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(987654321),
+		"flaw_id":          "987654321",
 	}
 
 	req, err := parseRemediationGuidanceRequest(args)
@@ -39,8 +39,8 @@ func TestParseRemediationGuidanceRequest_LargeFlawID(t *testing.T) {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
 
-	if req.FlawID != 987654321 {
-		t.Errorf("Expected flaw_id 987654321, got %d", req.FlawID)
+	if req.FlawID.IssueID != 987654321 {
+		t.Errorf("Expected flaw_id 987654321, got %d", req.FlawID.IssueID)
 	}
 }
 

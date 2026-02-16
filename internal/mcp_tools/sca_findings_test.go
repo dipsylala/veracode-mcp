@@ -32,7 +32,7 @@ func TestParseScaFindingsRequest_AllParameters(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
 		"app_profile":      "MyApp",
-		"size":             float64(100),
+		"page_size":        float64(100),
 		"page":             float64(2),
 		"severity":         float64(4),
 		"severity_gte":     float64(2),
@@ -69,7 +69,7 @@ func TestParseScaFindingsRequest_SeverityValidation(t *testing.T) {
 func TestParseScaFindingsRequest_PaginationValidation(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"size":             float64(0),
+		"page_size":        float64(0),
 	}
 
 	_, err := parseScaFindingsRequest(args)

@@ -47,7 +47,7 @@ func parseStaticFindingsRequest(args map[string]interface{}) (*StaticFindingsReq
 	// Extract optional fields
 	req.AppProfile, _ = extractOptionalString(args, "app_profile")
 	req.Sandbox, _ = extractOptionalString(args, "sandbox")
-	req.Size = extractInt(args, "size", 10)
+	req.Size = extractInt(args, "page_size", 10)
 	req.Page = extractInt(args, "page", 0)
 
 	// Extract optional int32 pointers with validation

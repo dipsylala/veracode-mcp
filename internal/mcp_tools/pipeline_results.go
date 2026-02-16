@@ -39,7 +39,7 @@ func parsePipelineResultsRequest(args map[string]interface{}) (*PipelineResultsR
 	}
 
 	// Extract optional fields with defaults
-	req.Size = extractInt(args, "size", 10)
+	req.Size = extractInt(args, "page_size", 10)
 	req.Page = extractInt(args, "page", 0)
 
 	// Validate pagination bounds
@@ -218,9 +218,13 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 	}
 
 	// First, convert all findings and sort them by severity
+	// Note: issue_id may not be unique - we create a unique flaw_id by appending an index
 	allFindings := make([]MCPFinding, 0, len(results.Findings))
+	issueIDCounts := make(map[int]int)
 	for _, finding := range results.Findings {
-		mcpFinding := processPipelineFinding(finding)
+		issueIDCounts[finding.IssueID]++
+		occurrence := issueIDCounts[finding.IssueID]
+		mcpFinding := processPipelineFinding(finding, occurrence)
 		allFindings = append(allFindings, mcpFinding)
 	}
 
@@ -312,7 +316,8 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 }
 
 // processPipelineFinding converts a pipeline flaw to MCP finding format
-func processPipelineFinding(flaw PipelineFlaw) MCPFinding {
+// occurrence is used to make flaw_id unique when issue_id is duplicated
+func processPipelineFinding(flaw PipelineFlaw, occurrence int) MCPFinding {
 	// Parse CWE ID from string to int
 	var cweID int32
 	_, _ = fmt.Sscanf(flaw.CWEID, "%d", &cweID) // Ignore error, default to 0 if parse fails
@@ -323,8 +328,12 @@ func processPipelineFinding(flaw PipelineFlaw) MCPFinding {
 		severityScore = math.MaxInt32
 	}
 
+	// Create a unique flaw_id with occurrence suffix (always includes suffix, even for first occurrence)
+	// This ensures flaw_id is always a string format like "1000-1", "1000-2", etc.
+	flawID := fmt.Sprintf("%d-%d", flaw.IssueID, occurrence)
+
 	finding := MCPFinding{
-		FlawID:         fmt.Sprintf("%d", flaw.IssueID),
+		FlawID:         flawID,
 		ScanType:       "STATIC",
 		Severity:       transformPipelineSeverity(flaw.Severity),
 		SeverityScore:  int32(severityScore), // #nosec G115 - validated above

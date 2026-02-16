@@ -35,7 +35,7 @@ func parseGetLocalSCAResultsRequest(args map[string]interface{}) (*GetLocalSCARe
 	}
 
 	// Extract optional fields with defaults
-	req.Size = extractInt(args, "size", 50)
+	req.Size = extractInt(args, "page_size", 50)
 	req.Page = extractInt(args, "page", 0)
 
 	// Validate pagination bounds

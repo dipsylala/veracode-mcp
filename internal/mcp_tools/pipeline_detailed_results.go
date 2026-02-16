@@ -19,7 +19,7 @@ func init() {
 // PipelineDetailedResultsRequest represents the parsed parameters for pipeline-detailed-results
 type PipelineDetailedResultsRequest struct {
 	ApplicationPath string
-	FlawID          int
+	FlawID          *FlawIDComponents
 }
 
 // parsePipelineDetailedResultsRequest extracts and validates parameters from the raw args map
@@ -33,7 +33,7 @@ func parsePipelineDetailedResultsRequest(args map[string]interface{}) (*Pipeline
 		return nil, err
 	}
 
-	req.FlawID, err = extractFlawID(args)
+	req.FlawID, err = extractFlawIDString(args)
 	if err != nil {
 		return nil, err
 	}
@@ -169,16 +169,15 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 		return pipelineErrorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
 	}
 
-	// Find the specific flaw by ID
-	var targetFlaw *PipelineFlawWithStackDumps
+	// Find all flaws with the matching issue_id (there may be duplicates)
+	var matches []PipelineFlawWithStackDumps
 	for i := range scanResults.Findings {
-		if scanResults.Findings[i].IssueID == req.FlawID {
-			targetFlaw = &scanResults.Findings[i]
-			break
+		if scanResults.Findings[i].IssueID == req.FlawID.IssueID {
+			matches = append(matches, scanResults.Findings[i])
 		}
 	}
 
-	if targetFlaw == nil {
+	if len(matches) == 0 {
 		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Detailed Results
 ========================
 
@@ -188,8 +187,39 @@ Flaw ID: %d
 ❌ Flaw not found
 
 The specified flaw ID was not found in the pipeline scan results.
-`, req.ApplicationPath, req.FlawID)), nil
+`, req.ApplicationPath, req.FlawID.IssueID)), nil
 	}
+
+	// Select the correct occurrence
+	if req.FlawID.Occurrence > len(matches) {
+		occurrenceList := ""
+		for i := 0; i < len(matches); i++ {
+			flawIDStr := fmt.Sprintf("%d", req.FlawID.IssueID)
+			if i > 0 {
+				flawIDStr = fmt.Sprintf("%d-%d", req.FlawID.IssueID, i+1)
+			}
+			occurrenceList += fmt.Sprintf("- flaw_id %s: CWE-%s at %s:%d\n",
+				flawIDStr, matches[i].CWEID, matches[i].Files.SourceFile.File, matches[i].Files.SourceFile.Line)
+		}
+
+		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Detailed Results
+========================
+
+Application Path: %s
+Flaw ID: %d-%d
+
+❌ Occurrence not found
+
+Issue ID %d has %d occurrence(s), but you requested occurrence %d.
+
+Available occurrences:
+%s
+`, req.ApplicationPath, req.FlawID.IssueID, req.FlawID.Occurrence,
+			req.FlawID.IssueID, len(matches), req.FlawID.Occurrence, occurrenceList)), nil
+	}
+
+	// Get the requested occurrence (occurrence is 1-based)
+	targetFlaw := &matches[req.FlawID.Occurrence-1]
 
 	// Transform stack dumps to data paths
 	detailedFlaw := transformToDetailedFlaw(targetFlaw)

@@ -2,6 +2,8 @@ package mcp_tools
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 // extractRequiredString extracts and validates a required non-empty string parameter.
@@ -59,24 +61,85 @@ func extractOptionalBool(args map[string]interface{}, field string) (*bool, bool
 	return &val, true
 }
 
-// extractFlawID extracts a flaw_id parameter, handling both float64 (from JSON) and int types.
-// Returns an error if the parameter is missing, invalid, zero, or negative.
+// extractFlawID extracts a flaw_id parameter as an integer.
+// This is used for platform API tools where flaw IDs are always unique integers.
+// For pipeline scanner tools, use extractFlawIDString which supports the "1000-2" format.
 func extractFlawID(args map[string]interface{}) (int, error) {
-	switch val := args["flaw_id"].(type) {
+	val, exists := args["flaw_id"]
+	if !exists {
+		return 0, fmt.Errorf("flaw_id is required")
+	}
+
+	switch v := val.(type) {
 	case float64:
-		flawID := int(val)
+		flawID := int(v)
 		if flawID <= 0 {
-			return 0, fmt.Errorf("flaw_id is required and must be a positive integer")
+			return 0, fmt.Errorf("flaw_id must be a positive integer")
 		}
 		return flawID, nil
 	case int:
-		if val <= 0 {
-			return 0, fmt.Errorf("flaw_id is required and must be a positive integer")
+		if v <= 0 {
+			return 0, fmt.Errorf("flaw_id must be a positive integer")
 		}
-		return val, nil
+		return v, nil
+	case string:
+		// Support string numbers for consistency
+		flawID, err := strconv.Atoi(v)
+		if err != nil || flawID <= 0 {
+			return 0, fmt.Errorf("flaw_id must be a positive integer")
+		}
+		return flawID, nil
 	default:
-		return 0, fmt.Errorf("flaw_id is required and must be an integer")
+		return 0, fmt.Errorf("flaw_id must be an integer")
 	}
+}
+
+// FlawIDComponents represents a parsed flaw_id with issue_id and occurrence
+type FlawIDComponents struct {
+	IssueID    int
+	Occurrence int // 1-based, defaults to 1 for non-suffixed IDs
+}
+
+// extractFlawIDString extracts and parses a flaw_id parameter (pipeline tools only).
+// Only accepts strings in format "1000" or "1000-2".
+// Returns the parsed components (issue_id and occurrence) or an error if invalid.
+func extractFlawIDString(args map[string]interface{}) (*FlawIDComponents, error) {
+	val, exists := args["flaw_id"]
+	if !exists {
+		return nil, fmt.Errorf("flaw_id is required")
+	}
+
+	flawIDStr, ok := val.(string)
+	if !ok {
+		return nil, fmt.Errorf("flaw_id must be a string (e.g., \"1000\" or \"1000-2\")")
+	}
+
+	if flawIDStr == "" {
+		return nil, fmt.Errorf("flaw_id cannot be empty")
+	}
+
+	// Parse string format "1000" or "1000-2"
+	parts := strings.Split(flawIDStr, "-")
+	if len(parts) > 2 {
+		return nil, fmt.Errorf("invalid flaw_id format: %s (expected '1000' or '1000-2')", flawIDStr)
+	}
+
+	// Parse the base issue_id
+	issueID, err := strconv.Atoi(parts[0])
+	if err != nil || issueID <= 0 {
+		return nil, fmt.Errorf("invalid flaw_id: must be a positive integer (got '%s')", parts[0])
+	}
+
+	// Parse the occurrence suffix if present
+	occurrence := 1
+	if len(parts) == 2 {
+		occurrence, err = strconv.Atoi(parts[1])
+		if err != nil || occurrence <= 0 {
+			return nil, fmt.Errorf("invalid flaw_id: occurrence must be a positive integer (got '%s')", parts[1])
+		}
+	}
+
+	return &FlawIDComponents{IssueID: issueID, Occurrence: occurrence}, nil
 }
 
 // validateIntRange validates that an integer is within the specified range (inclusive).

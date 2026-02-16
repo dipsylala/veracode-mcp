@@ -32,7 +32,7 @@ func TestParseStaticFindingsRequest_AllParameters(t *testing.T) {
 		"application_path": "/path/to/app",
 		"app_profile":      "MyApp",
 		"sandbox":          "Dev",
-		"size":             float64(50),
+		"page_size":        float64(50),
 		"page":             float64(2),
 		"severity":         float64(4),
 		"severity_gte":     float64(2),
@@ -71,7 +71,7 @@ func TestParseStaticFindingsRequest_SeverityValidation(t *testing.T) {
 func TestParseStaticFindingsRequest_PaginationValidation(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"size":             float64(501),
+		"page_size":        float64(501),
 	}
 
 	_, err := parseStaticFindingsRequest(args)

@@ -26,7 +26,7 @@ func init() {
 // RemediationGuidanceRequest represents the parsed parameters for remediation-guidance
 type RemediationGuidanceRequest struct {
 	ApplicationPath string `json:"application_path"`
-	FlawID          int    `json:"flaw_id"`
+	FlawID          *FlawIDComponents
 }
 
 // parseRemediationGuidanceRequest extracts and validates parameters from the raw args map
@@ -40,7 +40,7 @@ func parseRemediationGuidanceRequest(args map[string]interface{}) (*RemediationG
 		return nil, err
 	}
 
-	req.FlawID, err = extractFlawID(args)
+	req.FlawID, err = extractFlawIDString(args)
 	if err != nil {
 		return nil, err
 	}
@@ -116,14 +116,30 @@ func getRemediationGuidancePath(cweID int, language string) (string, error) {
 	return genericPath, nil
 }
 
-// findFlawInPipelineResults finds a specific flaw by issue_id in pipeline results
-func findFlawInPipelineResults(results *PipelineScanResults, flawID int) *PipelineFlaw {
+// findAllFlawsInPipelineResults finds all flaws with a specific issue_id
+// Use this when you need to handle potential duplicates
+func findAllFlawsInPipelineResults(results *PipelineScanResults, flawID int) []PipelineFlaw {
+	var matches []PipelineFlaw
 	for i := range results.Findings {
 		if results.Findings[i].IssueID == flawID {
-			return &results.Findings[i]
+			matches = append(matches, results.Findings[i])
 		}
 	}
-	return nil
+	return matches
+}
+
+// formatOccurrenceList formats a list of occurrences for error messages
+func formatOccurrenceList(flaws []PipelineFlaw, issueID int) string {
+	var result strings.Builder
+	for i := 0; i < len(flaws); i++ {
+		flawIDStr := fmt.Sprintf("%d", issueID)
+		if i > 0 {
+			flawIDStr = fmt.Sprintf("%d-%d", issueID, i+1)
+		}
+		result.WriteString(fmt.Sprintf("- flaw_id %s: CWE-%s at %s:%d\n",
+			flawIDStr, flaws[i].CWEID, flaws[i].Files.SourceFile.File, flaws[i].Files.SourceFile.Line))
+	}
+	return result.String()
 }
 
 // errorResponse creates a standardized error response for MCP
@@ -136,20 +152,9 @@ func errorResponse(message string) map[string]interface{} {
 	}
 }
 
-func handleGetRemediationGuidance(ctx context.Context, args map[string]interface{}) (interface{}, error) {
-	// Parse and validate request parameters
-	req, err := parseRemediationGuidanceRequest(args)
-	if err != nil {
-		return map[string]interface{}{"error": err.Error()}, nil
-	}
-
-	// Locate the pipeline results directory
-	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
-
-	// Find the most recent results file
-	resultsFile, err := findMostRecentResultsFile(outputDir)
-	if err != nil {
-		return errorResponse(fmt.Sprintf(`Remediation Guidance Lookup
+// buildNoResultsError creates error message when pipeline results are not found
+func buildNoResultsError(appPath string, issueID int, err error) string {
+	return fmt.Sprintf(`Remediation Guidance Lookup
 ============================
 
 Application Path: %s
@@ -160,26 +165,12 @@ Flaw ID: %d
 %v
 
 Please run a pipeline scan first using the pipeline-scan tool.
-`, req.ApplicationPath, req.FlawID, err)), nil
-	}
+`, appPath, issueID, err)
+}
 
-	// Read and parse the results file
-	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
-	resultsData, err := os.ReadFile(resultsFile)
-	if err != nil {
-		return errorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil
-	}
-
-	var scanResults PipelineScanResults
-	err = json.Unmarshal(resultsData, &scanResults)
-	if err != nil {
-		return errorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
-	}
-
-	// Find the specific flaw by issue_id
-	flaw := findFlawInPipelineResults(&scanResults, req.FlawID)
-	if flaw == nil {
-		return errorResponse(fmt.Sprintf(`Remediation Guidance Lookup
+// buildFlawNotFoundError creates error message when flaw is not found
+func buildFlawNotFoundError(appPath string, issueID int) string {
+	return fmt.Sprintf(`Remediation Guidance Lookup
 ============================
 
 Application Path: %s
@@ -193,8 +184,103 @@ Please verify that:
 1. The flaw ID is correct
 2. The pipeline scan completed successfully
 3. The flaw exists in the most recent scan
-`, req.ApplicationPath, req.FlawID)), nil
+`, appPath, issueID)
+}
+
+// buildOccurrenceNotFoundError creates error message when requested occurrence doesn't exist
+func buildOccurrenceNotFoundError(appPath string, issueID, occurrence, matchCount int, matches []PipelineFlaw) string {
+	return fmt.Sprintf(`Remediation Guidance Lookup
+============================
+
+Application Path: %s
+Flaw ID: %d-%d
+
+❌ Occurrence not found
+
+Issue ID %d has %d occurrence(s), but you requested occurrence %d.
+
+Available occurrences:
+%s
+`, appPath, issueID, occurrence, issueID, matchCount, occurrence, formatOccurrenceList(matches, issueID))
+}
+
+// buildDuplicateNote creates a note about duplicate issue_ids when there are multiple occurrences
+func buildDuplicateNote(issueID int, matches []PipelineFlaw, selectedOccurrence int) string {
+	if len(matches) <= 1 {
+		return ""
 	}
+
+	log.Printf("Issue ID %d has %d occurrences. Using occurrence %d at %s:%d",
+		issueID, len(matches), selectedOccurrence,
+		matches[selectedOccurrence-1].Files.SourceFile.File, matches[selectedOccurrence-1].Files.SourceFile.Line)
+
+	note := fmt.Sprintf("\n\n⚠️  Note: Issue ID %d appears %d times in the scan results.\n\nAll occurrences:\n", issueID, len(matches))
+	for i := 0; i < len(matches); i++ {
+		flawIDStr := fmt.Sprintf("%d", issueID)
+		if i > 0 {
+			flawIDStr = fmt.Sprintf("%d-%d", issueID, i+1)
+		}
+		marker := "  "
+		if i == selectedOccurrence-1 {
+			marker = "→ "
+		}
+		note += fmt.Sprintf("%s- flaw_id %s: CWE-%s at %s:%d\n",
+			marker, flawIDStr, matches[i].CWEID, matches[i].Files.SourceFile.File, matches[i].Files.SourceFile.Line)
+	}
+	return note
+}
+
+// loadAndParsePipelineResults loads and parses the pipeline results file
+func loadAndParsePipelineResults(appPath string) (*PipelineScanResults, error) {
+	outputDir := filepath.Join(appPath, ".veracode", "pipeline")
+	resultsFile, err := findMostRecentResultsFile(outputDir)
+	if err != nil {
+		return nil, err
+	}
+
+	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
+	resultsData, err := os.ReadFile(resultsFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read results file: %w", err)
+	}
+
+	var scanResults PipelineScanResults
+	err = json.Unmarshal(resultsData, &scanResults)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse results file: %w", err)
+	}
+
+	return &scanResults, nil
+}
+
+func handleGetRemediationGuidance(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+	// Parse and validate request parameters
+	req, err := parseRemediationGuidanceRequest(args)
+	if err != nil {
+		return map[string]interface{}{"error": err.Error()}, nil
+	}
+
+	// Load and parse pipeline results
+	scanResults, err := loadAndParsePipelineResults(req.ApplicationPath)
+	if err != nil {
+		return errorResponse(buildNoResultsError(req.ApplicationPath, req.FlawID.IssueID, err)), nil
+	}
+
+	// Find all flaws with this issue_id (there may be duplicates)
+	matches := findAllFlawsInPipelineResults(scanResults, req.FlawID.IssueID)
+	if len(matches) == 0 {
+		return errorResponse(buildFlawNotFoundError(req.ApplicationPath, req.FlawID.IssueID)), nil
+	}
+
+	// Select the correct occurrence
+	if req.FlawID.Occurrence > len(matches) {
+		return errorResponse(buildOccurrenceNotFoundError(
+			req.ApplicationPath, req.FlawID.IssueID, req.FlawID.Occurrence, len(matches), matches)), nil
+	}
+
+	// Get the requested occurrence and build duplicate note if needed
+	flaw := &matches[req.FlawID.Occurrence-1]
+	duplicateNote := buildDuplicateNote(req.FlawID.IssueID, matches, req.FlawID.Occurrence)
 
 	// Extract CWE ID from the flaw (it's a string in the JSON)
 	cweID, err := strconv.Atoi(flaw.CWEID)
@@ -206,13 +292,13 @@ Application Path: %s
 Flaw ID: %d
 
 ❌ Error: Invalid CWE ID format: %s
-`, req.ApplicationPath, req.FlawID, flaw.CWEID)), nil
+`, req.ApplicationPath, req.FlawID.IssueID, flaw.CWEID)), nil
 	}
 
 	// Extract source file from the flaw
 	sourceFile := flaw.Files.SourceFile.File
 	if sourceFile == "" {
-		log.Printf("Warning: No source file found for flaw %d", req.FlawID)
+		log.Printf("Warning: No source file found for flaw %d", req.FlawID.IssueID)
 	}
 
 	// Detect language from filename
@@ -225,17 +311,17 @@ Flaw ID: %d
 	// Get the appropriate remediation guidance file
 	guidancePath, err := getRemediationGuidancePath(cweID, language)
 	if err != nil {
-		return errorResponse(fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: %v\n", req.ApplicationPath, req.FlawID, cweID, sourceFile, language, err)), nil
+		return errorResponse(fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: %v\n", req.ApplicationPath, req.FlawID.IssueID, cweID, sourceFile, language, err)), nil
 	}
 
 	// Read the guidance file from embedded FS
 	guidanceContent, err := remediationGuidanceFS.ReadFile(guidancePath)
 	if err != nil {
-		return errorResponse(fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: Failed to read guidance file\n\n%v\n", req.ApplicationPath, req.FlawID, cweID, sourceFile, language, err)), nil
+		return errorResponse(fmt.Sprintf("Remediation Guidance Lookup\n============================\n\nApplication Path: %s\nFlaw ID: %d\nCWE ID: %d\nSource File: %s\nDetected Language: %s\n\n❌ Error: Failed to read guidance file\n\n%v\n", req.ApplicationPath, req.FlawID.IssueID, cweID, sourceFile, language, err)), nil
 	}
 
 	// Format and return the guidance
-	return formatRemediationGuidanceResponse(req, cweID, flaw, language, sourceFile, string(guidanceContent)), nil
+	return formatRemediationGuidanceResponse(req, cweID, flaw, language, sourceFile, string(guidanceContent), duplicateNote), nil
 }
 
 // detectMarkdownSection determines which section a line represents
@@ -385,13 +471,13 @@ func getSeverityText(severity int) string {
 }
 
 // formatRemediationGuidanceResponse formats the remediation guidance into a structured JSON response
-func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID int, flaw *PipelineFlaw, language, sourceFile, guidance string) map[string]interface{} {
+func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID int, flaw *PipelineFlaw, language, sourceFile, guidance, duplicateNote string) map[string]interface{} {
 	// Parse the markdown guidance into structured sections
 	summary, keyPrinciples, remediationSteps, codeSamples := parseMarkdownGuidance(guidance)
 
 	// Build flaw details
 	flawDetails := map[string]interface{}{
-		"flaw_id":        req.FlawID,
+		"flaw_id":        req.FlawID.IssueID,
 		"issue_id":       flaw.IssueID,
 		"cwe_id":         cweID,
 		"issue_type":     flaw.IssueType,
@@ -431,7 +517,7 @@ func formatRemediationGuidanceResponse(req *RemediationGuidanceRequest, cweID in
 		"remediation_guidance": remediationGuidance,
 		"data_path":            extractDataPath(flaw),
 		"next_steps": map[string]interface{}{
-			"instructions_for_llm": buildLLMInstructions(sourceFile, flaw.Files.SourceFile.Line, remediationSteps),
+			"instructions_for_llm": buildLLMInstructions(sourceFile, flaw.Files.SourceFile.Line, remediationSteps) + duplicateNote,
 		},
 	}
 

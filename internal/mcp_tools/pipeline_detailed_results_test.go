@@ -12,7 +12,7 @@ import (
 func TestParsePipelineDetailedResultsRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(999),
+		"flaw_id":          "999",
 	}
 
 	req, err := parsePipelineDetailedResultsRequest(args)
@@ -23,15 +23,15 @@ func TestParsePipelineDetailedResultsRequest_Success(t *testing.T) {
 	if req.ApplicationPath != "/path/to/app" {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
-	if req.FlawID != 999 {
-		t.Errorf("Expected flaw_id 999, got %d", req.FlawID)
+	if req.FlawID.IssueID != 999 {
+		t.Errorf("Expected flaw_id 999, got %d", req.FlawID.IssueID)
 	}
 }
 
 func TestParsePipelineDetailedResultsRequest_LargeFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(123456789),
+		"flaw_id":          "123456789",
 	}
 
 	req, err := parsePipelineDetailedResultsRequest(args)
@@ -39,8 +39,8 @@ func TestParsePipelineDetailedResultsRequest_LargeFlawID(t *testing.T) {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
 
-	if req.FlawID != 123456789 {
-		t.Errorf("Expected flaw_id 123456789, got %d", req.FlawID)
+	if req.FlawID.IssueID != 123456789 {
+		t.Errorf("Expected flaw_id 123456789, got %d", req.FlawID.IssueID)
 	}
 }
 
@@ -55,10 +55,60 @@ func TestParsePipelineDetailedResultsRequest_MissingFlawID(t *testing.T) {
 	}
 }
 
+func TestParsePipelineDetailedResultsRequest_WithOccurrenceSuffix(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"flaw_id":          "1000-1",
+	}
+
+	req, err := parsePipelineDetailedResultsRequest(args)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	if req.FlawID.IssueID != 1000 {
+		t.Errorf("Expected issue_id 1000, got %d", req.FlawID.IssueID)
+	}
+	if req.FlawID.Occurrence != 1 {
+		t.Errorf("Expected occurrence 1, got %d", req.FlawID.Occurrence)
+	}
+}
+
+func TestParsePipelineDetailedResultsRequest_WithOccurrenceSuffix2(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"flaw_id":          "1000-2",
+	}
+
+	req, err := parsePipelineDetailedResultsRequest(args)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	if req.FlawID.IssueID != 1000 {
+		t.Errorf("Expected issue_id 1000, got %d", req.FlawID.IssueID)
+	}
+	if req.FlawID.Occurrence != 2 {
+		t.Errorf("Expected occurrence 2, got %d", req.FlawID.Occurrence)
+	}
+}
+
+func TestParsePipelineDetailedResultsRequest_NumericFlawIDRejected(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"flaw_id":          float64(1000),
+	}
+
+	_, err := parsePipelineDetailedResultsRequest(args)
+	if err == nil {
+		t.Fatal("Expected error for numeric flaw_id (must be string)")
+	}
+}
+
 func TestParsePipelineDetailedResultsRequest_ZeroFlawID(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"flaw_id":          float64(0),
+		"flaw_id":          "0",
 	}
 
 	_, err := parsePipelineDetailedResultsRequest(args)

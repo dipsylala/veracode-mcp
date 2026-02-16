@@ -253,7 +253,7 @@ func TestScaFindingsIntegrationWithLicenses(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "c:\\test\\path",
 		"app_profile":      "f4e74197-1e26-42c4-ab4b-245870c93280", // MCPVerademo GUID
-		"size":             5,
+		"page_size":        5,
 		"page":             0,
 	}
 

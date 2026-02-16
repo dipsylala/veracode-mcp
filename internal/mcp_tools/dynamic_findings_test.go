@@ -14,7 +14,7 @@ func TestParseDynamicFindingsRequest_Success(t *testing.T) {
 		"application_path": "/path/to/app",
 		"app_profile":      "MyApp",
 		"sandbox":          "Development",
-		"size":             float64(25),
+		"page_size":        float64(25),
 		"page":             float64(1),
 	}
 
@@ -95,7 +95,7 @@ func TestParseDynamicFindingsRequest_SeverityOutOfRange(t *testing.T) {
 func TestParseDynamicFindingsRequest_SizeTooSmall(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
-		"size":             float64(0),
+		"page_size":        float64(0),
 	}
 
 	_, err := parseDynamicFindingsRequest(args)
