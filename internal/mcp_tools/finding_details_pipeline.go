@@ -111,7 +111,7 @@ Available occurrences:
 	detailedFlaw := transformToDetailedFlaw(targetFlaw)
 
 	// Format and return the response
-	return formatPipelineDetailedResultsResponse(req.ApplicationPath, resultsFile, &detailedFlaw, flawIDComponents.IssueID, flawIDComponents.Occurrence), nil
+	return formatPipelineDetailedFindingsResponse(req.ApplicationPath, resultsFile, &detailedFlaw, flawIDComponents.IssueID, flawIDComponents.Occurrence), nil
 }
 
 // PipelineDetailedFlaw represents a detailed finding with data paths
@@ -234,8 +234,8 @@ func cleanVeracodeAnnotations(input string) string {
 	return re.ReplaceAllString(input, "")
 }
 
-// formatPipelineDetailedResultsResponse formats the detailed results into an MCP response
-func formatPipelineDetailedResultsResponse(appPath, resultsFile string, flaw *PipelineDetailedFlaw, issueID, occurrence int) map[string]interface{} {
+// formatPipelineDetailedFindingsResponse formats the detailed findings into an MCP response
+func formatPipelineDetailedFindingsResponse(appPath, resultsFile string, flaw *PipelineDetailedFlaw, issueID, occurrence int) map[string]interface{} {
 	// Build LLM-optimized JSON structure
 	result := buildPipelineLLMOptimizedResponse(appPath, resultsFile, flaw, issueID, occurrence)
 

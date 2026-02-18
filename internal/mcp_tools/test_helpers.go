@@ -28,9 +28,9 @@ func NewPipelineStatusTool() ToolImplementation {
 	return NewSimpleTool(PipelineStatusToolName, handlePipelineStatus)
 }
 
-// NewPipelineResultsTool creates a SimpleTool for pipeline results (test helper)
-func NewPipelineResultsTool() ToolImplementation {
-	return NewSimpleTool(PipelineResultsToolName, handlePipelineResults)
+// NewPipelineFindingsTool creates a SimpleTool for pipeline findings (test helper)
+func NewPipelineFindingsTool() ToolImplementation {
+	return NewSimpleTool(PipelineFindingsToolName, handlePipelineFindings)
 }
 
 // NewLocalSCAScanTool creates a SimpleTool for SCA scan (test helper)
@@ -38,9 +38,9 @@ func NewLocalSCAScanTool() ToolImplementation {
 	return NewSimpleTool(LocalSCAScanToolName, handleLocalSCAScan)
 }
 
-// NewGetLocalSCAResultsTool creates a SimpleTool for local SCA results (test helper)
-func NewGetLocalSCAResultsTool() ToolImplementation {
-	return NewSimpleTool(GetLocalSCAResultsToolName, handleGetLocalSCAResults)
+// NewGetLocalSCAFindingsTool creates a SimpleTool for local SCA findings (test helper)
+func NewGetLocalSCAFindingsTool() ToolImplementation {
+	return NewSimpleTool(GetLocalSCAFindingsToolName, handleGetLocalSCAFindings)
 }
 
 // NewPackageWorkspaceTool creates a SimpleTool for package workspace (test helper)

@@ -116,9 +116,9 @@ func getRemediationGuidancePath(cweID int, language string) (string, error) {
 	return genericPath, nil
 }
 
-// findAllFlawsInPipelineResults finds all flaws with a specific issue_id
+// findAllFlawsInPipelineFindings finds all flaws with a specific issue_id
 // Use this when you need to handle potential duplicates
-func findAllFlawsInPipelineResults(results *PipelineScanResults, flawID int) []PipelineFlaw {
+func findAllFlawsInPipelineFindings(results *PipelineScanResults, flawID int) []PipelineFlaw {
 	var matches []PipelineFlaw
 	for i := range results.Findings {
 		if results.Findings[i].IssueID == flawID {
@@ -230,8 +230,8 @@ func buildDuplicateNote(issueID int, matches []PipelineFlaw, selectedOccurrence 
 	return note
 }
 
-// loadAndParsePipelineResults loads and parses the pipeline results file
-func loadAndParsePipelineResults(appPath string) (*PipelineScanResults, error) {
+// loadAndParsePipelineFindings loads and parses the pipeline findings file
+func loadAndParsePipelineFindings(appPath string) (*PipelineScanResults, error) {
 	outputDir := filepath.Join(appPath, ".veracode", "pipeline")
 	resultsFile, err := findMostRecentResultsFile(outputDir)
 	if err != nil {
@@ -260,14 +260,14 @@ func handleGetRemediationGuidance(ctx context.Context, args map[string]interface
 		return map[string]interface{}{"error": err.Error()}, nil
 	}
 
-	// Load and parse pipeline results
-	scanResults, err := loadAndParsePipelineResults(req.ApplicationPath)
+	// Load and parse pipeline findings
+	scanResults, err := loadAndParsePipelineFindings(req.ApplicationPath)
 	if err != nil {
 		return errorResponse(buildNoResultsError(req.ApplicationPath, req.FlawID.IssueID, err)), nil
 	}
 
 	// Find all flaws with this issue_id (there may be duplicates)
-	matches := findAllFlawsInPipelineResults(scanResults, req.FlawID.IssueID)
+	matches := findAllFlawsInPipelineFindings(scanResults, req.FlawID.IssueID)
 	if len(matches) == 0 {
 		return errorResponse(buildFlawNotFoundError(req.ApplicationPath, req.FlawID.IssueID)), nil
 	}

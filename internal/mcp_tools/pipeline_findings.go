@@ -13,23 +13,23 @@ import (
 	"time"
 )
 
-const PipelineResultsToolName = "pipeline-findings"
+const PipelineFindingsToolName = "pipeline-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterMCPTool(PipelineResultsToolName, handlePipelineResults)
+	RegisterMCPTool(PipelineFindingsToolName, handlePipelineFindings)
 }
 
-// PipelineResultsRequest represents the parsed parameters for pipeline-findings
-type PipelineResultsRequest struct {
+// PipelineFindingsRequest represents the parsed parameters for pipeline-findings
+type PipelineFindingsRequest struct {
 	ApplicationPath string
 	Size            int `json:"size,omitempty"`
 	Page            int `json:"page,omitempty"`
 }
 
-// parsePipelineResultsRequest extracts and validates parameters from the raw args map
-func parsePipelineResultsRequest(args map[string]interface{}) (*PipelineResultsRequest, error) {
-	req := &PipelineResultsRequest{}
+// parsePipelineFindingsRequest extracts and validates parameters from the raw args map
+func parsePipelineFindingsRequest(args map[string]interface{}) (*PipelineFindingsRequest, error) {
+	req := &PipelineFindingsRequest{}
 
 	// Extract required fields
 	var err error
@@ -96,10 +96,10 @@ func pipelineErrorResponse(message string) map[string]interface{} {
 	}
 }
 
-// handlePipelineResults retrieves and formats pipeline scan results
-func handlePipelineResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+// handlePipelineFindings retrieves and formats pipeline scan results
+func handlePipelineFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
-	req, err := parsePipelineResultsRequest(args)
+	req, err := parsePipelineFindingsRequest(args)
 	if err != nil {
 		return map[string]interface{}{
 			"error": err.Error(),
@@ -139,7 +139,7 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 	}
 
 	// Format and return the response
-	return formatPipelineResultsResponse(ctx, req.ApplicationPath, resultsFile, &scanResults, req), nil
+	return formatPipelineFindingsResponse(ctx, req.ApplicationPath, resultsFile, &scanResults, req), nil
 }
 
 // findMostRecentResultsFile finds the most recent results-*.json file in the directory
@@ -175,8 +175,8 @@ func findMostRecentResultsFile(dir string) (string, error) {
 	return resultsFiles[len(resultsFiles)-1], nil
 }
 
-// formatPipelineResultsResponse formats the pipeline results into an MCP response
-func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults, req *PipelineResultsRequest) map[string]interface{} {
+// formatPipelineFindingsResponse formats the pipeline findings into an MCP response
+func formatPipelineFindingsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults, req *PipelineFindingsRequest) map[string]interface{} {
 	// Build MCP response structure similar to static findings
 	response := MCPFindingsResponse{
 		Application: MCPApplication{

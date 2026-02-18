@@ -8,12 +8,12 @@ import (
 	"testing"
 )
 
-func TestParseGetLocalSCAResultsRequest_Success(t *testing.T) {
+func TestParseGetLocalSCAFindingsRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
 	}
 
-	req, err := parseGetLocalSCAResultsRequest(args)
+	req, err := parseGetLocalSCAFindingsRequest(args)
 	if err != nil {
 		t.Fatalf("Failed to parse request: %v", err)
 	}
@@ -23,33 +23,33 @@ func TestParseGetLocalSCAResultsRequest_Success(t *testing.T) {
 	}
 }
 
-func TestParseGetLocalSCAResultsRequest_MissingApplicationPath(t *testing.T) {
+func TestParseGetLocalSCAFindingsRequest_MissingApplicationPath(t *testing.T) {
 	args := map[string]interface{}{}
 
-	_, err := parseGetLocalSCAResultsRequest(args)
+	_, err := parseGetLocalSCAFindingsRequest(args)
 	if err == nil {
 		t.Fatal("Expected error for missing application_path")
 	}
 }
 
-func TestParseGetLocalSCAResultsRequest_EmptyApplicationPath(t *testing.T) {
+func TestParseGetLocalSCAFindingsRequest_EmptyApplicationPath(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "",
 	}
 
-	_, err := parseGetLocalSCAResultsRequest(args)
+	_, err := parseGetLocalSCAFindingsRequest(args)
 	if err == nil {
 		t.Fatal("Expected error for empty application_path")
 	}
 }
 
-func TestGetLocalSCAResultsTool_HandleMissingResultsFile(t *testing.T) {
+func TestGetLocalSCAFindingsTool_HandleMissingResultsFile(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a temporary directory without results file
 	tempDir := t.TempDir()
 
-	result, err := handleGetLocalSCAResults(ctx, map[string]interface{}{
+	result, err := handleGetLocalSCAFindings(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 
@@ -68,7 +68,7 @@ func TestGetLocalSCAResultsTool_HandleMissingResultsFile(t *testing.T) {
 	}
 }
 
-func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
+func TestGetLocalSCAFindingsTool_HandleValidResultsFile(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a temporary directory with results file
@@ -80,7 +80,7 @@ func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
 
 	// Create a sample results file with Grype structure
 	resultsFile := filepath.Join(scaDir, "veracode.json")
-	sampleResults := SCAResults{
+	sampleResults := SCAFindings{
 		Vulnerabilities: SCAVulnerabilities{
 			Matches: []SCAMatch{
 				{
@@ -108,7 +108,7 @@ func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
 		t.Fatalf("Failed to write results file: %v", err)
 	}
 
-	result, err := handleGetLocalSCAResults(ctx, map[string]interface{}{
+	result, err := handleGetLocalSCAFindings(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 
@@ -142,8 +142,8 @@ func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
 	}
 }
 
-func TestFormatSCAResultsResponse(t *testing.T) {
-	results := &SCAResults{
+func TestFormatSCAFindingsResponse(t *testing.T) {
+	results := &SCAFindings{
 		Vulnerabilities: SCAVulnerabilities{
 			Matches: []SCAMatch{
 				{
@@ -174,13 +174,13 @@ func TestFormatSCAResultsResponse(t *testing.T) {
 		},
 	}
 
-	req := &GetLocalSCAResultsRequest{
+	req := &GetLocalSCAFindingsRequest{
 		ApplicationPath: "/test/path",
 		Size:            50,
 		Page:            0,
 	}
 
-	response := formatSCAResultsResponse("/test/path", "/test/path/.veracode/sca/veracode.json", results, req)
+	response := formatSCAFindingsResponse("/test/path", "/test/path/.veracode/sca/veracode.json", results, req)
 
 	// Verify response structure
 	if response["content"] == nil {

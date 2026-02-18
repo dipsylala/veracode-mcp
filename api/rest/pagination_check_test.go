@@ -68,8 +68,8 @@ func logPaginationResponse(t *testing.T, label string, resp *paginationTestRespo
 	}
 }
 
-// comparePaginationResults compares findings counts and logs the results
-func comparePaginationResults(t *testing.T, findings1, findings2, findings3 int) {
+// comparePaginationFindings compares findings counts and logs the results
+func comparePaginationFindings(t *testing.T, findings1, findings2, findings3 int) {
 	t.Logf("Findings count comparison:")
 	t.Logf("  - Default (no params): %d", findings1)
 	t.Logf("  - With size=1: %d", findings2)
@@ -185,5 +185,5 @@ func TestCheckPaginationSupport(t *testing.T) {
 		findings3 = len(resp3.Embedded.Findings)
 	}
 
-	comparePaginationResults(t, findings1, findings2, findings3)
+	comparePaginationFindings(t, findings1, findings2, findings3)
 }
