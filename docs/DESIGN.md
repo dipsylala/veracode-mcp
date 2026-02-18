@@ -89,7 +89,7 @@ The Veracode MCP Server is a Model Context Protocol (MCP) server implementation 
 
 - `ui/static-findings-app/` - React UI for static findings
 - `ui/dynamic-findings-app/` - React UI for dynamic findings
-- `ui/pipeline-results-app/` - React UI for pipeline results
+- `ui/pipeline-findings-app/` - React UI for pipeline results
 
 ## Tool Architecture
 
@@ -374,7 +374,7 @@ The server integrates with multiple Veracode APIs:
 1. package-workspace → Creates .zip artifact
 2. pipeline-scan → Runs local scan, generates results.json
 3. pipeline-status → Checks scan completion
-4. pipeline-results → Reads results.json, returns findings
+4. pipeline-findings → Reads results.json, returns findings
 5. pipeline-detailed-results → Gets specific flaw with data flow
 
 ## Design Decisions

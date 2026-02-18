@@ -10,21 +10,21 @@ import (
 	"time"
 )
 
-const RunSCAScanToolName = "run-sca-scan"
+const LocalSCAScanToolName = "local-sca-scan"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterMCPTool(RunSCAScanToolName, handleRunSCAScan)
+	RegisterMCPTool(LocalSCAScanToolName, handleLocalSCAScan)
 }
 
-// RunSCAScanRequest represents the parsed parameters for run-sca-scan
-type RunSCAScanRequest struct {
+// LocalSCAScanRequest represents the parsed parameters for local-sca-scan
+type LocalSCAScanRequest struct {
 	ApplicationPath string
 }
 
-// parseRunSCAScanRequest extracts and validates parameters from the raw args map
-func parseRunSCAScanRequest(args map[string]interface{}) (*RunSCAScanRequest, error) {
-	req := &RunSCAScanRequest{}
+// parseLocalSCAScanRequest extracts and validates parameters from the raw args map
+func parseLocalSCAScanRequest(args map[string]interface{}) (*LocalSCAScanRequest, error) {
+	req := &LocalSCAScanRequest{}
 
 	// Extract required fields
 	var err error
@@ -36,10 +36,10 @@ func parseRunSCAScanRequest(args map[string]interface{}) (*RunSCAScanRequest, er
 	return req, nil
 }
 
-// handleRunSCAScan runs a Software Composition Analysis scan on the workspace
-func handleRunSCAScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+// handleLocalSCAScan runs a Software Composition Analysis scan on the workspace
+func handleLocalSCAScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
-	req, err := parseRunSCAScanRequest(args)
+	req, err := parseLocalSCAScanRequest(args)
 	if err != nil {
 		return map[string]interface{}{
 			"error": err.Error(),
@@ -92,7 +92,7 @@ func validateAndPrepareSCADirectories(applicationPath string) (string, string, e
 }
 
 // executeSCAScanCommand builds and executes the Veracode SCA scan command
-func executeSCAScanCommand(ctx context.Context, req *RunSCAScanRequest, outputFile string) (int, time.Duration, bytes.Buffer, bytes.Buffer, error) {
+func executeSCAScanCommand(ctx context.Context, req *LocalSCAScanRequest, outputFile string) (int, time.Duration, bytes.Buffer, bytes.Buffer, error) {
 	// Build command arguments
 	cmdArgs := []string{
 		"scan",
@@ -126,7 +126,7 @@ func executeSCAScanCommand(ctx context.Context, req *RunSCAScanRequest, outputFi
 }
 
 // buildSCAScanResponse constructs the response based on command execution results
-func buildSCAScanResponse(req *RunSCAScanRequest, outputDir, outputFile string, exitCode int, duration time.Duration, stdout, stderr bytes.Buffer) map[string]interface{} {
+func buildSCAScanResponse(req *LocalSCAScanRequest, outputDir, outputFile string, exitCode int, duration time.Duration, stdout, stderr bytes.Buffer) map[string]interface{} {
 	// Interpret the exit code
 	cliInfo := InterpretVeracodeExitCode(exitCode)
 

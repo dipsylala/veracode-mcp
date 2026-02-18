@@ -139,11 +139,11 @@ func GetUIMetaForTool(toolName string) map[string]interface{} {
 	// - Nested "ui.resourceUri" (MCP Apps current format)
 
 	switch toolName {
-	case "pipeline-results":
+	case "pipeline-findings":
 		return map[string]interface{}{
-			"ui/resourceUri": "ui://pipeline-results/app.html",
+			"ui/resourceUri": "ui://pipeline-findings/app.html",
 			"ui": map[string]interface{}{
-				"resourceUri": "ui://pipeline-results/app.html",
+				"resourceUri": "ui://pipeline-findings/app.html",
 			},
 		}
 	case "static-findings":
@@ -160,11 +160,11 @@ func GetUIMetaForTool(toolName string) map[string]interface{} {
 				"resourceUri": "ui://dynamic-findings/app.html",
 			},
 		}
-	case "get-local-sca-results":
+	case "local-sca-findings":
 		return map[string]interface{}{
-			"ui/resourceUri": "ui://local-sca-results/app.html",
+			"ui/resourceUri": "ui://local-sca-findings/app.html",
 			"ui": map[string]interface{}{
-				"resourceUri": "ui://local-sca-results/app.html",
+				"resourceUri": "ui://local-sca-findings/app.html",
 			},
 		}
 	default:

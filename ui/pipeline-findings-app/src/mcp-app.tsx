@@ -14,12 +14,12 @@ function normalizeSeverity(severity: string): string {
   return severity.toLowerCase().replace(/\s+/g, '');
 }
 
-function PipelineResultsApp() {
+function PipelineFindingsApp() {
   const [resultsData, setResultsData] = useState<MCPFindingsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { app, error: appError } = useApp({
-    appInfo: { name: "Pipeline Results", version: "1.0.0" },
+    appInfo: { name: "Pipeline Findings", version: "1.0.0" },
     capabilities: {},
     onAppCreated: (app) => {
       app.ontoolinput = async (input) => {
@@ -96,14 +96,14 @@ function PipelineResultsApp() {
     return <div className={styles.loading}>Loading results...</div>;
   }
 
-  return <PipelineResultsView data={resultsData} />;
+  return <PipelineFindingsView data={resultsData} />;
 }
 
-interface PipelineResultsViewProps {
+interface PipelineFindingsViewProps {
   data: MCPFindingsResponse;
 }
 
-function PipelineResultsView({ data }: PipelineResultsViewProps) {
+function PipelineFindingsView({ data }: PipelineFindingsViewProps) {
   const { application, summary, findings, pagination } = data;
 
   // If no findings, show simple message
@@ -111,7 +111,7 @@ function PipelineResultsView({ data }: PipelineResultsViewProps) {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1>Pipeline Scan Results: {application.name}</h1>
+          <h1>Pipeline Scan Findings: {application.name}</h1>
         </div>
         <div className={styles.empty}>No findings to display</div>
       </div>
@@ -121,7 +121,7 @@ function PipelineResultsView({ data }: PipelineResultsViewProps) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Pipeline Scan Results: {application.name}</h1>
+        <h1>Pipeline Scan Findings: {application.name}</h1>
         
         {pagination && (
           <div className={styles.paginationInfo}>
@@ -266,6 +266,6 @@ function FindingRow({ finding }: FindingRowProps) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <PipelineResultsApp />
+    <PipelineFindingsApp />
   </StrictMode>,
 );

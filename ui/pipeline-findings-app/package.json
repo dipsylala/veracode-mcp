@@ -1,8 +1,8 @@
 {
-  "name": "veracode-local-sca-results-app",
+  "name": "veracode-pipeline-findings-app",
   "version": "1.0.0",
   "type": "module",
-  "description": "MCP App for Veracode Local SCA Results",
+  "description": "MCP App for Veracode Pipeline Findings",
   "license": "MIT",
   "scripts": {
     "build": "cross-env INPUT=mcp-app.html vite build",

@@ -1,6 +1,6 @@
-# Pipeline Results MCP App
+# Pipeline Findings MCP App
 
-This directory contains the interactive UI for the Veracode Pipeline Results tool, built with React and the MCP Apps SDK.
+This directory contains the interactive UI for the Veracode Pipeline Findings tool, built with React and the MCP Apps SDK.
 
 ## Structure
 
@@ -39,8 +39,8 @@ Or from the repository root:
 
 ## How It Works
 
-1. **Tool Registration**: The Go server registers the `pipeline-results` tool with UI metadata (`_meta.ui.resourceUri`)
-2. **Resource Registration**: The server also registers the UI resource at `ui://pipeline-results/app.html`
+1. **Tool Registration**: The Go server registers the `pipeline-findings` tool with UI metadata (`_meta.ui.resourceUri`)
+2. **Resource Registration**: The server also registers the UI resource at `ui://pipeline-findings/app.html`
 3. **Tool Execution**: When Claude calls the tool, it receives both the data (as JSON) and the UI resource URI
 4. **UI Rendering**: The MCP host (Claude Desktop) renders the UI in an iframe and passes the tool result to it
 5. **Data Display**: The React app receives the data via `ontoolresult` handler and displays it in a table
@@ -48,6 +48,7 @@ Or from the repository root:
 ## Development
 
 The UI uses:
+
 - **MCP Apps SDK** (`@modelcontextprotocol/ext-apps`) for connecting to the MCP host
 - **React** with TypeScript for the UI
 - **Vite** with `vite-plugin-singlefile` to bundle everything into a single HTML file

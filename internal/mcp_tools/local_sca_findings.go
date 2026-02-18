@@ -10,15 +10,15 @@ import (
 	"strings"
 )
 
-const GetLocalSCAResultsToolName = "get-local-sca-results"
+const GetLocalSCAFindingsToolName = "local-sca-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
-	RegisterMCPTool(GetLocalSCAResultsToolName, handleGetLocalSCAResults)
+	RegisterMCPTool(GetLocalSCAFindingsToolName, handleGetLocalSCAFindings)
 }
 
-// GetLocalSCAResultsRequest represents the parsed parameters for get-local-sca-results
-type GetLocalSCAResultsRequest struct {
+// GetLocalSCAFindingsRequest represents the parsed parameters for local-sca-findings
+type GetLocalSCAFindingsRequest struct {
 	ApplicationPath string
 	CVE             string `json:"cve,omitempty"`
 	ComponentName   string `json:"component_name,omitempty"`
@@ -27,9 +27,9 @@ type GetLocalSCAResultsRequest struct {
 	Page            int    `json:"page,omitempty"`
 }
 
-// parseGetLocalSCAResultsRequest extracts and validates parameters from the raw args map
-func parseGetLocalSCAResultsRequest(args map[string]interface{}) (*GetLocalSCAResultsRequest, error) {
-	req := &GetLocalSCAResultsRequest{}
+// parseGetLocalSCAFindingsRequest extracts and validates parameters from the raw args map
+func parseGetLocalSCAFindingsRequest(args map[string]interface{}) (*GetLocalSCAFindingsRequest, error) {
+	req := &GetLocalSCAFindingsRequest{}
 
 	// Extract required fields
 	var err error
@@ -62,8 +62,8 @@ func parseGetLocalSCAResultsRequest(args map[string]interface{}) (*GetLocalSCARe
 	return req, nil
 }
 
-// SCAResults represents the JSON structure from Veracode SCA scan
-type SCAResults struct {
+// SCAFindings represents the JSON structure from Veracode SCA scan
+type SCAFindings struct {
 	Vulnerabilities SCAVulnerabilities `json:"vulnerabilities"`
 }
 
@@ -173,10 +173,10 @@ type SCARelatedVuln struct {
 	EPSS        []SCAEPSS `json:"epss"`
 }
 
-// handleGetLocalSCAResults retrieves and formats local SCA scan results
-func handleGetLocalSCAResults(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+// handleGetLocalSCAFindings retrieves and formats local SCA scan findings
+func handleGetLocalSCAFindings(ctx context.Context, args map[string]interface{}) (interface{}, error) {
 	// Parse and validate request parameters
-	req, err := parseGetLocalSCAResultsRequest(args)
+	req, err := parseGetLocalSCAFindingsRequest(args)
 	if err != nil {
 		return map[string]interface{}{
 			"error": err.Error(),
@@ -215,7 +215,7 @@ The results file does not exist. Run a local SCA scan using the run-sca-scan too
 		}, nil
 	}
 
-	var scaResults SCAResults
+	var scaResults SCAFindings
 	err = json.Unmarshal(resultsData, &scaResults)
 	if err != nil {
 		return map[string]interface{}{
@@ -224,10 +224,10 @@ The results file does not exist. Run a local SCA scan using the run-sca-scan too
 	}
 
 	// Format and return the response
-	return formatSCAResultsResponse(req.ApplicationPath, resultsFile, &scaResults, req), nil
+	return formatSCAFindingsResponse(req.ApplicationPath, resultsFile, &scaResults, req), nil
 }
 
-// scaSummary holds summary statistics for SCA results
+// scaSummary holds summary statistics for SCA findings
 type scaSummary struct {
 	Total          int
 	Critical       int
@@ -239,8 +239,8 @@ type scaSummary struct {
 	TotalVulns     int
 }
 
-// buildSCASummary builds summary statistics from SCA results
-func buildSCASummary(results *SCAResults) scaSummary {
+// buildSCASummary builds summary statistics from SCA findings
+func buildSCASummary(results *SCAFindings) scaSummary {
 	summary := scaSummary{}
 	artifactMap := make(map[string]bool)
 	vulnMap := make(map[string]bool)
@@ -290,7 +290,7 @@ func severityToInt(severity string) int {
 }
 
 // matchesFilters checks if an SCA match passes all active filters
-func matchesFilters(match SCAMatch, req *GetLocalSCAResultsRequest) bool {
+func matchesFilters(match SCAMatch, req *GetLocalSCAFindingsRequest) bool {
 	// Filter by CVE
 	if req.CVE != "" {
 		found := false
@@ -445,8 +445,8 @@ func addRelatedCVEs(finding map[string]interface{}, relatedVulns []SCARelatedVul
 	}
 }
 
-// formatSCAResultsResponse formats the SCA results into an MCP response
-func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults, req *GetLocalSCAResultsRequest) map[string]interface{} {
+// formatSCAFindingsResponse formats the SCA findings into an MCP response
+func formatSCAFindingsResponse(appPath, resultsFile string, results *SCAFindings, req *GetLocalSCAFindingsRequest) map[string]interface{} {
 	// Apply filters and convert matches to LLM-friendly format
 	allFindings := make([]map[string]interface{}, 0, len(results.Vulnerabilities.Matches))
 	filteredMatches := make([]SCAMatch, 0, len(results.Vulnerabilities.Matches))
@@ -458,7 +458,7 @@ func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults, 
 	}
 
 	// Build summary from filtered results
-	filteredResults := &SCAResults{
+	filteredResults := &SCAFindings{
 		Vulnerabilities: SCAVulnerabilities{
 			Matches: filteredMatches,
 		},

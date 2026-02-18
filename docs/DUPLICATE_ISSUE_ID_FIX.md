@@ -33,7 +33,7 @@ This maintains:
 
 ### Implementation Details
 
-#### pipeline-results Tool
+#### pipeline-findings Tool
 - Tracks occurrence count for each `issue_id`
 - Assigns unique `flaw_id` with suffix for duplicates
 - Both occurrences appear in the results list

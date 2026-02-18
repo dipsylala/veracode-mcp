@@ -8,15 +8,15 @@ import (
 )
 
 // ============================================================================
-// parsePipelineResultsRequest tests
+// parsePipelineFindingsRequest tests
 // ============================================================================
 
-func TestParsePipelineResultsRequest_Success(t *testing.T) {
+func TestParsePipelineFindingsRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
 	}
 
-	req, err := parsePipelineResultsRequest(args)
+	req, err := parsePipelineFindingsRequest(args)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -29,14 +29,14 @@ func TestParsePipelineResultsRequest_Success(t *testing.T) {
 	}
 }
 
-func TestParsePipelineResultsRequest_WithPagination(t *testing.T) {
+func TestParsePipelineFindingsRequest_WithPagination(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
 		"page_size":        float64(50),
 		"page":             float64(2),
 	}
 
-	req, err := parsePipelineResultsRequest(args)
+	req, err := parsePipelineFindingsRequest(args)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -49,53 +49,53 @@ func TestParsePipelineResultsRequest_WithPagination(t *testing.T) {
 	}
 }
 
-func TestParsePipelineResultsRequest_SizeValidation(t *testing.T) {
+func TestParsePipelineFindingsRequest_SizeValidation(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
 		"page_size":        float64(501),
 	}
 
-	_, err := parsePipelineResultsRequest(args)
+	_, err := parsePipelineFindingsRequest(args)
 	if err == nil {
 		t.Fatal("Expected error for size=501")
 	}
 }
 
-func TestParsePipelineResultsRequest_PageValidation(t *testing.T) {
+func TestParsePipelineFindingsRequest_PageValidation(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
 		"page":             float64(-1),
 	}
 
-	_, err := parsePipelineResultsRequest(args)
+	_, err := parsePipelineFindingsRequest(args)
 	if err == nil {
 		t.Fatal("Expected error for page=-1")
 	}
 }
 
-func TestParsePipelineResultsRequest_MissingApplicationPath(t *testing.T) {
+func TestParsePipelineFindingsRequest_MissingApplicationPath(t *testing.T) {
 	args := map[string]interface{}{}
 
-	_, err := parsePipelineResultsRequest(args)
+	_, err := parsePipelineFindingsRequest(args)
 	if err == nil {
 		t.Fatal("Expected error for missing application_path")
 	}
 }
 
 // ============================================================================
-// handleGetPipelineResults tests
+// handleGetPipelineFindings tests
 // ============================================================================
 
-func TestPipelineResultsTool_Initialize(t *testing.T) {
-	tool := NewPipelineResultsTool()
+func TestPipelineFindingsTool_Initialize(t *testing.T) {
+	tool := NewPipelineFindingsTool()
 	if err := tool.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize tool: %v", err)
 	}
 	defer tool.Shutdown()
 }
 
-func TestPipelineResultsTool_RegisterHandlers(t *testing.T) {
-	tool := NewPipelineResultsTool()
+func TestPipelineFindingsTool_RegisterHandlers(t *testing.T) {
+	tool := NewPipelineFindingsTool()
 	if err := tool.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize tool: %v", err)
 	}
@@ -106,18 +106,18 @@ func TestPipelineResultsTool_RegisterHandlers(t *testing.T) {
 		t.Fatalf("Failed to register handlers: %v", err)
 	}
 
-	if registry.handlers[PipelineResultsToolName] == nil {
+	if registry.handlers[PipelineFindingsToolName] == nil {
 		t.Error("Handler was not registered")
 	}
 }
 
-func TestPipelineResultsTool_HandleMissingResultsFile(t *testing.T) {
+func TestPipelineFindingsTool_HandleMissingResultsFile(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a temporary directory without results file
 	tempDir := t.TempDir()
 
-	result, err := handlePipelineResults(ctx, map[string]interface{}{
+	result, err := handlePipelineFindings(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 
@@ -136,7 +136,7 @@ func TestPipelineResultsTool_HandleMissingResultsFile(t *testing.T) {
 	}
 }
 
-func TestPipelineResultsTool_HandleValidPath(t *testing.T) {
+func TestPipelineFindingsTool_HandleValidPath(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a temporary directory with pipeline structure
@@ -146,7 +146,7 @@ func TestPipelineResultsTool_HandleValidPath(t *testing.T) {
 		t.Fatalf("Failed to create pipeline directory: %v", err)
 	}
 
-	result, err := handlePipelineResults(ctx, map[string]interface{}{
+	result, err := handlePipelineFindings(ctx, map[string]interface{}{
 		"application_path": tempDir,
 	})
 

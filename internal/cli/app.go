@@ -12,12 +12,12 @@ import (
 
 // AppConfig holds the application configuration
 type AppConfig struct {
-	Version             string
-	ToolsJSON           []byte
-	PipelineResultsHTML string
-	StaticFindingsHTML  string
-	DynamicFindingsHTML string
-	LocalSCAResultsHTML string
+	Version              string
+	ToolsJSON            []byte
+	PipelineFindingsHTML string
+	StaticFindingsHTML   string
+	DynamicFindingsHTML  string
+	LocalSCAFindingsHTML string
 }
 
 // ConfigureLogging sets up logging based on command line flags
@@ -55,5 +55,5 @@ func RunServer(s *server.MCPServer, verbose bool) error {
 // InitializeResources sets the embedded resources in internal packages
 func InitializeResources(config AppConfig) {
 	tools.SetToolsJSON(config.ToolsJSON)
-	server.SetUIResources(config.PipelineResultsHTML, config.StaticFindingsHTML, config.DynamicFindingsHTML, config.LocalSCAResultsHTML)
+	server.SetUIResources(config.PipelineFindingsHTML, config.StaticFindingsHTML, config.DynamicFindingsHTML, config.LocalSCAFindingsHTML)
 }

@@ -38,10 +38,10 @@ Write-Host "╚═════════════════════�
 # Build UI apps if not skipped
 if (-not $SkipUI) {
     $uiApps = @(
-        @{Name="Pipeline Results"; Path="ui\pipeline-results-app"},
+        @{Name="Pipeline Findings"; Path="ui\pipeline-findings-app"},
         @{Name="Static Findings"; Path="ui\static-findings-app"},
         @{Name="Dynamic Findings"; Path="ui\dynamic-findings-app"},
-        @{Name="Local SCA Results"; Path="ui\local-sca-results-app"}
+        @{Name="Local SCA Findings"; Path="ui\local-sca-findings-app"}
     )
     
     foreach ($app in $uiApps) {

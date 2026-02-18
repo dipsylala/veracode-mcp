@@ -35,18 +35,18 @@ func WithUICapability(ctx context.Context, supportsUI bool) context.Context {
 	return context.WithValue(ctx, uiCapabilityKey, supportsUI)
 }
 
-var embeddedPipelineResultsHTML string
+var embeddedPipelineFindingsHTML string
 var embeddedStaticFindingsHTML string
 var embeddedDynamicFindingsHTML string
-var embeddedLocalSCAResultsHTML string
+var embeddedLocalSCAFindingsHTML string
 var embeddedInstructions string
 
 // SetUIResources sets the embedded UI resources from the main package
-func SetUIResources(pipeline, staticFindings, dynamicFindings, localSCAResults string) {
-	embeddedPipelineResultsHTML = pipeline
+func SetUIResources(pipeline, staticFindings, dynamicFindings, localSCAFindings string) {
+	embeddedPipelineFindingsHTML = pipeline
 	embeddedStaticFindingsHTML = staticFindings
 	embeddedDynamicFindingsHTML = dynamicFindings
-	embeddedLocalSCAResultsHTML = localSCAResults
+	embeddedLocalSCAFindingsHTML = localSCAFindings
 }
 
 // SetInstructions sets the embedded instructions from the main package

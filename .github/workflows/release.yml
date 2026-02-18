@@ -29,8 +29,8 @@ jobs:
 
       - name: Build UI Apps
         run: |
-          # Build Pipeline Results UI
-          cd ui/pipeline-results-app
+          # Build Pipeline Findings UI
+          cd ui/pipeline-findings-app
           npm install
           npm run build
           cd ../..
@@ -47,8 +47,8 @@ jobs:
           npm run build
           cd ../..
           
-          # Build Local SCA Results UI
-          cd ui/local-sca-results-app
+          # Build Local SCA Findings UI
+          cd ui/local-sca-findings-app
           npm install
           npm run build
           cd ../..

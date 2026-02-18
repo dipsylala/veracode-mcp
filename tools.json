@@ -8,7 +8,7 @@
     },
     {
       "name": "dynamic-findings",
-      "description": "Get runtime vulnerabilities from DYNAMIC analysis scans (auth/session flaws, authorization bypasses, CSRF, clickjacking, etc.)",
+      "description": "Get runtime vulnerabilities from platform-based DYNAMIC analysis scans (auth/session flaws, authorization bypasses, CSRF, clickjacking, etc.)",
       "params": [
         {
           "name": "application_path",
@@ -56,7 +56,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Results per page (1-500, default 10)"
+          "description": "Findings per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -78,7 +78,7 @@
     },
     {
       "name": "static-findings",
-      "description": "Get source code vulnerabilities from STATIC analysis scans (XSS, SQLi, crypto issues, buffer overflows, etc.)",
+      "description": "Get source code vulnerabilities from platform-based STATIC analysis scans (XSS, SQLi, crypto issues, buffer overflows, etc.)",
       "params": [
         {
           "name": "application_path",
@@ -126,7 +126,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Results per page (1-500, default 10)"
+          "description": "Findings per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -147,7 +147,7 @@
       ]
     },
     {
-      "name": "get-finding-details",
+      "name": "finding-details",
       "description": "Get detailed information about any flaw from platform scans (static/dynamic) or pipeline scans. Returns complete flaw details including data flow paths or request/response info for dynamic flaws. Use this to get more context on any specific flaw ID from scan results.",
       "params": [
         {
@@ -185,13 +185,13 @@
           "name": "flaw_id",
           "type": "string",
           "isRequired": true,
-          "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-results output."
+          "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-findings output."
         }
       ]
     },
     {
-      "name": "get-sca-findings",
-      "description": "Get third-party library vulnerabilities from SCA scans (vulnerable dependencies, outdated libraries, CVEs)",
+      "name": "sca-findings",
+      "description": "Get third-party library vulnerabilities from platform-based SCA scans (vulnerable dependencies, outdated libraries, CVEs)",
       "params": [
         {
           "name": "application_path",
@@ -233,7 +233,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Results per page (1-500, default 10)"
+          "description": "Findings per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -285,7 +285,7 @@
     },
     {
       "name": "pipeline-status",
-      "description": "Check pipeline scan status",
+      "description": "Check pipeline local scan status",
       "params": [
         {
           "name": "application_path",
@@ -296,8 +296,8 @@
       ]
     },
     {
-      "name": "pipeline-results",
-      "description": "Get completed pipeline scan results with interactive UI",
+      "name": "pipeline-findings",
+      "description": "Get completed pipeline local scan results with interactive UI",
       "params": [
         {
           "name": "application_path",
@@ -313,7 +313,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Results per page (1-500, default 10)"
+          "description": "Findings per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -328,7 +328,7 @@
       ]
     },
     {
-      "name": "run-sca-scan",
+      "name": "local-sca-scan",
       "description": "Run local SCA scan to identify vulnerable dependencies",
       "params": [
         {
@@ -340,7 +340,7 @@
       ]
     },
     {
-      "name": "get-local-sca-results",
+      "name": "local-sca-findings",
       "description": "Get local SCA scan results with vulnerability details and fix recommendations",
       "params": [
         {
@@ -379,7 +379,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Results per page (1-500, default 10)"
+          "description": "Findings per page (1-500, default 10)"
         },
         {
           "name": "page",

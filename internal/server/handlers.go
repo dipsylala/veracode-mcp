@@ -195,7 +195,7 @@ func (s *MCPServer) handleListTools() *types.ListToolsResult {
 
 	// Debug: log metadata for UI tools
 	for _, tool := range result.Tools {
-		if tool.Name == "pipeline-results" || tool.Name == "static-findings" || tool.Name == "dynamic-findings" {
+		if tool.Name == "pipeline-findings" || tool.Name == "static-findings" || tool.Name == "dynamic-findings" {
 			if len(tool.Meta) > 0 {
 				flatUri, _ := tool.Meta["ui/resourceUri"].(string)
 				nestedUI, _ := tool.Meta["ui"].(map[string]interface{})
@@ -298,15 +298,9 @@ func (s *MCPServer) handleListResources() *ListResourcesResult {
 	result := &ListResourcesResult{
 		Resources: []Resource{
 			{
-				URI:         "resource://example/hello",
-				Name:        "Hello Resource",
-				Description: "A simple example resource",
-				MimeType:    "text/plain",
-			},
-			{
-				URI:         "ui://pipeline-results/app.html",
-				Name:        "Pipeline Results UI",
-				Description: "Interactive UI for pipeline scan results",
+				URI:         "ui://pipeline-findings/app.html",
+				Name:        "Pipeline Findings UI",
+				Description: "Interactive UI for pipeline scan findings",
 				MimeType:    UICapabilityMimeType,
 			},
 			{
@@ -322,9 +316,9 @@ func (s *MCPServer) handleListResources() *ListResourcesResult {
 				MimeType:    UICapabilityMimeType,
 			},
 			{
-				URI:         "ui://local-sca-results/app.html",
-				Name:        "Local SCA Results UI",
-				Description: "Interactive UI for local SCA scan results",
+				URI:         "ui://local-sca-findings/app.html",
+				Name:        "Local SCA Findings UI",
+				Description: "Interactive UI for local SCA scan findings",
 				MimeType:    UICapabilityMimeType,
 			},
 		},
@@ -351,23 +345,12 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 	log.Printf("[RESOURCES/READ] Requested URI: %s", readParams.URI)
 
 	switch readParams.URI {
-	case "resource://example/hello":
-		return &ReadResourceResult{
-			Contents: []ResourceContents{
-				{
-					URI:      readParams.URI,
-					MimeType: "text/plain",
-					Text:     "Hello from MCP resource!",
-				},
-			},
-		}, nil
-
-	case "ui://pipeline-results/app.html":
-		log.Printf("[RESOURCES/READ] 🎯 Serving Pipeline Results UI - HTML length: %d bytes", len(embeddedPipelineResultsHTML))
-		if len(embeddedPipelineResultsHTML) < 1000 {
+	case "ui://pipeline-findings/app.html":
+		log.Printf("[RESOURCES/READ] 🎯 Serving Pipeline Results UI - HTML length: %d bytes", len(embeddedPipelineFindingsHTML))
+		if len(embeddedPipelineFindingsHTML) < 1000 {
 			log.Printf("[RESOURCES/READ] ⚠️  WARNING: HTML is suspiciously small! May not be built correctly.")
 		}
-		return s.serveUIResource(readParams.URI, embeddedPipelineResultsHTML)
+		return s.serveUIResource(readParams.URI, embeddedPipelineFindingsHTML)
 
 	case "ui://static-findings/app.html":
 		log.Printf("[RESOURCES/READ] 🎯 Serving Static Findings UI - HTML length: %d bytes", len(embeddedStaticFindingsHTML))
@@ -383,16 +366,16 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 		}
 		return s.serveUIResource(readParams.URI, embeddedDynamicFindingsHTML)
 
-	case "ui://local-sca-results/app.html":
-		log.Printf("[RESOURCES/READ] 🎯 Serving Local SCA Results UI - HTML length: %d bytes", len(embeddedLocalSCAResultsHTML))
-		if len(embeddedLocalSCAResultsHTML) < 1000 {
+	case "ui://local-sca-findings/app.html":
+		log.Printf("[RESOURCES/READ] 🎯 Serving Local SCA Findings UI - HTML length: %d bytes", len(embeddedLocalSCAFindingsHTML))
+		if len(embeddedLocalSCAFindingsHTML) < 1000 {
 			log.Printf("[RESOURCES/READ] ⚠️  WARNING: HTML is suspiciously small! May not be built correctly.")
 		}
-		return s.serveUIResource(readParams.URI, embeddedLocalSCAResultsHTML)
+		return s.serveUIResource(readParams.URI, embeddedLocalSCAFindingsHTML)
 
 	default:
 		log.Printf("[RESOURCES/READ] ❌ Resource not found: %s", readParams.URI)
-		log.Printf("[RESOURCES/READ] Available URIs: ui://pipeline-results/app.html, ui://static-findings/app.html, ui://dynamic-findings/app.html, ui://local-sca-results/app.html")
+		log.Printf("[RESOURCES/READ] Available URIs: ui://pipeline-findings/app.html, ui://static-findings/app.html, ui://dynamic-findings/app.html, ui://local-sca-findings/app.html")
 		return nil, fmt.Errorf("resource not found: %s", readParams.URI)
 	}
 }

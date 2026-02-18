@@ -9,14 +9,14 @@ import (
 	"github.com/dipsylala/veracode-mcp/workspace"
 )
 
-const FindingDetailsToolName = "get-finding-details"
+const FindingDetailsToolName = "finding-details"
 
 // Auto-register this tool when the package is imported
 func init() {
 	RegisterMCPTool(FindingDetailsToolName, handleGetFindingDetails)
 }
 
-// FindingDetailsRequest represents the parsed parameters for get-finding-details
+// FindingDetailsRequest represents the parsed parameters for finding-details
 type FindingDetailsRequest struct {
 	ApplicationPath string `json:"application_path"`
 	AppProfile      string `json:"app_profile,omitempty"`
