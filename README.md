@@ -202,6 +202,45 @@ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 }
 ```
 
+### VS Code: Veracode Analyst Agent
+
+A pre-built VS Code agent is available that works with the MCP to provide AI-powered analysis of your Veracode findings. Where the MCP provides structured, LLM-optimised data retrieval, the agent provides the non-deterministic layer: risk prioritisation, cross-scan correlation, root cause grouping, and remediation planning.
+
+**Check the feature is enabled in VS Code:**
+
+
+**Install for a project:**
+
+Download `veracode-analyst.agent.md` from the [Releases page](https://github.com/dipsylala/veracode-mcp/releases) and place it in your project:
+
+```text
+<your-project>/.github/agents/veracode-analyst.agent.md
+```
+
+**Install for personal use across all projects (VS Code Insiders):**
+
+```powershell
+# Windows
+Copy-Item veracode-analyst.agent.md "$env:APPDATA\Code\User\agents\"
+```
+
+```bash
+# macOS/Linux
+cp veracode-analyst.agent.md "$HOME/Library/Application Support/Code/User/agents/"
+```
+
+After placing the file, reload VS Code (`Developer: Reload Window`). The **Veracode Analyst** agent will appear in the chat mode selector in the Copilot Chat panel.
+
+**Usage:**
+
+Select **Veracode Analyst** from the chat mode selector, then ask:
+
+```text
+Analyse the security posture of /path/to/my/project and tell me what I should fix first.
+```
+
+The agent will check for findings, retrieve findings across SCA and Pipeline static scans, and synthesise a prioritised remediation plan. It requires the MCP server to be configured in VS Code settings as shown above.
+
 ## Available MCP Tools
 
 The server provides these Veracode-specific tools:
