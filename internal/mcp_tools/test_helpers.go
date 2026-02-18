@@ -33,9 +33,9 @@ func NewPipelineResultsTool() ToolImplementation {
 	return NewSimpleTool(PipelineResultsToolName, handlePipelineResults)
 }
 
-// NewRunSCAScanTool creates a SimpleTool for SCA scan (test helper)
-func NewRunSCAScanTool() ToolImplementation {
-	return NewSimpleTool(RunSCAScanToolName, handleRunSCAScan)
+// NewLocalSCAScanTool creates a SimpleTool for SCA scan (test helper)
+func NewLocalSCAScanTool() ToolImplementation {
+	return NewSimpleTool(LocalSCAScanToolName, handleLocalSCAScan)
 }
 
 // NewGetLocalSCAResultsTool creates a SimpleTool for local SCA results (test helper)

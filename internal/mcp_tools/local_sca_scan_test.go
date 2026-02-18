@@ -8,12 +8,12 @@ import (
 	"testing"
 )
 
-func TestParseRunSCAScanRequest_Success(t *testing.T) {
+func TestParseLocalSCAScanRequest_Success(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "/path/to/app",
 	}
 
-	req, err := parseRunSCAScanRequest(args)
+	req, err := parseLocalSCAScanRequest(args)
 	if err != nil {
 		t.Fatalf("Failed to parse request: %v", err)
 	}
@@ -23,21 +23,21 @@ func TestParseRunSCAScanRequest_Success(t *testing.T) {
 	}
 }
 
-func TestParseRunSCAScanRequest_MissingApplicationPath(t *testing.T) {
+func TestParseLocalSCAScanRequest_MissingApplicationPath(t *testing.T) {
 	args := map[string]interface{}{}
 
-	_, err := parseRunSCAScanRequest(args)
+	_, err := parseLocalSCAScanRequest(args)
 	if err == nil {
 		t.Fatal("Expected error for missing application_path")
 	}
 }
 
-func TestParseRunSCAScanRequest_EmptyApplicationPath(t *testing.T) {
+func TestParseLocalSCAScanRequest_EmptyApplicationPath(t *testing.T) {
 	args := map[string]interface{}{
 		"application_path": "",
 	}
 
-	_, err := parseRunSCAScanRequest(args)
+	_, err := parseLocalSCAScanRequest(args)
 	if err == nil {
 		t.Fatal("Expected error for empty application_path")
 	}
@@ -106,10 +106,10 @@ func TestValidateAndPrepareSCADirectories_CreatesDirectoryIfNeeded(t *testing.T)
 	}
 }
 
-func TestRunSCAScanTool_HandleInvalidPath(t *testing.T) {
+func TestLocalSCAScanTool_HandleInvalidPath(t *testing.T) {
 	ctx := context.Background()
 
-	result, err := handleRunSCAScan(ctx, map[string]interface{}{
+	result, err := handleLocalSCAScan(ctx, map[string]interface{}{
 		"application_path": "/nonexistent/path/to/app",
 	})
 
@@ -128,8 +128,8 @@ func TestRunSCAScanTool_HandleInvalidPath(t *testing.T) {
 	}
 }
 
-func TestRunSCAScanTool_HandleValidPath(t *testing.T) {
-	tool := NewRunSCAScanTool()
+func TestLocalSCAScanTool_HandleValidPath(t *testing.T) {
+	tool := NewLocalSCAScanTool()
 	if err := tool.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize tool: %v", err)
 	}
@@ -140,7 +140,7 @@ func TestRunSCAScanTool_HandleValidPath(t *testing.T) {
 		t.Fatalf("Failed to register handlers: %v", err)
 	}
 
-	handler := registry.handlers[RunSCAScanToolName]
+	handler := registry.handlers[LocalSCAScanToolName]
 	ctx := context.Background()
 
 	// Create a temporary directory
@@ -166,7 +166,7 @@ func TestRunSCAScanTool_HandleValidPath(t *testing.T) {
 	}
 }
 
-func TestRunSCAScanTool_OutputFileLocation(t *testing.T) {
+func TestLocalSCAScanTool_OutputFileLocation(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Create the expected output structure
@@ -197,7 +197,7 @@ func TestRunSCAScanTool_OutputFileLocation(t *testing.T) {
 }
 
 func TestBuildSCAScanResponse_Success(t *testing.T) {
-	req := &RunSCAScanRequest{
+	req := &LocalSCAScanRequest{
 		ApplicationPath: "/test/path",
 	}
 
@@ -214,7 +214,7 @@ func TestBuildSCAScanResponse_Success(t *testing.T) {
 }
 
 func TestBuildSCAScanResponse_Error(t *testing.T) {
-	req := &RunSCAScanRequest{
+	req := &LocalSCAScanRequest{
 		ApplicationPath: "/test/path",
 	}
 
@@ -232,7 +232,7 @@ func TestBuildSCAScanResponse_Error(t *testing.T) {
 }
 
 func TestBuildSCAScanResponse_Warning(t *testing.T) {
-	req := &RunSCAScanRequest{
+	req := &LocalSCAScanRequest{
 		ApplicationPath: "/test/path",
 	}
 

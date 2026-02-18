@@ -11,14 +11,14 @@ import (
 	"github.com/dipsylala/veracode-mcp/workspace"
 )
 
-const ScaFindingsToolName = "get-sca-findings"
+const ScaFindingsToolName = "sca-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
 	RegisterMCPTool(ScaFindingsToolName, handleGetScaFindings)
 }
 
-// ScaFindingsRequest represents the parsed parameters for get-sca-findings
+// ScaFindingsRequest represents the parsed parameters for sca-findings
 type ScaFindingsRequest struct {
 	ApplicationPath string `json:"application_path"`
 	AppProfile      string `json:"app_profile,omitempty"`
