@@ -233,7 +233,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Results per page (1-500, default 50)"
+          "description": "Results per page (1-500, default 10)"
         },
         {
           "name": "page",
@@ -350,6 +350,28 @@
           "description": "Absolute path to the application workspace"
         },
         {
+          "name": "cve",
+          "type": "string",
+          "isRequired": false,
+          "description": "Filter by specific CVE ID (e.g., CVE-2024-1234)"
+        },
+        {
+          "name": "component_name",
+          "type": "string",
+          "isRequired": false,
+          "description": "Filter by library or component name (partial match, case-insensitive)"
+        },
+        {
+          "name": "severity_gte",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 5
+          },
+          "description": "Minimum severity (2=Low, 3=Medium, 4=High, 5=Critical)"
+        },
+        {
           "name": "page_size",
           "type": "number",
           "isRequired": false,
@@ -357,7 +379,7 @@
             "min": 1,
             "max": 500
           },
-          "description": "Results per page (1-500, default 50)"
+          "description": "Results per page (1-500, default 10)"
         },
         {
           "name": "page",

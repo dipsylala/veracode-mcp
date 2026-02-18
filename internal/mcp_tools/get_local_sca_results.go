@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -19,8 +20,11 @@ func init() {
 // GetLocalSCAResultsRequest represents the parsed parameters for get-local-sca-results
 type GetLocalSCAResultsRequest struct {
 	ApplicationPath string
-	Size            int `json:"size,omitempty"`
-	Page            int `json:"page,omitempty"`
+	CVE             string `json:"cve,omitempty"`
+	ComponentName   string `json:"component_name,omitempty"`
+	SeverityGTE     *int   `json:"severity_gte,omitempty"`
+	Size            int    `json:"size,omitempty"`
+	Page            int    `json:"page,omitempty"`
 }
 
 // parseGetLocalSCAResultsRequest extracts and validates parameters from the raw args map
@@ -34,8 +38,20 @@ func parseGetLocalSCAResultsRequest(args map[string]interface{}) (*GetLocalSCARe
 		return nil, err
 	}
 
+	// Extract filter fields
+	if cve, ok := args["cve"].(string); ok && cve != "" {
+		req.CVE = cve
+	}
+	if component, ok := args["component_name"].(string); ok && component != "" {
+		req.ComponentName = component
+	}
+	if sevGTE, ok := args["severity_gte"].(float64); ok {
+		sevInt := int(sevGTE)
+		req.SeverityGTE = &sevInt
+	}
+
 	// Extract optional fields with defaults
-	req.Size = extractInt(args, "page_size", 50)
+	req.Size = extractInt(args, "page_size", 10)
 	req.Page = extractInt(args, "page", 0)
 
 	// Validate pagination bounds
@@ -218,7 +234,6 @@ type scaSummary struct {
 	High           int
 	Medium         int
 	Low            int
-	Informational  int
 	WithEPSS       int
 	TotalArtifacts int
 	TotalVulns     int
@@ -236,7 +251,8 @@ func buildSCASummary(results *SCAResults) scaSummary {
 		artifactMap[match.Artifact.ID] = true
 		vulnMap[match.Vulnerability.ID] = true
 
-		switch strings.ToLower(match.Vulnerability.Severity) {
+		sevNorm := strings.ToLower(strings.ReplaceAll(match.Vulnerability.Severity, " ", ""))
+		switch sevNorm {
 		case "critical":
 			summary.Critical++
 		case "high":
@@ -245,8 +261,6 @@ func buildSCASummary(results *SCAResults) scaSummary {
 			summary.Medium++
 		case "low":
 			summary.Low++
-		default:
-			summary.Informational++
 		}
 
 		if len(match.Vulnerability.EPSS) > 0 && match.Vulnerability.EPSS[0].EPSS > 0 {
@@ -258,44 +272,71 @@ func buildSCASummary(results *SCAResults) scaSummary {
 	return summary
 }
 
-// buildSCAHeaderWithPagination builds the text header for SCA results with pagination info
-func buildSCAHeaderWithPagination(appPath, resultsFile string, summary scaSummary, pagination map[string]interface{}, showingCount int) string {
-	return fmt.Sprintf(`Local SCA Scan Results
-===================
+// severityToInt converts severity string to numeric value for filtering
+func severityToInt(severity string) int {
+	sevNorm := strings.ToLower(strings.TrimSpace(severity))
+	switch sevNorm {
+	case "critical":
+		return 5
+	case "high":
+		return 4
+	case "medium":
+		return 3
+	case "low":
+		return 2
+	default:
+		return 0
+	}
+}
 
-Application Path: %s
-Results File: %s
+// matchesFilters checks if an SCA match passes all active filters
+func matchesFilters(match SCAMatch, req *GetLocalSCAResultsRequest) bool {
+	// Filter by CVE
+	if req.CVE != "" {
+		found := false
+		// Check primary vulnerability ID
+		if strings.EqualFold(match.Vulnerability.ID, req.CVE) {
+			found = true
+		}
+		// Check EPSS CVE
+		if !found && len(match.Vulnerability.EPSS) > 0 {
+			for _, epss := range match.Vulnerability.EPSS {
+				if strings.EqualFold(epss.CVE, req.CVE) {
+					found = true
+					break
+				}
+			}
+		}
+		// Check related vulnerabilities
+		if !found {
+			for _, rv := range match.RelatedVulns {
+				if strings.EqualFold(rv.ID, req.CVE) {
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			return false
+		}
+	}
 
-Showing %d findings on page %d of %d (Total: %d findings across all pages)
+	// Filter by component name (partial match, case-insensitive)
+	if req.ComponentName != "" {
+		if !strings.Contains(strings.ToLower(match.Artifact.Name), strings.ToLower(req.ComponentName)) {
+			return false
+		}
+	}
 
-Unique Vulnerabilities: %d
-Vulnerable Components: %d
+	// Filter by minimum severity
+	if req.SeverityGTE != nil {
+		matchSev := severityToInt(match.Vulnerability.Severity)
+		if matchSev < *req.SeverityGTE {
+			return false
+		}
+	}
 
-Severity Breakdown (Total):
-- Critical: %d
-- High: %d
-- Medium: %d
-- Low: %d
-- Informational: %d
-
-EPSS Data Available: %d vulnerabilities
-
-`,
-		appPath,
-		filepath.Base(resultsFile),
-		showingCount,
-		pagination["current_page"].(int)+1,
-		pagination["total_pages"],
-		pagination["total_elements"],
-		summary.TotalVulns,
-		summary.TotalArtifacts,
-		summary.Critical,
-		summary.High,
-		summary.Medium,
-		summary.Low,
-		summary.Informational,
-		summary.WithEPSS,
-	)
+	return true
 }
 
 // convertMatchToFinding converts an SCA match to LLM-friendly format
@@ -352,14 +393,17 @@ func addCVSSData(finding map[string]interface{}, cvssData []SCACVSS) {
 	finding["cvss"] = cvss
 }
 
-// addCWEData adds CWE data to a finding if available
+// addCWEData adds CWE data to a finding if available (deduplicates)
 func addCWEData(finding map[string]interface{}, cweData []SCACWE) {
 	if len(cweData) == 0 {
 		return
 	}
+	// Use a map to track unique CWEs
+	cweMap := make(map[string]bool)
 	cweList := make([]string, 0)
 	for _, cwe := range cweData {
-		if cwe.CWE != "" {
+		if cwe.CWE != "" && !cweMap[cwe.CWE] {
+			cweMap[cwe.CWE] = true
 			cweList = append(cweList, cwe.CWE)
 		}
 	}
@@ -382,14 +426,17 @@ func addEPSSData(finding map[string]interface{}, epssData []SCAEPSS) {
 	}
 }
 
-// addRelatedCVEs adds related CVEs to a finding if available
+// addRelatedCVEs adds related CVEs to a finding if available (deduplicates)
 func addRelatedCVEs(finding map[string]interface{}, relatedVulns []SCARelatedVuln) {
 	if len(relatedVulns) == 0 {
 		return
 	}
+	// Use a map to track unique CVEs
+	cveMap := make(map[string]bool)
 	relatedCVEs := make([]string, 0)
 	for _, rv := range relatedVulns {
-		if strings.HasPrefix(rv.ID, "CVE-") {
+		if strings.HasPrefix(rv.ID, "CVE-") && !cveMap[rv.ID] {
+			cveMap[rv.ID] = true
 			relatedCVEs = append(relatedCVEs, rv.ID)
 		}
 	}
@@ -400,16 +447,50 @@ func addRelatedCVEs(finding map[string]interface{}, relatedVulns []SCARelatedVul
 
 // formatSCAResultsResponse formats the SCA results into an MCP response
 func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults, req *GetLocalSCAResultsRequest) map[string]interface{} {
-	summary := buildSCASummary(results)
-
-	// Convert all matches to LLM-friendly format
+	// Apply filters and convert matches to LLM-friendly format
 	allFindings := make([]map[string]interface{}, 0, len(results.Vulnerabilities.Matches))
+	filteredMatches := make([]SCAMatch, 0, len(results.Vulnerabilities.Matches))
 	for _, match := range results.Vulnerabilities.Matches {
-		allFindings = append(allFindings, convertMatchToFinding(match))
+		if matchesFilters(match, req) {
+			allFindings = append(allFindings, convertMatchToFinding(match))
+			filteredMatches = append(filteredMatches, match)
+		}
 	}
+
+	// Build summary from filtered results
+	filteredResults := &SCAResults{
+		Vulnerabilities: SCAVulnerabilities{
+			Matches: filteredMatches,
+		},
+	}
+	summary := buildSCASummary(filteredResults)
+
+	// Sort findings by severity (descending), then component name (ascending)
+	sort.Slice(allFindings, func(i, j int) bool {
+		sevI := allFindings[i]["severity"].(string)
+		sevJ := allFindings[j]["severity"].(string)
+		sevIntI := severityToInt(sevI)
+		sevIntJ := severityToInt(sevJ)
+
+		// Sort by severity descending (higher severity first)
+		if sevIntI != sevIntJ {
+			return sevIntI > sevIntJ
+		}
+
+		// If same severity, sort by component name ascending
+		compI := allFindings[i]["component"].(map[string]interface{})["name"].(string)
+		compJ := allFindings[j]["component"].(map[string]interface{})["name"].(string)
+		return strings.ToLower(compI) < strings.ToLower(compJ)
+	})
 
 	// Apply pagination
 	totalFindings := len(allFindings)
+
+	// Ensure we have a valid page size
+	if req.Size <= 0 {
+		req.Size = 10 // Fallback default
+	}
+
 	startIdx := req.Page * req.Size
 	endIdx := startIdx + req.Size
 	if startIdx > totalFindings {
@@ -423,17 +504,38 @@ func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults, 
 	llmFriendlyFindings := allFindings[startIdx:endIdx]
 
 	// Build pagination info
+	totalPages := 0
+	if req.Size > 0 {
+		totalPages = (totalFindings + req.Size - 1) / req.Size
+	}
 	pagination := map[string]interface{}{
 		"current_page":   req.Page,
 		"page_size":      req.Size,
 		"total_elements": totalFindings,
-		"total_pages":    (totalFindings + req.Size - 1) / req.Size,
+		"total_pages":    totalPages,
 		"has_next":       endIdx < totalFindings,
 		"has_previous":   req.Page > 0,
 	}
 
-	// Build header with pagination info
-	header := buildSCAHeaderWithPagination(appPath, resultsFile, summary, pagination, len(llmFriendlyFindings))
+	// Build filters info to show what's active
+	filters := map[string]interface{}{}
+	if req.CVE != "" {
+		filters["cve"] = req.CVE
+	}
+	if req.ComponentName != "" {
+		filters["component_name"] = req.ComponentName
+	}
+	if req.SeverityGTE != nil {
+		severityNames := map[int]string{
+			2: "low",
+			3: "medium",
+			4: "high",
+			5: "critical",
+		}
+		if name, ok := severityNames[*req.SeverityGTE]; ok {
+			filters["severity_gte"] = name
+		}
+	}
 
 	// Build the response structure
 	responseData := map[string]interface{}{
@@ -446,16 +548,20 @@ func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults, 
 			"unique_vulnerabilities": summary.TotalVulns,
 			"vulnerable_components":  summary.TotalArtifacts,
 			"by_severity": map[string]int{
-				"critical":      summary.Critical,
-				"high":          summary.High,
-				"medium":        summary.Medium,
-				"low":           summary.Low,
-				"informational": summary.Informational,
+				"critical": summary.Critical,
+				"high":     summary.High,
+				"medium":   summary.Medium,
+				"low":      summary.Low,
 			},
 			"epss_data_available": summary.WithEPSS,
 		},
 		"pagination": pagination,
 		"findings":   llmFriendlyFindings,
+	}
+
+	// Include filters only if any are active
+	if len(filters) > 0 {
+		responseData["filters"] = filters
 	}
 
 	// Marshal response to JSON string
@@ -469,19 +575,21 @@ func formatSCAResultsResponse(appPath, resultsFile string, results *SCAResults, 
 		}
 	}
 
-	// Return MCP response with both text header and JSON data
-	return map[string]interface{}{
+	// Build result with JSON content and structuredContent
+	result := map[string]interface{}{
 		"content": []map[string]interface{}{
-			{
-				"type": "text",
-				"text": header,
-			},
 			{
 				"type": "text",
 				"text": string(responseJSON),
 			},
 		},
 	}
+
+	// Include structuredContent for MCP Apps UI
+	// The converter will handle checking if client supports UI
+	result["structuredContent"] = responseData
+
+	return result
 }
 
 // transformSCASeverity converts string severity to normalized lowercase

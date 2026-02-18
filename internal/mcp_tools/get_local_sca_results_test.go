@@ -132,8 +132,13 @@ func TestGetLocalSCAResultsTool_HandleValidResultsFile(t *testing.T) {
 		t.Fatal("Expected content to be array of maps")
 	}
 
-	if len(content) < 2 {
-		t.Error("Expected at least header and JSON in content")
+	if len(content) < 1 {
+		t.Error("Expected at least one content item (combined header and JSON)")
+	}
+
+	// Verify structuredContent is present
+	if resultMap["structuredContent"] == nil {
+		t.Error("Expected structuredContent in response")
 	}
 }
 
@@ -187,50 +192,56 @@ func TestFormatSCAResultsResponse(t *testing.T) {
 		t.Fatal("Expected content to be array of maps")
 	}
 
-	if len(content) != 2 {
-		t.Errorf("Expected 2 content items (header and JSON), got %d", len(content))
+	if len(content) != 1 {
+		t.Errorf("Expected 1 content item (JSON only), got %d", len(content))
 	}
 
-	// Verify header contains expected information
-	header, ok := content[0]["text"].(string)
+	// Verify text is valid JSON
+	jsonText, ok := content[0]["text"].(string)
 	if !ok {
-		t.Fatal("Expected header to be string")
+		t.Fatal("Expected text to be string")
 	}
 
-	if !contains(header, "Showing 2 findings on page 1 of 1") {
-		t.Errorf("Header should contain pagination info, got: %s", header)
-	}
-
-	if !contains(header, "Total: 2 findings across all pages") {
-		t.Errorf("Header should contain total findings count, got: %s", header)
-	}
-
-	if !contains(header, "Critical: 1") {
-		t.Errorf("Header should contain critical count, got: %s", header)
-	}
-
-	if !contains(header, "High: 1") {
-		t.Errorf("Header should contain high count, got: %s", header)
-	}
-
-	// Verify JSON data can be parsed
-	jsonData, ok := content[1]["text"].(string)
-	if !ok {
-		t.Fatal("Expected JSON data to be string")
-	}
-
+	// Parse the JSON to verify it's valid
 	var parsedData map[string]interface{}
-	if err := json.Unmarshal([]byte(jsonData), &parsedData); err != nil {
-		t.Fatalf("Failed to parse JSON data: %v", err)
+	if err := json.Unmarshal([]byte(jsonText), &parsedData); err != nil {
+		t.Fatalf("Failed to parse JSON text: %v", err)
 	}
 
-	// Verify parsed data structure
+	// Verify parsed data has expected fields
+	if parsedData["application"] == nil {
+		t.Error("Expected application in JSON")
+	}
+
 	if parsedData["summary"] == nil {
-		t.Error("Expected summary in parsed data")
+		t.Error("Expected summary in JSON")
 	}
 
 	if parsedData["findings"] == nil {
-		t.Error("Expected findings in parsed data")
+		t.Error("Expected findings in JSON")
+	}
+
+	if parsedData["pagination"] == nil {
+		t.Error("Expected pagination in JSON")
+	}
+
+	// Verify structuredContent is present
+	if response["structuredContent"] == nil {
+		t.Fatal("Expected structuredContent in response")
+	}
+
+	// Verify structuredContent structure
+	structuredContent, ok := response["structuredContent"].(map[string]interface{})
+	if !ok {
+		t.Fatal("Expected structuredContent to be a map")
+	}
+
+	if structuredContent["summary"] == nil {
+		t.Error("Expected summary in structuredContent")
+	}
+
+	if structuredContent["findings"] == nil {
+		t.Error("Expected findings in structuredContent")
 	}
 }
 
@@ -255,17 +266,4 @@ func TestTransformSCASeverity(t *testing.T) {
 			t.Errorf("transformSCASeverity(%q) = %q, expected %q", test.severity, result, test.expected)
 		}
 	}
-}
-
-func contains(s, substr string) bool {
-	return len(s) > 0 && len(substr) > 0 && len(s) >= len(substr) && (s == substr || len(s) > len(substr) && (s[:len(substr)] == substr || s[len(s)-len(substr):] == substr || containsMiddle(s, substr)))
-}
-
-func containsMiddle(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
 }

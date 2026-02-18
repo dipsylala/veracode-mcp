@@ -160,6 +160,13 @@ func GetUIMetaForTool(toolName string) map[string]interface{} {
 				"resourceUri": "ui://dynamic-findings/app.html",
 			},
 		}
+	case "get-local-sca-results":
+		return map[string]interface{}{
+			"ui/resourceUri": "ui://local-sca-results/app.html",
+			"ui": map[string]interface{}{
+				"resourceUri": "ui://local-sca-results/app.html",
+			},
+		}
 	default:
 		return nil
 	}

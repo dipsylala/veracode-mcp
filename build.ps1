@@ -40,7 +40,8 @@ if (-not $SkipUI) {
     $uiApps = @(
         @{Name="Pipeline Results"; Path="ui\pipeline-results-app"},
         @{Name="Static Findings"; Path="ui\static-findings-app"},
-        @{Name="Dynamic Findings"; Path="ui\dynamic-findings-app"}
+        @{Name="Dynamic Findings"; Path="ui\dynamic-findings-app"},
+        @{Name="Local SCA Results"; Path="ui\local-sca-results-app"}
     )
     
     foreach ($app in $uiApps) {

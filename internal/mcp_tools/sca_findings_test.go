@@ -22,9 +22,9 @@ func TestParseScaFindingsRequest_Success(t *testing.T) {
 	if req.ApplicationPath != "/path/to/app" {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
-	// SCA default size is 50 (different from static/dynamic)
-	if req.Size != 50 {
-		t.Errorf("Expected default size 50 for SCA, got %d", req.Size)
+	// SCA default size is 10 (same as other findings)
+	if req.Size != 10 {
+		t.Errorf("Expected default size 10 for SCA, got %d", req.Size)
 	}
 }
 
