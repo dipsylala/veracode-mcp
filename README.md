@@ -215,10 +215,10 @@ The server provides these Veracode-specific tools:
 - **package-workspace** - Package workspace files for Veracode upload
 - **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
 - **pipeline-status** - Check the status of a Pipeline Scan
-- **pipeline-results** - Get results from Veracode Pipeline Scans
+- **pipeline-findings** - Get results from Veracode Pipeline Scans
 - **pipeline-detailed-results** - Get detailed results from Pipeline Scans with full flaw information
 - **run-sca-scan** - Run Software Composition Analysis scan on a directory to identify vulnerable dependencies
-- **get-local-sca-results** - Read and parse local SCA scan results from veracode.json file
+- **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
 

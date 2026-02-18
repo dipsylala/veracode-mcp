@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
-const GetLocalSCAResultsToolName = "get-local-sca-results"
+const GetLocalSCAResultsToolName = "local-sca-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
 	RegisterMCPTool(GetLocalSCAResultsToolName, handleGetLocalSCAResults)
 }
 
-// GetLocalSCAResultsRequest represents the parsed parameters for get-local-sca-results
+// GetLocalSCAResultsRequest represents the parsed parameters for local-sca-findings
 type GetLocalSCAResultsRequest struct {
 	ApplicationPath string
 	CVE             string `json:"cve,omitempty"`

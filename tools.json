@@ -185,7 +185,7 @@
           "name": "flaw_id",
           "type": "string",
           "isRequired": true,
-          "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-results output."
+          "description": "Pipeline scan flaw ID (string format with occurrence, e.g., \"1026-1\", \"1026-2\", \"999-1\"). Copy the exact flaw ID from pipeline-findings output."
         }
       ]
     },
@@ -296,7 +296,7 @@
       ]
     },
     {
-      "name": "pipeline-results",
+      "name": "pipeline-findings",
       "description": "Get completed pipeline scan results with interactive UI",
       "params": [
         {
@@ -340,7 +340,7 @@
       ]
     },
     {
-      "name": "get-local-sca-results",
+      "name": "local-sca-findings",
       "description": "Get local SCA scan results with vulnerability details and fix recommendations",
       "params": [
         {

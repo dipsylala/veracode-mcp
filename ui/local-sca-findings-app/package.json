@@ -1,5 +1,5 @@
 {
-  "name": "veracode-local-sca-results-app",
+  "name": "veracode-local-sca-findings-app",
   "version": "1.0.0",
   "type": "module",
   "description": "MCP App for Veracode Local SCA Results",

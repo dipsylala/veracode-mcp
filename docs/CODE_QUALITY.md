@@ -257,7 +257,7 @@ For GitHub Actions, ensure UI is built before linting:
 - name: Build UI Apps
   run: |
     # Build all UI apps (required for go:embed to work)
-    cd ui/pipeline-results-app && npm install && npm run build && cd ../..
+    cd ui/pipeline-findings-app && npm install && npm run build && cd ../..
     cd ui/static-findings-app && npm install && npm run build && cd ../..
     cd ui/dynamic-findings-app && npm install && npm run build && cd ../..
 

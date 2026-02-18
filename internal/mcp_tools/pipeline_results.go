@@ -13,14 +13,14 @@ import (
 	"time"
 )
 
-const PipelineResultsToolName = "pipeline-results"
+const PipelineResultsToolName = "pipeline-findings"
 
 // Auto-register this tool when the package is imported
 func init() {
 	RegisterMCPTool(PipelineResultsToolName, handlePipelineResults)
 }
 
-// PipelineResultsRequest represents the parsed parameters for pipeline-results
+// PipelineResultsRequest represents the parsed parameters for pipeline-findings
 type PipelineResultsRequest struct {
 	ApplicationPath string
 	Size            int `json:"size,omitempty"`
@@ -309,13 +309,13 @@ func formatPipelineResultsResponse(ctx context.Context, appPath, resultsFile str
 
 	// Only include structuredContent if client supports MCP Apps UI
 	clientSupportsUI := ClientSupportsUIFromContext(ctx)
-	log.Printf("[PIPELINE-RESULTS] ClientSupportsUIFromContext(ctx) returned: %v", clientSupportsUI)
+	log.Printf("[PIPELINE-FINDINGS] ClientSupportsUIFromContext(ctx) returned: %v", clientSupportsUI)
 
 	if clientSupportsUI {
-		log.Printf("Pipeline results: Returning %d findings from %s (content: JSON, structuredContent: full data for UI)", len(response.Findings), resultsFile)
+		log.Printf("Pipeline findings: Returning %d findings from %s (content: JSON, structuredContent: full data for UI)", len(response.Findings), resultsFile)
 		result["structuredContent"] = response
 	} else {
-		log.Printf("Pipeline results: Returning %d findings from %s (content: JSON only, no structuredContent - client doesn't support UI)", len(response.Findings), resultsFile)
+		log.Printf("Pipeline findings: Returning %d findings from %s (content: JSON only, no structuredContent - client doesn't support UI)", len(response.Findings), resultsFile)
 	}
 
 	return result
