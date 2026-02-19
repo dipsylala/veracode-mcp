@@ -2239,7 +2239,6 @@ components:
     ManualFinding:
       description: Details of a Manual Penetration Testing (MPT) finding.
       example:
-        severity: 5
         date: 2000-01-23T04:56:07.000+00:00
         appendix:
         - codeSamples:
@@ -2276,6 +2275,7 @@ components:
         count: 5
         externalId: 6
         description: description
+        Severity: 5
         source:
           note: note
           capecId: 4
@@ -2351,7 +2351,7 @@ components:
           description: Number of duplicate findings found in all modules.
           format: int32
           type: integer
-        severity:
+        Severity:
           description: Severity of the finding.
           format: int32
           type: integer
@@ -2397,8 +2397,7 @@ components:
     EmbeddedManualFinding:
       example:
         manualFindings:
-        - severity: 5
-          date: 2000-01-23T04:56:07.000+00:00
+        - date: 2000-01-23T04:56:07.000+00:00
           appendix:
           - codeSamples:
             - codeSamples
@@ -2434,6 +2433,7 @@ components:
           count: 5
           externalId: 6
           description: description
+          Severity: 5
           source:
             note: note
             capecId: 4
@@ -2485,8 +2485,7 @@ components:
           exploitability: 2
           cvss: 9.301444243932576
           matchedId: 1
-        - severity: 5
-          date: 2000-01-23T04:56:07.000+00:00
+        - date: 2000-01-23T04:56:07.000+00:00
           appendix:
           - codeSamples:
             - codeSamples
@@ -2522,6 +2521,7 @@ components:
           count: 5
           externalId: 6
           description: description
+          Severity: 5
           source:
             note: note
             capecId: 4
@@ -2597,8 +2597,7 @@ components:
           type: type
         __embedded:
           manualFindings:
-          - severity: 5
-            date: 2000-01-23T04:56:07.000+00:00
+          - date: 2000-01-23T04:56:07.000+00:00
             appendix:
             - codeSamples:
               - codeSamples
@@ -2634,6 +2633,7 @@ components:
             count: 5
             externalId: 6
             description: description
+            Severity: 5
             source:
               note: note
               capecId: 4
@@ -2685,8 +2685,7 @@ components:
             exploitability: 2
             cvss: 9.301444243932576
             matchedId: 1
-          - severity: 5
-            date: 2000-01-23T04:56:07.000+00:00
+          - date: 2000-01-23T04:56:07.000+00:00
             appendix:
             - codeSamples:
               - codeSamples
@@ -2722,6 +2721,7 @@ components:
             count: 5
             externalId: 6
             description: description
+            Severity: 5
             source:
               note: note
               capecId: 4
@@ -2967,7 +2967,6 @@ components:
       type: object
     EntityModelManualFinding:
       example:
-        severity: 1
         date: 2000-01-23T04:56:07.000+00:00
         appendix:
         - codeSamples:
@@ -3004,6 +3003,7 @@ components:
         count: 7
         externalId: 1
         description: description
+        Severity: 1
         source:
           note: note
           capecId: 4
@@ -3079,7 +3079,7 @@ components:
           description: Number of duplicate findings found in all modules.
           format: int32
           type: integer
-        severity:
+        Severity:
           description: Severity of the finding.
           format: int32
           type: integer
@@ -3126,8 +3126,7 @@ components:
       example:
         _embedded:
           findings:
-          - severity: 1
-            date: 2000-01-23T04:56:07.000+00:00
+          - date: 2000-01-23T04:56:07.000+00:00
             appendix:
             - codeSamples:
               - codeSamples
@@ -3163,6 +3162,7 @@ components:
             count: 7
             externalId: 1
             description: description
+            Severity: 1
             source:
               note: note
               capecId: 4
@@ -3214,8 +3214,7 @@ components:
             exploitability: 4
             cvss: 9.965781217890562
             matchedId: 9
-          - severity: 1
-            date: 2000-01-23T04:56:07.000+00:00
+          - date: 2000-01-23T04:56:07.000+00:00
             appendix:
             - codeSamples:
               - codeSamples
@@ -3251,6 +3250,7 @@ components:
             count: 7
             externalId: 1
             description: description
+            Severity: 1
             source:
               note: note
               capecId: 4
@@ -3507,8 +3507,7 @@ components:
     PagedModelEntityModelManualFinding__embedded:
       example:
         findings:
-        - severity: 1
-          date: 2000-01-23T04:56:07.000+00:00
+        - date: 2000-01-23T04:56:07.000+00:00
           appendix:
           - codeSamples:
             - codeSamples
@@ -3544,6 +3543,7 @@ components:
           count: 7
           externalId: 1
           description: description
+          Severity: 1
           source:
             note: note
             capecId: 4
@@ -3595,8 +3595,7 @@ components:
           exploitability: 4
           cvss: 9.965781217890562
           matchedId: 9
-        - severity: 1
-          date: 2000-01-23T04:56:07.000+00:00
+        - date: 2000-01-23T04:56:07.000+00:00
           appendix:
           - codeSamples:
             - codeSamples
@@ -3632,6 +3631,7 @@ components:
           count: 7
           externalId: 1
           description: description
+          Severity: 1
           source:
             note: note
             capecId: 4

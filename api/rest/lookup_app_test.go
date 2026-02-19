@@ -28,6 +28,23 @@ func TestLookupMCPVerademo(t *testing.T) {
 		t.Fatal("App not found")
 	}
 
-	t.Logf("MCPVerademo App ID: %s", *app.Guid)
-	t.Logf("App Name: %s", *app.Profile.Name)
+	if app.Guid != nil {
+		t.Logf("App GUID:    %s", *app.Guid)
+	} else {
+		t.Error("App GUID is nil")
+	}
+
+	if app.Profile != nil && app.Profile.Name != nil {
+		t.Logf("App Name:    %s", *app.Profile.Name)
+	}
+
+	if app.Id != nil {
+		t.Logf("App ID (numeric): %d", *app.Id)
+	} else {
+		t.Error("App numeric Id is nil — this field is required for --app-id")
+	}
+
+	if app.Oid != nil {
+		t.Logf("App OID:     %d", *app.Oid)
+	}
 }

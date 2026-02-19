@@ -88,6 +88,11 @@ $apis = @(
         Name = "applications"
         Spec = "specs/veracode-applications.json"
         Package = "applications"
+    },
+    @{
+        Name = "policy"
+        Spec = "specs/veracode-policy.json"
+        Package = "policy"
     }
 )
 
@@ -117,6 +122,33 @@ if (-not $SkipClean) {
 
 # Apply pre-generation spec fixes
 Write-Step "Applying pre-generation spec fixes..."
+
+# Fix policy spec: operations have multiple duplicate tags which cause the generator to produce
+# multiple files with conflicting type declarations. Reduce each operation to a single tag.
+$policySpec = "specs/veracode-policy.json"
+if (Test-Path $policySpec) {
+    $specContent = Get-Content -Path $policySpec -Raw | ConvertFrom-Json
+    $changed = $false
+    foreach ($pathProp in $specContent.paths.PSObject.Properties) {
+        foreach ($methodProp in $pathProp.Value.PSObject.Properties) {
+            $op = $methodProp.Value
+            if ($op.tags -and $op.tags.Count -gt 1) {
+                # Keep only "Policy settings information API" (or the last tag if not present)
+                $canonical = $op.tags | Where-Object { $_ -eq "Policy settings information API" }
+                if (-not $canonical) { $canonical = $op.tags[-1] }
+                $op.tags = @($canonical)
+                $changed = $true
+            }
+        }
+    }
+    if ($changed) {
+        $specContent | ConvertTo-Json -Depth 100 | Set-Content -Path $policySpec -Encoding UTF8 -NoNewline
+        Write-Success "Removed duplicate tags from policy spec operations"
+    } else {
+        Write-Success "Policy spec already has single tags per operation"
+    }
+}
+
 $findingsSpec = "specs/veracode-findings.json"
 if (Test-Path $findingsSpec) {
     $specContent = Get-Content -Path $findingsSpec -Raw
@@ -275,6 +307,40 @@ if ($LASTEXITCODE -eq 0) {
 
 # Apply post-generation patches
 Write-Step "Applying post-generation patches..."
+
+# Patch policy package: the OAS2 spec generates duplicate request types across multiple tag-based
+# files. Remove the duplicate files and fix client.go to only reference the surviving services.
+$policyDir = "api/rest/generated/policy"
+if (Test-Path $policyDir) {
+    # These files contain types that are already declared in api_policy_settings_information_api.go
+    $policyDuplicates = @(
+        "$policyDir/api_application_policy_settings_information_api.go",
+        "$policyDir/api_default_pre_build_component_policy_settings_information_api.go",
+        "$policyDir/api_default_pre_build_component_policy_settings_update_api.go"
+    )
+    foreach ($dup in $policyDuplicates) {
+        if (Test-Path $dup) {
+            Remove-Item $dup -Force
+        }
+    }
+
+    # Fix client.go: remove references to the deleted service types
+    $clientFile = "$policyDir/client.go"
+    if (Test-Path $clientFile) {
+        $content = Get-Content $clientFile -Raw
+        # Remove struct fields for deleted services
+        $content = $content -replace '\s*ApplicationPolicySettingsInformationAPIAPI \*ApplicationPolicySettingsInformationAPIAPIService\n', ''
+        $content = $content -replace '\s*DefaultPreBuildComponentPolicySettingsInformationAPIAPI \*DefaultPreBuildComponentPolicySettingsInformationAPIAPIService\n', ''
+        $content = $content -replace '\s*DefaultPreBuildComponentPolicySettingsUpdateAPIAPI \*DefaultPreBuildComponentPolicySettingsUpdateAPIAPIService\n', ''
+        # Remove initialisation lines for deleted services
+        $content = $content -replace '\s*c\.ApplicationPolicySettingsInformationAPIAPI = \([^)]+\)\([^)]+\)\n', ''
+        $content = $content -replace '\s*c\.DefaultPreBuildComponentPolicySettingsInformationAPIAPI = \([^)]+\)\([^)]+\)\n', ''
+        $content = $content -replace '\s*c\.DefaultPreBuildComponentPolicySettingsUpdateAPIAPI = \([^)]+\)\([^)]+\)\n', ''
+        Set-Content $clientFile -Value $content -NoNewline
+    }
+    Write-Success "Patched policy package to remove duplicate type declarations"
+}
+
 $findingDetailsFile = "api/rest/generated/findings/model_finding_finding_details.go"
 if (Test-Path $findingDetailsFile) {
     $content = Get-Content -Path $findingDetailsFile -Raw
@@ -359,6 +425,33 @@ func (dst *FindingFindingDetails) UnmarshalJSON(data []byte) error {
 
 # Restore original spec files
 Write-Step "Restoring original spec files..."
+
+# Restore policy spec: re-add the duplicate tags that were removed for generation
+if (Test-Path $policySpec) {
+    $duplicateTags = @{
+        "/appsec/v1/policy_settings" = @{
+            "get" = @("Application policy settings information API", "Policy settings information API")
+            "put" = @("Application policy settings information API", "Policy settings information API")
+        }
+        "/appsec/v1/policy_settings/components" = @{
+            "get" = @("Default pre-build component policy settings information API", "Policy settings information API")
+            "put" = @("Default pre-build component policy settings update API", "Policy settings information API")
+        }
+        "/appsec/v1/policy_settings/thirdparty_libraries" = @{
+            "get" = @("Default pre-build component policy settings information API", "Policy settings information API")
+            "put" = @("Default pre-build component policy settings update API", "Policy settings information API")
+        }
+    }
+    $specContent = Get-Content -Path $policySpec -Raw | ConvertFrom-Json
+    foreach ($path in $duplicateTags.Keys) {
+        foreach ($method in $duplicateTags[$path].Keys) {
+            $specContent.paths.$path.$method.tags = $duplicateTags[$path][$method]
+        }
+    }
+    $specContent | ConvertTo-Json -Depth 100 | Set-Content -Path $policySpec -Encoding UTF8 -NoNewline
+    Write-Success "Restored original duplicate tags in policy spec"
+}
+
 if (Test-Path $findingsSpec) {
     $specContent = Get-Content -Path $findingsSpec -Raw
     

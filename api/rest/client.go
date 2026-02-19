@@ -10,6 +10,7 @@ import (
 	dynamic_flaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
 	findings "github.com/dipsylala/veracode-mcp/api/rest/generated/findings"
 	healthcheck "github.com/dipsylala/veracode-mcp/api/rest/generated/healthcheck"
+	policy "github.com/dipsylala/veracode-mcp/api/rest/generated/policy"
 	static_finding_data_path "github.com/dipsylala/veracode-mcp/api/rest/generated/static_finding_data_path"
 	"github.com/dipsylala/veracode-mcp/credentials"
 	veracodehmac "github.com/dipsylala/veracode-mcp/hmac"
@@ -22,6 +23,7 @@ type Client struct {
 	dynamicFlawClient           *dynamic_flaw.APIClient
 	staticFindingDataPathClient *static_finding_data_path.APIClient
 	applicationsClient          *applications.APIClient
+	policyClient                *policy.APIClient
 	apiID                       string
 	apiKey                      string
 	baseURL                     string
@@ -108,12 +110,17 @@ func NewClient() (*Client, error) {
 	applicationsCfg.HTTPClient = httpClient
 	applicationsCfg.Servers[0].URL = baseURL
 
+	policyCfg := policy.NewConfiguration()
+	policyCfg.HTTPClient = httpClient
+	policyCfg.Servers[0].URL = baseURL
+
 	return &Client{
 		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
 		findingsClient:              findings.NewAPIClient(findingsCfg),
 		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
 		staticFindingDataPathClient: static_finding_data_path.NewAPIClient(staticFindingDataPathCfg),
 		applicationsClient:          applications.NewAPIClient(applicationsCfg),
+		policyClient:                policy.NewAPIClient(policyCfg),
 		apiID:                       apiID,
 		apiKey:                      apiKey,
 		baseURL:                     baseURL,
@@ -157,12 +164,17 @@ func NewClientUnconfigured() *Client {
 	applicationsCfg.HTTPClient = httpClient
 	applicationsCfg.Servers[0].URL = baseURL
 
+	policyCfg2 := policy.NewConfiguration()
+	policyCfg2.HTTPClient = httpClient
+	policyCfg2.Servers[0].URL = baseURL
+
 	return &Client{
 		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
 		findingsClient:              findings.NewAPIClient(findingsCfg),
 		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
 		staticFindingDataPathClient: static_finding_data_path.NewAPIClient(staticFindingDataPathCfg),
 		applicationsClient:          applications.NewAPIClient(applicationsCfg),
+		policyClient:                policy.NewAPIClient(policyCfg2),
 		apiID:                       apiID,
 		apiKey:                      apiKey,
 		baseURL:                     baseURL,
