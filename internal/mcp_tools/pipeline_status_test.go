@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -55,6 +56,48 @@ func TestPipelineStatusTool_NoPIDFile(t *testing.T) {
 
 	if resultMap["content"] == nil {
 		t.Error("Expected content in result")
+	}
+}
+
+func TestPipelineStatusTool_NoPIDFileButResultsExist(t *testing.T) {
+	ctx := context.Background()
+
+	tempDir := t.TempDir()
+	outputDir := filepath.Join(tempDir, ".veracode", "pipeline")
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		t.Fatalf("Failed to create output directory: %v", err)
+	}
+
+	// Write a results file but no PID file
+	resultsFile := filepath.Join(outputDir, "results-20260101-120000.json")
+	if err := os.WriteFile(resultsFile, []byte(`{"findings":[]}`), 0644); err != nil {
+		t.Fatalf("Failed to write results file: %v", err)
+	}
+
+	result, err := handlePipelineStatus(ctx, map[string]interface{}{
+		"application_path": tempDir,
+	})
+
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	resultMap, ok := result.(map[string]interface{})
+	if !ok {
+		t.Fatal("Expected map result")
+	}
+
+	content, ok := resultMap["content"].([]map[string]string)
+	if !ok || len(content) == 0 {
+		t.Fatal("Expected content in result")
+	}
+
+	text := content[0]["text"]
+	if !strings.Contains(text, "COMPLETED") {
+		t.Errorf("Expected COMPLETED status in response, got: %s", text)
+	}
+	if !strings.Contains(text, resultsFile) {
+		t.Errorf("Expected results file path in response, got: %s", text)
 	}
 }
 

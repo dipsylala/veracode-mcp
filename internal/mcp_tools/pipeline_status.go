@@ -58,6 +58,31 @@ func handlePipelineStatus(ctx context.Context, args map[string]interface{}) (int
 	pidData, err := os.ReadFile(pidFile)
 	if err != nil {
 		if os.IsNotExist(err) {
+			// No PID file — check whether a completed results file exists
+			matches, globErr := filepath.Glob(filepath.Join(outputDir, "results-*.json"))
+			if globErr == nil && len(matches) > 0 {
+				// Use the most recent results file (Glob returns lexicographic order,
+				// and the timestamp format sorts correctly)
+				latest := matches[len(matches)-1]
+				return map[string]interface{}{
+					"content": []map[string]string{{
+						"type": "text",
+						"text": fmt.Sprintf(`Pipeline Scan Status
+==================
+
+Application Path: %s
+Status: COMPLETED ✓
+
+No active scan in progress. A previous scan completed successfully.
+
+Results File: %s
+
+Use pipeline-findings to retrieve the results.
+`, req.ApplicationPath, latest),
+					}},
+				}, nil
+			}
+
 			return map[string]interface{}{
 				"content": []map[string]string{{
 					"type": "text",
