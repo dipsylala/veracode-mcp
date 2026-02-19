@@ -7,6 +7,7 @@ import (
 	"github.com/dipsylala/veracode-mcp/api/rest"
 	applications "github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
 	dynamic_flaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
+	policy "github.com/dipsylala/veracode-mcp/api/rest/generated/policy"
 	static_finding_data_path "github.com/dipsylala/veracode-mcp/api/rest/generated/static_finding_data_path"
 	"github.com/dipsylala/veracode-mcp/api/xml"
 )
@@ -28,6 +29,9 @@ type Client interface {
 	GetApplication(ctx context.Context, applicationGUID string) (*applications.Application, error)
 	GetApplicationByName(ctx context.Context, name string) (*applications.Application, error)
 	ListApplications(ctx context.Context, page, size int) (*applications.PagedResourceOfApplication, error)
+
+	// Policy
+	GetPolicy(ctx context.Context, policyName string) (*policy.PagedResourceOfPolicyVersion, error)
 
 	// Findings (SAST/DAST/SCA)
 	GetStaticFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error)
@@ -112,6 +116,10 @@ func (c *unifiedClient) GetApplicationByName(ctx context.Context, name string) (
 
 func (c *unifiedClient) ListApplications(ctx context.Context, page, size int) (*applications.PagedResourceOfApplication, error) {
 	return c.restClient.ListApplications(ctx, page, size)
+}
+
+func (c *unifiedClient) GetPolicy(ctx context.Context, policyName string) (*policy.PagedResourceOfPolicyVersion, error) {
+	return c.restClient.GetPolicy(ctx, policyName)
 }
 
 func (c *unifiedClient) GetStaticFindings(ctx context.Context, req FindingsRequest) (*FindingsResponse, error) {

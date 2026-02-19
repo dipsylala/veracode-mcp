@@ -33,7 +33,7 @@ type ManualFinding struct {
 	// Number of duplicate findings found in all modules.
 	Count *int32 `json:"count,omitempty"`
 	// Severity of the finding.
-	Severity *int32 `json:"severity,omitempty"`
+	Severity *int32 `json:"Severity,omitempty"`
 	// Exploitability of the finding.
 	Exploitability *int32 `json:"exploitability,omitempty"`
 	// The CWE identifier.
@@ -609,7 +609,7 @@ func (o ManualFinding) ToMap() (map[string]interface{}, error) {
 		toSerialize["count"] = o.Count
 	}
 	if !IsNil(o.Severity) {
-		toSerialize["severity"] = o.Severity
+		toSerialize["Severity"] = o.Severity
 	}
 	if !IsNil(o.Exploitability) {
 		toSerialize["exploitability"] = o.Exploitability

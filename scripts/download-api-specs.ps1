@@ -52,6 +52,11 @@ $specs = @(
         Name = "Applications API"
         File = "specs/veracode-applications.json"
         Url = "https://api.swaggerhub.com/apis/Veracode/veracode-applications_api_specification/1.0"
+    },
+    @{
+        Name = "Policy API"
+        File = "specs/veracode-policy.json"
+        Url = "https://api.swaggerhub.com/apis/Veracode/veracode-policy_api_specification/1.0"
     }
 )
 

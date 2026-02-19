@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestParsePipelineScanRequest_Success(t *testing.T) {
@@ -126,6 +127,50 @@ func TestParsePipelineScanRequest_AllParameters(t *testing.T) {
 	expectedFilename := filepath.Join("/path/to/app", ".veracode", "packaging", "myapp.zip")
 	if req.Filename != expectedFilename {
 		t.Errorf("Expected filename '%s', got '%s'", expectedFilename, req.Filename)
+	}
+}
+
+func TestParsePipelineScanRequest_WithAppProfile(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"app_profile":      "MCPVerademo",
+	}
+
+	req, err := parsePipelineScanRequest(args)
+	if err != nil {
+		t.Fatalf("Failed to parse request: %v", err)
+	}
+
+	if req.AppProfile != "MCPVerademo" {
+		t.Errorf("Expected app_profile 'MCPVerademo', got '%s'", req.AppProfile)
+	}
+}
+
+// TestResolveAppInfo_MCPVerademo is an integration test that verifies resolveAppInfo
+// returns the correct numeric application ID and policy details for MCPVerademo.
+func TestResolveAppInfo_MCPVerademo(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	info := resolveAppInfo(ctx, t.TempDir(), "MCPVerademo")
+
+	if info.NumericID == "" {
+		t.Fatal("resolveAppInfo returned empty NumericID — check API credentials and app name")
+	}
+
+	t.Logf("MCPVerademo numeric app ID: %s", info.NumericID)
+	t.Logf("Policy Name:  %s", info.PolicyName)
+
+	if info.NumericID != "2663774" {
+		t.Errorf("Expected app ID '2663774', got '%s'", info.NumericID)
+	}
+
+	if info.PolicyName == "" {
+		t.Error("Expected a non-empty PolicyName")
 	}
 }
 

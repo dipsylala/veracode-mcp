@@ -29,6 +29,7 @@ Name | Type | Description | Notes
 **Type** | Pointer to **string** | Internal classification of the finding. | [optional] 
 **Description** | Pointer to **string** | Detailed description of the finding. | [optional] 
 **Count** | Pointer to **int32** | Number of duplicate findings found in all modules. | [optional] 
+**Severity** | Pointer to **int32** | Severity of the finding. | [optional] 
 **Resolution** | Pointer to **string** | Resolution of the finding. | [optional] 
 **State** | Pointer to **string** |  | [optional] 
 **Date** | Pointer to **time.Time** | Date the scan finding was found. | [optional] 
@@ -688,6 +689,31 @@ SetCount sets Count field to given value.
 `func (o *FindingFindingDetails) HasCount() bool`
 
 HasCount returns a boolean if a field has been set.
+
+### GetSeverity
+
+`func (o *FindingFindingDetails) GetSeverity() int32`
+
+GetSeverity returns the Severity field if non-nil, zero value otherwise.
+
+### GetSeverityOk
+
+`func (o *FindingFindingDetails) GetSeverityOk() (*int32, bool)`
+
+GetSeverityOk returns a tuple with the Severity field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSeverity
+
+`func (o *FindingFindingDetails) SetSeverity(v int32)`
+
+SetSeverity sets Severity field to given value.
+
+### HasSeverity
+
+`func (o *FindingFindingDetails) HasSeverity() bool`
+
+HasSeverity returns a boolean if a field has been set.
 
 ### GetResolution
 

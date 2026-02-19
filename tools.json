@@ -276,6 +276,12 @@
           "description": "Absolute path to the application workspace"
         },
         {
+          "name": "app_profile",
+          "type": "string",
+          "isRequired": false,
+          "description": "Application name (auto-detected if not provided)"
+        },
+        {
           "name": "filename",
           "type": "string",
           "isRequired": false,
