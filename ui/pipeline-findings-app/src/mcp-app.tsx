@@ -104,7 +104,7 @@ interface PipelineFindingsViewProps {
 }
 
 function PipelineFindingsView({ data }: PipelineFindingsViewProps) {
-  const { application, summary, findings, pagination } = data;
+  const { application, summary, findings, pagination, policy_filter } = data;
 
   // If no findings, show simple message
   if (findings.length === 0) {
@@ -123,6 +123,13 @@ function PipelineFindingsView({ data }: PipelineFindingsViewProps) {
       <div className={styles.header}>
         <h1>Pipeline Scan Findings: {application.name}</h1>
         
+        {policy_filter && (
+          <div className={styles.filtersInfo}>
+            <span className={styles.filterBadge}>Policy Violations Only</span>
+            Showing only findings that violate policy
+          </div>
+        )}
+
         {pagination && (
           <div className={styles.paginationInfo}>
             Showing {findings.length} findings on page {pagination.current_page + 1} of {pagination.total_pages} (Total: {pagination.total_elements} findings)
@@ -168,6 +175,7 @@ function PipelineFindingsView({ data }: PipelineFindingsViewProps) {
                 <th>File</th>
                 <th>Status</th>
                 <th>Mitigation</th>
+                <th className={styles.policyCell}>Policy</th>
               </tr>
             </thead>
             <tbody>
@@ -217,10 +225,15 @@ function FindingRow({ finding }: FindingRowProps) {
         </td>
         <td>{finding.status}</td>
         <td>{finding.mitigation_status}</td>
+        <td className={styles.policyCell}>
+          {finding.violates_policy && (
+            <span className={styles.policyViolation} title="Violates Policy">⚠️</span>
+          )}
+        </td>
       </tr>
       {isExpanded && (
         <tr className={styles.expandedRow}>
-          <td colSpan={7}>
+          <td colSpan={8}>
             <div className={styles.expandedContent}>
               {finding.attack_vector && (
                 <div className={styles.expandedSection}>

@@ -61,7 +61,12 @@ func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsR
 	}
 
 	// Extract optional booleans
-	violatesPolicy, _ := extractOptionalBool(args, "violates_policy")
+	// Extract optional booleans — default violates_policy to true if not provided
+	violatesPolicy, provided := extractOptionalBool(args, "violates_policy")
+	if !provided {
+		defaultTrue := true
+		violatesPolicy = &defaultTrue
+	}
 	req.ViolatesPolicy = violatesPolicy
 
 	// Extract CWE IDs
@@ -227,17 +232,19 @@ Please verify:
 	}
 
 	// Step 6: Format and return the response
-	return formatDynamicFindingsResponse(ctx, appProfile, applicationGUID, req.Sandbox, findingsResp), nil
+	policyFilter := req.ViolatesPolicy != nil && *req.ViolatesPolicy
+	return formatDynamicFindingsResponse(ctx, appProfile, applicationGUID, req.Sandbox, findingsResp, policyFilter), nil
 }
 
 // formatDynamicFindingsResponse formats the findings API response into an MCP tool response
-func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse) map[string]interface{} {
+func formatDynamicFindingsResponse(ctx context.Context, appProfile, applicationGUID, sandbox string, findings *api.FindingsResponse, policyFilter bool) map[string]interface{} {
 	// Build MCP response structure
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
 			Name: appProfile,
 			ID:   applicationGUID,
 		},
+		PolicyFilter: policyFilter,
 		Summary: MCPFindingsSummary{
 			BySeverity: map[string]int{
 				"very high": 0,

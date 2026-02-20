@@ -233,12 +233,12 @@ func buildDuplicateNote(issueID int, matches []PipelineFlaw, selectedOccurrence 
 // loadAndParsePipelineFindings loads and parses the pipeline findings file
 func loadAndParsePipelineFindings(appPath string) (*PipelineScanResults, error) {
 	outputDir := filepath.Join(appPath, ".veracode", "pipeline")
-	resultsFile, err := findMostRecentResultsFile(outputDir)
+	resultsFile, err := findMostRecentFile(outputDir, "results-", ".json")
 	if err != nil {
 		return nil, err
 	}
 
-	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
+	// #nosec G304 -- resultsFile is from findMostRecentFile which validates the directory
 	resultsData, err := os.ReadFile(resultsFile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read results file: %w", err)

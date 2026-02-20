@@ -99,7 +99,7 @@ interface DynamicFindingsViewProps {
 }
 
 function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
-  const { application, summary, findings, pagination } = data;
+  const { application, summary, findings, pagination, policy_filter } = data;
 
   // Define severity order (5 to 0)
   const severityOrder = ['Very High', 'High', 'Medium', 'Low', 'Very Low', 'Info'];
@@ -121,6 +121,13 @@ function DynamicFindingsView({ data }: DynamicFindingsViewProps) {
       <div className={styles.header}>
         <h1>Dynamic Findings: {application.name}</h1>
         
+        {policy_filter && (
+          <div className={styles.filtersInfo}>
+            <span className={styles.filterBadge}>Policy Violations Only</span>
+            Showing only findings that violate policy
+          </div>
+        )}
+
         {pagination && (
           <div className={styles.paginationInfo}>
             Showing {findings.length} findings on page {pagination.current_page + 1} of {pagination.total_pages} (Total: {pagination.total_elements} findings)
