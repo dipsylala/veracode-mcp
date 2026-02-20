@@ -23,7 +23,7 @@ func handlePipelineFindingDetails(ctx context.Context, req *FindingDetailsReques
 	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
 
 	// Find the most recent results file
-	resultsFile, err := findMostRecentResultsFile(outputDir)
+	resultsFile, err := findMostRecentFile(outputDir, "results-", ".json")
 	if err != nil {
 		return map[string]interface{}{
 			"content": []map[string]string{{
@@ -45,7 +45,7 @@ To generate results, run a pipeline scan using the pipeline-scan tool.
 	}
 
 	// Read and parse the results file
-	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
+	// #nosec G304 -- resultsFile is from findMostRecentFile which validates the directory
 	resultsData, err := os.ReadFile(resultsFile)
 	if err != nil {
 		return pipelineErrorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil

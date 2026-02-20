@@ -23,8 +23,9 @@ func init() {
 // PipelineFindingsRequest represents the parsed parameters for pipeline-findings
 type PipelineFindingsRequest struct {
 	ApplicationPath string
-	Size            int `json:"size,omitempty"`
-	Page            int `json:"page,omitempty"`
+	Size            int   `json:"size,omitempty"`
+	Page            int   `json:"page,omitempty"`
+	ViolatesPolicy  *bool `json:"violates_policy,omitempty"`
 }
 
 // parsePipelineFindingsRequest extracts and validates parameters from the raw args map
@@ -38,9 +39,15 @@ func parsePipelineFindingsRequest(args map[string]interface{}) (*PipelineFinding
 		return nil, err
 	}
 
-	// Extract optional fields with defaults
+	// Extract optional fields with defaults — default violates_policy to true if not provided
 	req.Size = extractInt(args, "page_size", 10)
 	req.Page = extractInt(args, "page", 0)
+	violatesPolicy, provided := extractOptionalBool(args, "violates_policy")
+	if !provided {
+		defaultTrue := true
+		violatesPolicy = &defaultTrue
+	}
+	req.ViolatesPolicy = violatesPolicy
 
 	// Validate pagination bounds
 	if err := validatePaginationParams(req.Size, req.Page); err != nil {
@@ -109,8 +116,8 @@ func handlePipelineFindings(ctx context.Context, args map[string]interface{}) (i
 	// Locate the results directory
 	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
 
-	// Find the most recent results file
-	resultsFile, err := findMostRecentResultsFile(outputDir)
+	// Find the most recent full results file (used for totals)
+	resultsFile, err := findMostRecentFile(outputDir, "results-", ".json")
 	if err != nil {
 		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Scan Results
 ==================
@@ -126,8 +133,8 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 `, req.ApplicationPath, outputDir, err)), nil
 	}
 
-	// Read and parse the results file
-	// #nosec G304 -- resultsFile is from findMostRecentResultsFile which validates the directory
+	// Read and parse the full results file
+	// #nosec G304 -- resultsFile is from findMostRecentFile which validates the directory
 	resultsData, err := os.ReadFile(resultsFile)
 	if err != nil {
 		return pipelineErrorResponse(fmt.Sprintf("Failed to read results file: %v", err)), nil
@@ -138,12 +145,61 @@ To generate results, run a pipeline scan using the pipeline-static-scan tool.
 		return pipelineErrorResponse(fmt.Sprintf("Failed to parse results file: %v", err)), nil
 	}
 
+	// Always load filtered results to know which flaws violate policy
+	var filteredResults *PipelineScanResults
+	if filteredFile, ferr := findMostRecentFile(outputDir, "filtered-results-", ".json"); ferr == nil {
+		// #nosec G304 -- filteredFile is from findMostRecentFile which validates the directory
+		if filteredData, ferr := os.ReadFile(filteredFile); ferr == nil {
+			var fr PipelineScanResults
+			if ferr = json.Unmarshal(filteredData, &fr); ferr == nil {
+				filteredResults = &fr
+			}
+		}
+	}
+
 	// Format and return the response
-	return formatPipelineFindingsResponse(ctx, req.ApplicationPath, resultsFile, &scanResults, req), nil
+	return formatPipelineFindingsResponse(ctx, req.ApplicationPath, resultsFile, &scanResults, filteredResults, req), nil
 }
 
-// findMostRecentResultsFile finds the most recent results-*.json file in the directory
-func findMostRecentResultsFile(dir string) (string, error) {
+// buildPipelineSummaryTotals computes summary counts from the full (unfiltered) results.
+func buildPipelineSummaryTotals(findings []PipelineFlaw) MCPFindingsSummary {
+	summary := MCPFindingsSummary{
+		TotalFindings: len(findings),
+		OpenFindings:  len(findings), // all pipeline findings are "open"
+		BySeverity: map[string]int{
+			"very high": 0,
+			"high":      0,
+			"medium":    0,
+			"low":       0,
+			"very low":  0,
+			"info":      0,
+		},
+		ByStatus:     map[string]int{"open": 0},
+		ByMitigation: map[string]int{"none": 0},
+	}
+	for _, f := range findings {
+		sev := transformPipelineSeverity(f.Severity)
+		if _, ok := summary.BySeverity[sev]; ok {
+			summary.BySeverity[sev]++
+		}
+		summary.ByMitigation["none"]++
+	}
+	return summary
+}
+
+// buildPolicyViolatingIDs returns a set of issue IDs present in the filtered (policy-failing) results.
+func buildPolicyViolatingIDs(filteredResults *PipelineScanResults) map[int]bool {
+	ids := make(map[int]bool)
+	if filteredResults != nil {
+		for _, f := range filteredResults.Findings {
+			ids[f.IssueID] = true
+		}
+	}
+	return ids
+}
+
+// findMostRecentFile finds the most recent file with the given prefix and suffix in the directory
+func findMostRecentFile(dir, prefix, suffix string) (string, error) {
 	// Check if directory exists
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return "", fmt.Errorf("pipeline directory does not exist: %s", dir)
@@ -154,127 +210,91 @@ func findMostRecentResultsFile(dir string) (string, error) {
 		return "", fmt.Errorf("failed to read directory: %w", err)
 	}
 
-	var resultsFiles []string
+	var matches []string
 	for _, entry := range entries {
 		if entry.IsDir() {
 			continue
 		}
-
 		name := entry.Name()
-		if strings.HasPrefix(name, "results-") && strings.HasSuffix(name, ".json") {
-			resultsFiles = append(resultsFiles, filepath.Join(dir, name))
+		if strings.HasPrefix(name, prefix) && strings.HasSuffix(name, suffix) {
+			matches = append(matches, filepath.Join(dir, name))
 		}
 	}
 
-	if len(resultsFiles) == 0 {
-		return "", fmt.Errorf("no results files found in directory: %s", dir)
+	if len(matches) == 0 {
+		return "", fmt.Errorf("no %s*%s files found in directory: %s", prefix, suffix, dir)
 	}
 
-	// Sort by filename (which includes timestamp) to get the most recent
-	sort.Strings(resultsFiles)
-	return resultsFiles[len(resultsFiles)-1], nil
+	sort.Strings(matches)
+	return matches[len(matches)-1], nil
 }
 
 // formatPipelineFindingsResponse formats the pipeline findings into an MCP response
-func formatPipelineFindingsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults, req *PipelineFindingsRequest) map[string]interface{} {
+func formatPipelineFindingsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults, filteredResults *PipelineScanResults, req *PipelineFindingsRequest) map[string]interface{} {
+	// Determine which findings to display (paginate)
+	// Totals are always calculated from the full results.
+	violatesPolicy := req.ViolatesPolicy != nil && *req.ViolatesPolicy
+	displaySource := results.Findings
+	if violatesPolicy && filteredResults != nil {
+		displaySource = filteredResults.Findings
+	}
 	// Build MCP response structure similar to static findings
 	response := MCPFindingsResponse{
 		Application: MCPApplication{
 			Name: filepath.Base(appPath),
 			ID:   appPath,
 		},
-		Summary: MCPFindingsSummary{
-			BySeverity: map[string]int{
-				"very high": 0,
-				"high":      0,
-				"medium":    0,
-				"low":       0,
-				"very low":  0,
-				"info":      0,
-			},
-			ByStatus: map[string]int{
-				"open": 0,
-			},
-			ByMitigation: map[string]int{
-				"none": 0,
-			},
-		},
-		Findings: []MCPFinding{},
+		PolicyFilter: violatesPolicy,
+		Findings:     []MCPFinding{},
 	}
 
-	// Set total findings - all pipeline findings are "open" by default
-	totalFindings := len(results.Findings)
-	response.Summary.TotalFindings = totalFindings
-	response.Summary.PolicyViolations = 0 // Pipeline scanner doesn't provide policy violation info per finding
+	// Compute summary totals directly from the full results (always results-*.json)
+	response.Summary = buildPipelineSummaryTotals(results.Findings)
 
-	// Add pagination info
+	// Build set of issue IDs that violate policy (from filtered-results)
+	policyViolatingIDs := buildPolicyViolatingIDs(filteredResults)
+	if filteredResults != nil {
+		response.Summary.PolicyViolations = len(filteredResults.Findings)
+	}
+
+	// Build display findings from the appropriate source:
+	//   violates_policy=true  → filtered-results-*.json (policy-failing flaws only)
+	//   violates_policy=false → results-*.json (all flaws)
+	displayFindings := make([]MCPFinding, 0, len(displaySource))
+	issueIDCounts := make(map[int]int)
+	for _, finding := range displaySource {
+		issueIDCounts[finding.IssueID]++
+		mcpFinding := processPipelineFinding(finding, issueIDCounts[finding.IssueID])
+		mcpFinding.ViolatesPolicy = policyViolatingIDs[finding.IssueID]
+		displayFindings = append(displayFindings, mcpFinding)
+	}
+
+	// Sort by severity descending, then flaw ID for stable ordering
+	sort.Slice(displayFindings, func(i, j int) bool {
+		if displayFindings[i].SeverityScore != displayFindings[j].SeverityScore {
+			return displayFindings[i].SeverityScore > displayFindings[j].SeverityScore
+		}
+		return displayFindings[i].FlawID < displayFindings[j].FlawID
+	})
+
+	// Paginate
+	displayCount := len(displayFindings)
 	response.Pagination = &MCPPagination{
 		CurrentPage:   req.Page,
 		PageSize:      req.Size,
-		TotalElements: totalFindings,
-		TotalPages:    (totalFindings + req.Size - 1) / req.Size,
-		HasNext:       (req.Page+1)*req.Size < totalFindings,
+		TotalElements: displayCount,
+		TotalPages:    (displayCount + req.Size - 1) / req.Size,
+		HasNext:       (req.Page+1)*req.Size < displayCount,
 		HasPrevious:   req.Page > 0,
 	}
 
-	// First, convert all findings and sort them by severity
-	// Note: issue_id may not be unique - we create a unique flaw_id by appending an index
-	allFindings := make([]MCPFinding, 0, len(results.Findings))
-	issueIDCounts := make(map[int]int)
-	for _, finding := range results.Findings {
-		issueIDCounts[finding.IssueID]++
-		occurrence := issueIDCounts[finding.IssueID]
-		mcpFinding := processPipelineFinding(finding, occurrence)
-		allFindings = append(allFindings, mcpFinding)
-	}
-
-	// Sort findings by severity (most severe first), then by Flaw ID for consistent ordering
-	sort.Slice(allFindings, func(i, j int) bool {
-		if allFindings[i].SeverityScore != allFindings[j].SeverityScore {
-			return allFindings[i].SeverityScore > allFindings[j].SeverityScore
-		}
-		// Secondary sort by Flaw ID for consistent ordering when severities are equal
-		return allFindings[i].FlawID < allFindings[j].FlawID
-	})
-
-	// Calculate total summary counts across ALL findings before pagination
-	for i := range allFindings {
-		mcpFinding := allFindings[i]
-
-		// Update total severity counters
-		severity := strings.ToLower(mcpFinding.Severity)
-		if count, ok := response.Summary.BySeverity[severity]; ok {
-			response.Summary.BySeverity[severity] = count + 1
-		}
-
-		// Update total open findings counter
-		if mcpFinding.Status == "open" || mcpFinding.Status == "OPEN" {
-			response.Summary.OpenFindings++
-		}
-
-		// Update total mitigation status counters
-		mitigationStatus := strings.ToLower(mcpFinding.MitigationStatus)
-		if mitigationStatus == "" {
-			mitigationStatus = "none"
-		}
-		if count, ok := response.Summary.ByMitigation[mitigationStatus]; ok {
-			response.Summary.ByMitigation[mitigationStatus] = count + 1
-		}
-	}
-
-	// Apply pagination
 	startIdx := req.Page * req.Size
-	endIdx := startIdx + req.Size
-	if startIdx > len(allFindings) {
-		startIdx = len(allFindings)
+	endIdx := min(startIdx+req.Size, displayCount)
+	if startIdx > displayCount {
+		startIdx = displayCount
 	}
-	if endIdx > len(allFindings) {
-		endIdx = len(allFindings)
-	}
-
-	// Add paginated findings to response
 	for i := startIdx; i < endIdx; i++ {
-		response.Findings = append(response.Findings, allFindings[i])
+		response.Findings = append(response.Findings, displayFindings[i])
 	}
 
 	// Marshal response to JSON for non-UI clients
@@ -285,16 +305,21 @@ func formatPipelineFindingsResponse(ctx context.Context, appPath, resultsFile st
 	}
 
 	// Build pagination summary for LLM
+	findingsLabel := "findings"
+	if violatesPolicy {
+		findingsLabel = "policy-relevant findings"
+	}
 	var paginationSummary string
 	if response.Pagination != nil {
-		paginationSummary = fmt.Sprintf("Showing %d findings on page %d of %d (Total: %d findings across all pages)\n\n",
+		paginationSummary = fmt.Sprintf("Showing %d findings on page %d of %d (Total: %d %s across all pages)\n\n",
 			len(response.Findings),
 			response.Pagination.CurrentPage+1, // Display as 1-based
 			response.Pagination.TotalPages,
 			response.Pagination.TotalElements,
+			findingsLabel,
 		)
 	} else {
-		paginationSummary = fmt.Sprintf("Showing %d findings\n\n", len(response.Findings))
+		paginationSummary = fmt.Sprintf("Showing %d %s\n\n", len(response.Findings), findingsLabel)
 	}
 
 	// Build result with content
@@ -346,7 +371,7 @@ func processPipelineFinding(flaw PipelineFlaw, occurrence int) MCPFinding {
 		CweId:          cweID,
 		Description:    CleanDescription(flaw.DisplayText),
 		Status:         "open",                          // Pipeline findings are always open
-		ViolatesPolicy: false,                           // Pipeline scanner doesn't provide this per-finding
+		ViolatesPolicy: false,                           // may be overridden by caller when sourced from filtered-results
 		FirstFound:     time.Now().Format(time.RFC3339), // Pipeline scans don't track this
 		FilePath:       flaw.Files.SourceFile.File,
 		LineNumber:     flaw.Files.SourceFile.Line,

@@ -5,6 +5,7 @@ export interface MCPFindingsResponse {
   summary: MCPFindingsSummary;
   findings: MCPFinding[];
   pagination?: MCPPagination;
+  policy_filter?: boolean;
 }
 
 export interface MCPApplication {

@@ -8,11 +8,12 @@ type Reference struct {
 
 // MCPFindingsResponse represents the complete MCP response for findings
 type MCPFindingsResponse struct {
-	Application MCPApplication     `json:"application"`
-	Sandbox     *MCPSandbox        `json:"sandbox,omitempty"`
-	Summary     MCPFindingsSummary `json:"summary"`
-	Findings    []MCPFinding       `json:"findings"`
-	Pagination  *MCPPagination     `json:"pagination,omitempty"`
+	Application  MCPApplication     `json:"application"`
+	Sandbox      *MCPSandbox        `json:"sandbox,omitempty"`
+	Summary      MCPFindingsSummary `json:"summary"`
+	Findings     []MCPFinding       `json:"findings"`
+	Pagination   *MCPPagination     `json:"pagination,omitempty"`
+	PolicyFilter bool               `json:"policy_filter,omitempty"`
 }
 
 // MCPApplication represents application information

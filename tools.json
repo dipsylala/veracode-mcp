@@ -72,7 +72,7 @@
           "name": "violates_policy",
           "type": "boolean",
           "isRequired": false,
-          "description": "Filter by policy violation status"
+          "description": "Filter by policy violation status. Default is true (policy violations only). Only set this parameter if the user explicitly asks to see all findings regardless of policy. Do not set it to false unless directly requested."
         }
       ]
     },
@@ -142,7 +142,7 @@
           "name": "violates_policy",
           "type": "boolean",
           "isRequired": false,
-          "description": "Filter by policy violation status"
+          "description": "Filter by policy violation status. Default is true (policy violations only). Only set this parameter if the user explicitly asks to see all findings regardless of policy. Do not set it to false unless directly requested."
         }
       ]
     },
@@ -310,6 +310,12 @@
           "type": "string",
           "isRequired": true,
           "description": "Absolute path to the application workspace"
+        },
+        {
+          "name": "violates_policy",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Filter by policy violation status. Default is true (policy violations only). Only set this parameter if the user explicitly asks to see all findings regardless of policy. Do not set it to false unless directly requested."
         },
         {
           "name": "page_size",
