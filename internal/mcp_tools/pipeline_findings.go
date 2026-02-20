@@ -77,7 +77,13 @@ type PipelineFlaw struct {
 	DisplayText     string     `json:"display_text"`
 	Files           FileInfo   `json:"files"`
 	FlawDetailsLink string     `json:"flaw_details_link"`
+	FlawMatch       FlawMatch  `json:"flaw_match,omitempty"`
 	StackDumps      StackDumps `json:"stack_dumps,omitempty"`
+}
+
+// FlawMatch contains the hash data used to uniquely identify a flaw across scans
+type FlawMatch struct {
+	FlawHash string `json:"flaw_hash"`
 }
 
 type FileInfo struct {
@@ -187,15 +193,21 @@ func buildPipelineSummaryTotals(findings []PipelineFlaw) MCPFindingsSummary {
 	return summary
 }
 
-// buildPolicyViolatingIDs returns a set of issue IDs present in the filtered (policy-failing) results.
-func buildPolicyViolatingIDs(filteredResults *PipelineScanResults) map[int]bool {
-	ids := make(map[int]bool)
+// buildPolicyViolatingIDs returns a set of composite keys (issue_id:flaw_hash) present in the filtered (policy-failing) results.
+func buildPolicyViolatingIDs(filteredResults *PipelineScanResults) map[string]bool {
+	ids := make(map[string]bool)
 	if filteredResults != nil {
 		for _, f := range filteredResults.Findings {
-			ids[f.IssueID] = true
+			ids[flawKey(f)] = true
 		}
 	}
 	return ids
+}
+
+// flawKey returns a composite key for a flaw using issue_id and flaw_hash.
+// flaw_hash alone is not unique across scans; combined with issue_id it identifies a specific occurrence.
+func flawKey(f PipelineFlaw) string {
+	return fmt.Sprintf("%d:%s", f.IssueID, f.FlawMatch.FlawHash)
 }
 
 // findMostRecentFile finds the most recent file with the given prefix and suffix in the directory
@@ -265,7 +277,7 @@ func formatPipelineFindingsResponse(ctx context.Context, appPath, resultsFile st
 	for _, finding := range displaySource {
 		issueIDCounts[finding.IssueID]++
 		mcpFinding := processPipelineFinding(finding, issueIDCounts[finding.IssueID])
-		mcpFinding.ViolatesPolicy = policyViolatingIDs[finding.IssueID]
+		mcpFinding.ViolatesPolicy = policyViolatingIDs[flawKey(finding)]
 		displayFindings = append(displayFindings, mcpFinding)
 	}
 
