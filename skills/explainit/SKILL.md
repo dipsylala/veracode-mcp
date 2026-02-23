@@ -1,11 +1,12 @@
 ---
 name: explainit
 description: |
-  Provides remediation guidance and explanations for a number of languages and libraries
+  Explains security vulnerabilities and flaws identified by Veracode
 
-  - User asks to fix security vulnerabilities
-  - User mentions "help", "explain", "describe"
-  - User wants to understand a specific CVE,Flaw ID, or vulnerability type (XSS, SQL injection, path traversal, etc.)
+  - User asks to explain or understand a security vulnerability
+  - User mentions "explainit", "explain", "describe", "what is", "tell me about"
+  - User wants to understand a specific CVE, Flaw ID, or vulnerability type (XSS, SQL injection, path traversal, etc.)
+  - User asks what a flaw means or why it is a risk
 
 allowed-tools:
   - Read
@@ -18,13 +19,35 @@ metadata:
   version: 1.0.0
 ---
 
-# Secure Dependency Advisor
+# Security Flaw Explainer
 
-Help developers and AI agents make informed decisions when selecting open-source packages by evaluating security health, vulnerability history, and maintenance status.
+Help developers understand security vulnerabilities identified by Veracode — what the flaw is, why it matters, and how it could be exploited — without overwhelming them with jargon.
 
-## Parse the request
+**Core Principle**: Call `remediation_guidance` to obtain authoritative flaw details, then explain the result in clear, contextual language suited to the developer's level.
 
-### Explaining flaws
-The user will have received a list of flaws and wants to understand them better. The remediation_guidance tool will help the user when provided a CVE or flaw ID. It performs the appropriate calls to retrieve flaw details and will return guidance. No call to finding_details is necessary, as remediation_guidance will provide all necessary information in its response.
+## Identify the ID type
 
-The key here is to help the user understand the nature of the flaw, its impact, and potential remediation steps without overwhelming them with technical jargon. Focus on clear, concise explanations that relate to the user's context and needs.
+### Flaw IDs — first-party SAST findings
+
+A flaw ID is a numeric identifier, optionally with a pipeline suffix:
+- Plain numeric: `12345`
+- With pipeline suffix: `12345-1`
+
+### CVE / SCA IDs — third-party dependency findings
+
+A third-party vulnerability identifier starts with `cve-` or `sid-` (case-insensitive), for example `CVE-2021-44228` or `sid-12345`.
+
+## Retrieving flaw details
+
+**Always call `remediation_guidance` with the flaw ID or CVE/SID first.** This single call retrieves all necessary details — do not call `finding_details` separately, as `remediation_guidance` already includes that information in its response.
+
+## Presenting the explanation
+
+Use the response from `remediation_guidance` to explain:
+
+1. **What the flaw is** — the vulnerability class (e.g. SQL injection, path traversal) in plain terms.
+2. **Why it is a risk** — the potential impact if exploited (data exposure, code execution, privilege escalation, etc.).
+3. **Where it exists** — the affected file, function, or component if the information is available.
+4. **How to address it** — a brief, non-prescriptive summary of the remediation approach (full fix guidance belongs to the `/fixit` skill).
+
+Keep explanations concise and relate them to the developer's context. Avoid unnecessary acronyms or academic references unless the user asks for deeper detail.

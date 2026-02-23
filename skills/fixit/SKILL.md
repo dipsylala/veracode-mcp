@@ -16,6 +16,7 @@ allowed-tools:
   - Bash
   - Grep
   - mcp_veracode_remediation-guidance
+  - mcp_veracode_run-sca-scan
 license: Apache-2.0
 compatibility: Requires Veracode MCP server connection and authenticated Veracode account. Supports SAST and SCA for all major package managers.
 metadata:
@@ -23,28 +24,36 @@ metadata:
   version: 1.0.0
 ---
 
-# Secure Dependency Advisor
+# Secure Remediation Advisor
 
-Help developers and AI agents make informed decisions when selecting open-source packages by evaluating security health, vulnerability history, and maintenance status.
+Help developers fix security vulnerabilities identified by Veracode — whether first-party static flaws (SAST) or third-party dependency vulnerabilities (SCA).
 
-**Core Principle**: Choose dependencies wisely to minimize supply chain risk.
+**Core Principle**: Obtain authoritative remediation guidance before making code or dependency changes, then apply the smallest safe fix.
 
-## Parse the request
+## Identify the request type
 
-### Fixing flaws
-If the user wants to fix a particular flaw Id, call remediation_guidance with that ID.
+### Flaw IDs — first-party SAST findings
 
-### Fixing 3rd party dependencies
-If the user wants to fix a CVE ID, review any prior output from the tool run-sca-scan and see if there is a suggested version to resolve that  CVE. If there is, review other flaws for the same component and see if there are higher versions of the flawed component recommended.
+A flaw ID is a numeric identifier, optionally with a pipeline suffix:
+- Plain numeric: `12345`
+- With pipeline suffix: `12345-1`
 
-If a user wants to fix a particular 3rd party component, review any prior output from the tool run-sca-scan and check the highest recommended version across all CVEs.
+**Always call `remediation_guidance` with the flaw ID first.** Prefer to provide guidance first unless explicitly asked to fix immediately.
 
-When upgrading a vulnerable dependency:
+### CVE / SCA IDs — third-party dependency findings
 
- - If it is a transitive dependency, check if there is a non-vulnerable version of the direct dependency that includes a non-vulnerable version of the transitive dependency. If so, upgrade the direct dependency to that version.
- - Upgrade to latest or least-vulnerable version via package manager (npm, pip, maven, etc.)
- - Replace with alternative component with similar functionality
- - Remove dependency if not needed
- - run any commands necessary to clear caches, update lockfiles, or otherwise complete the upgrade process
+A third-party vulnerability identifier starts with `cve-` or `sid-` (case-insensitive), for example `CVE-2021-44228` or `sid-12345`.
 
- **Only update package manifests or lockfiles directly if the package manager is unable to or is not present**
+Treat these as SCA findings and follow the **Fixing 3rd party dependencies** steps below.
+
+## Fixing 3rd party dependencies
+
+1. Review any prior output from `run-sca-scan` for the affected component.
+2. Identify the suggested safe version that resolves the CVE/SID. If multiple CVEs affect the same component, select the highest recommended version across all of them.
+3. Determine whether the dependency is direct or transitive:
+   - **Transitive**: check whether a newer version of the *direct* dependency already bundles a safe version of the transitive one. If so, upgrade the direct dependency instead.
+   - **Direct**: upgrade to the latest non-vulnerable version.
+4. Apply the upgrade using the appropriate package manager (npm, pip, maven, gradle, go, etc.) and run any commands needed to clear caches and update lockfiles.
+5. If no safe version exists, consider replacing the component with a maintained alternative or removing it if unused.
+
+**Only edit package manifests or lockfiles by hand if the package manager is unavailable or unable to complete the upgrade.**
