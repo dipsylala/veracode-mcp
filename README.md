@@ -233,13 +233,74 @@ After placing the file, reload VS Code (`Developer: Reload Window`). The **Verac
 
 **Usage:**
 
-Select **Veracode Analyst** from the chat mode selector, then ask:
+Select **Veracode Analyst** from the chat mode selector, or let Copilot spawn it automatically as a subagent when it determines it's appropriate:
 
 ```text
 Analyse the security posture of /path/to/my/project and tell me what I should fix first.
 ```
 
 The agent will check for findings, retrieve findings across SCA and Pipeline static scans, and synthesise a prioritised remediation plan. It requires the MCP server to be configured in VS Code settings as shown above.
+
+### VS Code: Copilot Skills
+
+Five task-focused skills are available for GitHub Copilot in VS Code. Each skill is a pre-built prompt that knows which MCP tools to call — they require the Veracode MCP server to be configured in VS Code.
+
+| Skill | Trigger phrase | What it does |
+|---|---|---|
+| **scanit** | `#scanit` | Packages the workspace and starts a pipeline SAST scan |
+| **thirdit** | `#thirdit` | Runs a local SCA scan on third-party dependencies |
+| **reportit** | `#reportit` | Retrieves findings and produces a prioritised executive summary |
+| **fixit** | `#fixit` | Retrieves remediation guidance and applies fixes for a specific flaw or CVE |
+| **explainit** | `#explainit` | Explains a specific flaw or CVE in plain language |
+
+#### Installing the skills
+
+Skills are distributed as individual `.md` files on the [Releases page](https://github.com/dipsylala/veracode-mcp/releases).
+
+**Install for a project** (team-shared, checked in to source control):
+
+```text
+<your-project>/.github/skills/scanit.skill.md
+<your-project>/.github/skills/thirdit.skill.md
+<your-project>/.github/skills/reportit.skill.md
+<your-project>/.github/skills/fixit.skill.md
+<your-project>/.github/skills/explainit.skill.md
+```
+
+**Install for personal use across all projects:**
+
+*Windows:*
+```powershell
+# Copy all skill files to your user skills directory
+Copy-Item *.skill.md "$env:APPDATA\Code\User\skills\"
+```
+
+*macOS/Linux:*
+```bash
+cp *.skill.md "$HOME/Library/Application Support/Code/User/skills/"
+```
+
+After placing the files, reload VS Code (`Developer: Reload Window`). Skills appear as `#scanit`, `#thirdit`, etc. in the Copilot Chat input.
+
+#### Typical workflow
+
+```text
+# 1. Package and scan
+@workspace #scanit scan /path/to/my/project
+
+# 2. Check status (after scan completes)
+@workspace #reportit summarise findings in /path/to/my/project
+
+# 3. Fix a specific flaw
+@workspace #fixit fix flaw 1026-1 in /path/to/my/project
+
+# 4. Scan dependencies separately
+@workspace #thirdit scan /path/to/my/project
+```
+
+> **Note:** Skills call MCP tools automatically based on your request. The MCP server must be running and configured in VS Code (see VS Code configuration above) for skills to work.
+
+---
 
 ## Available MCP Tools
 
@@ -277,66 +338,7 @@ The `remediation-guidance` tool provides CWE-specific, language-aware security g
 
 ## For Developers
 
-### Building from Source
-
-If you want to build from source instead of using the pre-built releases:
-
-```bash
-# Clone the repository
-git clone https://github.com/dipsylala/veracode-mcp.git
-cd veracode-mcp
-
-# Install dependencies
-go mod download
-
-# Build the server
-.\build.ps1    # Windows (builds to dist/veracode-mcp.exe)
-# or
-go build -o dist/veracode-mcp.exe .  # Manual build
-```
-
-The project includes a PowerShell build script with quality checks:
-
-```powershell
-.\build.ps1          # Full build with all checks
-.\build.ps1 -Quick   # Fast build, skip checks
-.\build.ps1 -NoTest  # Build without running tests
-.\build.ps1 -Verbose # Show detailed test output
-```
-
-The build script performs:
-
-1. Code formatting (`go fmt`)
-2. Static analysis (`go vet`)
-3. Linting (`golangci-lint` if available)
-4. Unit tests
-5. Binary compilation to `dist/veracode-mcp.exe`
-
-### Testing
-
-Run tests with:
-
-```bash
-go test ./...        # Run all tests
-go test ./... -v     # Verbose output
-go test ./tools/...  # Test only tools package
-```
-
-See [docs/MCP_TESTING.md](docs/MCP_TESTING.md) for MCP integration testing.
-
-### Adding New Tools
-
-See [docs/ADDING_TOOLS.md](docs/ADDING_TOOLS.md) for the complete guide on implementing new MCP tools.
-
-### Developer Documentation
-
-- **[Architecture & Design](docs/DESIGN.md)** - System architecture and design decisions
-- **[Quick Start](docs/QUICKSTART.md)** - Get up and running quickly
-- **[Adding Tools](docs/ADDING_TOOLS.md)** - Create new MCP tools (extensibility guide)
-- **[API Integration](docs/API_INTEGRATION.md)** - Integrate Veracode REST APIs
-- **[Code Quality](docs/CODE_QUALITY.md)** - Build tools and quality checks
-- **[Tool Structure](docs/TOOLS_STRUCTURE.md)** - Tool system architecture
-- **[MCP Testing](docs/MCP_TESTING.md)** - Testing MCP implementations
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for building from source, running tests, adding new tools, and the full developer documentation index.
 
 ## License
 
@@ -344,6 +346,4 @@ MIT
 
 ## Contributing
 
-⚠️ This is alpha software. Contributions are welcome, but please be aware that APIs and architecture may change significantly.
-
-Please feel free to submit issues and pull requests.
+⚠️ This is alpha software. Contributions are welcome — see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). APIs and architecture may change significantly.

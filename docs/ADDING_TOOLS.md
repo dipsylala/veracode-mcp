@@ -1,6 +1,74 @@
 # Adding New Tools to the MCP Server
 
-This guide shows how to add new tools to the Veracode MCP server using the auto-registration architecture.
+## Quick Start
+
+The fastest path to a working tool — two files, then build.
+
+### 1. Define in `tools.json`
+
+Add your tool definition to `tools.json` in the root directory:
+
+```json
+{
+  "tools": [
+    {
+      "name": "your-tool-name",
+      "description": "Clear description of what this tool does and when to use it",
+      "category": "analysis",
+      "params": [
+        {
+          "name": "param_name",
+          "type": "string",
+          "is_required": true,
+          "description": "What this parameter does"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 2. Create your implementation in `mcp_tools/`
+
+Create `mcp_tools/your_tool.go`:
+
+```go
+package mcp_tools
+
+import (
+  "context"
+)
+
+func init() {
+  RegisterMCPTool("your-tool-name", handleYourTool)
+}
+
+func handleYourTool(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+  param, err := extractRequiredString(args, "param_name")
+  if err != nil {
+    return map[string]interface{}{"error": err.Error()}, nil
+  }
+
+  return map[string]interface{}{
+    "content": []map[string]string{{
+      "type": "text",
+      "text": "Result: " + param,
+    }},
+  }, nil
+}
+```
+
+### 3. Build and verify
+
+```powershell
+.\build.ps1
+```
+
+That's it — tools self-register via `init()`. No changes to core server code needed.
+
+For a deeper walkthrough of schemas, API helpers, error handling, and best practices, read on.
+
+---
 
 ## Overview
 
