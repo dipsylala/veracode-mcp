@@ -42,8 +42,8 @@ func TestParsePipelineScanRequest_WithFilename(t *testing.T) {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
 
-	// When just a filename is provided, it should prepend .veracode/packaging
-	expectedFilename := filepath.Join("/path/to/app", ".veracode", "packaging", "myapp.zip")
+	// When just a filename is provided, it should prepend the temp .veracode/packaging directory
+	expectedFilename := filepath.Join(veracodeWorkDir("/path/to/app", "packaging"), "myapp.zip")
 	if req.Filename != expectedFilename {
 		t.Errorf("Expected filename '%s', got '%s'", expectedFilename, req.Filename)
 	}
@@ -123,8 +123,8 @@ func TestParsePipelineScanRequest_AllParameters(t *testing.T) {
 		t.Errorf("Expected application_path '/path/to/app', got '%s'", req.ApplicationPath)
 	}
 
-	// When just a filename is provided, it should prepend .veracode/packaging
-	expectedFilename := filepath.Join("/path/to/app", ".veracode", "packaging", "myapp.zip")
+	// When just a filename is provided, it should prepend the temp .veracode/packaging directory
+	expectedFilename := filepath.Join(veracodeWorkDir("/path/to/app", "packaging"), "myapp.zip")
 	if req.Filename != expectedFilename {
 		t.Errorf("Expected filename '%s', got '%s'", expectedFilename, req.Filename)
 	}
@@ -233,6 +233,8 @@ func TestPipelineScanTool_HandleValidPath(t *testing.T) {
 
 	// Create a temporary directory
 	tempDir := t.TempDir()
+	// Clean up global work dir created by the handler
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(veracodeWorkDir(tempDir, "pipeline"))) })
 
 	result, err := handler(ctx, map[string]interface{}{
 		"application_path": tempDir,

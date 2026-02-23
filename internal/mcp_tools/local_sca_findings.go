@@ -184,7 +184,7 @@ func handleGetLocalSCAFindings(ctx context.Context, args map[string]interface{})
 	}
 
 	// Locate the results directory
-	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "sca")
+	outputDir := veracodeWorkDir(req.ApplicationPath, "sca")
 	resultsFile := filepath.Join(outputDir, "veracode.json")
 
 	// Check if results file exists

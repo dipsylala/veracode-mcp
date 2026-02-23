@@ -120,7 +120,7 @@ func handlePipelineFindings(ctx context.Context, args map[string]interface{}) (i
 	}
 
 	// Locate the results directory
-	outputDir := filepath.Join(req.ApplicationPath, ".veracode", "pipeline")
+	outputDir := veracodeWorkDir(req.ApplicationPath, "pipeline")
 
 	// Find the most recent full results file (used for totals)
 	resultsFile, err := findMostRecentFile(outputDir, "results-", ".json")

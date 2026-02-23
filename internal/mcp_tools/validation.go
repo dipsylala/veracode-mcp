@@ -2,9 +2,18 @@ package mcp_tools
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
+
+// veracodeWorkDir returns the temporary working directory for a given application and scan type.
+// Path: {os.TempDir()}/.veracode/{app_dir_name}/{subdir}
+func veracodeWorkDir(applicationPath, subdir string) string {
+	appName := filepath.Base(applicationPath)
+	return filepath.Join(os.TempDir(), ".veracode", appName, subdir)
+}
 
 // extractRequiredString extracts and validates a required non-empty string parameter.
 // Returns an error if the parameter is missing or empty.

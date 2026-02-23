@@ -54,8 +54,8 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 	if filename, ok := extractOptionalString(args, "filename"); ok && filename != "" {
 		// Check if filename is just a name (no directory separators)
 		if filepath.Base(filename) == filename {
-			// Just a filename - prepend .veracode/packaging directory
-			req.Filename = filepath.Join(req.ApplicationPath, ".veracode", "packaging", filename)
+			// Just a filename - prepend temp .veracode/packaging directory
+			req.Filename = filepath.Join(veracodeWorkDir(req.ApplicationPath, "packaging"), filename)
 		} else {
 			// Full or relative path - use as-is
 			req.Filename = filename
@@ -164,7 +164,7 @@ func prepareOutputDir(applicationPath string) (string, error) {
 		return "", fmt.Errorf("failed to access application path: %v", err)
 	}
 
-	outputDir := filepath.Join(applicationPath, ".veracode", "pipeline")
+	outputDir := veracodeWorkDir(applicationPath, "pipeline")
 	if err := os.MkdirAll(outputDir, 0750); err != nil {
 		return "", fmt.Errorf("failed to create output directory: %v", err)
 	}
@@ -183,7 +183,7 @@ func resolveScanTarget(req *PipelineScanRequest) (string, error) {
 		}
 		return req.Filename, nil
 	}
-	packagingDir := filepath.Join(req.ApplicationPath, ".veracode", "packaging")
+	packagingDir := veracodeWorkDir(req.ApplicationPath, "packaging")
 	target, err := findLargestFile(packagingDir)
 	if err != nil {
 		return "", fmt.Errorf("failed to find file to scan: %v. Either specify a filename parameter or ensure .veracode/packaging contains packaged files", err)

@@ -73,7 +73,10 @@ func TestGetLocalSCAFindingsTool_HandleValidResultsFile(t *testing.T) {
 
 	// Create a temporary directory with results file
 	tempDir := t.TempDir()
-	scaDir := filepath.Join(tempDir, ".veracode", "sca")
+	scaDir := veracodeWorkDir(tempDir, "sca")
+	// Remove stale state from previous tests sharing this basename, then clean up after
+	_ = os.RemoveAll(filepath.Dir(scaDir))
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(scaDir)) })
 	if err := os.MkdirAll(scaDir, 0750); err != nil {
 		t.Fatalf("Failed to create SCA directory: %v", err)
 	}

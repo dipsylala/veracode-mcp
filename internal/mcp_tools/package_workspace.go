@@ -86,8 +86,8 @@ func validateAndPrepareDirectories(applicationPath string) (string, error) {
 		return "", fmt.Errorf("Failed to access application path: %v", err)
 	}
 
-	// Create output directory (.veracode/packaging)
-	outputDir := filepath.Join(applicationPath, ".veracode", "packaging")
+	// Create output directory (temp/.veracode/{app}/packaging)
+	outputDir := veracodeWorkDir(applicationPath, "packaging")
 	err = os.MkdirAll(outputDir, 0750)
 	if err != nil {
 		return "", fmt.Errorf("Failed to create output directory: %v", err)

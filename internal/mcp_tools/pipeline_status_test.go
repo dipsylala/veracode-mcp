@@ -63,7 +63,10 @@ func TestPipelineStatusTool_NoPIDFileButResultsExist(t *testing.T) {
 	ctx := context.Background()
 
 	tempDir := t.TempDir()
-	outputDir := filepath.Join(tempDir, ".veracode", "pipeline")
+	outputDir := veracodeWorkDir(tempDir, "pipeline")
+	// Remove stale state from previous tests sharing this basename, then clean up after
+	_ = os.RemoveAll(filepath.Dir(outputDir))
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(outputDir)) })
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		t.Fatalf("Failed to create output directory: %v", err)
 	}
@@ -118,7 +121,8 @@ func TestPipelineStatusTool_WithPIDFile(t *testing.T) {
 
 	// Create a temporary directory
 	tempDir := t.TempDir()
-	outputDir := filepath.Join(tempDir, ".veracode", "pipeline")
+	outputDir := veracodeWorkDir(tempDir, "pipeline")
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(outputDir)) })
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		t.Fatalf("Failed to create output directory: %v", err)
 	}

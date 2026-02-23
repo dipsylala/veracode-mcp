@@ -46,13 +46,14 @@ func TestParseLocalSCAScanRequest_EmptyApplicationPath(t *testing.T) {
 func TestValidateAndPrepareSCADirectories_Success(t *testing.T) {
 	// Create a temporary directory
 	tempDir := t.TempDir()
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(veracodeWorkDir(tempDir, "sca"))) })
 
 	outputDir, outputFile, err := validateAndPrepareSCADirectories(tempDir)
 	if err != nil {
 		t.Fatalf("Failed to validate and prepare directories: %v", err)
 	}
 
-	expectedOutputDir := filepath.Join(tempDir, ".veracode", "sca")
+	expectedOutputDir := veracodeWorkDir(tempDir, "sca")
 	if outputDir != expectedOutputDir {
 		t.Errorf("Expected output directory '%s', got '%s'", expectedOutputDir, outputDir)
 	}
@@ -78,6 +79,7 @@ func TestValidateAndPrepareSCADirectories_NonexistentPath(t *testing.T) {
 func TestValidateAndPrepareSCADirectories_CreatesDirectoryIfNeeded(t *testing.T) {
 	// Create a temporary directory
 	tempDir := t.TempDir()
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(veracodeWorkDir(tempDir, "sca"))) })
 
 	// Call twice to ensure it handles existing directory
 	_, _, err := validateAndPrepareSCADirectories(tempDir)
@@ -90,7 +92,7 @@ func TestValidateAndPrepareSCADirectories_CreatesDirectoryIfNeeded(t *testing.T)
 		t.Fatalf("Second call failed: %v", err)
 	}
 
-	expectedOutputDir := filepath.Join(tempDir, ".veracode", "sca")
+	expectedOutputDir := veracodeWorkDir(tempDir, "sca")
 	if outputDir != expectedOutputDir {
 		t.Errorf("Expected output directory '%s', got '%s'", expectedOutputDir, outputDir)
 	}
@@ -145,6 +147,8 @@ func TestLocalSCAScanTool_HandleValidPath(t *testing.T) {
 
 	// Create a temporary directory
 	tempDir := t.TempDir()
+	// Clean up global work dir created by the handler
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(veracodeWorkDir(tempDir, "sca"))) })
 
 	result, err := handler(ctx, map[string]interface{}{
 		"application_path": tempDir,
@@ -168,6 +172,7 @@ func TestLocalSCAScanTool_HandleValidPath(t *testing.T) {
 
 func TestLocalSCAScanTool_OutputFileLocation(t *testing.T) {
 	tempDir := t.TempDir()
+	t.Cleanup(func() { _ = os.RemoveAll(filepath.Dir(veracodeWorkDir(tempDir, "sca"))) })
 
 	// Create the expected output structure
 	outputDir, outputFile, err := validateAndPrepareSCADirectories(tempDir)
@@ -175,7 +180,7 @@ func TestLocalSCAScanTool_OutputFileLocation(t *testing.T) {
 		t.Fatalf("Failed to prepare directories: %v", err)
 	}
 
-	expectedDir := filepath.Join(tempDir, ".veracode", "sca")
+	expectedDir := veracodeWorkDir(tempDir, "sca")
 	if outputDir != expectedDir {
 		t.Errorf("Expected output dir '%s', got '%s'", expectedDir, outputDir)
 	}
