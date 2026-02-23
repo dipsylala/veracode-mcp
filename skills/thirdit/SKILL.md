@@ -24,4 +24,5 @@ Helps developers to package and scan their third party libraries for security vu
 
 ## Parse the request
 
-If the user wants to scan third party libraries call local-sca-scan to perform the scan. Run local-sca-findings to get the SCA results, default to a page size of 10
+* Calls the local-sca-scan MCP endpoint with the application_path pointing to the workspace root.
+* Dispaly the results using local-sca-findings, defaulting to a page size of 10

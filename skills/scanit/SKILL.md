@@ -20,10 +20,13 @@ metadata:
   version: 1.0.0
 ---
 
-# Security Scanner
+# Primary Purpose
 
-Helps developers to package and scan their first party code for security vulnerabilities.
+Performs packaging and static scanning for an application
 
 ## Parse the request
 
-if the user wants to scan an application call package_workspace to prepare the code for scanning, then call pipeline_scan to start the scan. Default to a page size of 10. Let the user know that they can use pipeline_status to check when the scan has finished, but do not run it yourself
+* Calls the package_workspace MCP endpoint with the application_path pointing to the workspace root.
+* Calls the pipeline_scan MCP endpoint to start the scan, with the application_path pointing to the workspace root.
+* Calls the local_sca_scan MCP endpoint to start an SCA scan, with the application_path pointing to the workspace root.
+* Let the user know that they can use pipeline_status to check when the Static scan has finished, but do not run it yourself
