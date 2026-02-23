@@ -26,4 +26,4 @@ Helps developers to package and scan their first party code for security vulnera
 
 ## Parse the request
 
-if the user wants to scan an application call package_workspace to prepare the code for scanning, then call pipeline_scan to start the scan. Default to a page size of 10. Let the user know that they can use pipeline_status to check when the scan has finished.
+if the user wants to scan an application call package_workspace to prepare the code for scanning, then call pipeline_scan to start the scan. Default to a page size of 10. Let the user know that they can use pipeline_status to check when the scan has finished, but do not run it yourself
