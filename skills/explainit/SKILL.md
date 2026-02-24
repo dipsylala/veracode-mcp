@@ -39,11 +39,13 @@ A third-party vulnerability identifier starts with `cve-` or `sid-` (case-insens
 
 ## Retrieving flaw details
 
-**Always call `remediation_guidance` with the flaw ID or CVE/SID first.** This single call retrieves all necessary details — do not call `finding_details` separately, as `remediation_guidance` already includes that information in its response.
+**For numeric flaw IDs only** (`12345` or `12345-1`), call `remediation_guidance` with the flaw ID. This single call retrieves all necessary details — do not call `finding_details` separately, as `remediation_guidance` already includes that information in its response.
+
+**For CVE / SCA IDs** (`cve-` or `sid-` prefixes), do not call `remediation_guidance`. Instead, use any prior output from `run-sca-scan` or other scan results already in context to explain the vulnerability.
 
 ## Presenting the explanation
 
-Use the response from `remediation_guidance` to explain:
+Use the retrieved flaw details to explain:
 
 1. **What the flaw is** — the vulnerability class (e.g. SQL injection, path traversal) in plain terms.
 2. **Why it is a risk** — the potential impact if exploited (data exposure, code execution, privilege escalation, etc.).

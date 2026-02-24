@@ -38,13 +38,15 @@ A flaw ID is a numeric identifier, optionally with a pipeline suffix:
 - Plain numeric: `12345`
 - With pipeline suffix: `12345-1`
 
-**Always call `remediation_guidance` with the flaw ID first.** Prefer to provide guidance first unless explicitly asked to fix immediately.
+**For numeric flaw IDs only**, call `remediation_guidance` with the flaw ID first to obtain fix guidance before making any code change. Prefer to explain the guidance first unless the user explicitly asks to fix immediately.
+
+**Do not call `remediation_guidance` for CVE or SID identifiers** — those are third-party findings and are handled below.
 
 ### CVE / SCA IDs — third-party dependency findings
 
 A third-party vulnerability identifier starts with `cve-` or `sid-` (case-insensitive), for example `CVE-2021-44228` or `sid-12345`.
 
-Treat these as SCA findings and follow the **Fixing 3rd party dependencies** steps below.
+Do not call `remediation_guidance` for these. Instead, use any prior output from `run-sca-scan` or other scan results already in context, and follow the **Fixing 3rd party dependencies** steps below.
 
 ## Fixing 3rd party dependencies
 
