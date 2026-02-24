@@ -23,7 +23,7 @@ metadata:
 
 Help developers understand security vulnerabilities identified by Veracode — what the flaw is, why it matters, and how it could be exploited — without overwhelming them with jargon.
 
-**Core Principle**: Call `remediation_guidance` to obtain authoritative flaw details, then explain the result in clear, contextual language suited to the developer's level.
+**Core Principles**: Educate while you guide
 
 ## Identify the ID type
 
@@ -47,9 +47,14 @@ A third-party vulnerability identifier starts with `cve-` or `sid-` (case-insens
 
 Use the retrieved flaw details to explain:
 
-1. **What the flaw is** — the vulnerability class (e.g. SQL injection, path traversal) in plain terms.
-2. **Why it is a risk** — the potential impact if exploited (data exposure, code execution, privilege escalation, etc.).
-3. **Where it exists** — the affected file, function, or component if the information is available.
-4. **How to address it** — a brief, non-prescriptive summary of the remediation approach (full fix guidance belongs to the `/fixit` skill).
+1. **What the vulnerability is and where it exists** — describe the flaw class (SQL injection, XSS, path traversal, etc.) in plain language and identify the affected file, function, or line number if available.
 
-Keep explanations concise and relate them to the developer's context. Avoid unnecessary acronyms or academic references unless the user asks for deeper detail.
+2. **Why it's a risk** — reference the CWE identifier and explain the real-world impact if exploited (data exposure, code execution, privilege escalation, denial of service, etc.).
+
+3. **What makes this code exploitable** — identify the specific unsafe pattern, missing validation, or improper API usage that creates the vulnerability (e.g., "line 42 concatenates user input directly into the SQL query").
+
+4. **How to address it** — summarize the general remediation approach (e.g., "use parameterized queries," "validate and sanitize input," "apply context-aware encoding"). Keep this brief and conceptual — detailed step-by-step fixes belong to the `/fixit` skill.
+
+5. **Related best practices** — mention relevant secure coding patterns for the language/framework, OWASP guidelines, or security principles that prevent this class of vulnerability.
+
+Keep explanations concise, educational, and grounded in the developer's context. Avoid unnecessary acronyms or academic references unless the user asks for deeper detail.
