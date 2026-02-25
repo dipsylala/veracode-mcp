@@ -404,6 +404,66 @@
           "description": "Page number (0-based, default 0)"
         }
       ]
+    },
+    {
+      "name": "local-iac-findings",
+      "description": "Get local IaC scan results (Dockerfile and configuration misconfigurations) from the most recent local SCA scan",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "Absolute path to the application workspace"
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "isRequired": false,
+          "description": "Filter by target file path (partial match, case-insensitive, e.g. 'Dockerfile')"
+        },
+        {
+          "name": "check_id",
+          "type": "string",
+          "isRequired": false,
+          "description": "Filter by specific check ID (e.g., DS026)"
+        },
+        {
+          "name": "severity_gte",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 5
+          },
+          "description": "Minimum severity (2=Low, 3=Medium, 4=High, 5=Critical)"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "isRequired": false,
+          "description": "Filter by status: 'fail' (default), 'pass', or 'all'.  Only set this parameter if the user explicitly asks to see all findings regardless status."
+        },
+        {
+          "name": "page_size",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 1,
+            "max": 500
+          },
+          "description": "Findings per page (1-500, default 10)"
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "isRequired": false,
+          "validation": {
+            "min": 0,
+            "max": 500
+          },
+          "description": "Page number (0-based, default 0)"
+        }
+      ]
     }
   ]
 }

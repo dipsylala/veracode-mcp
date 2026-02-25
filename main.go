@@ -29,11 +29,14 @@ var dynamicFindingsHTML string
 //go:embed ui/local-sca-findings-app/dist/mcp-app.html
 var localSCAFindingsHTML string
 
+//go:embed ui/local-iac-findings-app/dist/mcp-app.html
+var localIACFindingsHTML string
+
 func init() {
 	// Set embedded resources in the internal packages
 	tools.SetToolsJSON(toolsJSONData)
 	server.SetInstructions(instructionsJSONData)
-	server.SetUIResources(pipelineFindingsHTML, staticFindingsHTML, dynamicFindingsHTML, localSCAFindingsHTML)
+	server.SetUIResources(pipelineFindingsHTML, staticFindingsHTML, dynamicFindingsHTML, localSCAFindingsHTML, localIACFindingsHTML)
 }
 
 // version can be set at build time with -ldflags="-X main.version=x.y.z"
