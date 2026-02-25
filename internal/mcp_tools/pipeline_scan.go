@@ -175,7 +175,7 @@ func prepareOutputDir(applicationPath string) (string, error) {
 }
 
 // resolveScanTarget returns the absolute path of the file to scan.
-// It uses req.Filename if set, otherwise picks the largest file in .veracode/packaging.
+// It uses req.Filename if set, otherwise picks the largest non-log file in .veracode/packaging.
 func resolveScanTarget(req *PipelineScanRequest) (string, error) {
 	if req.Filename != "" {
 		if _, err := os.Stat(req.Filename); os.IsNotExist(err) {
@@ -300,7 +300,7 @@ func fetchAndSavePolicy(ctx context.Context, outputDir, policyName string) strin
 	return policyFile
 }
 
-// findLargestFile finds the largest file in the specified directory
+// findLargestFile finds the largest file in the specified directory, ignoring log files
 func findLargestFile(dir string) (string, error) {
 	// Check if directory exists
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -317,6 +317,11 @@ func findLargestFile(dir string) (string, error) {
 
 	for _, entry := range entries {
 		if entry.IsDir() {
+			continue
+		}
+
+		// Skip log files
+		if strings.HasSuffix(strings.ToLower(entry.Name()), ".log") {
 			continue
 		}
 

@@ -113,7 +113,7 @@ function PipelineFindingsView({ data }: PipelineFindingsViewProps) {
         <div className={styles.header}>
           <h1>Pipeline Scan Findings: {application.name}</h1>
         </div>
-        <div className={styles.empty}>No findings to display</div>
+        <div className={styles.empty}>No flaws found</div>
       </div>
     );
   }

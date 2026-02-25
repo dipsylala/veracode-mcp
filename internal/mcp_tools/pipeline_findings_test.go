@@ -125,7 +125,7 @@ func TestPipelineFindingsTool_HandleMissingResultsFile(t *testing.T) {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
-	// Should return content with "No results found" message
+	// Should return structured content with empty findings for UI
 	resultMap, ok := result.(map[string]interface{})
 	if !ok {
 		t.Fatal("Expected map result")
@@ -133,6 +133,29 @@ func TestPipelineFindingsTool_HandleMissingResultsFile(t *testing.T) {
 
 	if resultMap["content"] == nil {
 		t.Error("Expected content in response")
+	}
+
+	// Verify structuredContent is present with proper structure
+	if resultMap["structuredContent"] == nil {
+		t.Error("Expected structuredContent in response for UI rendering")
+	}
+
+	structuredContent, ok := resultMap["structuredContent"].(MCPFindingsResponse)
+	if !ok {
+		t.Fatal("Expected structuredContent to be MCPFindingsResponse")
+	}
+
+	// Verify empty findings structure
+	if len(structuredContent.Findings) != 0 {
+		t.Errorf("Expected 0 findings, got %d", len(structuredContent.Findings))
+	}
+
+	if structuredContent.Summary.TotalFindings != 0 {
+		t.Errorf("Expected 0 total findings, got %d", structuredContent.Summary.TotalFindings)
+	}
+
+	if structuredContent.Application.Name == "" {
+		t.Error("Expected application name to be set")
 	}
 }
 
