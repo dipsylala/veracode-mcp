@@ -285,7 +285,7 @@
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "File to scan (defaults to largest file in .veracode/packaging)"
+          "description": "File to scan (defaults to largest non-log file in .veracode/packaging)"
         }
       ]
     },

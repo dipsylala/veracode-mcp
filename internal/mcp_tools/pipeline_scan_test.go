@@ -328,3 +328,35 @@ func TestFindLargestFile_IgnoresDirectories(t *testing.T) {
 		t.Errorf("Expected file to be '%s', got '%s'", file, result)
 	}
 }
+
+func TestFindLargestFile_IgnoresLogFiles(t *testing.T) {
+	tempDir := t.TempDir()
+
+	// Create a small regular file
+	smallFile := filepath.Join(tempDir, "app.jar")
+	if err := os.WriteFile(smallFile, []byte("small jar content"), 0644); err != nil {
+		t.Fatalf("Failed to create small file: %v", err)
+	}
+
+	// Create a large log file (should be ignored)
+	largeLogFile := filepath.Join(tempDir, "veracode-packaging-20240101-120000.log")
+	if err := os.WriteFile(largeLogFile, []byte("this is a very large log file with lots and lots of content that should be ignored"), 0644); err != nil {
+		t.Fatalf("Failed to create large log file: %v", err)
+	}
+
+	// Create another log file with mixed case extension
+	anotherLogFile := filepath.Join(tempDir, "scan.LOG")
+	if err := os.WriteFile(anotherLogFile, []byte("another large log file that should also be ignored when finding the largest file"), 0644); err != nil {
+		t.Fatalf("Failed to create another log file: %v", err)
+	}
+
+	// Find the largest file (should skip log files and return the jar)
+	result, err := findLargestFile(tempDir)
+	if err != nil {
+		t.Fatalf("Failed to find largest file: %v", err)
+	}
+
+	if result != smallFile {
+		t.Errorf("Expected largest file to be '%s', got '%s'", smallFile, result)
+	}
+}

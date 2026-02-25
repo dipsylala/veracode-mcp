@@ -99,6 +99,45 @@ type SourceFileInfo struct {
 	Scope             string `json:"scope,omitempty"`
 }
 
+// formatEmptyPipelineFindingsResponse returns a properly structured empty response when no results exist
+func formatEmptyPipelineFindingsResponse(appPath string) map[string]interface{} {
+	response := MCPFindingsResponse{
+		Application: MCPApplication{
+			Name: filepath.Base(appPath),
+			ID:   appPath,
+		},
+		PolicyFilter: false,
+		Findings:     []MCPFinding{},
+		Summary: MCPFindingsSummary{
+			TotalFindings:    0,
+			OpenFindings:     0,
+			PolicyViolations: 0,
+			BySeverity: map[string]int{
+				"very high": 0,
+				"high":      0,
+				"medium":    0,
+				"low":       0,
+				"very low":  0,
+				"info":      0,
+			},
+			ByStatus:     map[string]int{"open": 0},
+			ByMitigation: map[string]int{"none": 0},
+		},
+	}
+
+	responseJSON, _ := json.Marshal(response)
+
+	return map[string]interface{}{
+		"content": []map[string]interface{}{
+			{
+				"type": "text",
+				"text": string(responseJSON),
+			},
+		},
+		"structuredContent": response,
+	}
+}
+
 // pipelineErrorResponse creates a standardized error response for pipeline results
 func pipelineErrorResponse(message string) map[string]interface{} {
 	return map[string]interface{}{
@@ -125,18 +164,8 @@ func handlePipelineFindings(ctx context.Context, args map[string]interface{}) (i
 	// Find the most recent full results file (used for totals)
 	resultsFile, err := findMostRecentFile(outputDir, "results-", ".json")
 	if err != nil {
-		return pipelineErrorResponse(fmt.Sprintf(`Pipeline Scan Results
-==================
-
-Application Path: %s
-Results Directory: %s
-
-❌ No results found
-
-%v
-
-To generate results, run a pipeline scan using the pipeline-static-scan tool.
-`, req.ApplicationPath, outputDir, err)), nil
+		// Return empty results with proper structure for UI
+		return formatEmptyPipelineFindingsResponse(req.ApplicationPath), nil
 	}
 
 	// Read and parse the full results file
