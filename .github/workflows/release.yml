@@ -53,6 +53,12 @@ jobs:
           npm run build
           cd ../..
 
+          # Build Local IaC Findings UI
+          cd ui/local-iac-findings-app
+          npm install
+          npm run build
+          cd ../..          
+
       - name: Get version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
