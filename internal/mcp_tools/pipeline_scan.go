@@ -27,6 +27,7 @@ type PipelineScanRequest struct {
 	ApplicationPath string
 	AppProfile      string
 	Filename        string
+	Wait            bool
 }
 
 // appInfo holds resolved application details used during the scan
@@ -59,6 +60,13 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 		} else {
 			// Full or relative path - use as-is
 			req.Filename = filename
+		}
+	}
+
+	// Extract optional synchronous flag
+	if synchronous, ok := args["synchronous"]; ok {
+		if b, ok := synchronous.(bool); ok {
+			req.Wait = b
 		}
 	}
 
@@ -116,13 +124,32 @@ func handlePipelineScan(ctx context.Context, args map[string]interface{}) (inter
 		return map[string]interface{}{"error": err.Error()}, nil
 	}
 
-	// Build optional warnings section
-	var warningsSection string
-	if len(info.Warnings) > 0 {
-		warningsSection = "\n⚠ Warnings:\n"
-		for _, w := range info.Warnings {
-			warningsSection += fmt.Sprintf("- %s\n", w)
+	warningsSection := buildWarningsSection(info.Warnings)
+
+	if req.Wait {
+		if err := waitForScan(ctx, pid, outputDir); err != nil {
+			return map[string]interface{}{"error": err.Error()}, nil
 		}
+		completedText := fmt.Sprintf(`Veracode Pipeline Static Scan - Completed
+============================
+
+Application Path: %s
+Scan Target: %s
+PID: %d
+Results File: %s
+Filtered Results File: %s
+Log File: %s
+%s
+✓ Pipeline scan completed successfully
+
+Use pipeline-findings to retrieve the results.
+`, req.ApplicationPath, scanTarget, pid, resultsFile, filteredResultsFile, logFile, warningsSection)
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": completedText,
+			}},
+		}, nil
 	}
 
 	responseText := fmt.Sprintf(`Veracode Pipeline Static Scan - Started
@@ -153,6 +180,39 @@ Next steps:
 			"text": responseText,
 		}},
 	}, nil
+}
+
+// waitForScan polls until the process with the given pid has exited, then removes the PID file.
+// It returns an error if the context is cancelled or the scan exceeds its timeout.
+func waitForScan(ctx context.Context, pid int, outputDir string) error {
+	const pollInterval = 10 * time.Second
+	const maxWait = 70 * time.Minute
+	deadline := time.Now().Add(maxWait)
+	for time.Now().Before(deadline) {
+		if isRunning, _ := checkProcessStatus(pid); !isRunning {
+			_ = os.Remove(filepath.Join(outputDir, "pipeline.pid"))
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("context cancelled while waiting for pipeline scan")
+		case <-time.After(pollInterval):
+		}
+	}
+	return fmt.Errorf("pipeline scan (PID %d) did not complete within %v", pid, maxWait)
+}
+
+// buildWarningsSection formats a slice of warning strings into a display block.
+// Returns an empty string if there are no warnings.
+func buildWarningsSection(warnings []string) string {
+	if len(warnings) == 0 {
+		return ""
+	}
+	s := "\n⚠ Warnings:\n"
+	for _, w := range warnings {
+		s += fmt.Sprintf("- %s\n", w)
+	}
+	return s
 }
 
 // prepareOutputDir creates the pipeline output directory, cleans up prior run artifacts,
