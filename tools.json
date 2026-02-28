@@ -286,6 +286,12 @@
           "type": "string",
           "isRequired": false,
           "description": "File to scan (defaults to largest non-log file in .veracode/packaging)"
+        },
+        {
+          "name": "synchronous",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Wait for the scan to complete before returning. Default is false (scan runs in background). Set to true when the caller needs results before proceeding, such as in an automated pipeline."
         }
       ]
     },
