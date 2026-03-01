@@ -319,6 +319,7 @@ The server provides these Veracode-specific tools:
 - **pipeline-detailed-results** - Get detailed results from Pipeline Scans with full flaw information
 - **run-sca-scan** - Run Software Composition Analysis scan on a directory to identify vulnerable dependencies
 - **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
+- **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
 

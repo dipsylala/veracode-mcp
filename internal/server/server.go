@@ -39,14 +39,16 @@ var embeddedPipelineFindingsHTML string
 var embeddedStaticFindingsHTML string
 var embeddedDynamicFindingsHTML string
 var embeddedLocalSCAFindingsHTML string
+var embeddedLocalIACFindingsHTML string
 var embeddedInstructions string
 
 // SetUIResources sets the embedded UI resources from the main package
-func SetUIResources(pipeline, staticFindings, dynamicFindings, localSCAFindings string) {
+func SetUIResources(pipeline, staticFindings, dynamicFindings, localSCAFindings, localIACFindings string) {
 	embeddedPipelineFindingsHTML = pipeline
 	embeddedStaticFindingsHTML = staticFindings
 	embeddedDynamicFindingsHTML = dynamicFindings
 	embeddedLocalSCAFindingsHTML = localSCAFindings
+	embeddedLocalIACFindingsHTML = localIACFindings
 }
 
 // SetInstructions sets the embedded instructions from the main package

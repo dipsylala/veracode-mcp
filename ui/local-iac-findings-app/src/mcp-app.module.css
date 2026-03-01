@@ -1,0 +1,97 @@
+/* Import shared base styles */
+@import '../../shared/base.module.css';
+
+/* =============================================================================
+   LOCAL IAC RESULTS - APP SPECIFIC STYLES
+   ============================================================================= */
+
+/* Status column */
+.statusHeader {
+  width: 70px;
+}
+
+.statusCell {
+  width: 70px;
+  text-align: center;
+}
+
+.statusFail {
+  font-weight: var(--font-weight-semibold, 600);
+  color: #c00;
+}
+
+.statusPass {
+  font-weight: var(--font-weight-semibold, 600);
+  color: #0a0;
+}
+
+/* Check ID */
+.checkId {
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: var(--font-text-sm-size, 13px);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-primary, #000);
+}
+
+/* Target file path */
+.targetPath {
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: var(--font-text-xs-size, 11px);
+  color: var(--color-text-secondary, #555);
+}
+
+/* Title */
+.findingTitle {
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-primary, #000);
+}
+
+/* Description / resolution */
+.description {
+  color: var(--color-text-primary, #000);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.resolution {
+  color: var(--color-text-primary, #000);
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Expanded two-column layout */
+.expandedTwoColumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Reference links */
+.referenceList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.referenceLink {
+  color: var(--color-link, #0066cc);
+  text-decoration: none;
+  font-size: var(--font-text-xs-size, 11px);
+  word-break: break-all;
+}
+
+.referenceLink:hover {
+  text-decoration: underline;
+}
+
+/* Primary URL link */
+.primaryUrlLink {
+  color: var(--color-link, #0066cc);
+  text-decoration: none;
+  font-size: var(--font-text-sm-size, 13px);
+}
+
+.primaryUrlLink:hover {
+  text-decoration: underline;
+}

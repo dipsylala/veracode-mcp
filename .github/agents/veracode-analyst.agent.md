@@ -38,9 +38,10 @@ If neither has results, ask the user whether they want to run scans first before
 proceeding — do not start scans automatically.
 
 ### Step 2 — Retrieve findings
-Retrieve both sources unless the user specifies one:
+Retrieve all sources unless the user specifies one:
 - Local SAST → `pipeline-findings`
-- Use the Local SCA findings from Step 1
+- Local SCA → `local-sca-findings`
+- Local IaC → `local-iac-findings`
 
 For pipeline findings, start with the default page and retrieve additional pages
 only if the first page indicates significant volume of high/very-high findings

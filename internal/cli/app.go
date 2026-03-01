@@ -18,6 +18,7 @@ type AppConfig struct {
 	StaticFindingsHTML   string
 	DynamicFindingsHTML  string
 	LocalSCAFindingsHTML string
+	LocalIACFindingsHTML string
 }
 
 // ConfigureLogging sets up logging based on command line flags
@@ -55,5 +56,5 @@ func RunServer(s *server.MCPServer, verbose bool) error {
 // InitializeResources sets the embedded resources in internal packages
 func InitializeResources(config AppConfig) {
 	tools.SetToolsJSON(config.ToolsJSON)
-	server.SetUIResources(config.PipelineFindingsHTML, config.StaticFindingsHTML, config.DynamicFindingsHTML, config.LocalSCAFindingsHTML)
+	server.SetUIResources(config.PipelineFindingsHTML, config.StaticFindingsHTML, config.DynamicFindingsHTML, config.LocalSCAFindingsHTML, config.LocalIACFindingsHTML)
 }

@@ -186,6 +186,7 @@ function LocalSCAResultsView({ data }: LocalSCAResultsViewProps) {
               <th className={styles.severityHeader}>Severity</th>
               <th>Component</th>
               <th>Version</th>
+              <th>Location</th>
               <th className={styles.epssHeader}>EPSS</th>
               <th>Fix Available</th>
             </tr>
@@ -249,6 +250,20 @@ function FindingRow({ finding }: FindingRowProps) {
         <td>
           <div className={styles.version}>{finding.component.version}</div>
         </td>
+        <td>
+          {finding.component.locations && finding.component.locations.length > 0 ? (
+            <div className={styles.locationPath}>
+              {finding.component.locations.map((loc: SCALocation, i: number) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {loc.path}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <span className={styles.noData}>-</span>
+          )}
+        </td>
         <td className={styles.epssCell}>
           {hasEPSS && (
             <div className={styles.epssScore} title={`EPSS: ${(finding.epss!.score * 100).toFixed(2)}% (${finding.epss!.percentile.toFixed(1)}th percentile)`}>
@@ -267,7 +282,7 @@ function FindingRow({ finding }: FindingRowProps) {
       </tr>
       {isExpanded && (
         <tr className={styles.expandedRow}>
-          <td colSpan={7}>
+          <td colSpan={8}>
             <div className={styles.expandedContent}>
               <div className={styles.expandedSection}>
                 <h4 className={styles.expandedHeader}>Description</h4>

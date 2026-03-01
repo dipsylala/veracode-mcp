@@ -5,14 +5,12 @@ description: |
 
 allowed-tools:
   - Read
-  - Write
-  - Edit
-  - Bash
   - Grep
   - mcp_veracode_local-sca-scan
   - mcp_veracode_local-sca-findings
+  - mcp_veracode_local-iac-findings
 license: Apache-2.0
-compatibility: Requires Veracode MCP server connection and authenticated Veracode account. Supports SAST and SCA for all major package managers.
+compatibility: Requires Veracode MCP server connection and authenticated Veracode account. Supports SCA and IaC analysis for all major package managers.
 metadata:
   author: Dipsylala
   version: 1.0.0
@@ -20,9 +18,9 @@ metadata:
 
 # Security Scanner
 
-Helps developers to package and scan their third party libraries for security vulnerabilities.
+Helps developers to package and scan their third party libraries for security vulnerabilities, and check their IaC files for misconfigurations.
 
 ## Parse the request
 
 * Calls the local-sca-scan MCP endpoint with the application_path pointing to the workspace root.
-* Dispaly the results using local-sca-findings, defaulting to a page size of 10
+* Display the results using local-sca-findings and local-iac-findings, defaulting to a page size of 10

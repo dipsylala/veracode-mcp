@@ -321,6 +321,12 @@ func (s *MCPServer) handleListResources() *ListResourcesResult {
 				Description: "Interactive UI for local SCA scan findings",
 				MimeType:    UICapabilityMimeType,
 			},
+			{
+				URI:         "ui://local-iac-findings/app.html",
+				Name:        "Local IaC Findings UI",
+				Description: "Interactive UI for local IaC (Dockerfile/configuration) findings",
+				MimeType:    UICapabilityMimeType,
+			},
 		},
 	}
 
@@ -373,9 +379,16 @@ func (s *MCPServer) handleReadResource(params json.RawMessage) (*ReadResourceRes
 		}
 		return s.serveUIResource(readParams.URI, embeddedLocalSCAFindingsHTML)
 
+	case "ui://local-iac-findings/app.html":
+		log.Printf("[RESOURCES/READ] 🎯 Serving Local IaC Findings UI - HTML length: %d bytes", len(embeddedLocalIACFindingsHTML))
+		if len(embeddedLocalIACFindingsHTML) < 1000 {
+			log.Printf("[RESOURCES/READ] ⚠️  WARNING: HTML is suspiciously small! May not be built correctly.")
+		}
+		return s.serveUIResource(readParams.URI, embeddedLocalIACFindingsHTML)
+
 	default:
 		log.Printf("[RESOURCES/READ] ❌ Resource not found: %s", readParams.URI)
-		log.Printf("[RESOURCES/READ] Available URIs: ui://pipeline-findings/app.html, ui://static-findings/app.html, ui://dynamic-findings/app.html, ui://local-sca-findings/app.html")
+		log.Printf("[RESOURCES/READ] Available URIs: ui://pipeline-findings/app.html, ui://static-findings/app.html, ui://dynamic-findings/app.html, ui://local-sca-findings/app.html, ui://local-iac-findings/app.html")
 		return nil, fmt.Errorf("resource not found: %s", readParams.URI)
 	}
 }

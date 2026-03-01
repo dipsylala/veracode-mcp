@@ -38,9 +38,9 @@ func TestLoadToolDefinitions(t *testing.T) {
 	// Get all MCP tools from the tool manager
 	mcpTools := server.toolManager.GetAllMCPTools()
 
-	// tools.json now has 12 tools: api-health, dynamic-findings, static-findings, finding-details (handles both platform and pipeline), remediation-guidance, sca-findings, package-workspace, pipeline-scan, pipeline-status, pipeline-findings, run-sca-scan, local-sca-findings
-	if len(mcpTools) != 12 {
-		t.Errorf("Expected 12 tools, got %d", len(mcpTools))
+	// tools.json now has 13 tools: api-health, dynamic-findings, static-findings, finding-details (handles both platform and pipeline), remediation-guidance, sca-findings, package-workspace, pipeline-scan, pipeline-status, pipeline-findings, run-sca-scan, local-sca-findings, local-iac-findings
+	if len(mcpTools) != 13 {
+		t.Errorf("Expected 13 tools, got %d", len(mcpTools))
 	}
 
 	// Check dynamic findings tool
