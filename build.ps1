@@ -58,13 +58,11 @@ if (-not $SkipUI) {
         Push-Location $appPath
         
         try {
-            # Install dependencies if node_modules doesn't exist
-            if (-not (Test-Path "node_modules")) {
-                Write-Host "  Installing dependencies..." -ForegroundColor Gray
-                npm install 2>&1 | Out-Null
-                if ($LASTEXITCODE -ne 0) {
-                    throw "npm install failed"
-                }
+            # Always install/refresh dependencies to avoid stale packages
+            Write-Host "  Installing dependencies..." -ForegroundColor Gray
+            npm install 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                throw "npm install failed"
             }
             
             # Build UI
