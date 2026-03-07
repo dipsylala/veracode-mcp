@@ -16,7 +16,8 @@ allowed-tools:
   - Bash
   - Grep
   - mcp_veracode_remediation-guidance
-  - mcp_veracode_run-sca-scan
+  - mcp_veracode_local-sca-scan
+  - mcp_veracode_local-sca-findings
 license: Apache-2.0
 compatibility: Requires Veracode MCP server connection and authenticated Veracode account. Supports SAST and SCA for all major package managers.
 metadata:
@@ -38,19 +39,20 @@ A flaw ID is a numeric identifier, optionally with a pipeline suffix:
 - Plain numeric: `12345`
 - With pipeline suffix: `12345-1`
 
-**For numeric flaw IDs only**, call `remediation_guidance` with the flaw ID first to obtain fix guidance before making any code change. Prefer to explain the guidance first unless the user explicitly asks to fix immediately.
+**For numeric flaw IDs only**, obtain remediation guidance first to get language-specific fix instructions before making any code change. Prefer to explain the guidance first unless the user explicitly asks to fix immediately.
 
-**Do not call `remediation_guidance` for CVE or SID identifiers** — those are third-party findings and are handled below.
+**Do not use remediation guidance for CVE or SID identifiers** — those are third-party findings and are handled below.
 
 ### CVE / SCA IDs — third-party dependency findings
 
 A third-party vulnerability identifier starts with `cve-` or `sid-` (case-insensitive), for example `CVE-2021-44228` or `sid-12345`.
 
-Do not call `remediation_guidance` for these. Instead, use any prior output from `run-sca-scan` or other scan results already in context, and follow the **Fixing 3rd party dependencies** steps below.
+Do not use remediation guidance for these. Instead, check whether local SCA scan results are already available in context. If prior SCA output is present, use it directly. If not, retrieve SCA findings filtered by the specific CVE or component name — a fresh scan is not needed if results already exist on disk. Then follow the **Fixing 3rd party dependencies** steps below.
 
 ## Fixing 3rd party dependencies
 
-1. Review any prior output from `run-sca-scan` for the affected component.
+1. Check whether local SCA scan results already contain data for the affected component. If results are present in context or on disk, use them directly before considering a new scan.
+2. If no SCA data is available for the component, run a local SCA scan first, then retrieve findings filtered by the component name or CVE.
 2. Identify the suggested safe version that resolves the CVE/SID. If multiple CVEs affect the same component, select the highest recommended version across all of them.
 3. Determine whether the dependency is direct or transitive:
    - **Transitive**: check whether a newer version of the *direct* dependency already bundles a safe version of the transitive one. If so, upgrade the direct dependency instead.

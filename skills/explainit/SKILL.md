@@ -12,6 +12,7 @@ allowed-tools:
   - Read
   - Grep
   - mcp_veracode_remediation-guidance
+  - mcp_veracode_local-sca-findings
 license: Apache-2.0
 compatibility: Requires Veracode MCP server connection and authenticated Veracode account. Supports SAST and SCA for all major package managers.
 metadata:
@@ -39,9 +40,12 @@ A third-party vulnerability identifier starts with `cve-` or `sid-` (case-insens
 
 ## Retrieving flaw details
 
-**For numeric flaw IDs only** (`12345` or `12345-1`), call `remediation_guidance` with the flaw ID. This single call retrieves all necessary details — do not call `finding_details` separately, as `remediation_guidance` already includes that information in its response.
+**For numeric flaw IDs only** (`12345` or `12345-1`), retrieve remediation guidance using the flaw ID. This single call retrieves all necessary details — do not also call finding-details separately, as the remediation guidance response already includes that information.
 
-**For CVE / SCA IDs** (`cve-` or `sid-` prefixes), do not call `remediation_guidance`. Instead, use any prior output from `run-sca-scan` or other scan results already in context to explain the vulnerability.
+**For CVE / SCA IDs** (`cve-` or `sid-` prefixes), do not use remediation guidance (it only works with pipeline flaw IDs). Instead:
+1. Check whether local SCA scan results already in context contain data for this CVE.
+2. If prior SCA context is available, use it to explain the vulnerability.
+3. If no prior context exists, retrieve local SCA findings filtered by the CVE identifier to get component name, affected version, CVSS score, EPSS score, and fix version.
 
 ## Presenting the explanation
 

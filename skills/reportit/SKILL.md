@@ -1,13 +1,20 @@
 ---
 name: reportit
 description: |
-  
-  - Provides prioritisation, executive summary, and reporting of vulnerabilities in the codebase, based off the pipeline scan
+  Analyses and reports on the security posture of the codebase using completed local scan results.
+
+  - User asks for a security report, posture summary, or vulnerability analysis
+  - User mentions "reportit", "report", "summarise findings", "what vulnerabilities do I have"
+  - User wants to understand priorities, patterns, or what to fix first
+  - User asks for an executive summary or board-level summary of security status
 
 allowed-tools:
   - Read
   - Grep
+  - mcp_veracode_pipeline-status
   - mcp_veracode_pipeline-findings
+  - mcp_veracode_finding-details
+  - mcp_veracode_remediation-guidance
   - mcp_veracode_local-sca-findings
   - mcp_veracode_local-iac-findings
 
@@ -42,32 +49,23 @@ Your value is in the *interpretation* of what the tools return.
 ## Workflow
 
 ### Step 1 — Check scan results exist
-Call `pipeline-status` to confirm a completed pipeline scan is available.
-Call `local-sca-findings` to check whether local SCA results exist.
-If neither has results, ask the user whether they want to run scans first before
-proceeding — do not start scans automatically.
+Check whether a completed pipeline scan is available and whether local SCA results exist.
+If neither source has results, ask the user whether they want to run scans first before proceeding — do not start scans automatically.
 
 ### Step 2 — Retrieve findings
 Retrieve all sources unless the user specifies one:
-- Local SAST → `pipeline-findings`
-- Local SCA (dependencies) → `local-sca-findings`
-- Local IaC → `local-iac-findings`
+- Local SAST pipeline findings
+- Local SCA dependency vulnerabilities
+- Local IaC misconfigurations
 
-For pipeline findings, start with the default page and retrieve additional pages
-only if the first page indicates significant volume of high/very-high findings
-worth reviewing in full.
+For SAST findings, start with the default page and retrieve additional pages only if the first page indicates significant volume of High/Very High findings worth reviewing in full.
 
 ### Step 3 — Drill into detail selectively
-For SAST findings that appear significant or ambiguous, call `finding-details`
-with the pipeline flaw ID to get the full data-flow path. Do not call this for
-every finding — use judgment on findings where the data flow would materially
-change the remediation advice.
+For SAST findings that appear significant or ambiguous, retrieve the full data-flow path for the pipeline flaw. Do not do this for every finding — use judgment on findings where the data flow would materially change the remediation advice.
 
-If a finding references a specific source file, use `read` to examine the
-relevant code before commenting on it.
+If a finding references a specific source file, read the relevant code before commenting on it.
 
-For pipeline findings where the user wants to fix a specific flaw, call
-`remediation-guidance` to get language-specific, CWE-aware fix instructions.
+For pipeline findings where the user wants to fix a specific flaw, retrieve language-specific, CWE-aware fix instructions using the pipeline flaw ID.
 
 ### Step 4 — Synthesize
 

@@ -2,13 +2,13 @@
   "tools": [
     {
       "name": "api-health",
-      "description": "Checks the health and availability of Veracode API endpoints",
+      "description": "Checks the health and availability of Veracode API endpoints. Call this first if API connectivity is uncertain before running scans or retrieving findings.",
       "category": "veracode",
       "params": []
     },
     {
       "name": "dynamic-findings",
-      "description": "Get runtime vulnerabilities from platform-based DYNAMIC analysis scans (auth/session flaws, authorization bypasses, CSRF, clickjacking, etc.)",
+      "description": "Get runtime vulnerabilities from platform-based DYNAMIC analysis scans (auth/session flaws, authorization bypasses, CSRF, clickjacking, etc.). These are findings from scans already completed on the Veracode platform — this tool does not run a new scan. Do not use for local or pipeline scan results.",
       "params": [
         {
           "name": "application_path",
@@ -78,7 +78,7 @@
     },
     {
       "name": "static-findings",
-      "description": "Get source code vulnerabilities from platform-based STATIC analysis scans (XSS, SQLi, crypto issues, buffer overflows, etc.)",
+      "description": "Get source code vulnerabilities from platform-based STATIC analysis scans on the Veracode platform (XSS, SQLi, crypto issues, buffer overflows, etc.). These are findings from scans already completed on the platform — this tool does not run a new scan. Do not use for local pipeline scan results; use pipeline-findings for those.",
       "params": [
         {
           "name": "application_path",
@@ -148,7 +148,7 @@
     },
     {
       "name": "finding-details",
-      "description": "Get detailed information about any flaw from platform scans (static/dynamic) or pipeline scans. Returns complete flaw details including data flow paths or request/response info for dynamic flaws. Use this to get more context on any specific flaw ID from scan results.",
+      "description": "Get detailed information about a specific flaw including full data-flow paths (SAST) or request/response info (DAST). Determines scan type automatically from flaw ID format: plain numeric (e.g., '12345') indicates a platform scan flaw; numeric with occurrence suffix (e.g., '12345-1') indicates a pipeline scan flaw. Use selectively for findings where the full data-flow path would materially change the remediation approach — not for every finding.",
       "params": [
         {
           "name": "application_path",
@@ -172,7 +172,7 @@
     },
     {
       "name": "remediation-guidance",
-      "description": "Fix flaws, vulnerabilities, or security issues found in pipeline scan results. Provides language-specific remediation guidance, secure code examples, and step-by-step fix instructions for any pipeline scan finding. Use this when user wants to fix, remediate, or resolve a specific flaw ID or issue from pipeline results.",
+      "description": "Provides language-specific remediation guidance, secure code examples, and step-by-step fix instructions for pipeline scan SAST findings. ONLY works with pipeline scan flaw IDs (format: '1234-1' with occurrence suffix). Do NOT call this for platform flaw IDs (plain numeric) or CVE/SID identifiers — it will fail. Already includes flaw details, so calling finding-details first is unnecessary.",
       "category": "veracode",
       "params": [
         {
@@ -191,7 +191,7 @@
     },
     {
       "name": "sca-findings",
-      "description": "Get third-party library vulnerabilities from platform-based SCA scans (vulnerable dependencies, outdated libraries, CVEs)",
+      "description": "Get third-party library vulnerabilities from platform-based SCA scans on the Veracode platform (vulnerable dependencies, outdated libraries, CVEs). These are findings from scans already completed on the platform. Do not use for local SCA scan results — use local-sca-findings for those.",
       "params": [
         {
           "name": "application_path",
@@ -249,7 +249,7 @@
     },
     {
       "name": "package-workspace",
-      "description": "Package workspace files for Veracode scanning",
+      "description": "Packages source code into a ZIP artifact suitable for Veracode pipeline scanning. Must be called before pipeline-scan. Stores the artifact in .veracode/packaging/ within the workspace. If a filename is not specified, pipeline-scan will automatically locate the artifact.",
       "params": [
         {
           "name": "application_path",
@@ -267,7 +267,7 @@
     },
     {
       "name": "pipeline-scan",
-      "description": "Perform local SAST scan using Veracode Pipeline Scanner",
+      "description": "Performs a local SAST scan using the Veracode Pipeline Scanner. Requires package-workspace to have been called first. By default runs asynchronously (returns immediately); use pipeline-status to poll for completion and pipeline-findings to retrieve results. Set synchronous=true when results are needed before proceeding, such as in an automated remediation workflow — then call pipeline-findings immediately after.",
       "params": [
         {
           "name": "application_path",
@@ -297,7 +297,7 @@
     },
     {
       "name": "pipeline-status",
-      "description": "Check pipeline local scan status",
+      "description": "Checks the status of a local pipeline scan (RUNNING, COMPLETED, or no scan found). Call pipeline-findings once COMPLETED is returned. Also indicates whether a previous completed results file exists even when no scan is active.",
       "params": [
         {
           "name": "application_path",
@@ -309,7 +309,7 @@
     },
     {
       "name": "pipeline-findings",
-      "description": "Get completed pipeline local scan results with interactive UI",
+      "description": "Retrieves findings from a completed local pipeline SAST scan with an interactive UI. Requires a scan to have completed — check pipeline-status first if unsure. By default returns only policy-violating findings. Use finding-details for the full data-flow path on a specific flaw, or remediation-guidance to get fix instructions for a pipeline flaw ID.",
       "params": [
         {
           "name": "application_path",
@@ -347,7 +347,7 @@
     },
     {
       "name": "local-sca-scan",
-      "description": "Run local SCA scan to identify vulnerable dependencies",
+      "description": "Runs a local SCA scan to identify vulnerable third-party dependencies and IaC misconfigurations. Stores results in the workspace. After completion, call local-sca-findings to retrieve dependency vulnerabilities and local-iac-findings to retrieve IaC misconfigurations — both read from the same scan output.",
       "params": [
         {
           "name": "application_path",
@@ -359,7 +359,7 @@
     },
     {
       "name": "local-sca-findings",
-      "description": "Get local SCA scan results with vulnerability details and fix recommendations",
+      "description": "Retrieves vulnerability details from a completed local SCA scan, including CVE identifiers, CVSS scores, EPSS scores, affected versions, and fix version recommendations. Requires a prior local-sca-scan to have run. EPSS score reflects real-world exploitability probability — prioritize findings with EPSS > 0.1 even for medium CVSS scores. Use the cve filter to look up a specific CVE directly.",
       "params": [
         {
           "name": "application_path",
@@ -413,7 +413,7 @@
     },
     {
       "name": "local-iac-findings",
-      "description": "Get local IaC scan results (Dockerfile and configuration misconfigurations) from the most recent local SCA scan",
+      "description": "Retrieves IaC misconfiguration findings (Dockerfiles, Kubernetes manifests, cloud configs) from the most recent local SCA scan. Results come from the same scan run as local-sca-findings — run local-sca-scan once to populate both. By default returns only failed checks.",
       "params": [
         {
           "name": "application_path",
