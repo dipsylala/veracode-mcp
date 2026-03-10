@@ -326,7 +326,7 @@ The server provides these Veracode-specific tools:
 
 ### Remediation Guidance
 
-The `remediation-guidance` tool provides CWE-specific, language-aware security guidance with code examples. It returns structured JSON containing:
+The `remediation-guidance` tool provides CWE-specific, language-aware security guidance with code examples. It returns structured JSON back to the calling LLM, containing:
 
 - Vulnerability summary and key principles
 - Step-by-step remediation instructions  
