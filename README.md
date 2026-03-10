@@ -1,4 +1,4 @@
-# Veracode MCP Server (Go)
+# Veracode MCP Server
 
 ⚠️ **ALPHA SOFTWARE** - This is early-stage software under active development. APIs and functionality may change without notice. This is not production-ready code.
 
@@ -23,7 +23,6 @@ This is my 4th version, after writing it in TypeScript, Python, as a set of [Age
   - Static Pipeline and scan results
   - Remediation Guidance for Pipeline results
   - Finding details - Data paths and dynamic request/responses
-  
 
 ## Installation
 
