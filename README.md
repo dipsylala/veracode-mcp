@@ -244,10 +244,6 @@ Remediation guidance is based on LLM-optimised versions of the work at [https://
 
 See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for building from source, running tests, adding new tools, and the full developer documentation index.
 
-## License
-
-MIT
-
 ## Contributing
 
 ⚠️ This is alpha software. Contributions are welcome — see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). APIs and architecture may change significantly.
