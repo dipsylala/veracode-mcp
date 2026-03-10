@@ -1,10 +1,10 @@
-# Veracode MCP Server
+# Veracode MCP Server (Go)
 
 ⚠️ **ALPHA SOFTWARE** - This is early-stage software under active development. APIs and functionality may change without notice. This is not production-ready code.
 
 A Model Context Protocol (MCP) server implementation in Go that provides Veracode security scanning capabilities to AI assistants and LLMs. Uses stdio transport for local filesystem operations.
 
-This is my 4th version, after writing it in TypeScript, Python, as a set of [Agent Skills](https://agentskills.io/home) calling scripts, and now - in Go. Go ultimately makes it easier to distribute, and I wanted more practice writing that language, so here we go.
+This is my 4th version, after writing it in TypeScript, Python, as a set of [Agent Skills](https://agentskills.io/home), and now - in Go. Go ultimately makes it easier to distribute, and I wanted more practice in it, so here we go.
 
 ## Features
 
@@ -211,7 +211,6 @@ The server provides these Veracode-specific tools:
 - **static-findings** - Retrieve source code vulnerabilities from Static Analysis (SAST) scans
 - **sca-findings** - Retrieve third-party component vulnerabilities from Software Composition Analysis
 - **finding-details** - Get detailed information about a specific finding
-
 - **package-workspace** - Package workspace files for Veracode upload
 - **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
 - **pipeline-status** - Check the status of a Pipeline Scan
@@ -220,23 +219,24 @@ The server provides these Veracode-specific tools:
 - **run-sca-scan** - Run Software Composition Analysis scan on a directory to identify vulnerable dependencies
 - **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
 - **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
+- **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
 - **remediation-guidance** - Help fix flaws (see below)
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
 
 ### Remediation Guidance
 
-The `remediation-guidance` tool provides CWE-specific, language-aware security guidance with code examples. It returns structured JSON back to the calling LLM, containing:
+The `remediation-guidance` tool provides CWE-specific, language-aware security guidance with code examples. It returns structured JSON containing:
 
 - Vulnerability summary and key principles
 - Step-by-step remediation instructions  
 - Safe code patterns and examples
 - Data flow information from the scan
 
+Remediation guidance is based on LLM-optimised versions of the work at [https://dipsylala.github.io/FlawFixingGuidance/](https://dipsylala.github.io/FlawFixingGuidance/)
+
 > [!NOTE]
 > **Quality Expectations:** The usefulness of remediation guidance depends heavily on how the AI assistant (LLM) interprets and applies the returned information. The tool provides structured security best practices and code samples, but the quality of the final code suggestions is determined by the capabilities of the LLM you're using (e.g., Claude, GPT-4, etc.). More capable models will better understand context and provide more accurate, applicable fixes.
-
-Remediation guidance is based on LLM-optimised versions of the work at [https://dipsylala.github.io/FlawFixingGuidance/](https://dipsylala.github.io/FlawFixingGuidance/)
 
 ---
 
