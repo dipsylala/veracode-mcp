@@ -202,106 +202,6 @@ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 }
 ```
 
-### VS Code: Veracode Analyst Agent
-
-A pre-built VS Code agent is available that works with the MCP to provide AI-powered analysis of your Veracode findings. Where the MCP provides structured, LLM-optimised data retrieval, the agent provides the non-deterministic layer: risk prioritisation, cross-scan correlation, root cause grouping, and remediation planning.
-
-**Check the feature is enabled in VS Code:**
-
-
-**Install for a project:**
-
-Download `veracode-analyst.agent.md` from the [Releases page](https://github.com/dipsylala/veracode-mcp/releases) and place it in your project:
-
-```text
-<your-project>/.github/agents/veracode-analyst.agent.md
-```
-
-**Install for personal use across all projects (VS Code Insiders):**
-
-```powershell
-# Windows
-Copy-Item veracode-analyst.agent.md "$env:APPDATA\Code\User\agents\"
-```
-
-```bash
-# macOS/Linux
-cp veracode-analyst.agent.md "$HOME/Library/Application Support/Code/User/agents/"
-```
-
-After placing the file, reload VS Code (`Developer: Reload Window`). The **Veracode Analyst** agent will appear in the chat mode selector in the Copilot Chat panel.
-
-**Usage:**
-
-Select **Veracode Analyst** from the chat mode selector, or let Copilot spawn it automatically as a subagent when it determines it's appropriate:
-
-```text
-Analyse the security posture of /path/to/my/project and tell me what I should fix first.
-```
-
-The agent will check for findings, retrieve findings across SCA and Pipeline static scans, and synthesise a prioritised remediation plan. It requires the MCP server to be configured in VS Code settings as shown above.
-
-### VS Code: Copilot Skills
-
-Five task-focused skills are available for GitHub Copilot in VS Code. Each skill is a pre-built prompt that knows which MCP tools to call — they require the Veracode MCP server to be configured in VS Code.
-
-| Skill | Trigger phrase | What it does |
-|---|---|---|
-| **scanit** | `#scanit` | Packages the workspace and starts a pipeline SAST scan |
-| **thirdit** | `#thirdit` | Runs a local SCA scan on third-party dependencies |
-| **reportit** | `#reportit` | Retrieves findings and produces a prioritised executive summary |
-| **fixit** | `#fixit` | Retrieves remediation guidance and applies fixes for a specific flaw or CVE |
-| **explainit** | `#explainit` | Explains a specific flaw or CVE in plain language |
-
-#### Installing the skills
-
-Skills are distributed as individual `.md` files on the [Releases page](https://github.com/dipsylala/veracode-mcp/releases).
-
-**Install for a project** (team-shared, checked in to source control):
-
-```text
-<your-project>/.github/skills/scanit.skill.md
-<your-project>/.github/skills/thirdit.skill.md
-<your-project>/.github/skills/reportit.skill.md
-<your-project>/.github/skills/fixit.skill.md
-<your-project>/.github/skills/explainit.skill.md
-```
-
-**Install for personal use across all projects:**
-
-*Windows:*
-```powershell
-# Copy all skill files to your user skills directory
-Copy-Item *.skill.md "$env:APPDATA\Code\User\skills\"
-```
-
-*macOS/Linux:*
-```bash
-cp *.skill.md "$HOME/Library/Application Support/Code/User/skills/"
-```
-
-After placing the files, reload VS Code (`Developer: Reload Window`). Skills appear as `#scanit`, `#thirdit`, etc. in the Copilot Chat input.
-
-#### Typical workflow
-
-```text
-# 1. Package and scan
-@workspace #scanit scan /path/to/my/project
-
-# 2. Check status (after scan completes)
-@workspace #reportit summarise findings in /path/to/my/project
-
-# 3. Fix a specific flaw
-@workspace #fixit fix flaw 1026-1 in /path/to/my/project
-
-# 4. Scan dependencies separately
-@workspace #thirdit scan /path/to/my/project
-```
-
-> **Note:** Skills call MCP tools automatically based on your request. The MCP server must be running and configured in VS Code (see VS Code configuration above) for skills to work.
-
----
-
 ## Available MCP Tools
 
 The server provides these Veracode-specific tools:
@@ -335,6 +235,8 @@ The `remediation-guidance` tool provides CWE-specific, language-aware security g
 
 > [!NOTE]
 > **Quality Expectations:** The usefulness of remediation guidance depends heavily on how the AI assistant (LLM) interprets and applies the returned information. The tool provides structured security best practices and code samples, but the quality of the final code suggestions is determined by the capabilities of the LLM you're using (e.g., Claude, GPT-4, etc.). More capable models will better understand context and provide more accurate, applicable fixes.
+
+Remediation guidance is based on LLM-optimised versions of the work at [https://dipsylala.github.io/FlawFixingGuidance/](https://dipsylala.github.io/FlawFixingGuidance/)
 
 ---
 
