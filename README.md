@@ -1,10 +1,10 @@
-# Veracode MCP Server (Go)
+# Veracode MCP Server
 
 ⚠️ **ALPHA SOFTWARE** - This is early-stage software under active development. APIs and functionality may change without notice. This is not production-ready code.
 
 A Model Context Protocol (MCP) server implementation in Go that provides Veracode security scanning capabilities to AI assistants and LLMs. Uses stdio transport for local filesystem operations.
 
-This is my 4th version, after writing it in TypeScript, Python, as a set of [Agent Skills](https://agentskills.io/home), and now - in Go. Go ultimately makes it easier to distribute, and I wanted more practice in it, so here we go.
+This is my 4th version, after writing it in TypeScript, Python, as a set of [Agent Skills](https://agentskills.io/home) calling scripts, and now - in Go. Go ultimately makes it easier to distribute, and I wanted more practice writing that language, so here we go.
 
 ## Features
 
