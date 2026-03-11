@@ -189,20 +189,28 @@ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 
 The server provides these Veracode-specific tools:
 
+API:
 - **api-health** - Verify Veracode API connectivity and credentials
+
+Platform:
 - **dynamic-findings** - Retrieve runtime security vulnerabilities from Dynamic Analysis (DAST) scans
 - **static-findings** - Retrieve source code vulnerabilities from Static Analysis (SAST) scans
 - **sca-findings** - Retrieve third-party component vulnerabilities from Software Composition Analysis
 - **finding-details** - Get detailed information about a specific finding
+
+Pipeline:
 - **package-workspace** - Package workspace files for Veracode upload
 - **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
 - **pipeline-status** - Check the status of a Pipeline Scan
 - **pipeline-findings** - Get results from Veracode Pipeline Scans
 - **pipeline-detailed-results** - Get detailed results from Pipeline Scans with full flaw information
+
+SCA:
 - **run-sca-scan** - Run Software Composition Analysis scan on a directory to identify vulnerable dependencies
 - **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
 - **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
-- **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
+
+Remediation:
 - **remediation-guidance** - Help fix flaws (see below)
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
