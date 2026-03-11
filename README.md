@@ -38,6 +38,8 @@ Extract and place the executable in a directory of your choice (e.g., `C:\Progra
 
 Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) require the Veracode CLI to be installed and available in your system PATH.
 
+Given the Veracode installation process requires elevated privileges, we took the decision for the user to perform the installation themselves, rather than an MCP requesting elevated privileges and installing software on a machine.
+
 **Install the Veracode CLI:**
 
 *Windows (Admin PowerShell):*
