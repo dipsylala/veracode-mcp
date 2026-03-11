@@ -120,8 +120,6 @@ See [credentials/README.md](credentials/README.md) for detailed information.
 ### Command Line Options
 
 ```bash
-.\path\to\veracode-mcp.exe [options]
-
 Options:
   -verbose
         Enable verbose logging to stderr (disabled by default)
@@ -134,16 +132,6 @@ Options:
 **Usage Examples:**
 
 Bear in mind, this will typically not be run from the command-line directly, but part of the IDE configuration.
-
-```bash
-# Basic usage (silent mode, stdio transport)
-.\path\to\veracode-mcp.exe
-
-# With debug logging to file (recommended for troubleshooting)
-.\path\path\to\veracode-mcp.exe -log \path\to\veracode-mcp.log
-
-# With verbose logging to stderr (avoid in stdio mode as some MCP clients can react badly)
-.\path\to\veracode-mcp.exe -verbose
 
 ```
 
