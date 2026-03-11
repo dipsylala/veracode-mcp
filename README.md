@@ -129,13 +129,7 @@ Options:
         Display version information
 ```
 
-**Usage Examples:**
-
-Bear in mind, this will typically not be run from the command-line directly, but part of the IDE configuration.
-
-```
-
-**Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, add `-log <filepath>` to write debug information to a file.
+**Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), `-verbose` generates stderr output which can interfere with some JSON-RPC clients. If necessary, add `-log <filepath>` to write debug information to a file.
 
 ### Stdio Mode
 
