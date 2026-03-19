@@ -92,9 +92,6 @@ jobs:
         run: |
           GOOS=darwin GOARCH=arm64 go build -o dist/veracode-mcp-darwin-arm64 -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" .
 
-      - name: Copy agent file
-        run: cp .github/agents/veracode-analyst.agent.md dist/veracode-analyst.agent.md
-
       - name: Create checksums
         run: |
           cd dist
@@ -115,7 +112,6 @@ jobs:
             dist/veracode-mcp-linux-arm64
             dist/veracode-mcp-darwin-amd64
             dist/veracode-mcp-darwin-arm64
-            dist/veracode-analyst.agent.md
             dist/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
