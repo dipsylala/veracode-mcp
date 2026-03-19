@@ -144,6 +144,44 @@ func TestParseDynamicFindingsRequest_MissingApplicationPath(t *testing.T) {
 	}
 }
 
+func TestParseDynamicFindingsRequest_ViolatesPolicyDefault(t *testing.T) {
+	// When violates_policy is not provided it should default to true (policy violations only)
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+	}
+
+	req, err := parseDynamicFindingsRequest(args)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	if req.ViolatesPolicy == nil {
+		t.Fatal("Expected ViolatesPolicy to be non-nil by default")
+	}
+	if !*req.ViolatesPolicy {
+		t.Error("Expected default ViolatesPolicy to be true")
+	}
+}
+
+func TestParseDynamicFindingsRequest_ViolatesPolicyFalseDisablesFilter(t *testing.T) {
+	// Passing false should disable the policy filter entirely (nil), not filter for non-violations.
+	// This matches the pipeline_findings behaviour and the tool description:
+	// "set to false to see all findings regardless of policy".
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"violates_policy":  false,
+	}
+
+	req, err := parseDynamicFindingsRequest(args)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	if req.ViolatesPolicy != nil {
+		t.Errorf("Expected ViolatesPolicy to be nil (no filter) when false is passed, got %v", *req.ViolatesPolicy)
+	}
+}
+
 // ============================================================================
 // handleGetDynamicFindings tests
 // ============================================================================

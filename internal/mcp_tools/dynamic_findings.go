@@ -60,12 +60,17 @@ func parseDynamicFindingsRequest(args map[string]interface{}) (*DynamicFindingsR
 		return nil, err
 	}
 
-	// Extract optional booleans
 	// Extract optional booleans — default violates_policy to true if not provided
+	// false means "disable the policy filter" (show all findings), not "only non-violating findings".
+	// The Veracode REST API treats violates_policy=false as a positive filter for non-violations,
+	// so we convert false → nil (omit the parameter) to match the pipeline_findings behaviour.
 	violatesPolicy, provided := extractOptionalBool(args, "violates_policy")
 	if !provided {
 		defaultTrue := true
 		violatesPolicy = &defaultTrue
+	} else if !*violatesPolicy {
+		// false → no policy filter; show all findings
+		violatesPolicy = nil
 	}
 	req.ViolatesPolicy = violatesPolicy
 
