@@ -38,6 +38,8 @@ Extract and place the executable in a directory of your choice (e.g., `C:\Progra
 
 Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) require the Veracode CLI to be installed and available in your system PATH.
 
+Given the Veracode installation process requires elevated privileges, we took the decision for the user to perform the installation themselves, rather than an MCP requesting elevated privileges and installing software on a machine.
+
 **Install the Veracode CLI:**
 
 *Windows (Admin PowerShell):*
@@ -118,8 +120,6 @@ See [credentials/README.md](credentials/README.md) for detailed information.
 ### Command Line Options
 
 ```bash
-.\path\to\veracode-mcp.exe [options]
-
 Options:
   -verbose
         Enable verbose logging to stderr (disabled by default)
@@ -129,23 +129,7 @@ Options:
         Display version information
 ```
 
-**Usage Examples:**
-
-Bear in mind, this will typically not be run from the command-line directly, but part of the IDE configuration.
-
-```bash
-# Basic usage (silent mode, stdio transport)
-.\path\to\veracode-mcp.exe
-
-# With debug logging to file (recommended for troubleshooting)
-.\path\path\to\veracode-mcp.exe -log \path\to\veracode-mcp.log
-
-# With verbose logging to stderr (avoid in stdio mode as some MCP clients can react badly)
-.\path\to\veracode-mcp.exe -verbose
-
-```
-
-**Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), avoid using `-verbose` as stderr output can interfere with JSON-RPC communication. Instead, add `-log <filepath>` to write debug information to a file.
+**Important:** When using stdio mode with MCP clients (like VS Code or Claude Desktop), `-verbose` generates stderr output which can interfere with some JSON-RPC clients. If necessary, add `-log <filepath>` to write debug information to a file.
 
 ### Stdio Mode
 
@@ -205,20 +189,28 @@ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 
 The server provides these Veracode-specific tools:
 
+API:
 - **api-health** - Verify Veracode API connectivity and credentials
+
+Platform:
 - **dynamic-findings** - Retrieve runtime security vulnerabilities from Dynamic Analysis (DAST) scans
 - **static-findings** - Retrieve source code vulnerabilities from Static Analysis (SAST) scans
 - **sca-findings** - Retrieve third-party component vulnerabilities from Software Composition Analysis
 - **finding-details** - Get detailed information about a specific finding
+
+Pipeline:
 - **package-workspace** - Package workspace files for Veracode upload
 - **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
 - **pipeline-status** - Check the status of a Pipeline Scan
 - **pipeline-findings** - Get results from Veracode Pipeline Scans
 - **pipeline-detailed-results** - Get detailed results from Pipeline Scans with full flaw information
+
+SCA:
 - **run-sca-scan** - Run Software Composition Analysis scan on a directory to identify vulnerable dependencies
 - **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
 - **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
-- **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
+
+Remediation:
 - **remediation-guidance** - Help fix flaws (see below)
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
