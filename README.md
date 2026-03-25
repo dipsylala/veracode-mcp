@@ -42,6 +42,10 @@ Given the Veracode installation process requires elevated privileges, we took th
 
 **Install the Veracode CLI:**
 
+Note - this is only necessary for running some of the local tools like packaging, Veracode SCA agent scanning and pipeline scanning.
+
+If you wish to only use data from the platform, it's not necessary.
+
 *Windows (Admin PowerShell):*
 
 ```powershell
