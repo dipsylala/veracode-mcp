@@ -75,6 +75,11 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 
 // handlePipelineScan performs a local static scan using Veracode Pipeline Scanner
 func handlePipelineScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+	// Verify the veracode CLI binary is available before doing any other work
+	if err := CheckVeracodeExecutable(); err != nil {
+		return map[string]interface{}{"error": err.Error()}, nil
+	}
+
 	// Parse and validate request parameters
 	req, err := parsePipelineScanRequest(args)
 	if err != nil {

@@ -217,6 +217,16 @@ function FindingRow({ finding }: FindingRowProps) {
           >
             {finding.cwe_id}
           </a>
+          {' '}
+          <a
+            href={`https://dipsylala.github.io/FlawFixingGuidance/CWE-${finding.cwe_id}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            title="Flaw Fixing Guidance"
+          >
+            &#x1F6E0;
+          </a>
         </td>
         <td>
           <div className={styles.filePath}>

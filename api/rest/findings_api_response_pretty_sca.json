@@ -37,11 +37,6 @@
             "severity": "High",
             "vector": "AV:N/​AC:L/​Au:N/​C:C/​I:C/​A:C"
           },
-          "cwe": {
-            "href": "https://api.veracode.com/appsec/v1/cwes/502",
-            "id": 502,
-            "name": "Deserialization of Untrusted Data"
-          },
           "language": "JAVA",
           "licenses": [
             {
@@ -59,8 +54,8 @@
         },
         "finding_status": {
           "first_found_date": "2025-12-13T05:03:47.470Z",
-          "last_seen_date": "2025-07-24T09:50:33.591Z",
-          "new": true,
+          "last_seen_date": "2026-03-10T14:45:00.508Z",
+          "new": false,
           "resolution": "UNRESOLVED",
           "resolution_status": "NONE",
           "status": "OPEN"
@@ -126,7 +121,7 @@
         },
         "finding_status": {
           "first_found_date": "2025-07-24T09:50:20.870Z",
-          "last_seen_date": "2025-07-24T09:50:33.591Z",
+          "last_seen_date": "2026-03-10T14:45:00.508Z",
           "new": false,
           "resolution": "UNRESOLVED",
           "resolution_status": "NONE",
@@ -188,8 +183,8 @@
         },
         "finding_status": {
           "first_found_date": "2025-12-13T19:42:50.746Z",
-          "last_seen_date": "2025-07-24T09:50:33.591Z",
-          "new": true,
+          "last_seen_date": "2026-03-10T14:45:00.508Z",
+          "new": false,
           "resolution": "UNRESOLVED",
           "resolution_status": "NONE",
           "status": "OPEN"
@@ -255,7 +250,7 @@
         },
         "finding_status": {
           "first_found_date": "2025-07-24T09:50:21.138Z",
-          "last_seen_date": "2025-07-24T09:50:33.591Z",
+          "last_seen_date": "2026-03-10T14:45:00.508Z",
           "new": false,
           "resolution": "UNRESOLVED",
           "resolution_status": "NONE",
@@ -322,7 +317,7 @@
         },
         "finding_status": {
           "first_found_date": "2025-07-24T09:50:21.138Z",
-          "last_seen_date": "2025-07-24T09:50:33.591Z",
+          "last_seen_date": "2026-03-10T14:45:00.508Z",
           "new": false,
           "resolution": "UNRESOLVED",
           "resolution_status": "NONE",
@@ -341,7 +336,7 @@
       "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=0\u0026size=5"
     },
     "last": {
-      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=22\u0026size=5"
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=23\u0026size=5"
     },
     "next": {
       "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=1\u0026size=5"
@@ -358,7 +353,7 @@
   "page": {
     "number": 0,
     "size": 5,
-    "total_elements": 113,
-    "total_pages": 23
+    "total_elements": 118,
+    "total_pages": 24
   }
 }

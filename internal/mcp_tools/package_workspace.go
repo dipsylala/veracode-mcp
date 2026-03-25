@@ -39,6 +39,11 @@ func parsePackageWorkspaceRequest(args map[string]interface{}) (*PackageWorkspac
 
 // handlePackageWorkspace packages the workspace for Veracode scanning
 func handlePackageWorkspace(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+	// Verify the veracode CLI binary is available before doing any other work
+	if err := CheckVeracodeExecutable(); err != nil {
+		return map[string]interface{}{"error": err.Error()}, nil
+	}
+
 	// Parse and validate request parameters
 	req, err := parsePackageWorkspaceRequest(args)
 	if err != nil {

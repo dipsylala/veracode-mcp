@@ -1,5 +1,20 @@
 package mcp_tools
 
+import (
+	"fmt"
+	"os/exec"
+)
+
+// CheckVeracodeExecutable verifies that the veracode CLI binary is available on PATH.
+// Returns a descriptive error if not found.
+func CheckVeracodeExecutable() error {
+	_, err := exec.LookPath("veracode")
+	if err != nil {
+		return fmt.Errorf("veracode CLI executable not found on PATH: install the Veracode CLI and ensure it is available in your system PATH")
+	}
+	return nil
+}
+
 // VeracodeExitCodeInfo contains information about a Veracode CLI exit code
 type VeracodeExitCodeInfo struct {
 	ExitCode  int

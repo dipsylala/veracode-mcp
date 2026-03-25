@@ -38,6 +38,11 @@ func parseLocalSCAScanRequest(args map[string]interface{}) (*LocalSCAScanRequest
 
 // handleLocalSCAScan runs a Software Composition Analysis scan on the workspace
 func handleLocalSCAScan(ctx context.Context, args map[string]interface{}) (interface{}, error) {
+	// Verify the veracode CLI binary is available before doing any other work
+	if err := CheckVeracodeExecutable(); err != nil {
+		return map[string]interface{}{"error": err.Error()}, nil
+	}
+
 	// Parse and validate request parameters
 	req, err := parseLocalSCAScanRequest(args)
 	if err != nil {
