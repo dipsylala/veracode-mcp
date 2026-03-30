@@ -6,6 +6,10 @@ A Model Context Protocol (MCP) server implementation in Go that provides Veracod
 
 This is my 4th version, after writing it in TypeScript, Python, as a set of [Agent Skills](https://agentskills.io/home), and now - in Go. Go ultimately makes it easier to distribute, and I wanted more practice in it, so here we go.
 
+> [!NOTE]
+> This is not associated with Veracode, and does not fall under their support
+
+
 ## Features
 
 - **MCP Protocol Support**
