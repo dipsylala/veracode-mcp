@@ -21,7 +21,6 @@ This is my 4th version, after writing it in TypeScript, Python, as a set of [Age
   - Platform SCA (Software Composition Analysis) findings
   - Workspace packaging for scan preparation
   - Static Pipeline and scan results
-  - Remediation Guidance for Pipeline results
   - Finding details - Data paths and dynamic request/responses
 
 ## Installation
@@ -210,24 +209,7 @@ SCA:
 - **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
 - **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
 
-Remediation:
-- **remediation-guidance** - Help fix flaws (see below)
-
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
-
-### Remediation Guidance
-
-The `remediation-guidance` tool provides CWE-specific, language-aware security guidance with code examples. It returns structured JSON containing:
-
-- Vulnerability summary and key principles
-- Step-by-step remediation instructions  
-- Safe code patterns and examples
-- Data flow information from the scan
-
-Remediation guidance is based on LLM-optimised versions of the work at [https://dipsylala.github.io/FlawFixingGuidance/](https://dipsylala.github.io/FlawFixingGuidance/)
-
-> [!NOTE]
-> **Quality Expectations:** The usefulness of remediation guidance depends heavily on how the AI assistant (LLM) interprets and applies the returned information. The tool provides structured security best practices and code samples, but the quality of the final code suggestions is determined by the capabilities of the LLM you're using (e.g., Claude, GPT-4, etc.). More capable models will better understand context and provide more accurate, applicable fixes.
 
 ---
 

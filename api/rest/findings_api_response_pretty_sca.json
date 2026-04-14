@@ -336,7 +336,7 @@
       "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=0\u0026size=5"
     },
     "last": {
-      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=23\u0026size=5"
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=24\u0026size=5"
     },
     "next": {
       "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=1\u0026size=5"
@@ -353,7 +353,7 @@
   "page": {
     "number": 0,
     "size": 5,
-    "total_elements": 118,
-    "total_pages": 24
+    "total_elements": 123,
+    "total_pages": 25
   }
 }

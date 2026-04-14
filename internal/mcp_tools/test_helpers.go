@@ -57,8 +57,3 @@ func NewFindingDetailsTool() ToolImplementation {
 func NewAPIHealthTool() ToolImplementation {
 	return NewSimpleTool(APIHealthToolName, handleAPIHealth)
 }
-
-// NewRemediationGuidanceTool creates a SimpleTool for remediation guidance (test helper)
-func NewRemediationGuidanceTool() ToolImplementation {
-	return NewSimpleTool(RemediationGuidanceToolName, handleGetRemediationGuidance)
-}

@@ -141,24 +141,6 @@ func parsePipelineFlawIDString(flawIDStr string) (*FlawIDComponents, error) {
 	return &FlawIDComponents{IssueID: issueID, Occurrence: occurrence}, nil
 }
 
-// extractFlawIDString extracts and parses a flaw_id parameter (pipeline tools only).
-// Only accepts strings in format "1000" or "1000-2".
-// Returns the parsed components (issue_id and occurrence) or an error if invalid.
-func extractFlawIDString(args map[string]interface{}) (*FlawIDComponents, error) {
-	val, exists := args["flaw_id"]
-	if !exists {
-		return nil, fmt.Errorf("flaw_id is required")
-	}
-
-	flawIDStr, ok := val.(string)
-	if !ok {
-		return nil, fmt.Errorf("flaw_id must be a string (e.g., \"1000\" or \"1000-2\")")
-	}
-
-	// Reuse the parsing logic
-	return parsePipelineFlawIDString(flawIDStr)
-}
-
 // validateIntRange validates that an integer is within the specified range (inclusive).
 // Returns an error with a descriptive message if the value is out of range.
 func validateIntRange(value int, min, max int, fieldName string) error {
