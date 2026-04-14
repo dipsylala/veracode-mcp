@@ -1,6 +1,9 @@
 # Veracode MCP Server
 
-⚠️ **ALPHA SOFTWARE** - This is early-stage software under active development. APIs and functionality may change without notice. This is not production-ready code.
+> [!NOTE]
+> This is not associated with Veracode, and does not fall under their support
+
+⚠️ **BETA** - After running this regularly for months on multiple applications, I'm happy to move this to Beta. This is still early-stage software under active development, but the tools and general functionality have stabilised.
 
 A Model Context Protocol (MCP) server implementation in Go that provides Veracode security scanning capabilities to AI assistants and LLMs. Uses stdio transport for local filesystem operations.
 
@@ -40,6 +43,10 @@ Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) requir
 Given the Veracode installation process requires elevated privileges, we took the decision for the user to perform the installation themselves, rather than an MCP requesting elevated privileges and installing software on a machine.
 
 **Install the Veracode CLI:**
+
+> [!NOTE]
+> **Requirements:** this is only necessary for running some of the local tools like packaging, Veracode SCA agent scanning and pipeline scanning.
+> If you wish to only use data from the platform like platform SAST, DAST and 'Upload and Scan' SCA it's not necessary.
 
 *Windows (Admin PowerShell):*
 
@@ -219,4 +226,4 @@ See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for building from source, runni
 
 ## Contributing
 
-⚠️ This is alpha software. Contributions are welcome — see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). APIs and architecture may change significantly.
+⚠️ This is beta software. Contributions are welcome — see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
