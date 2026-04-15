@@ -82,6 +82,100 @@ func TestParsePipelineFindingsRequest_MissingApplicationPath(t *testing.T) {
 	}
 }
 
+func TestParsePipelineFindingsRequest_CWEIDs(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+		"cwe_ids":          []interface{}{float64(502), float64(89)},
+	}
+
+	req, err := parsePipelineFindingsRequest(args)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	if len(req.CWEIDs) != 2 {
+		t.Fatalf("Expected 2 CWE IDs, got %d", len(req.CWEIDs))
+	}
+	if req.CWEIDs[0] != "502" {
+		t.Errorf("Expected CWE ID '502', got '%s'", req.CWEIDs[0])
+	}
+	if req.CWEIDs[1] != "89" {
+		t.Errorf("Expected CWE ID '89', got '%s'", req.CWEIDs[1])
+	}
+}
+
+func TestParsePipelineFindingsRequest_NoCWEIDs(t *testing.T) {
+	args := map[string]interface{}{
+		"application_path": "/path/to/app",
+	}
+
+	req, err := parsePipelineFindingsRequest(args)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	if req.CWEIDs != nil {
+		t.Errorf("Expected nil CWE IDs, got %v", req.CWEIDs)
+	}
+}
+
+func TestFormatPipelineFindingsResponse_CWEFilter(t *testing.T) {
+	ctx := context.WithValue(context.Background(), UICapabilityKey, true)
+	findings := []PipelineFlaw{
+		{IssueID: 1, CWEID: "502", Severity: 4, Title: "Deserialization"},
+		{IssueID: 2, CWEID: "89", Severity: 3, Title: "SQL Injection"},
+		{IssueID: 3, CWEID: "79", Severity: 3, Title: "XSS"},
+	}
+	results := &PipelineScanResults{Findings: findings}
+
+	req := &PipelineFindingsRequest{
+		ApplicationPath: "/app",
+		Size:            10,
+		Page:            0,
+		CWEIDs:          []string{"502"},
+	}
+
+	result := formatPipelineFindingsResponse(ctx, "/app", "results.json", results, nil, req)
+
+	structured, ok := result["structuredContent"].(MCPFindingsResponse)
+	if !ok {
+		t.Fatal("Expected structuredContent to be MCPFindingsResponse")
+	}
+
+	if len(structured.Findings) != 1 {
+		t.Fatalf("Expected 1 finding after CWE filter, got %d", len(structured.Findings))
+	}
+	if structured.Findings[0].CweId != 502 {
+		t.Errorf("Expected CWE ID 502, got %d", structured.Findings[0].CweId)
+	}
+}
+
+func TestFormatPipelineFindingsResponse_NoCWEFilter(t *testing.T) {
+	ctx := context.WithValue(context.Background(), UICapabilityKey, true)
+	findings := []PipelineFlaw{
+		{IssueID: 1, CWEID: "502", Severity: 4, Title: "Deserialization"},
+		{IssueID: 2, CWEID: "89", Severity: 3, Title: "SQL Injection"},
+	}
+	results := &PipelineScanResults{Findings: findings}
+
+	req := &PipelineFindingsRequest{
+		ApplicationPath: "/app",
+		Size:            10,
+		Page:            0,
+	}
+
+	result := formatPipelineFindingsResponse(ctx, "/app", "results.json", results, nil, req)
+
+	structured, ok := result["structuredContent"].(MCPFindingsResponse)
+	if !ok {
+		t.Fatal("Expected structuredContent to be MCPFindingsResponse")
+	}
+
+	if len(structured.Findings) != 2 {
+		t.Errorf("Expected 2 findings with no CWE filter, got %d", len(structured.Findings))
+	}
+}
+
 // ============================================================================
 // handleGetPipelineFindings tests
 // ============================================================================

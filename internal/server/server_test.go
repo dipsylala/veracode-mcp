@@ -47,6 +47,7 @@ func TestLoadToolDefinitions(t *testing.T) {
 	dynamicTool := server.toolManager.GetToolDefinition("dynamic-findings")
 	if dynamicTool == nil {
 		t.Fatal("dynamic-findings tool not found")
+		return
 	}
 
 	// Note: Category is optional and may not be set
@@ -187,6 +188,7 @@ func validateToolsListWorks(t *testing.T, server *MCPServer) {
 	result := server.handleListTools()
 	if result == nil {
 		t.Fatal("handleListTools returned nil")
+		return
 	}
 
 	if len(result.Tools) < 5 {
@@ -455,6 +457,7 @@ func TestServerRefactoredHandlers(t *testing.T) {
 
 		if result == nil {
 			t.Fatal("Initialize result is nil")
+			return
 		}
 
 		if result.ProtocolVersion != "2024-11-05" {
@@ -498,6 +501,7 @@ func TestServerRefactoredHandlers(t *testing.T) {
 
 		if errorResult == nil {
 			t.Fatal("Error result is nil")
+			return
 		}
 
 		if !errorResult.IsError {

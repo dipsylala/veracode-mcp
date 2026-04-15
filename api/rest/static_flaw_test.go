@@ -45,11 +45,13 @@ func TestGetStaticFlawDetails_Integration(t *testing.T) {
 
 	if staticFlaw == nil {
 		t.Fatal("Static flaw response is nil")
+		return
 	}
 
 	// Verify the response structure
 	if staticFlaw.IssueSummary == nil {
 		t.Fatal("IssueSummary is nil")
+		return
 	}
 
 	if staticFlaw.IssueSummary.Name == nil || *staticFlaw.IssueSummary.Name == "" {

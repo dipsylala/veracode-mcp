@@ -305,6 +305,12 @@
           "description": "Filter by policy violation status. Default is true (policy violations only). Only set this parameter if the user explicitly asks to see all findings regardless of policy. Do not set it to false unless directly requested."
         },
         {
+          "name": "cwe_ids",
+          "type": "array",
+          "isRequired": false,
+          "description": "Filter by CWE IDs (e.g., [89, 79] for SQLi and XSS)"
+        },
+        {
           "name": "page_size",
           "type": "number",
           "isRequired": false,

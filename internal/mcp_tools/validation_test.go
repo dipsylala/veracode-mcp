@@ -183,6 +183,7 @@ func TestExtractOptionalInt32Ptr_Success(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("Expected non-nil result")
+		return
 	}
 	if *result != 5 {
 		t.Errorf("Expected 5, got %d", *result)
@@ -270,6 +271,7 @@ func TestExtractOptionalBool_True(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("Expected non-nil result")
+		return
 	}
 	if !*result {
 		t.Error("Expected true, got false")
@@ -287,6 +289,7 @@ func TestExtractOptionalBool_False(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("Expected non-nil result")
+		return
 	}
 	if *result {
 		t.Error("Expected false, got true")

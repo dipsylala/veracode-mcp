@@ -23,9 +23,10 @@ func init() {
 // PipelineFindingsRequest represents the parsed parameters for pipeline-findings
 type PipelineFindingsRequest struct {
 	ApplicationPath string
-	Size            int   `json:"size,omitempty"`
-	Page            int   `json:"page,omitempty"`
-	ViolatesPolicy  *bool `json:"violates_policy,omitempty"`
+	Size            int      `json:"size,omitempty"`
+	Page            int      `json:"page,omitempty"`
+	ViolatesPolicy  *bool    `json:"violates_policy,omitempty"`
+	CWEIDs          []string `json:"cwe_ids,omitempty"`
 }
 
 // parsePipelineFindingsRequest extracts and validates parameters from the raw args map
@@ -48,6 +49,9 @@ func parsePipelineFindingsRequest(args map[string]interface{}) (*PipelineFinding
 		violatesPolicy = &defaultTrue
 	}
 	req.ViolatesPolicy = violatesPolicy
+
+	// Extract CWE IDs
+	req.CWEIDs = extractCWEIDs(args)
 
 	// Validate pagination bounds
 	if err := validatePaginationParams(req.Size, req.Page); err != nil {
@@ -271,6 +275,25 @@ func findMostRecentFile(dir, prefix, suffix string) (string, error) {
 }
 
 // formatPipelineFindingsResponse formats the pipeline findings into an MCP response
+// filterPipelineFlawsByCWE returns only the flaws whose CWE ID is in the provided list.
+// If cweIDs is empty, the original slice is returned unchanged.
+func filterPipelineFlawsByCWE(findings []PipelineFlaw, cweIDs []string) []PipelineFlaw {
+	if len(cweIDs) == 0 {
+		return findings
+	}
+	cweSet := make(map[string]bool, len(cweIDs))
+	for _, id := range cweIDs {
+		cweSet[id] = true
+	}
+	filtered := findings[:0:0]
+	for _, f := range findings {
+		if cweSet[f.CWEID] {
+			filtered = append(filtered, f)
+		}
+	}
+	return filtered
+}
+
 func formatPipelineFindingsResponse(ctx context.Context, appPath, resultsFile string, results *PipelineScanResults, filteredResults *PipelineScanResults, req *PipelineFindingsRequest) map[string]interface{} {
 	// Determine which findings to display (paginate)
 	// Totals are always calculated from the full results.
@@ -297,6 +320,9 @@ func formatPipelineFindingsResponse(ctx context.Context, appPath, resultsFile st
 	if filteredResults != nil {
 		response.Summary.PolicyViolations = len(filteredResults.Findings)
 	}
+
+	// Apply CWE ID filter if specified
+	displaySource = filterPipelineFlawsByCWE(displaySource, req.CWEIDs)
 
 	// Build display findings from the appropriate source:
 	//   violates_policy=true  → filtered-results-*.json (policy-failing flaws only)
