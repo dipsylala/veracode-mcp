@@ -95,16 +95,7 @@ func handleGetLocalSCASummary(ctx context.Context, args map[string]interface{}) 
 		return map[string]interface{}{
 			"content": []map[string]string{{
 				"type": "text",
-				"text": fmt.Sprintf(`Local SCA Scan Results
-===================
-
-Application Path: %s
-Results File: %s
-
-❌ No results found
-
-The results file does not exist. Run a local SCA scan using the local-sca-scan tool first.
-`, req.ApplicationPath, resultsFile),
+				"text": fmt.Sprintf("No results file found at %s. Use the run-sca-scan tool to perform a local SCA scan first.", resultsFile),
 			}},
 		}, nil
 	}
@@ -320,79 +311,103 @@ func compareVersionStrings(a, b string) int {
 }
 
 // formatSCASummaryResponse formats the component-grouped summary into an MCP response
-func formatSCASummaryResponse(appPath, resultsFile string, results *SCAFindings, req *GetLocalSCASummaryRequest) map[string]interface{} {
-	components := buildComponentSummaries(results, req)
+// scaSummaryCounts holds aggregate counts across all components.
+type scaSummaryCounts struct {
+	totalCVEs         int
+	bySeverity        map[string]int
+	componentsWithFix int
+	componentsNoFix   int
+}
 
-	// Build overall summary counts
-	totalCVEs := 0
-	bySeverity := map[string]int{"critical": 0, "high": 0, "medium": 0, "low": 0}
-	componentsWithFix := 0
-	componentsNoFix := 0
-
+// buildSCASummaryCounts aggregates totals across all component summaries.
+func buildSCASummaryCounts(components []componentSummary) scaSummaryCounts {
+	counts := scaSummaryCounts{
+		bySeverity: map[string]int{"critical": 0, "high": 0, "medium": 0, "low": 0},
+	}
 	for _, comp := range components {
-		totalCVEs += len(comp.CVEs)
+		counts.totalCVEs += len(comp.CVEs)
 		for sev, count := range comp.BySeverity {
-			bySeverity[sev] += count
+			counts.bySeverity[sev] += count
 		}
 		if comp.RecommendedUpgrade != "" {
-			componentsWithFix++
+			counts.componentsWithFix++
 		} else {
-			componentsNoFix++
+			counts.componentsNoFix++
 		}
 	}
+	return counts
+}
 
-	// Apply pagination to the component list
-	totalComponents := len(components)
+// paginateSCAComponents slices components for the requested page and returns pagination metadata.
+func paginateSCAComponents(components []componentSummary, req *GetLocalSCASummaryRequest) ([]componentSummary, map[string]interface{}) {
 	if req.Size <= 0 {
-		req.Size = 10
+		req.Size = 20
 	}
+	total := len(components)
 	startIdx := req.Page * req.Size
 	endIdx := startIdx + req.Size
-	if startIdx > totalComponents {
-		startIdx = totalComponents
+	if startIdx > total {
+		startIdx = total
 	}
-	if endIdx > totalComponents {
-		endIdx = totalComponents
+	if endIdx > total {
+		endIdx = total
 	}
-	pagedComponents := components[startIdx:endIdx]
-
-	totalPages := 0
-	if req.Size > 0 {
-		totalPages = (totalComponents + req.Size - 1) / req.Size
-	}
+	totalPages := (total + req.Size - 1) / req.Size
 	pagination := map[string]interface{}{
 		"current_page":   req.Page,
 		"page_size":      req.Size,
-		"total_elements": totalComponents,
+		"total_elements": total,
 		"total_pages":    totalPages,
-		"has_next":       endIdx < totalComponents,
+		"has_next":       endIdx < total,
 		"has_previous":   req.Page > 0,
 	}
+	return components[startIdx:endIdx], pagination
+}
 
-	// Build the component list for the response
+// componentToEntry converts a componentSummary to its LLM-friendly map representation.
+func componentToEntry(comp componentSummary) map[string]interface{} {
+	entry := map[string]interface{}{
+		"name":            comp.Name,
+		"current_version": comp.Version,
+		"type":            comp.Type,
+		"language":        comp.Language,
+		"cve_count":       len(comp.CVEs),
+		"by_severity":     comp.BySeverity,
+		"max_epss":        comp.MaxEPSS,
+		"cves":            comp.CVEs,
+	}
+	if comp.PURL != "" {
+		entry["purl"] = comp.PURL
+	}
+	if comp.RecommendedUpgrade != "" {
+		entry["recommended_upgrade"] = comp.RecommendedUpgrade
+		entry["upgrade_fixes_all_cves"] = true
+	} else {
+		entry["recommended_upgrade"] = nil
+		entry["upgrade_fixes_all_cves"] = false
+	}
+	return entry
+}
+
+func formatSCASummaryResponse(appPath, resultsFile string, results *SCAFindings, req *GetLocalSCASummaryRequest) map[string]interface{} {
+	components := buildComponentSummaries(results, req)
+
+	if len(components) == 0 {
+		return map[string]interface{}{
+			"content": []map[string]interface{}{{
+				"type": "text",
+				"text": "No results found.",
+			}},
+		}
+	}
+
+	counts := buildSCASummaryCounts(components)
+	totalComponents := len(components)
+	pagedComponents, pagination := paginateSCAComponents(components, req)
+
 	componentList := make([]map[string]interface{}, 0, len(pagedComponents))
 	for _, comp := range pagedComponents {
-		entry := map[string]interface{}{
-			"name":            comp.Name,
-			"current_version": comp.Version,
-			"type":            comp.Type,
-			"language":        comp.Language,
-			"cve_count":       len(comp.CVEs),
-			"by_severity":     comp.BySeverity,
-			"max_epss":        comp.MaxEPSS,
-			"cves":            comp.CVEs,
-		}
-		if comp.PURL != "" {
-			entry["purl"] = comp.PURL
-		}
-		if comp.RecommendedUpgrade != "" {
-			entry["recommended_upgrade"] = comp.RecommendedUpgrade
-			entry["upgrade_fixes_all_cves"] = true
-		} else {
-			entry["recommended_upgrade"] = nil
-			entry["upgrade_fixes_all_cves"] = false
-		}
-		componentList = append(componentList, entry)
+		componentList = append(componentList, componentToEntry(comp))
 	}
 
 	filters := map[string]interface{}{}
@@ -410,10 +425,10 @@ func formatSCASummaryResponse(appPath, resultsFile string, results *SCAFindings,
 		},
 		"summary": map[string]interface{}{
 			"vulnerable_components":  totalComponents,
-			"components_with_fix":    componentsWithFix,
-			"components_without_fix": componentsNoFix,
-			"total_cves":             totalCVEs,
-			"by_severity":            bySeverity,
+			"components_with_fix":    counts.componentsWithFix,
+			"components_without_fix": counts.componentsNoFix,
+			"total_cves":             counts.totalCVEs,
+			"by_severity":            counts.bySeverity,
 		},
 		"pagination": pagination,
 		"components": componentList,
@@ -433,15 +448,11 @@ func formatSCASummaryResponse(appPath, resultsFile string, results *SCAFindings,
 		}
 	}
 
-	result := map[string]interface{}{
-		"content": []map[string]interface{}{
-			{
-				"type": "text",
-				"text": string(responseJSON),
-			},
-		},
+	return map[string]interface{}{
+		"content": []map[string]interface{}{{
+			"type": "text",
+			"text": string(responseJSON),
+		}},
 		"structuredContent": responseData,
 	}
-
-	return result
 }

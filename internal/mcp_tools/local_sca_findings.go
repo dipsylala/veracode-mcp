@@ -192,16 +192,7 @@ func handleGetLocalSCAFindings(ctx context.Context, args map[string]interface{})
 		return map[string]interface{}{
 			"content": []map[string]string{{
 				"type": "text",
-				"text": fmt.Sprintf(`Local SCA Scan Results
-===================
-
-Application Path: %s
-Results File: %s
-
-❌ No results found
-
-The results file does not exist. Run a local SCA scan using the run-sca-scan tool first.
-`, req.ApplicationPath, resultsFile),
+				"text": fmt.Sprintf("No results file found at %s. Use the run-sca-scan tool to perform a local SCA scan first.", resultsFile),
 			}},
 		}, nil
 	}
@@ -454,6 +445,15 @@ func formatSCAFindingsResponse(appPath, resultsFile string, results *SCAFindings
 		if matchesFilters(match, req) {
 			allFindings = append(allFindings, convertMatchToFinding(match))
 			filteredMatches = append(filteredMatches, match)
+		}
+	}
+
+	if len(allFindings) == 0 {
+		return map[string]interface{}{
+			"content": []map[string]interface{}{{
+				"type": "text",
+				"text": "No results found.",
+			}},
 		}
 	}
 
