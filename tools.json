@@ -230,7 +230,7 @@
     },
     {
       "name": "package-workspace",
-      "description": "Packages source code into a ZIP artifact suitable for Veracode pipeline scanning. Must be called before pipeline-scan. Stores the artifact in .veracode/packaging/ within the workspace. If a filename is not specified, pipeline-scan will automatically locate the artifact.",
+      "description": "Packages source code into a ZIP artifact suitable for Veracode pipeline scanning. Must be called before pipeline-scan. Stores the artifact in .veracode/packaging/ within user's temp folder. If a filename is not specified, pipeline-scan will automatically locate the artifact.",
       "params": [
         {
           "name": "application_path",
@@ -242,7 +242,7 @@
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "Output filename (saved to .veracode/packaging if no path specified)"
+          "description": "Output filename (saved to .veracode/packaging in the temp folder if no path specified)"
         }
       ]
     },
@@ -266,7 +266,7 @@
           "name": "filename",
           "type": "string",
           "isRequired": false,
-          "description": "File to scan (defaults to largest non-log file in .veracode/packaging)"
+          "description": "File to scan (defaults to largest non-log file in .veracode/packaging in the temp folder)"
         },
         {
           "name": "synchronous",
@@ -334,7 +334,7 @@
     },
     {
       "name": "local-sca-scan",
-      "description": "Runs a local SCA scan to identify vulnerable third-party dependencies and IaC misconfigurations. Stores results in the workspace. After completion, call local-sca-findings to retrieve dependency vulnerabilities and local-iac-findings to retrieve IaC misconfigurations — both read from the same scan output.",
+      "description": "Runs a local SCA scan to identify vulnerable third-party dependencies and IaC misconfigurations. Stores results in the workspace. After completion, call local-sca-summary to retrieve dependency vulnerabilities and local-iac-findings to retrieve IaC misconfigurations — both read from the same scan output.",
       "params": [
         {
           "name": "application_path",
