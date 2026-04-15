@@ -213,6 +213,7 @@ Pipeline:
 
 SCA:
 - **run-sca-scan** - Run Software Composition Analysis scan on a directory to identify vulnerable dependencies
+- **local-sca-summary** - Group local SCA findings by component showing the minimum upgrade version to fix all CVEs
 - **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
 - **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
 
