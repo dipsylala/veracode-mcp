@@ -219,6 +219,30 @@ SCA:
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
 
+### Veracode platform work
+
+To assign a Veracode profile to code you're working on, create a `.veracode-workspace.json` file with the following contents in your code area:
+
+<img width="742" height="502" alt="image" src="https://github.com/user-attachments/assets/6f67f0fe-cb10-45c4-8fd0-f80dffc870f5" />
+
+This will allow the MCP to know which profile you're focusing on in your IDE/TUI.
+
+The contents are as follows:
+
+```json
+{
+  "name": "{profile name}"
+}
+```
+
+example:
+
+```json
+{
+  "name": "Verademo"
+}
+```
+
 ---
 
 ## For Developers
