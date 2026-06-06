@@ -257,7 +257,7 @@ If you want some of the benefits of the MCP but without the Context window overh
 
 [veracode-platform-results](https://github.com/dipsylala/veracode-platform-results) - this pulls SCA, Dynamic and Static data from the platform.
 
-In each case, these are designed to look after your context window - veracode-pipeline-results and veracode-local-sca-results use Python scripts to translate the JSON into something more LLM-convenient. veracode-platform-results uses my [veracode-api](https://github.com/dipsylala/veracode-api) CLI tool to use your existing Veracode credentials to authenticate to the platform and query the API. 
+In each case, these are designed to look after your context window - `veracode-pipeline-results` and `veracode-local-sca-results` use Python scripts to translate the JSON into something more LLM-convenient. `veracode-platform-results` uses my [veracode-api](https://github.com/dipsylala/veracode-api) CLI tool to use your existing Veracode credentials to authenticate to the platform and query the API. 
 
 ---
 
