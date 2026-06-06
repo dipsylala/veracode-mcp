@@ -10,11 +10,6 @@ All code in this directory is automatically generated. Any manual changes will b
 
 Each subdirectory contains a separate API client:
 
-- **`healthcheck/`** - Veracode Healthcheck API
-  - Generated from: specs/veracode-healthcheck.yaml
-  - Package: `healthcheck`
-  - Endpoints: Health status checks
-
 - **`findings/`** - Veracode Findings API
   - Generated from: specs/veracode-findings.yaml
   - Package: `findings`
@@ -61,10 +56,9 @@ openapi-generator generate \
 Instead, use the `api/` package which wraps these clients:
 
 ```go
-// ❌ BAD - Don't do this in tools
-import healthcheck "github.com/dipsylala/veracode-mcp/api/generated/healthcheck"
+// BAD - Don't import generated clients directly in tools.
 
-// ✅ GOOD - Use the api wrapper
+// GOOD - Use the api wrapper.
 import "github.com/dipsylala/veracode-mcp/api"
 
 client, err := api.NewClient()
@@ -74,7 +68,6 @@ status, err := client.CheckHealth(ctx)
 ## Package Names
 
 Each generated client uses its own package name to avoid conflicts:
-- `healthcheck` - Healthcheck API
 - `findings` - Findings API
 - `upload` - Upload API
 

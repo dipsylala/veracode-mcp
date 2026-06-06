@@ -119,6 +119,26 @@ veracode configure
    export VERACODE_API_KEY="YOUR_API_KEY_SECRET"
    ```
 
+### API Health Check
+
+The `api-health` tool verifies both API connectivity and credential validity. It
+loads credentials using the precedence described above, signs the request with
+Veracode HMAC authentication, and sends:
+
+```http
+GET https://api.veracode.com/api/authn/v2/principal
+```
+
+The regional API domain is selected from the API ID or the configured
+`override-api-base-url`.
+
+- `HTTP 200` confirms the API is reachable and the credentials were accepted.
+- `HTTP 401` or `HTTP 403` indicates that authentication or authorization failed.
+- A connection or timeout error indicates that the API could not be reached.
+
+See the
+[Veracode Identity API documentation](https://docs.veracode.com/r/c_identity_intro#get-principal-for-your-account).
+
 See [credentials/README.md](credentials/README.md) for detailed information.
 
 ## Usage
@@ -196,7 +216,7 @@ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 The server provides these Veracode-specific tools:
 
 API:
-- **api-health** - Verify Veracode API connectivity and credentials
+- **api-health** - Verify API connectivity and HMAC credentials with the Identity API principal endpoint
 
 Platform:
 - **dynamic-findings** - Retrieve runtime security vulnerabilities from Dynamic Analysis (DAST) scans

@@ -2,7 +2,7 @@
   "tools": [
     {
       "name": "api-health",
-      "description": "Checks the health and availability of Veracode API endpoints. Call this first if API connectivity is uncertain before running scans or retrieving findings.",
+      "description": "Checks Veracode API connectivity and validates the configured HMAC credentials using GET /api/authn/v2/principal. Call this first if API connectivity or authentication is uncertain.",
       "category": "veracode",
       "params": []
     },

@@ -34,11 +34,6 @@ $specs = @(
         Url = "https://api.swaggerhub.com/apis/Veracode/veracode-findings_api_specification/2.1"
     },
     @{
-        Name = "Healthcheck API"
-        File = "specs/veracode-healthcheck.json"
-        Url = "https://api.swaggerhub.com/apis/Veracode/veracode-healthcheck_api_specification/1.0"
-    },
-    @{
         Name = "Dynamic Flaw API"
         File = "specs/veracode-dynamic-flaw.json"
         Url = "https://api.swaggerhub.com/apis/Veracode/veracode-dynamic_flaw_api/v2"

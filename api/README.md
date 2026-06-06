@@ -7,9 +7,8 @@ api/
 ├── client.go           # Client orchestrator (manages all API clients)
 ├── helpers/            # Business logic wrappers
 │   ├── findings.go     # SAST/DAST findings with filtering
-│   └── health.go       # Health check wrapper
+│   └── health.go       # Authenticated principal health check
 └── generated/          # Auto-generated Swagger clients
-    ├── healthcheck/
     ├── findings/
     ├── dynamic_flaw/
     └── static_finding_data_path/
@@ -29,20 +28,25 @@ api/
 
 Manages all API clients and authentication:
 
-- `NewClient()` - Creates client with all 4 API clients initialized
+- `NewClient()` - Creates the authenticated REST and XML API clients
 - `GetAuthContext()` - Adds Veracode HMAC authentication to requests
 - `IsConfigured()` - Checks if credentials are set
-- Holds: healthcheckClient, findingsClient, dynamicFlawClient, staticFindingDataPathClient
+- Holds generated clients for findings, flaw details, applications, and policy APIs
 
 ### helpers/ (Business Logic)
 
 #### helpers/health.go
 
-Wraps healthcheck API:
+Checks API connectivity and credentials with an authenticated request to
+`GET /api/authn/v2/principal`:
 
 - `CheckHealth()` - Returns health status struct
 - `CheckHealthSimple()` - Returns simple boolean
 - Used by `api-health` tool
+
+A `200 OK` response means the regional Veracode API is reachable and the HMAC
+credentials were accepted. Non-200 responses and transport errors are returned
+as unavailable health status values. The response body is not used or exposed.
 
 #### helpers/findings.go
 
@@ -59,7 +63,6 @@ Wraps findings API with advanced features:
 
 Swagger-generated API clients - **DO NOT EDIT**:
 
-- `healthcheck/` - Health check API client
 - `findings/` - Findings API client (SAST/DAST/SCA)
 - `dynamic_flaw/` - Dynamic flaw details API client
 - `static_finding_data_path/` - Static finding data path API client
@@ -196,4 +199,6 @@ Create helpers in `helpers/` when you need:
 - **Severity mapping**: Converting numeric codes to human-readable strings
 - **Business logic**: Combining multiple API calls or adding domain logic
 
-Skip helpers for simple APIs where direct client usage is clean enough (like healthcheck).
+Skip helpers only when direct generated-client usage is clean enough. The
+health check is implemented in `rest/health.go` because it uses the Identity API
+principal endpoint rather than a generated API client.

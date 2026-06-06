@@ -292,10 +292,13 @@ func (t *YourTool) Handle(ctx context.Context, params map[string]interface{}) (i
         return errorResponse("API not configured: " + err.Error()), nil
     }
 
-    // For simple APIs - use generated client directly
-    resp, err := client.healthcheckClient.HealthcheckAPIsApi.HealthcheckStatusGet(ctx)
-    
-    // For complex APIs - use helpers
+    // Use the public API abstraction. For example, CheckHealth performs an
+    // HMAC-authenticated GET to /api/authn/v2/principal.
+    health, err := client.CheckHealth(ctx)
+    if err != nil || !health.Available {
+        return errorResponse("Veracode API authentication failed"), nil
+    }
+
     findings, err := client.GetDynamicFindings(ctx, api.FindingsRequest{
         AppProfile: params["app_profile"].(string),
         Severity:   extractStringArray(params, "severity"),

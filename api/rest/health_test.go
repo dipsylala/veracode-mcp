@@ -2,200 +2,159 @@ package rest
 
 import (
 	"context"
-	"os"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
-	"time"
 )
 
-// TestCheckHealth_Integration performs a real API call to verify health check functionality
-// This test requires valid Veracode credentials configured via ~/.veracode/veracode.yml
-// or VERACODE_API_ID/VERACODE_API_KEY environment variables
-func TestCheckHealth_Integration(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+const (
+	testAPIID  = "test-api-id"
+	testAPIKey = "0000000000000000000000000000000000000000000000000000000000000000"
+)
+
+func TestCheckHealth_UsesAuthenticatedPrincipalEndpoint(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("expected GET request, got %s", r.Method)
+		}
+		if r.URL.Path != principalEndpoint {
+			t.Errorf("expected path %s, got %s", principalEndpoint, r.URL.Path)
+		}
+		if auth := r.Header.Get("Authorization"); !strings.HasPrefix(auth, "VERACODE-HMAC-SHA-256 ") {
+			t.Errorf("expected Veracode HMAC Authorization header, got %q", auth)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"user_name":"test-user"}`))
+	}))
+	defer server.Close()
+
+	client := &Client{
+		apiID:   testAPIID,
+		apiKey:  testAPIKey,
+		baseURL: server.URL + "/",
 	}
 
-	// Create a new Veracode client (will use credentials from config/env)
-	client, err := NewClient()
+	status, err := client.CheckHealth(context.Background())
 	if err != nil {
-		t.Skipf("Skipping integration test: %v", err)
+		t.Fatalf("CheckHealth returned an error: %v", err)
 	}
-
-	// Create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	// Call the health check API
-	status, err := client.CheckHealth(ctx)
-	if err != nil {
-		t.Fatalf("CheckHealth failed: %v", err)
-	}
-
-	// Verify we got a response
 	if status == nil {
-		t.Fatal("Expected health status, got nil")
+		t.Fatal("expected health status, got nil")
 	}
-
-	// Log the results for debugging
-	t.Logf("Health check result:")
-	t.Logf("  Available: %v", status.Available)
-	t.Logf("  Message: %s", status.Message)
-	t.Logf("  Status Code: %d", status.StatusCode)
-
-	// Verify the health check succeeded
 	if !status.Available {
-		t.Errorf("API health check failed: %s (status code: %d)", status.Message, status.StatusCode)
+		t.Fatalf("expected API to be available, got message %q", status.Message)
 	}
-
-	// Verify we got a 200 status code
-	if status.StatusCode != 200 {
-		t.Errorf("Expected status code 200, got %d", status.StatusCode)
+	if status.StatusCode != http.StatusOK {
+		t.Errorf("expected status code %d, got %d", http.StatusOK, status.StatusCode)
 	}
-
-	// Verify we got a message
-	if status.Message == "" {
-		t.Error("Expected non-empty message")
+	if !strings.Contains(status.Message, "authentication succeeded") {
+		t.Errorf("expected authentication success message, got %q", status.Message)
 	}
 }
 
-// TestCheckHealthSimple_Integration tests the simplified health check method
-func TestCheckHealthSimple_Integration(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+func TestCheckHealth_ReportsPrincipalEndpointFailure(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+	}))
+	defer server.Close()
+
+	client := &Client{
+		apiID:   testAPIID,
+		apiKey:  testAPIKey,
+		baseURL: server.URL,
 	}
 
-	client, err := NewClient()
+	status, err := client.CheckHealth(context.Background())
 	if err != nil {
-		t.Skipf("Skipping integration test: %v", err)
+		t.Fatalf("CheckHealth returned an error: %v", err)
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	// Call the simple health check
-	available := client.CheckHealthSimple(ctx)
-
-	t.Logf("CheckHealthSimple result: %v", available)
-
-	if !available {
-		t.Error("Expected API to be available")
+	if status == nil {
+		t.Fatal("expected health status, got nil")
+	}
+	if status.Available {
+		t.Fatal("expected API to be unavailable")
+	}
+	if status.StatusCode != http.StatusUnauthorized {
+		t.Errorf("expected status code %d, got %d", http.StatusUnauthorized, status.StatusCode)
+	}
+	if !strings.Contains(status.Message, "status 401") {
+		t.Errorf("expected HTTP status in message, got %q", status.Message)
 	}
 }
 
-// TestCheckHealth_WithCancelledContext tests behavior when context is cancelled
 func TestCheckHealth_WithCancelledContext(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	client := &Client{
+		apiID:   testAPIID,
+		apiKey:  testAPIKey,
+		baseURL: server.URL,
 	}
 
-	client, err := NewClient()
-	if err != nil {
-		t.Skipf("Skipping integration test: %v", err)
-	}
-
-	// Create a context and cancel it immediately
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	// Try to call health check with cancelled context
-	status, _ := client.CheckHealth(ctx)
-
-	// Should get a status indicating failure (not an error, as per the implementation)
-	if status == nil {
-		t.Fatal("Expected health status, got nil")
-	}
-
-	// Should report as not available
-	if status.Available {
-		t.Error("Expected Available=false with cancelled context")
-	}
-
-	t.Logf("Cancelled context result: %s", status.Message)
-}
-
-// TestCheckHealth_VerifyAuthentication verifies that HMAC authentication is applied
-func TestCheckHealth_VerifyAuthentication(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
-	}
-
-	// This test verifies the health check succeeds, which implicitly
-	// verifies that HMAC authentication is working correctly
-	client, err := NewClient()
-	if err != nil {
-		t.Skipf("Skipping integration test: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
 	status, err := client.CheckHealth(ctx)
 	if err != nil {
-		t.Fatalf("CheckHealth failed: %v", err)
+		t.Fatalf("CheckHealth returned an error: %v", err)
 	}
-
-	if !status.Available {
-		t.Errorf("Health check should succeed with valid credentials: %s", status.Message)
+	if status == nil {
+		t.Fatal("expected health status, got nil")
+	}
+	if status.Available {
+		t.Fatal("expected API to be unavailable")
+	}
+	if status.StatusCode != 0 {
+		t.Errorf("expected status code 0, got %d", status.StatusCode)
+	}
+	if !strings.Contains(status.Message, "context canceled") {
+		t.Errorf("expected cancellation message, got %q", status.Message)
 	}
 }
 
-// TestCheckHealth_WithoutAuthorization tests the API behavior without valid credentials
-// Note: The Veracode health check endpoint appears to be publicly accessible
-func TestCheckHealth_WithoutAuthorization(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+func TestCheckHealthSimple(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		statusCode int
+		want       bool
+	}{
+		{name: "available", statusCode: http.StatusOK, want: true},
+		{name: "unavailable", statusCode: http.StatusServiceUnavailable, want: false},
 	}
 
-	// Save current credentials
-	oldID := os.Getenv("VERACODE_API_ID")
-	oldKey := os.Getenv("VERACODE_API_KEY")
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	// Temporarily set invalid credentials
-	os.Setenv("VERACODE_API_ID", "invalid-key-id")
-	os.Setenv("VERACODE_API_KEY", "0000000000000000000000000000000000000000000000000000000000000000")
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
 
-	defer func() {
-		// Restore original credentials
-		if oldID != "" {
-			os.Setenv("VERACODE_API_ID", oldID)
-		} else {
-			os.Unsetenv("VERACODE_API_ID")
-		}
-		if oldKey != "" {
-			os.Setenv("VERACODE_API_KEY", oldKey)
-		} else {
-			os.Unsetenv("VERACODE_API_KEY")
-		}
-	}()
+			client := &Client{
+				apiID:   testAPIID,
+				apiKey:  testAPIKey,
+				baseURL: server.URL,
+			}
 
-	// Create client with invalid credentials
-	client, err := NewClient()
-	if err != nil {
-		t.Fatalf("Failed to create client: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	// Call health check
-	status, _ := client.CheckHealth(ctx)
-
-	// Should get a status (not nil)
-	if status == nil {
-		t.Fatal("Expected health status, got nil")
-	}
-
-	t.Logf("Request with invalid credentials result:")
-	t.Logf("  Available: %v", status.Available)
-	t.Logf("  Message: %s", status.Message)
-	t.Logf("  Status Code: %d", status.StatusCode)
-
-	// The health check endpoint is publicly accessible - it returns 200 even without valid auth
-	// This is expected behavior for health check endpoints
-	switch status.StatusCode {
-	case 200:
-		t.Logf("Health check endpoint is publicly accessible (no authentication required)")
-	case 401, 403:
-		t.Logf("Health check endpoint requires authentication")
+			if got := client.CheckHealthSimple(context.Background()); got != tt.want {
+				t.Errorf("CheckHealthSimple() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

@@ -11,10 +11,9 @@ Veracode-MCP/
 ├── api/                        # API package
 │   ├── client.go              # Client orchestrator (manages all API clients)
 │   ├── findings.go            # Findings endpoints (SAST/DAST) with filtering and business logic
-│   ├── health.go              # Health check endpoints with business logic
+│   ├── health.go              # Authenticated Identity API principal health check
 │   ├── applications.go        # Application lookup and management
 │   ├── generated/             # Swagger-generated API clients (DO NOT EDIT)
-│   │   ├── healthcheck/       # Healthcheck API client
 │   │   ├── findings/          # Findings API client
 │   │   ├── dynamic_flaw/      # Dynamic flaw API client
 │   │   ├── static_finding_data_path/  # Static finding data path API client
@@ -41,7 +40,7 @@ Veracode-MCP/
 
 **API Client Orchestrator** (`api/client.go`):
 
-- ✅ Manages all 4 generated API clients
+- ✅ Manages the generated API clients and authenticated raw requests
 - ✅ Handles authentication (VERACODE_API_ID, VERACODE_API_KEY)
 - ✅ Provides GetAuthContext() for HMAC signing
 - ✅ Single point of initialization
@@ -224,7 +223,6 @@ This will:
 import new_api "github.com/dipsylala/veracode-mcp/api/generated/new_api"
 
 type Client struct {
-    healthcheckClient           *healthcheck.APIClient
     findingsClient              *findings.APIClient
     dynamicFlawClient           *dynamic_flaw.APIClient
     staticFindingDataPathClient *static_finding_data_path.APIClient
@@ -372,12 +370,11 @@ func TestGetDynamicFindings(t *testing.T) {
 ## Next Steps
 
 1. ✅ **Structure created**: api/ package with client.go, business logic files, generated/
-2. ✅ **5 API clients integrated**: healthcheck, findings, dynamic_flaw, static_finding_data_path, applications
-3. ✅ **Business logic created**: findings.go with filtering/conversion, health.go, applications.go
-4. ⏳ **Implement HMAC auth**: Add Veracode HMAC signature to GetAuthContext()
-5. ⏳ **Update tools**: Replace placeholders with actual API calls
-6. ⏳ **Add tests**: Unit tests for api package, integration tests for tools
-7. ⏳ **Add more endpoints**: SCA, SBOM, Upload, etc.
+2. ✅ **Generated API clients integrated**: findings, dynamic_flaw, static_finding_data_path, applications, policy
+3. ✅ **Authenticated health check implemented**: HMAC-signed `GET /api/authn/v2/principal`
+4. ✅ **Business logic created**: findings.go with filtering/conversion, health.go, applications.go
+5. ✅ **HMAC auth implemented**: Requests use the authenticated HTTP transport
+6. ⏳ **Add more endpoints**: SCA, SBOM, Upload, etc.
 
 ## Summary
 

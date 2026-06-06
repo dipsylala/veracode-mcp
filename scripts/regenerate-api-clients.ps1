@@ -64,11 +64,6 @@ else {
 # Define API specifications
 $apis = @(
     @{
-        Name = "healthcheck"
-        Spec = "specs/veracode-healthcheck.json"
-        Package = "healthcheck"
-    },
-    @{
         Name = "findings"
         Spec = "specs/veracode-findings.json"
         Package = "findings"

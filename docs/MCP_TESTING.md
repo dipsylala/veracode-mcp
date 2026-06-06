@@ -213,10 +213,15 @@ go test -v -run "TestMCP" -timeout 120s 2>&1 | Tee-Object test-output.log
 ### Check API Credentials
 
 ```powershell
-# Verify credentials are set
-Write-Host "API ID: $env:VERACODE_API_ID"
-Write-Host "API Key length: $($env:VERACODE_API_KEY.Length)"
+# Environment variables are only the fallback source.
+Test-Path "$env:USERPROFILE\.veracode\veracode.yml"
+[bool]$env:VERACODE_API_ID
+[bool]$env:VERACODE_API_KEY
 ```
+
+Credential presence does not prove validity. Invoke the MCP `api-health` tool
+to send an HMAC-signed `GET /api/authn/v2/principal`; `HTTP 200` confirms that
+Veracode accepted the configured credentials.
 
 ### Test Individual Components
 

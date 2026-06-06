@@ -23,10 +23,10 @@
             },
             "exploitability": {
               "epss_citation": "See EPSS at https://www.first.org/epss",
-              "epss_model_version": "v2023.03.01",
-              "epss_percentile": 0.88501,
-              "epss_score": 0.01891,
-              "epss_score_date": "2025-03-16",
+              "epss_model_version": "v2025.03.14",
+              "epss_percentile": 0.98744,
+              "epss_score": 0.71461,
+              "epss_score_date": "2026-06-04",
               "epss_status": "match found",
               "exploit_observed": false,
               "exploit_service_status": "available",
@@ -36,6 +36,11 @@
             "name": "CVE-2015-7501",
             "severity": "High",
             "vector": "AV:N/​AC:L/​Au:N/​C:C/​I:C/​A:C"
+          },
+          "cwe": {
+            "href": "https://api.veracode.com/appsec/v1/cwes/502",
+            "id": 502,
+            "name": "Deserialization of Untrusted Data"
           },
           "language": "JAVA",
           "licenses": [
@@ -85,10 +90,10 @@
             },
             "exploitability": {
               "epss_citation": "See EPSS at https://www.first.org/epss",
-              "epss_model_version": "v2023.03.01",
-              "epss_percentile": 0.77554,
-              "epss_score": 0.00539,
-              "epss_score_date": "2025-03-16",
+              "epss_model_version": "v2025.03.14",
+              "epss_percentile": 0.76799,
+              "epss_score": 0.00958,
+              "epss_score_date": "2026-06-03",
               "epss_status": "match found",
               "exploit_observed": false,
               "exploit_service_status": "available",
@@ -152,10 +157,10 @@
             },
             "exploitability": {
               "epss_citation": "See EPSS at https://www.first.org/epss",
-              "epss_model_version": "v2023.03.01",
-              "epss_percentile": 0.84947,
-              "epss_score": 0.0114,
-              "epss_score_date": "2025-03-16",
+              "epss_model_version": "v2025.03.14",
+              "epss_percentile": 0.97293,
+              "epss_score": 0.37911,
+              "epss_score_date": "2026-06-04",
               "epss_status": "match found",
               "exploit_observed": false,
               "exploit_service_status": "available",
@@ -214,10 +219,10 @@
             },
             "exploitability": {
               "epss_citation": "See EPSS at https://www.first.org/epss",
-              "epss_model_version": "v2023.03.01",
-              "epss_percentile": 0.11995,
-              "epss_score": 0.00043,
-              "epss_score_date": "2025-03-16",
+              "epss_model_version": "v2025.03.14",
+              "epss_percentile": 0.99356,
+              "epss_score": 0.84776,
+              "epss_score_date": "2026-06-04",
               "epss_status": "match found",
               "exploit_observed": false,
               "exploit_service_status": "available",
@@ -281,10 +286,10 @@
             },
             "exploitability": {
               "epss_citation": "See EPSS at https://www.first.org/epss",
-              "epss_model_version": "v2023.03.01",
-              "epss_percentile": 0.11995,
-              "epss_score": 0.00043,
-              "epss_score_date": "2025-03-16",
+              "epss_model_version": "v2025.03.14",
+              "epss_percentile": 0.85581,
+              "epss_score": 0.02487,
+              "epss_score_date": "2026-06-04",
               "epss_status": "match found",
               "exploit_observed": false,
               "exploit_service_status": "available",
@@ -336,7 +341,7 @@
       "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=0\u0026size=5"
     },
     "last": {
-      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=24\u0026size=5"
+      "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=28\u0026size=5"
     },
     "next": {
       "href": "https://api.veracode.com/appsec/v2/applications/f4e74197-1e26-42c4-ab4b-245870c93280/findings?scan_type=SCA\u0026page=1\u0026size=5"
@@ -353,7 +358,7 @@
   "page": {
     "number": 0,
     "size": 5,
-    "total_elements": 123,
-    "total_pages": 25
+    "total_elements": 145,
+    "total_pages": 29
   }
 }

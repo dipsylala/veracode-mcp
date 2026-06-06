@@ -59,8 +59,10 @@ Timestamp: %s
 	}
 
 	availableIcon := "✓"
+	requestStatus := "✓ Authenticated principal request succeeded"
 	if !healthStatus.Available {
 		availableIcon = "❌"
+		requestStatus = "❌ Authenticated principal request failed"
 	}
 
 	return map[string]interface{}{
@@ -71,16 +73,16 @@ Timestamp: %s
 
 Timestamp: %s
 
-%s Veracode API (api.veracode.com)
+%s Veracode API
 Status: %s
 HTTP Status: %d
 
-✓ Authentication: Configured
+%s
 
 Next steps:
 - Run dynamic-findings or static-findings to fetch data
 - Check application access permissions
-- Review API rate limits and quotas`, timestamp, availableIcon, healthStatus.Message, healthStatus.StatusCode),
+- Review API rate limits and quotas`, timestamp, availableIcon, healthStatus.Message, healthStatus.StatusCode, requestStatus),
 		}},
 	}, nil
 }

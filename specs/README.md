@@ -10,12 +10,6 @@ This directory contains OpenAPI/Swagger specifications for Veracode APIs.
 - **File**: `veracode-findings.yaml`
 - **Description**: SAST/DAST/SCA findings retrieval
 
-### Healthcheck API (v1.0)
-
-- **SwaggerHub**: [https://app.swaggerhub.com/apis/Veracode/veracode-healthcheck_api_specification/1.0]
-- **File**: `veracode-healthcheck.yaml`
-- **Description**: API health status checks
-
 ### Dynamic Flaw API (v2)
 
 - **SwaggerHub**: [https://app.swaggerhub.com/apis/Veracode/veracode-dynamic_flaw_api/v2]

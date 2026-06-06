@@ -109,6 +109,21 @@ api:
 3. Generate a new API key pair
 4. Save the `key-id` and `key-secret` to your `veracode.yml` file
 
+## Verifying Credentials
+
+Run the MCP `api-health` tool after configuring credentials. The tool loads the
+credentials from the sources above and sends an HMAC-signed request to:
+
+```http
+GET /api/authn/v2/principal
+```
+
+A `200 OK` response confirms that the credentials were loaded, used to sign the
+request, and accepted by Veracode. Merely finding a credentials file or
+environment variables does not prove that the credentials are valid.
+
+See the [Veracode Identity API documentation](https://docs.veracode.com/r/c_identity_intro#get-principal-for-your-account).
+
 ## Security Notes
 
 - The credentials file should have restricted permissions (600 on Unix systems)

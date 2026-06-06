@@ -9,7 +9,6 @@ import (
 	applications "github.com/dipsylala/veracode-mcp/api/rest/generated/applications"
 	dynamic_flaw "github.com/dipsylala/veracode-mcp/api/rest/generated/dynamic_flaw"
 	findings "github.com/dipsylala/veracode-mcp/api/rest/generated/findings"
-	healthcheck "github.com/dipsylala/veracode-mcp/api/rest/generated/healthcheck"
 	policy "github.com/dipsylala/veracode-mcp/api/rest/generated/policy"
 	static_finding_data_path "github.com/dipsylala/veracode-mcp/api/rest/generated/static_finding_data_path"
 	"github.com/dipsylala/veracode-mcp/credentials"
@@ -18,7 +17,6 @@ import (
 
 // Client wraps the generated API clients with authentication and configuration
 type Client struct {
-	healthcheckClient           *healthcheck.APIClient
 	findingsClient              *findings.APIClient
 	dynamicFlawClient           *dynamic_flaw.APIClient
 	staticFindingDataPathClient *static_finding_data_path.APIClient
@@ -90,10 +88,6 @@ func NewClient() (*Client, error) {
 	httpClient := newHMACHTTPClient(apiID, apiKey)
 
 	// Configure all API clients to use the HMAC-authenticated HTTP client and base URL
-	healthcheckCfg := healthcheck.NewConfiguration()
-	healthcheckCfg.HTTPClient = httpClient
-	healthcheckCfg.Servers[0].URL = baseURL
-
 	findingsCfg := findings.NewConfiguration()
 	findingsCfg.HTTPClient = httpClient
 	findingsCfg.Servers[0].URL = baseURL
@@ -115,7 +109,6 @@ func NewClient() (*Client, error) {
 	policyCfg.Servers[0].URL = baseURL
 
 	return &Client{
-		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
 		findingsClient:              findings.NewAPIClient(findingsCfg),
 		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
 		staticFindingDataPathClient: static_finding_data_path.NewAPIClient(staticFindingDataPathCfg),
@@ -144,10 +137,6 @@ func NewClientUnconfigured() *Client {
 	}
 
 	// Configure all API clients
-	healthcheckCfg := healthcheck.NewConfiguration()
-	healthcheckCfg.HTTPClient = httpClient
-	healthcheckCfg.Servers[0].URL = baseURL
-
 	findingsCfg := findings.NewConfiguration()
 	findingsCfg.HTTPClient = httpClient
 	findingsCfg.Servers[0].URL = baseURL
@@ -169,7 +158,6 @@ func NewClientUnconfigured() *Client {
 	policyCfg2.Servers[0].URL = baseURL
 
 	return &Client{
-		healthcheckClient:           healthcheck.NewAPIClient(healthcheckCfg),
 		findingsClient:              findings.NewAPIClient(findingsCfg),
 		dynamicFlawClient:           dynamic_flaw.NewAPIClient(dynamicFlawCfg),
 		staticFindingDataPathClient: static_finding_data_path.NewAPIClient(staticFindingDataPathCfg),

@@ -76,7 +76,7 @@ The Veracode MCP Server is a Model Context Protocol (MCP) server implementation 
   - `client.go` - Client orchestrator
   - `findings.go` - Findings API wrapper
   - `applications.go` - Applications API wrapper
-  - `health.go` - Health check API
+  - `health.go` - Authenticated Identity API principal health check
   - `generated/` - Swagger-generated API clients
 
 **Supporting Modules:**
@@ -318,7 +318,7 @@ The server integrates with multiple Veracode APIs:
 
 1. **Applications API** - Application metadata and GUID lookup
 2. **Findings API** - Static, dynamic, and SCA findings
-3. **Identity API** - Health checks and authentication
+3. **Identity API** - Credential and connectivity validation through the authenticated principal endpoint
 
 ### Authentication
 
@@ -327,6 +327,12 @@ The server integrates with multiple Veracode APIs:
 - All API requests signed with HMAC-SHA256
 - Credentials from `~/.veracode/veracode.yml` or env vars
 - Custom `Authorization` header with signature
+
+### API Health Validation
+
+The `api-health` MCP tool sends an HMAC-signed
+`GET /api/authn/v2/principal` request to the regional Veracode API domain. A
+`200 OK` response confirms both connectivity and successful authentication.
 
 **Credential Sources (checked in order):**
 

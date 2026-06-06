@@ -4,22 +4,34 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
+	"strings"
 )
 
-// CheckHealth verifies that Veracode API services are operational
-// Returns the health status of the API
-func (c *Client) CheckHealth(ctx context.Context) (*HealthStatus, error) {
-	// Get authenticated context
-	authCtx := c.GetAuthContext(ctx)
+const principalEndpoint = "/api/authn/v2/principal"
 
-	// Call the health check endpoint
-	resp, err := c.healthcheckClient.HealthcheckAPIsAPI.HealthcheckStatusGet(authCtx).Execute()
+// CheckHealth verifies that Veracode API services are operational
+// and that the configured credentials can authenticate.
+func (c *Client) CheckHealth(ctx context.Context) (*HealthStatus, error) {
+	ctx = c.GetAuthContext(ctx)
+
+	endpoint := strings.TrimRight(c.baseURL, "/") + principalEndpoint
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return &HealthStatus{
 			Available:  false,
-			Message:    fmt.Sprintf("Health check failed: %v", err),
+			Message:    fmt.Sprintf("Failed to create principal request: %v", err),
 			StatusCode: 0,
-		}, nil // Return nil error so tools can handle gracefully
+		}, nil
+	}
+
+	resp, err := newHMACHTTPClient(c.apiID, c.apiKey).Do(req)
+	if err != nil {
+		return &HealthStatus{
+			Available:  false,
+			Message:    fmt.Sprintf("Authenticated principal request failed: %v", err),
+			StatusCode: 0,
+		}, nil
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
@@ -27,13 +39,12 @@ func (c *Client) CheckHealth(ctx context.Context) (*HealthStatus, error) {
 		}
 	}()
 
-	// Parse response
 	statusCode := resp.StatusCode
-	available := statusCode == 200
+	available := statusCode == http.StatusOK
 
-	message := "API is operational"
+	message := "API is operational and authentication succeeded"
 	if !available {
-		message = fmt.Sprintf("API returned status %d", statusCode)
+		message = fmt.Sprintf("Authenticated principal request returned status %d", statusCode)
 	}
 
 	return &HealthStatus{
