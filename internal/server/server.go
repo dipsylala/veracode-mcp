@@ -175,6 +175,23 @@ func ValidateID(id any, maxLen int) error {
 // to the appropriate handler methods. This is the main request dispatcher.
 func (s *MCPServer) HandleRequest(req *types.JSONRPCRequest) *types.JSONRPCResponse {
 
+	// Validate method name first, before any logging, to prevent log forging via CRLF injection
+	if errMethod := ValidateMethod(req.Method); errMethod != nil {
+		log.Printf("Rejecting request with invalid method name (contains disallowed characters)")
+		idVal := req.ID
+		if idVal == nil {
+			return nil
+		}
+		return &types.JSONRPCResponse{
+			JSONRPC: "2.0",
+			ID:      idVal,
+			Error: &types.RPCError{
+				Code:    -32600,
+				Message: "Invalid request: method name contains invalid characters",
+			},
+		}
+	}
+
 	// Notifications (no ID) don't require responses
 	if req.ID == nil {
 		// Only allow nil ID for notification methods
@@ -229,20 +246,6 @@ func (s *MCPServer) HandleRequest(req *types.JSONRPCRequest) *types.JSONRPCRespo
 			Error: &types.RPCError{
 				Code:    -32600,
 				Message: "Invalid request: id MUST be a non-empty string consisting solely of printable ASCII characters in the range U+0020 through U+007E, with a maximum length of 64 characters.",
-			},
-		}
-	}
-
-	// Validate method name to prevent log forging attacks
-	errMethod := ValidateMethod(req.Method)
-	if errMethod != nil {
-		log.Printf("Rejecting request with invalid method name: %v)", req.Method)
-		return &types.JSONRPCResponse{
-			JSONRPC: "2.0",
-			ID:      req.ID,
-			Error: &types.RPCError{
-				Code:    -32600,
-				Message: "Invalid request: method name contains invalid characters",
 			},
 		}
 	}

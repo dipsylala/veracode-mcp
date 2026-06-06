@@ -205,6 +205,13 @@ In each case, these are designed to look after your context window - `veracode-p
 
 See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for building from source, running tests, adding new tools, and the full developer documentation index.
 
+---
+
+## Veracode Findings
+
+The Veracode MCP Go code was pipeline scanned using Veracode. The findings have been recorded in [VERACODE_FINDINGS.md](VERACODE_FINDINGS.md)
+
+
 ## Contributing
 
 ⚠️ This is beta software. Contributions are welcome — see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
