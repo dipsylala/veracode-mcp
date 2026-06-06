@@ -247,6 +247,20 @@ SCA:
 
 ---
 
+## But MCP and my context window...
+
+If you want some of the benefits of the MCP but without the Context window overhead, I wrote some skills that can help out instead. They're more results-focused, and you can pick and choose which ones you want. So if you're happy packaging, and maybe your scanning is being handled elsewhere (CI/CD, pipeline, platform scanning), they'll handle the final hurdle: getting the results into your LLM.
+
+[veracode-pipeline-results](https://github.com/dipsylala/veracode-pipeline-results) - designed to work on the json results output by the pipeline scan.
+
+[veracode-local-sca-results](https://github.com/dipsylala/veracode-local-sca-results) - doing a local SCA/IaC scan? This can provide a summary, as well as helping you dig deeper on individual results.
+
+[veracode-platform-results](https://github.com/dipsylala/veracode-platform-results) - this pulls SCA, Dynamic and Static data from the platform.
+
+In each case, these are designed to look after your context window - veracode-pipeline-results and veracode-local-sca-results use Python scripts to translate the JSON into something more LLM-convenient. veracode-platform-results uses my [veracode-api](https://github.com/dipsylala/veracode-api) CLI tool to use your existing Veracode credentials to authenticate to the platform and query the API. 
+
+---
+
 ## For Developers
 
 See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for building from source, running tests, adding new tools, and the full developer documentation index.
