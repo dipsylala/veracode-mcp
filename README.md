@@ -211,6 +211,32 @@ claude mcp add --transport stdio veracode "\path\to\veracode-mcp.exe"
 }
 ```
 
+### Veracode platform work
+
+To assign a Veracode profile to code you're working on, create a `.veracode-workspace.json` file with the following contents in your code area:
+
+<img width="742" height="502" alt="image" src="https://github.com/user-attachments/assets/6f67f0fe-cb10-45c4-8fd0-f80dffc870f5" />
+
+This will allow the MCP to know which profile you're focusing on in your IDE/TUI.
+
+The contents are as follows:
+
+```json
+{
+  "name": "{profile name}"
+}
+```
+
+example:
+
+```json
+{
+  "name": "Verademo"
+}
+```
+
+---
+
 ## Available MCP Tools
 
 The server provides these Veracode-specific tools:
@@ -238,6 +264,20 @@ SCA:
 - **local-iac-findings** - Read and parse local IaC scan results (Dockerfile and configuration misconfigurations)
 
 > **Note:** Use the `tools/list` MCP method to see all available tools with their complete parameter schemas and documentation.
+
+---
+
+## But MCP and my context window...
+
+If you want some of the benefits of the MCP but without the Context window overhead, I wrote some skills that can help out instead. They're more results-focused, and you can pick and choose which ones you want. So if you're happy packaging, and maybe your scanning is being handled elsewhere (CI/CD, pipeline, platform scanning), they'll handle the final hurdle: getting the results into your LLM.
+
+[veracode-pipeline-results](https://github.com/dipsylala/veracode-pipeline-results) - designed to work on the json results output by the pipeline scan.
+
+[veracode-local-sca-results](https://github.com/dipsylala/veracode-local-sca-results) - doing a local SCA/IaC scan? This can provide a summary, as well as helping you dig deeper on individual results.
+
+[veracode-platform-results](https://github.com/dipsylala/veracode-platform-results) - this pulls SCA, Dynamic and Static data from the platform.
+
+In each case, these are designed to look after your context window - `veracode-pipeline-results` and `veracode-local-sca-results` use Python scripts to translate the JSON into something more LLM-convenient. `veracode-platform-results` uses my [veracode-api](https://github.com/dipsylala/veracode-api) CLI tool to use your existing Veracode credentials to authenticate to the platform and query the API. 
 
 ---
 
