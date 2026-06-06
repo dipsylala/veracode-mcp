@@ -42,104 +42,19 @@ Some tools (such as `package-workspace`, `pipeline-scan`, `run-sca-scan`) requir
 
 Given the Veracode installation process requires elevated privileges, we took the decision for the user to perform the installation themselves, rather than an MCP requesting elevated privileges and installing software on a machine.
 
-**Install the Veracode CLI:**
-
-> [!NOTE]
-> **Requirements:** this is only necessary for running some of the local tools like packaging, Veracode SCA agent scanning and pipeline scanning.
-> If you wish to only use data from the platform like platform SAST, DAST and 'Upload and Scan' SCA it's not necessary.
-
-*Windows (Admin PowerShell):*
-
-```powershell
-Set-ExecutionPolicy AllSigned -Scope Process -Force
-iex (iwr https://tools.veracode.com/veracode-cli/install.ps1)
-```
-
-*macOS/Linux:*
-
-```bash
-curl -fsS https://tools.veracode.com/veracode-cli/install | sh
-```
-
 For detailed installation instructions and alternative methods, see the [official Veracode CLI installation guide](https://docs.veracode.com/r/Install_the_Veracode_CLI).
 
 ## Configuration
 
 ### Veracode API Credentials
 
-**Authenticate the CLI:**
+**veracode.yml**
 
-After installation, configure your API credentials via:
+Follow the instructions as per the [Veracode Docs](https://docs.veracode.com/r/Install_the_Veracode_CLI#store-credentials-with-the-cli).
 
-1. **Veracode CLI-based configuration** (Recommended)
+**Environment variables** (Fallback)
 
-```bash
-veracode configure
-```
-
-2. **File-based configuration** (Recommended)
-
-   Create `~/.veracode/veracode.yml`:
-
-   ```yaml
-   api:
-     key-id: YOUR_API_KEY_ID
-     key-secret: YOUR_API_KEY_SECRET
-   ```
-
-   **Setup commands:**
-
-   *Linux/macOS:*
-
-   ```bash
-   mkdir -p ~/.veracode
-   cat > ~/.veracode/veracode.yml << EOF
-   api:
-     key-id: YOUR_API_KEY_ID
-     key-secret: YOUR_API_KEY_SECRET
-   EOF
-   chmod 600 ~/.veracode/veracode.yml
-   ```
-
-   *Windows PowerShell:*
-
-   ```powershell
-   New-Item -ItemType Directory -Path "$env:USERPROFILE\.veracode" -Force
-   @"
-   api:
-     key-id: YOUR_API_KEY_ID
-     key-secret: YOUR_API_KEY_SECRET
-   "@ | Out-File -FilePath "$env:USERPROFILE\.veracode\veracode.yml" -Encoding UTF8
-   ```
-
-3. **Environment variables** (Fallback)
-
-   ```bash
-   export VERACODE_API_ID="YOUR_API_KEY_ID"
-   export VERACODE_API_KEY="YOUR_API_KEY_SECRET"
-   ```
-
-### API Health Check
-
-The `api-health` tool verifies both API connectivity and credential validity. It
-loads credentials using the precedence described above, signs the request with
-Veracode HMAC authentication, and sends:
-
-```http
-GET https://api.veracode.com/api/authn/v2/principal
-```
-
-The regional API domain is selected from the API ID or the configured
-`override-api-base-url`.
-
-- `HTTP 200` confirms the API is reachable and the credentials were accepted.
-- `HTTP 401` or `HTTP 403` indicates that authentication or authorization failed.
-- A connection or timeout error indicates that the API could not be reached.
-
-See the
-[Veracode Identity API documentation](https://docs.veracode.com/r/c_identity_intro#get-principal-for-your-account).
-
-See [credentials/README.md](credentials/README.md) for detailed information.
+If you wish to use the MCP server without the `veracode.yml`, it can also accept credentials [via the environment](https://docs.veracode.com/r/Install_the_Veracode_CLI?current-os=windows#configure-credentials-as-environment-variables)
 
 ## Usage
 
@@ -164,6 +79,7 @@ The server runs in stdio mode for local integrations where it operates as a subp
 **Codex:**
 
 via the command-line:
+
 ```bash
 codex mcp add veracode -- "\path\to\veracode-mcp.exe"
 ```
@@ -242,15 +158,18 @@ example:
 The server provides these Veracode-specific tools:
 
 API:
+
 - **api-health** - Verify API connectivity and HMAC credentials with the Identity API principal endpoint
 
 Platform:
+
 - **dynamic-findings** - Retrieve runtime security vulnerabilities from Dynamic Analysis (DAST) scans
 - **static-findings** - Retrieve source code vulnerabilities from Static Analysis (SAST) scans
 - **sca-findings** - Retrieve third-party component vulnerabilities from Software Composition Analysis
 - **finding-details** - Get detailed information about a specific finding
 
 Pipeline:
+
 - **package-workspace** - Package workspace files for Veracode upload
 - **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
 - **pipeline-status** - Check the status of a Pipeline Scan
@@ -258,6 +177,7 @@ Pipeline:
 - **pipeline-detailed-results** - Get detailed results from Pipeline Scans with full flaw information
 
 SCA:
+
 - **run-sca-scan** - Run Software Composition Analysis scan on a directory to identify vulnerable dependencies
 - **local-sca-summary** - Group local SCA findings by component showing the minimum upgrade version to fix all CVEs
 - **local-sca-findings** - Read and parse local SCA scan results from veracode.json file
@@ -267,7 +187,7 @@ SCA:
 
 ---
 
-## But MCP and my context window...
+## But MCP and my context window…
 
 If you want some of the benefits of the MCP but without the Context window overhead, I wrote some skills that can help out instead. They're more results-focused, and you can pick and choose which ones you want. So if you're happy packaging, and maybe your scanning is being handled elsewhere (CI/CD, pipeline, platform scanning), they'll handle the final hurdle: getting the results into your LLM.
 
