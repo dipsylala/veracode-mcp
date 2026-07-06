@@ -1,7 +1,7 @@
 # Veracode MCP Server
 
 > [!NOTE]
-> This is not associated with Veracode, and does not fall under their support
+> This is not associated with Veracode, and does not fall under their support. However, that doesn't mean I don't care! If you tried using this with your setup and had issues, you're welcome to raise an issue.
 
 ⚠️ **BETA** - After running this regularly for months on multiple applications, I'm happy to move this to Beta. This is still early-stage software under active development, but the tools and general functionality have stabilised.
 
