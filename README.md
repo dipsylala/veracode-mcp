@@ -1,14 +1,17 @@
 # Veracode MCP Server
 
+A Model Context Protocol (MCP) server implementation in Go that provides Veracode security scanning capabilities to AI assistants and LLMs. Uses stdio transport for local filesystem operations.
+
 > [!NOTE]
 > This is not associated with Veracode, and does not fall under their support. However, that doesn't mean I don't care! If you tried using this with your setup and had issues, you're welcome to raise an issue.
 
-⚠️ **BETA** - After running this regularly for months on multiple applications, I'm happy to move this to Beta. This is still early-stage software under active development, but the tools and general functionality have stabilised.
+> [!WARNING]
+> **BETA** - After running this regularly for months on multiple applications, I'm happy to move this to Beta. This is still early-stage software under active development, but the tools and general functionality have stabilised.
 
-A Model Context Protocol (MCP) server implementation in Go that provides Veracode security scanning capabilities to AI assistants and LLMs. Uses stdio transport for local filesystem operations.
 
-> [!PERSONA]
-> I'm a security conscious developer, so this is very developer-focused. All about packaging, scanning and getting results. If you want to create profiles, do analytics or Veracode's other offerings, this MCP won't help.
+
+> [!IMPORTANT]
+> I'm a security conscious developer, so this is MCP is very developer-focused. All about packaging, scanning and getting results. If you want to create profiles, do analytics or use LLMs with Veracode's other offerings, this MCP won't help.
 
 This is my 4th version, after writing it in TypeScript, Python, as a set of [Agent Skills](https://agentskills.io/home), and now - in Go. Go ultimately makes it easier to distribute, and I wanted more practice in it, so here we go.
 
