@@ -204,6 +204,12 @@ The server implements these core MCP protocol methods:
 - **`resources/read`** - Read resource content
   - Currently not implemented (reserved for future use)
 
+- **`tasks/get`**, **`tasks/result`**, **`tasks/cancel`** - MCP Tasks utility (spec 2025-11-25)
+  - `pipeline-scan` is task-augmented (`execution.taskSupport: "required"`): the scan runs
+    in a background goroutine while the client polls `tasks/get`/`tasks/result`, and
+    `tasks/cancel` kills the underlying scan process
+  - Tasks are held in memory for the life of the server process (no cross-restart durability)
+
 ### Protocol Compatibility
 
 - **Version Negotiation**: Automatically negotiates protocol version with client
@@ -378,10 +384,11 @@ The `api-health` MCP tool sends an HMAC-signed
 ### Pipeline Scan Workflow
 
 1. package-workspace → Creates .zip artifact
-2. pipeline-scan → Runs local scan, generates results.json
-3. pipeline-status → Checks scan completion
-4. pipeline-findings → Reads results.json, returns findings
-5. pipeline-detailed-results → Gets specific flaw with data flow
+2. pipeline-scan (task-augmented) → Server returns a CreateTaskResult immediately; scan runs in the background
+3. tasks/get → Poll for status (`working` → `completed`/`failed`); tasks/cancel to abort
+4. tasks/result → Blocks until terminal, returns the scan's final CallToolResult
+5. pipeline-findings → Reads results.json, returns findings
+6. pipeline-detailed-results → Gets specific flaw with data flow
 
 ## Design Decisions
 

@@ -248,7 +248,10 @@
     },
     {
       "name": "pipeline-scan",
-      "description": "Performs a local SAST scan using the Veracode Pipeline Scanner. Requires package-workspace to have been called first. By default runs asynchronously (returns immediately); use pipeline-status to poll for completion and pipeline-findings to retrieve results. Set synchronous=true when results are needed before proceeding, such as in an automated remediation workflow — then call pipeline-findings immediately after.",
+      "description": "Performs a local SAST scan using the Veracode Pipeline Scanner. Requires package-workspace to have been called first. This is a task-augmented tool (MCP Tasks, spec 2025-11-25): calls must include a \"task\" param; the server returns a CreateTaskResult immediately, then the scan runs in the background. Poll tasks/get for status, tasks/result for the final outcome, and tasks/cancel to abort a running scan. After completion, use pipeline-findings to retrieve results.",
+      "execution": {
+        "taskSupport": "required"
+      },
       "params": [
         {
           "name": "application_path",
@@ -267,30 +270,12 @@
           "type": "string",
           "isRequired": false,
           "description": "File to scan (defaults to largest non-log file in .veracode/packaging in the temp folder)"
-        },
-        {
-          "name": "synchronous",
-          "type": "boolean",
-          "isRequired": false,
-          "description": "Wait for the scan to complete before returning. Default is false (scan runs in background). Set to true when the caller needs results before proceeding, such as in an automated pipeline."
-        }
-      ]
-    },
-    {
-      "name": "pipeline-status",
-      "description": "Checks the status of a local pipeline scan (RUNNING, COMPLETED, or no scan found). Call pipeline-findings once COMPLETED is returned. Also indicates whether a previous completed results file exists even when no scan is active.",
-      "params": [
-        {
-          "name": "application_path",
-          "type": "string",
-          "isRequired": true,
-          "description": "Absolute path to the application workspace"
         }
       ]
     },
     {
       "name": "pipeline-findings",
-      "description": "Retrieves findings from a completed local pipeline SAST scan with an interactive UI. Requires a scan to have completed — check pipeline-status first if unsure. By default returns only policy-violating findings. Use finding-details for the full data-flow path on a specific flaw, or remediation-guidance to get fix instructions for a pipeline flaw ID.",
+      "description": "Retrieves findings from a completed local pipeline SAST scan with an interactive UI. Requires a scan to have completed — check the pipeline-scan task status via tasks/get if unsure. By default returns only policy-violating findings. Use finding-details for the full data-flow path on a specific flaw, or remediation-guidance to get fix instructions for a pipeline flaw ID.",
       "params": [
         {
           "name": "application_path",

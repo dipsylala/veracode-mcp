@@ -177,8 +177,7 @@ Platform:
 Pipeline:
 
 - **package-workspace** - Package workspace files for Veracode upload
-- **pipeline-scan** - Start an asynchronous pipeline scan, with the largest packaged file as default
-- **pipeline-status** - Check the status of a Pipeline Scan
+- **pipeline-scan** - Run a pipeline scan as an MCP task (task-augmented; poll `tasks/get`/`tasks/result`, or `tasks/cancel` to abort), with the largest packaged file as default
 - **pipeline-findings** - Get results from Veracode Pipeline Scans
 - **pipeline-detailed-results** - Get detailed results from Pipeline Scans with full flaw information
 

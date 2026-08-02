@@ -8,10 +8,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/dipsylala/veracode-mcp/api"
+	"github.com/dipsylala/veracode-mcp/internal/types"
 	"github.com/dipsylala/veracode-mcp/workspace"
 )
 
@@ -27,7 +30,6 @@ type PipelineScanRequest struct {
 	ApplicationPath string
 	AppProfile      string
 	Filename        string
-	Wait            bool
 }
 
 // appInfo holds resolved application details used during the scan
@@ -60,13 +62,6 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 		} else {
 			// Full or relative path - use as-is
 			req.Filename = filename
-		}
-	}
-
-	// Extract optional synchronous flag
-	if synchronous, ok := args["synchronous"]; ok {
-		if b, ok := synchronous.(bool); ok {
-			req.Wait = b
 		}
 	}
 
@@ -129,13 +124,26 @@ func handlePipelineScan(ctx context.Context, args map[string]interface{}) (inter
 		return map[string]interface{}{"error": err.Error()}, nil
 	}
 
+	// pipeline-scan is task-augmented (see execution.taskSupport in tools.json):
+	// the server dispatches this handler in a background goroutine and returns a
+	// CreateTaskResult to the caller immediately, so blocking here on waitForScan
+	// does not hold up the tools/call response. Registering a cancel function lets
+	// tasks/cancel stop the scan process.
+	types.RegisterTaskCancel(ctx, func() error {
+		process, err := os.FindProcess(pid)
+		if err != nil {
+			return err
+		}
+		return process.Kill()
+	})
+
 	warningsSection := buildWarningsSection(info.Warnings)
 
-	if req.Wait {
-		if err := waitForScan(ctx, pid, outputDir); err != nil {
-			return map[string]interface{}{"error": err.Error()}, nil
-		}
-		completedText := fmt.Sprintf(`Veracode Pipeline Static Scan - Completed
+	if err := waitForScan(ctx, pid, outputDir); err != nil {
+		return map[string]interface{}{"error": err.Error()}, nil
+	}
+
+	completedText := fmt.Sprintf(`Veracode Pipeline Static Scan - Completed
 ============================
 
 Application Path: %s
@@ -149,40 +157,10 @@ Log File: %s
 
 Use pipeline-findings to retrieve the results.
 `, req.ApplicationPath, scanTarget, pid, resultsFile, filteredResultsFile, logFile, warningsSection)
-		return map[string]interface{}{
-			"content": []map[string]string{{
-				"type": "text",
-				"text": completedText,
-			}},
-		}, nil
-	}
-
-	responseText := fmt.Sprintf(`Veracode Pipeline Static Scan - Started
-============================
-
-Application Path: %s
-Scan Target: %s
-PID: %d
-Results File: %s
-Filtered Results File: %s
-Log File: %s
-%s
-Command executed:
-veracode %s
-
-✓ Pipeline scan started successfully in background
-
-Next steps:
-- Use pipeline-status tool to check scan progress
-- Results will be available in: %s
-- Filtered results will be available in: %s
-- Log output will be in: %s
-`, req.ApplicationPath, scanTarget, pid, resultsFile, filteredResultsFile, logFile, warningsSection, strings.Join(cmdArgs, " "), resultsFile, filteredResultsFile, logFile)
-
 	return map[string]interface{}{
 		"content": []map[string]string{{
 			"type": "text",
-			"text": responseText,
+			"text": completedText,
 		}},
 	}, nil
 }
@@ -431,4 +409,60 @@ func cleanupPipelineDirectory(outputDir string) error {
 	}
 
 	return nil
+}
+
+// checkProcessStatus checks if a process is running and returns its exit code if available
+func checkProcessStatus(pid int) (isRunning bool, exitCode int) {
+	if runtime.GOOS == "windows" {
+		return checkProcessStatusWindows(pid)
+	}
+	return checkProcessStatusUnix(pid)
+}
+
+// checkProcessStatusWindows checks process status on Windows
+func checkProcessStatusWindows(pid int) (isRunning bool, exitCode int) {
+	// On Windows, we use FindProcess and then try Wait with timeout
+	// FindProcess always succeeds, so we need another method
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return false, -1
+	}
+
+	// Try to wait with a short timeout to check process state
+	// If Wait returns quickly, process has exited
+	// If it times out, process is still running
+	done := make(chan error, 1)
+	go func() {
+		_, err := process.Wait()
+		done <- err
+	}()
+
+	// Give the Wait call a brief moment to complete if process has already exited
+	select {
+	case <-done:
+		// Process has exited
+		return false, 0
+	case <-time.After(100 * time.Millisecond):
+		// Process is still running (Wait is still blocking after timeout)
+		return true, 0
+	}
+}
+
+// checkProcessStatusUnix checks process status on Unix-like systems
+func checkProcessStatusUnix(pid int) (isRunning bool, exitCode int) {
+	// On Unix, we can send signal 0 to check if process exists
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return false, -1
+	}
+
+	// Signal 0 doesn't actually send a signal, just checks if we can access the process
+	err = process.Signal(syscall.Signal(0))
+	if err != nil {
+		// Process doesn't exist
+		return false, -1
+	}
+
+	// Process is running
+	return true, 0
 }

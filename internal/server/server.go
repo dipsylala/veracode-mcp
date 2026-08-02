@@ -71,6 +71,7 @@ type MCPServer struct {
 	capabilities     ServerCapabilities
 	tools            []types.Tool
 	toolManager      *tools.ToolManager
+	taskManager      *TaskManager
 }
 
 // NewMCPServer creates a new MCP server instance with all necessary registries.
@@ -94,8 +95,17 @@ func NewMCPServer() (*MCPServer, error) {
 			Prompts: &PromptsCapability{
 				ListChanged: false,
 			},
+			Tasks: &TasksCapability{
+				Cancel: &TasksCancelCapability{},
+				Requests: &TasksRequestsCapability{
+					Tools: &TasksToolsRequests{
+						Call: &TasksCallCapability{},
+					},
+				},
+			},
 		},
 		toolManager: toolManager,
+		taskManager: NewTaskManager(),
 	}
 
 	// Initialize tool implementations and register their handlers
@@ -257,6 +267,13 @@ func (s *MCPServer) HandleRequest(req *types.JSONRPCRequest) *types.JSONRPCRespo
 		ID:      req.ID,
 	}
 
+	s.dispatchMethod(req, resp)
+
+	return resp
+}
+
+// dispatchMethod routes a validated request to its method handler.
+func (s *MCPServer) dispatchMethod(req *types.JSONRPCRequest, resp *types.JSONRPCResponse) {
 	switch req.Method {
 	case "initialize":
 		s.handleInitializeRequest(req, resp)
@@ -269,6 +286,12 @@ func (s *MCPServer) HandleRequest(req *types.JSONRPCRequest) *types.JSONRPCRespo
 		resp.Result = s.handleListResources()
 	case "resources/read":
 		s.handleResourcesReadRequest(req, resp)
+	case "tasks/get":
+		s.handleTasksGetRequest(req, resp)
+	case "tasks/result":
+		s.handleTasksResultRequest(req, resp)
+	case "tasks/cancel":
+		s.handleTasksCancelRequest(req, resp)
 	case "notifications/initialized":
 		// Client confirms initialization - no response needed for notifications
 		log.Println("Client sent initialized notification")
@@ -279,8 +302,6 @@ func (s *MCPServer) HandleRequest(req *types.JSONRPCRequest) *types.JSONRPCRespo
 			Message: fmt.Sprintf("Method not found: %s", req.Method),
 		}
 	}
-
-	return resp
 }
 
 // ClientSupportsUI returns whether the current client supports MCP Apps UI.

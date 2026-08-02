@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -10,6 +11,16 @@ import (
 	tools "github.com/dipsylala/veracode-mcp/internal/tool_registry"
 	"github.com/dipsylala/veracode-mcp/internal/types"
 )
+
+// rpcCodedError lets internal handlers surface a specific JSON-RPC error code
+// through the (interface{}, error) return chain instead of always falling back
+// to -32603 Internal error.
+type rpcCodedError struct {
+	code    int
+	message string
+}
+
+func (e *rpcCodedError) Error() string { return e.message }
 
 // MCP protocol method handlers that process specific JSON-RPC requests
 // and coordinate with the appropriate business logic.
@@ -59,15 +70,26 @@ func (s *MCPServer) handleToolsCallRequest(req *types.JSONRPCRequest, resp *type
 
 	result, err := s.handleCallTool(paramsRaw)
 	if err != nil {
+		code := -32603
+		var coded *rpcCodedError
+		if errors.As(err, &coded) {
+			code = coded.code
+		}
 		resp.Error = &types.RPCError{
-			Code:    -32603,
+			Code:    code,
 			Message: err.Error(),
 		}
 		log.Printf(">>> tools/call ERROR: %v", err)
-	} else {
-		s.logToolCallResult(result)
-		resp.Result = result
+		return
 	}
+
+	switch r := result.(type) {
+	case *types.CallToolResult:
+		s.logToolCallResult(r)
+	case *types.CreateTaskResult:
+		log.Printf(">>> tools/call created task %s (status: %s)", r.Task.TaskID, r.Task.Status)
+	}
+	resp.Result = result
 }
 
 // handleResourcesReadRequest processes resource read requests.
@@ -220,7 +242,9 @@ func (s *MCPServer) handleListTools() *types.ListToolsResult {
 
 // handleCallTool executes a tool by name with the provided arguments.
 // It performs validation, looks up handlers, and manages the execution context.
-func (s *MCPServer) handleCallTool(params json.RawMessage) (*types.CallToolResult, error) {
+// The result is either a *types.CallToolResult (normal call) or a
+// *types.CreateTaskResult (task-augmented call, per the MCP Tasks utility).
+func (s *MCPServer) handleCallTool(params json.RawMessage) (interface{}, error) {
 	callParams, err := s.parseToolCallParams(params)
 	if err != nil {
 		return nil, err
@@ -235,7 +259,56 @@ func (s *MCPServer) handleCallTool(params json.RawMessage) (*types.CallToolResul
 		return s.createToolError(err.Error()), nil
 	}
 
-	return s.executeToolCall(handler, callParams.Arguments)
+	taskSupport := s.toolTaskSupport(callParams.Name)
+	switch {
+	case callParams.Task != nil && (taskSupport == "" || taskSupport == "forbidden"):
+		return nil, &rpcCodedError{code: -32601, message: fmt.Sprintf("tool %q does not support task-augmented invocation", callParams.Name)}
+	case callParams.Task != nil:
+		return s.createTaskAndDispatch(handler, callParams), nil
+	case taskSupport == "required":
+		return nil, &rpcCodedError{code: -32601, message: fmt.Sprintf("tool %q requires task-augmented invocation: include a \"task\" field in params", callParams.Name)}
+	default:
+		return s.executeToolCall(handler, callParams.Arguments)
+	}
+}
+
+// toolTaskSupport returns the tool's declared execution.taskSupport value
+// ("required", "optional", "forbidden", or "" if undeclared).
+func (s *MCPServer) toolTaskSupport(toolName string) string {
+	def := s.toolManager.GetToolDefinition(toolName)
+	if def == nil || def.Execution == nil {
+		return ""
+	}
+	return def.Execution.TaskSupport
+}
+
+// createTaskAndDispatch creates a task in the "working" status and runs the
+// handler in the background, returning the CreateTaskResult immediately so the
+// caller can poll tasks/get and later retrieve the result via tasks/result.
+func (s *MCPServer) createTaskAndDispatch(handler func(context.Context, map[string]interface{}) (interface{}, error), callParams *types.CallToolParams) *types.CreateTaskResult {
+	var ttl *int64
+	if callParams.Task != nil {
+		ttl = callParams.Task.TTL
+	}
+	entry := s.taskManager.Create(ttl)
+	snapshot := entry.snapshot()
+	taskID := snapshot.TaskID
+
+	ctx := WithUICapability(context.Background(), s.clientSupportsUI)
+	ctx = types.WithTaskCancelRegistrar(ctx, func(cancel func() error) {
+		entry.setCancelFunc(cancel)
+	})
+
+	go func() {
+		result, err := handler(ctx, callParams.Arguments)
+		if err != nil {
+			s.taskManager.Fail(taskID, err.Error())
+			return
+		}
+		s.taskManager.Complete(taskID, tools.ConvertToCallToolResult(result))
+	}()
+
+	return &types.CreateTaskResult{Task: snapshot}
 }
 
 // parseToolCallParams validates and parses the tool call parameters.
@@ -338,6 +411,75 @@ func (s *MCPServer) handleListResources() *ListResourcesResult {
 	}
 
 	return result
+}
+
+// parseTaskIDParams parses the common {taskId} params shape shared by
+// tasks/get, tasks/result, and tasks/cancel.
+func parseTaskIDParams(params json.RawMessage) (*types.TaskIDParams, error) {
+	var p types.TaskIDParams
+	if err := json.Unmarshal(params, &p); err != nil {
+		return nil, fmt.Errorf("invalid params: %w", err)
+	}
+	if p.TaskID == "" {
+		return nil, fmt.Errorf("taskId is required")
+	}
+	return &p, nil
+}
+
+// handleTasksGetRequest processes tasks/get: returns the task's current status
+// without blocking. Requestors are expected to poll this until a terminal status.
+func (s *MCPServer) handleTasksGetRequest(req *types.JSONRPCRequest, resp *types.JSONRPCResponse) {
+	params, err := parseTaskIDParams(req.Params)
+	if err != nil {
+		resp.Error = &types.RPCError{Code: -32602, Message: err.Error()}
+		return
+	}
+
+	entry, err := s.taskManager.Get(params.TaskID)
+	if err != nil {
+		resp.Error = &types.RPCError{Code: -32602, Message: fmt.Sprintf("Failed to retrieve task: %v", err)}
+		return
+	}
+	resp.Result = entry.snapshot()
+}
+
+// handleTasksResultRequest processes tasks/result: blocks until the task reaches
+// a terminal status, then returns exactly what the wrapped tools/call would have
+// returned had it not been task-augmented.
+func (s *MCPServer) handleTasksResultRequest(req *types.JSONRPCRequest, resp *types.JSONRPCResponse) {
+	params, err := parseTaskIDParams(req.Params)
+	if err != nil {
+		resp.Error = &types.RPCError{Code: -32602, Message: err.Error()}
+		return
+	}
+
+	result, err := s.taskManager.WaitResult(params.TaskID)
+	if err != nil {
+		resp.Error = &types.RPCError{Code: -32602, Message: fmt.Sprintf("Failed to retrieve task: %v", err)}
+		return
+	}
+	resp.Result = result
+}
+
+// handleTasksCancelRequest processes tasks/cancel: stops the task's underlying
+// work (best-effort) and marks it cancelled. Rejects tasks already terminal.
+func (s *MCPServer) handleTasksCancelRequest(req *types.JSONRPCRequest, resp *types.JSONRPCResponse) {
+	params, err := parseTaskIDParams(req.Params)
+	if err != nil {
+		resp.Error = &types.RPCError{Code: -32602, Message: err.Error()}
+		return
+	}
+
+	task, err := s.taskManager.Cancel(params.TaskID)
+	if err != nil {
+		if errors.Is(err, ErrTaskTerminal) {
+			resp.Error = &types.RPCError{Code: -32602, Message: fmt.Sprintf("Cannot cancel task: already in terminal status '%s'", task.Status)}
+			return
+		}
+		resp.Error = &types.RPCError{Code: -32602, Message: fmt.Sprintf("Failed to retrieve task: %v", err)}
+		return
+	}
+	resp.Result = task
 }
 
 // handleReadResource serves the content for a specific resource URI.

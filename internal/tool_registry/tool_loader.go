@@ -17,10 +17,18 @@ func SetToolsJSON(data []byte) {
 
 // ToolDefinition represents a tool definition from JSON
 type ToolDefinition struct {
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Category    string            `json:"category"`
-	Params      []ParamDefinition `json:"params"`
+	Name        string               `json:"name"`
+	Description string               `json:"description"`
+	Category    string               `json:"category"`
+	Params      []ParamDefinition    `json:"params"`
+	Execution   *ExecutionDefinition `json:"execution,omitempty"`
+}
+
+// ExecutionDefinition declares a tool's support for task-augmented invocation
+// (MCP Tasks, spec 2025-11-25). TaskSupport is one of "required", "optional",
+// or "forbidden" (the default when Execution is absent).
+type ExecutionDefinition struct {
+	TaskSupport string `json:"taskSupport,omitempty"`
 }
 
 // ParamDefinition represents a parameter definition from JSON
@@ -115,10 +123,16 @@ func (td *ToolDefinition) ToMCPTool() types.Tool {
 		inputSchema["required"] = required
 	}
 
+	var execution *types.ToolExecution
+	if td.Execution != nil {
+		execution = &types.ToolExecution{TaskSupport: td.Execution.TaskSupport}
+	}
+
 	return types.Tool{
 		Name:        td.Name,
 		Description: td.Description,
 		InputSchema: inputSchema,
+		Execution:   execution,
 		Meta:        td.GetToolMeta(),
 	}
 }

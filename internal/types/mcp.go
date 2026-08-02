@@ -5,10 +5,17 @@ import "encoding/json"
 // Tool represents a tool available through the MCP protocol.
 // This structure defines how tools are presented to MCP clients.
 type Tool struct {
-	Name        string                 `json:"name"`            // Unique identifier for the tool
-	Description string                 `json:"description"`     // Human-readable description
-	InputSchema interface{}            `json:"inputSchema"`     // JSON Schema for tool parameters
-	Meta        map[string]interface{} `json:"_meta,omitempty"` // Optional metadata (UI hints, etc.) - underscore prefix per MCP spec
+	Name        string                 `json:"name"`                // Unique identifier for the tool
+	Description string                 `json:"description"`         // Human-readable description
+	InputSchema interface{}            `json:"inputSchema"`         // JSON Schema for tool parameters
+	Execution   *ToolExecution         `json:"execution,omitempty"` // Task-augmentation support (MCP 2025-11-25 Tasks)
+	Meta        map[string]interface{} `json:"_meta,omitempty"`     // Optional metadata (UI hints, etc.) - underscore prefix per MCP spec
+}
+
+// ToolExecution describes a tool's support for task-augmented invocation.
+type ToolExecution struct {
+	// TaskSupport is one of "required", "optional", or "forbidden" (default).
+	TaskSupport string `json:"taskSupport,omitempty"`
 }
 
 // JSONRPCRequest represents an incoming JSON-RPC 2.0 request.
@@ -46,8 +53,45 @@ type ListToolsResult struct {
 // CallToolParams represents the parameters for a tools/call request.
 // Specifies which tool to invoke and what arguments to pass.
 type CallToolParams struct {
-	Name      string                 `json:"name"`      // Tool name to invoke
-	Arguments map[string]interface{} `json:"arguments"` // Tool-specific parameters
+	Name      string                 `json:"name"`           // Tool name to invoke
+	Arguments map[string]interface{} `json:"arguments"`      // Tool-specific parameters
+	Task      *TaskParams            `json:"task,omitempty"` // Present when the request is task-augmented (MCP Tasks)
+}
+
+// TaskParams carries task-augmentation options included on a task-augmented request.
+type TaskParams struct {
+	TTL *int64 `json:"ttl,omitempty"` // Requested task lifetime in milliseconds since creation
+}
+
+// Task status values, per the MCP Tasks specification (2025-11-25).
+const (
+	TaskStatusWorking       = "working"
+	TaskStatusInputRequired = "input_required"
+	TaskStatusCompleted     = "completed"
+	TaskStatusFailed        = "failed"
+	TaskStatusCancelled     = "cancelled"
+)
+
+// Task represents the execution state of a task-augmented request.
+type Task struct {
+	TaskID        string `json:"taskId"`
+	Status        string `json:"status"`
+	StatusMessage string `json:"statusMessage,omitempty"`
+	CreatedAt     string `json:"createdAt"`     // ISO 8601
+	LastUpdatedAt string `json:"lastUpdatedAt"` // ISO 8601
+	TTL           *int64 `json:"ttl,omitempty"`
+	PollInterval  *int64 `json:"pollInterval,omitempty"`
+}
+
+// CreateTaskResult is returned in place of the normal result when a receiver
+// accepts a task-augmented request.
+type CreateTaskResult struct {
+	Task Task `json:"task"`
+}
+
+// TaskIDParams is the params shape for tasks/get, tasks/result, and tasks/cancel.
+type TaskIDParams struct {
+	TaskID string `json:"taskId"`
 }
 
 // CallToolResult represents the response from a tools/call request.
