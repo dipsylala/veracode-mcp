@@ -275,7 +275,7 @@
     },
     {
       "name": "pipeline-findings",
-      "description": "Retrieves findings from a completed local pipeline SAST scan with an interactive UI. Requires a scan to have completed — check the pipeline-scan task status via tasks/get if unsure. By default returns only policy-violating findings. Use finding-details for the full data-flow path on a specific flaw, or remediation-guidance to get fix instructions for a pipeline flaw ID.",
+      "description": "Retrieves findings from a pipeline scan run via this toolset's pipeline-scan tool (auto-locates its most recent output by timestamp). Does not read results from scans run outside this toolset — if you already have a results.json from a separately-invoked scan, parse it directly instead of calling this tool.",
       "params": [
         {
           "name": "application_path",
