@@ -205,10 +205,19 @@ The server implements these core MCP protocol methods:
   - Currently not implemented (reserved for future use)
 
 - **`tasks/get`**, **`tasks/result`**, **`tasks/cancel`** - MCP Tasks utility (spec 2025-11-25)
-  - `pipeline-scan` is task-augmented (`execution.taskSupport: "required"`): the scan runs
-    in a background goroutine while the client polls `tasks/get`/`tasks/result`, and
-    `tasks/cancel` kills the underlying scan process
+  - `pipeline-scan` is task-augmented but optional (`execution.taskSupport: "optional"`): a
+    client that sends a `task` param gets a `CreateTaskResult` immediately while the scan
+    runs in a background goroutine, polling `tasks/get`/`tasks/result`, with `tasks/cancel`
+    killing the underlying scan process
+  - No current Claude client (Claude Code, Claude Desktop, claude.ai) sends the `task`
+    param — see `pipeline-status` below for the fallback these clients use instead
   - Tasks are held in memory for the life of the server process (no cross-restart durability)
+
+- **`pipeline-status`** - Fallback async path for plain (non-task-augmented) `pipeline-scan`
+  calls. `pipeline-scan` defaults to starting the scan and returning immediately with a PID
+  (`synchronous=true` blocks instead); the caller polls `pipeline-status` for RUNNING/COMPLETED
+  by reading the PID file written under the pipeline output directory. This predates the Tasks
+  utility and is what actually gives Claude clients asynchronous behavior today.
 
 ### Protocol Compatibility
 
@@ -384,11 +393,16 @@ The `api-health` MCP tool sends an HMAC-signed
 ### Pipeline Scan Workflow
 
 1. package-workspace → Creates .zip artifact
-2. pipeline-scan (task-augmented) → Server returns a CreateTaskResult immediately; scan runs in the background
-3. tasks/get → Poll for status (`working` → `completed`/`failed`); tasks/cancel to abort
-4. tasks/result → Blocks until terminal, returns the scan's final CallToolResult
-5. pipeline-findings → Reads results.json, returns findings
-6. pipeline-detailed-results → Gets specific flaw with data flow
+2. pipeline-scan → Behavior depends on how the client calls it:
+   - Task-augmented (client sends a `task` param): server returns a `CreateTaskResult`
+     immediately; scan runs in the background. Poll `tasks/get` for status
+     (`working` → `completed`/`failed`); `tasks/cancel` to abort; `tasks/result` blocks
+     until terminal and returns the scan's final `CallToolResult`.
+   - Plain call (no `task` param — what Claude clients do today): server starts the scan
+     and returns immediately with a PID (unless `synchronous=true` is passed, which blocks).
+     Poll `pipeline-status` for RUNNING/COMPLETED.
+3. pipeline-findings → Reads results.json, returns findings
+4. pipeline-detailed-results → Gets specific flaw with data flow
 
 ## Design Decisions
 

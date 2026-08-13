@@ -20,3 +20,11 @@ func RegisterTaskCancel(ctx context.Context, cancel func() error) {
 		register(cancel)
 	}
 }
+
+// IsTaskAugmented reports whether the handler is running as part of a
+// task-augmented call (the server has already dispatched it to a background
+// goroutine), as opposed to a plain synchronous tools/call.
+func IsTaskAugmented(ctx context.Context) bool {
+	_, ok := ctx.Value(taskCancelRegistrarKey{}).(func(func() error))
+	return ok
+}

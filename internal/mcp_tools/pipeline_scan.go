@@ -30,6 +30,7 @@ type PipelineScanRequest struct {
 	ApplicationPath string
 	AppProfile      string
 	Filename        string
+	Wait            bool
 }
 
 // appInfo holds resolved application details used during the scan
@@ -62,6 +63,13 @@ func parsePipelineScanRequest(args map[string]interface{}) (*PipelineScanRequest
 		} else {
 			// Full or relative path - use as-is
 			req.Filename = filename
+		}
+	}
+
+	// Extract optional synchronous flag
+	if synchronous, ok := args["synchronous"]; ok {
+		if b, ok := synchronous.(bool); ok {
+			req.Wait = b
 		}
 	}
 
@@ -124,11 +132,12 @@ func handlePipelineScan(ctx context.Context, args map[string]interface{}) (inter
 		return map[string]interface{}{"error": err.Error()}, nil
 	}
 
-	// pipeline-scan is task-augmented (see execution.taskSupport in tools.json):
-	// the server dispatches this handler in a background goroutine and returns a
-	// CreateTaskResult to the caller immediately, so blocking here on waitForScan
-	// does not hold up the tools/call response. Registering a cancel function lets
-	// tasks/cancel stop the scan process.
+	// If the call is task-augmented (see execution.taskSupport in tools.json),
+	// the server has already dispatched this handler to a background goroutine
+	// and returned a CreateTaskResult to the caller, so blocking here on
+	// waitForScan does not hold up the tools/call response. Registering a
+	// cancel function lets tasks/cancel stop the scan process.
+	taskAugmented := types.IsTaskAugmented(ctx)
 	types.RegisterTaskCancel(ctx, func() error {
 		process, err := os.FindProcess(pid)
 		if err != nil {
@@ -139,11 +148,17 @@ func handlePipelineScan(ctx context.Context, args map[string]interface{}) (inter
 
 	warningsSection := buildWarningsSection(info.Warnings)
 
-	if err := waitForScan(ctx, pid, outputDir); err != nil {
-		return map[string]interface{}{"error": err.Error()}, nil
-	}
+	// Most MCP clients today (including Claude) never send the "task" param,
+	// so for a plain call we must not block here by default - that would make
+	// the tool synchronous in practice. Only wait when the call is
+	// task-augmented (the server is already backgrounding it) or the caller
+	// explicitly opted in via synchronous=true.
+	if taskAugmented || req.Wait {
+		if err := waitForScan(ctx, pid, outputDir); err != nil {
+			return map[string]interface{}{"error": err.Error()}, nil
+		}
 
-	completedText := fmt.Sprintf(`Veracode Pipeline Static Scan - Completed
+		completedText := fmt.Sprintf(`Veracode Pipeline Static Scan - Completed
 ============================
 
 Application Path: %s
@@ -157,10 +172,36 @@ Log File: %s
 
 Use pipeline-findings to retrieve the results.
 `, req.ApplicationPath, scanTarget, pid, resultsFile, filteredResultsFile, logFile, warningsSection)
+		return map[string]interface{}{
+			"content": []map[string]string{{
+				"type": "text",
+				"text": completedText,
+			}},
+		}, nil
+	}
+
+	startedText := fmt.Sprintf(`Veracode Pipeline Static Scan - Started
+============================
+
+Application Path: %s
+Scan Target: %s
+PID: %d
+Results File: %s
+Filtered Results File: %s
+Log File: %s
+%s
+✓ Pipeline scan started successfully in background
+
+Next steps:
+- Use pipeline-status to check scan progress
+- Results will be available in: %s
+- Filtered results will be available in: %s
+- Log output will be in: %s
+`, req.ApplicationPath, scanTarget, pid, resultsFile, filteredResultsFile, logFile, warningsSection, resultsFile, filteredResultsFile, logFile)
 	return map[string]interface{}{
 		"content": []map[string]string{{
 			"type": "text",
-			"text": completedText,
+			"text": startedText,
 		}},
 	}, nil
 }

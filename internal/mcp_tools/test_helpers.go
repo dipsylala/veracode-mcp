@@ -23,6 +23,11 @@ func NewPipelineScanTool() ToolImplementation {
 	return NewSimpleTool(PipelineScanToolName, handlePipelineScan)
 }
 
+// NewPipelineStatusTool creates a SimpleTool for pipeline status (test helper)
+func NewPipelineStatusTool() ToolImplementation {
+	return NewSimpleTool(PipelineStatusToolName, handlePipelineStatus)
+}
+
 // NewPipelineFindingsTool creates a SimpleTool for pipeline findings (test helper)
 func NewPipelineFindingsTool() ToolImplementation {
 	return NewSimpleTool(PipelineFindingsToolName, handlePipelineFindings)

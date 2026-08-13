@@ -3,12 +3,39 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
+	tools "github.com/dipsylala/veracode-mcp/internal/tool_registry"
 	"github.com/dipsylala/veracode-mcp/internal/types"
 )
 
+// TestHandleCallTool_TaskRequired_WithoutTask_Rejected exercises the router's
+// "required" branch. No shipped tool currently declares taskSupport: "required"
+// (pipeline-scan is "optional" so it still works for clients, like Claude's,
+// that don't send a "task" param — see pipeline-scan's fallback to its own
+// background+poll mode), so this test temporarily forces pipeline-scan's
+// declared taskSupport to "required" via the tools.json fixture to reach that
+// branch; the underlying handler is never invoked since the router rejects
+// the call before dispatch.
 func TestHandleCallTool_TaskRequired_WithoutTask_Rejected(t *testing.T) {
+	toolsJSONPath := filepath.Join("..", "..", "tools.json")
+	// #nosec G304 -- toolsJSONPath is a fixed test fixture path, not user input
+	originalToolsJSON, err := os.ReadFile(toolsJSONPath)
+	if err != nil {
+		t.Fatalf("Failed to read tools.json fixture: %v", err)
+	}
+	defer tools.SetToolsJSON(originalToolsJSON)
+
+	forcedRequiredJSON := strings.Replace(string(originalToolsJSON),
+		`"taskSupport": "optional"`, `"taskSupport": "required"`, 1)
+	if forcedRequiredJSON == string(originalToolsJSON) {
+		t.Fatal("Failed to force pipeline-scan's taskSupport to \"required\" in the tools.json fixture")
+	}
+	tools.SetToolsJSON([]byte(forcedRequiredJSON))
+
 	server, err := NewMCPServer()
 	if err != nil {
 		t.Fatalf("Failed to create server: %v", err)

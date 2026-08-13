@@ -248,9 +248,9 @@
     },
     {
       "name": "pipeline-scan",
-      "description": "Performs a local SAST scan using the Veracode Pipeline Scanner. Requires package-workspace to have been called first. This is a task-augmented tool (MCP Tasks, spec 2025-11-25): calls must include a \"task\" param; the server returns a CreateTaskResult immediately, then the scan runs in the background. Poll tasks/get for status, tasks/result for the final outcome, and tasks/cancel to abort a running scan. After completion, use pipeline-findings to retrieve results.",
+      "description": "Performs a local SAST scan using the Veracode Pipeline Scanner. Requires package-workspace to have been called first. This tool is task-augmented (MCP Tasks, spec 2025-11-25) but optional: if the call includes a \"task\" param, the server returns a CreateTaskResult immediately and the scan runs in the background — poll tasks/get for status, tasks/result for the outcome, tasks/cancel to abort. Most current MCP clients (including Claude) do not send \"task\", so for a plain call this tool falls back to its own async mode instead of blocking: by default it starts the scan and returns immediately with a PID, and you must poll pipeline-status to know when it's done. Set synchronous=true to block until the scan completes instead (useful in an automated remediation workflow, followed immediately by pipeline-findings).",
       "execution": {
-        "taskSupport": "required"
+        "taskSupport": "optional"
       },
       "params": [
         {
@@ -270,12 +270,30 @@
           "type": "string",
           "isRequired": false,
           "description": "File to scan (defaults to largest non-log file in .veracode/packaging in the temp folder)"
+        },
+        {
+          "name": "synchronous",
+          "type": "boolean",
+          "isRequired": false,
+          "description": "Only relevant for plain (non-task-augmented) calls. Wait for the scan to complete before returning. Default is false (scan runs in background; poll pipeline-status). Set to true when the caller needs results before proceeding, such as in an automated pipeline."
+        }
+      ]
+    },
+    {
+      "name": "pipeline-status",
+      "description": "Checks the status of a local pipeline scan started by a plain (non-task-augmented) pipeline-scan call (RUNNING, COMPLETED, or no scan found). Not needed if pipeline-scan was invoked as an MCP task — use tasks/get for that. Call pipeline-findings once COMPLETED is returned. Also indicates whether a previous completed results file exists even when no scan is active.",
+      "params": [
+        {
+          "name": "application_path",
+          "type": "string",
+          "isRequired": true,
+          "description": "Absolute path to the application workspace"
         }
       ]
     },
     {
       "name": "pipeline-findings",
-      "description": "Retrieves findings from a pipeline scan run via this toolset's pipeline-scan tool (auto-locates its most recent output by timestamp). Does not read results from scans run outside this toolset — if you already have a results.json from a separately-invoked scan, parse it directly instead of calling this tool.",
+      "description": "Retrieves findings from a pipeline scan run via this toolset's pipeline-scan tool (auto-locates its most recent output by timestamp). Requires the scan to have completed — check pipeline-status (or tasks/get, if pipeline-scan was invoked as an MCP task) first if unsure. Does not read results from scans run outside this toolset — if you already have a results.json from a separately-invoked scan, parse it directly instead of calling this tool.",
       "params": [
         {
           "name": "application_path",
