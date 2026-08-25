@@ -324,6 +324,7 @@ args = ["-log", "debug.log"]
 
 - Network configuration required
 - More complex deployment
+- Cannot perform local operations without relying on non-deterministic calls to the Veracode CLI
 
 ## API Integration
 
