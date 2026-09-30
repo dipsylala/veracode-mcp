@@ -44,31 +44,35 @@ func TestGetStaticFindings_Integration(t *testing.T) {
 	}
 
 	t.Logf("Static findings result:")
-	t.Logf("  Total count: %d", resp.TotalCount)
-	t.Logf("  Page: %d", resp.Page)
-	t.Logf("  Size: %d", resp.Size)
-	t.Logf("  Findings returned: %d", len(resp.Findings))
+	if resp != nil {
+		t.Logf("  Total count: %d", resp.TotalCount)
+		t.Logf("  Page: %d", resp.Page)
+		t.Logf("  Size: %d", resp.Size)
+		t.Logf("  Findings returned: %d", len(resp.Findings))
+	}
 
 	// Log first few findings if available
-	for i, finding := range resp.Findings {
-		if i >= 3 {
-			break
-		}
-		t.Logf("  Finding %d:", i+1)
-		t.Logf("    ID: %s", finding.ID)
-		t.Logf("    Status: %s", finding.Status)
-		t.Logf("    ResolutionStatus: %s", finding.ResolutionStatus)
-		t.Logf("    ViolatesPolicy: %v", finding.ViolatesPolicy)
-		t.Logf("    Severity: %s", finding.Severity)
-		t.Logf("    SeverityScore: %d", finding.SeverityScore)
-		t.Logf("    CWE: %s", finding.CWE)
-		if len(finding.Description) > 50 {
-			t.Logf("    Description: %s...", finding.Description[:50])
-		} else {
-			t.Logf("    Description: %s", finding.Description)
-		}
-		if finding.FilePath != "" {
-			t.Logf("    FilePath: %s:%d", finding.FilePath, finding.LineNumber)
+	if resp != nil {
+		for i, finding := range resp.Findings {
+			if i >= 3 {
+				break
+			}
+			t.Logf("  Finding %d:", i+1)
+			t.Logf("    ID: %s", finding.ID)
+			t.Logf("    Status: %s", finding.Status)
+			t.Logf("    ResolutionStatus: %s", finding.ResolutionStatus)
+			t.Logf("    ViolatesPolicy: %v", finding.ViolatesPolicy)
+			t.Logf("    Severity: %s", finding.Severity)
+			t.Logf("    SeverityScore: %d", finding.SeverityScore)
+			t.Logf("    CWE: %s", finding.CWE)
+			if len(finding.Description) > 50 {
+				t.Logf("    Description: %s...", finding.Description[:50])
+			} else {
+				t.Logf("    Description: %s", finding.Description)
+			}
+			if finding.FilePath != "" {
+				t.Logf("    FilePath: %s:%d", finding.FilePath, finding.LineNumber)
+			}
 		}
 	}
 }
@@ -103,31 +107,35 @@ func TestGetDynamicFindings_Integration(t *testing.T) {
 	}
 
 	t.Logf("Dynamic findings result:")
-	t.Logf("  Total count: %d", resp.TotalCount)
-	t.Logf("  Page: %d", resp.Page)
-	t.Logf("  Size: %d", resp.Size)
-	t.Logf("  Findings returned: %d", len(resp.Findings))
+	if resp != nil {
+		t.Logf("  Total count: %d", resp.TotalCount)
+		t.Logf("  Page: %d", resp.Page)
+		t.Logf("  Size: %d", resp.Size)
+		t.Logf("  Findings returned: %d", len(resp.Findings))
+	}
 
 	// Log first few findings if available
-	for i, finding := range resp.Findings {
-		if i >= 3 {
-			break
-		}
-		t.Logf("  Finding %d:", i+1)
-		t.Logf("    ID: %s", finding.ID)
-		t.Logf("    Status: %s", finding.Status)
-		t.Logf("    ResolutionStatus: %s", finding.ResolutionStatus)
-		t.Logf("    ViolatesPolicy: %v", finding.ViolatesPolicy)
-		t.Logf("    Severity: %s", finding.Severity)
-		t.Logf("    SeverityScore: %d", finding.SeverityScore)
-		t.Logf("    CWE: %s", finding.CWE)
-		if len(finding.Description) > 50 {
-			t.Logf("    Description: %s...", finding.Description[:50])
-		} else {
-			t.Logf("    Description: %s", finding.Description)
-		}
-		if finding.URL != "" {
-			t.Logf("    URL: %s", finding.URL)
+	if resp != nil {
+		for i, finding := range resp.Findings {
+			if i >= 3 {
+				break
+			}
+			t.Logf("  Finding %d:", i+1)
+			t.Logf("    ID: %s", finding.ID)
+			t.Logf("    Status: %s", finding.Status)
+			t.Logf("    ResolutionStatus: %s", finding.ResolutionStatus)
+			t.Logf("    ViolatesPolicy: %v", finding.ViolatesPolicy)
+			t.Logf("    Severity: %s", finding.Severity)
+			t.Logf("    SeverityScore: %d", finding.SeverityScore)
+			t.Logf("    CWE: %s", finding.CWE)
+			if len(finding.Description) > 50 {
+				t.Logf("    Description: %s...", finding.Description[:50])
+			} else {
+				t.Logf("    Description: %s", finding.Description)
+			}
+			if finding.URL != "" {
+				t.Logf("    URL: %s", finding.URL)
+			}
 		}
 	}
 }

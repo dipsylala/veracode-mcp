@@ -46,10 +46,10 @@ func TestCheckHealth_UsesAuthenticatedPrincipalEndpoint(t *testing.T) {
 	if status == nil {
 		t.Fatal("expected health status, got nil")
 	}
-	if !status.Available {
+	if status == nil || !status.Available {
 		t.Fatalf("expected API to be available, got message %q", status.Message)
 	}
-	if status.StatusCode != http.StatusOK {
+	if status == nil || status.StatusCode != http.StatusOK {
 		t.Errorf("expected status code %d, got %d", http.StatusOK, status.StatusCode)
 	}
 	if !strings.Contains(status.Message, "authentication succeeded") {
@@ -78,10 +78,10 @@ func TestCheckHealth_ReportsPrincipalEndpointFailure(t *testing.T) {
 	if status == nil {
 		t.Fatal("expected health status, got nil")
 	}
-	if status.Available {
+	if status == nil || status.Available {
 		t.Fatal("expected API to be unavailable")
 	}
-	if status.StatusCode != http.StatusUnauthorized {
+	if status == nil || status.StatusCode != http.StatusUnauthorized {
 		t.Errorf("expected status code %d, got %d", http.StatusUnauthorized, status.StatusCode)
 	}
 	if !strings.Contains(status.Message, "status 401") {
@@ -113,10 +113,10 @@ func TestCheckHealth_WithCancelledContext(t *testing.T) {
 	if status == nil {
 		t.Fatal("expected health status, got nil")
 	}
-	if status.Available {
+	if status == nil || status.Available {
 		t.Fatal("expected API to be unavailable")
 	}
-	if status.StatusCode != 0 {
+	if status == nil || status.StatusCode != 0 {
 		t.Errorf("expected status code 0, got %d", status.StatusCode)
 	}
 	if !strings.Contains(status.Message, "context canceled") {

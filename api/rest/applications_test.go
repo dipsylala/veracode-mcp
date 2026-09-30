@@ -38,13 +38,13 @@ func TestGetApplication_Integration(t *testing.T) {
 	}
 
 	t.Logf("Application retrieved:")
-	if app.Guid != nil {
+	if app != nil && app.Guid != nil {
 		t.Logf("  GUID: %s", *app.Guid)
 	}
-	if app.Profile != nil && app.Profile.Name != nil {
+	if app != nil && app.Profile != nil && app.Profile.Name != nil {
 		t.Logf("  Name: %s", *app.Profile.Name)
 	}
-	if app.Profile != nil && app.Profile.BusinessCriticality != nil {
+	if app != nil && app.Profile != nil && app.Profile.BusinessCriticality != nil {
 		t.Logf("  Business Criticality: %s", *app.Profile.BusinessCriticality)
 	}
 }
@@ -73,10 +73,10 @@ func TestGetApplicationByName_Integration(t *testing.T) {
 	}
 
 	t.Logf("Application retrieved by name:")
-	if app.Guid != nil {
+	if app != nil && app.Guid != nil {
 		t.Logf("  GUID: %s", *app.Guid)
 	}
-	if app.Profile != nil && app.Profile.Name != nil {
+	if app != nil && app.Profile != nil && app.Profile.Name != nil {
 		t.Logf("  Name: %s", *app.Profile.Name)
 
 		// Verify the name matches what we searched for (case-insensitive since API may return different casing)
@@ -110,11 +110,12 @@ func TestListApplications_Integration(t *testing.T) {
 	}
 
 	t.Logf("Applications list result:")
-	if resp.Page != nil {
-		t.Logf("  Page: %d", *resp.Page.Number)
-		t.Logf("  Size: %d", *resp.Page.Size)
-		t.Logf("  Total Elements: %d", *resp.Page.TotalElements)
+	if resp == nil || resp.Page == nil {
+		t.Fatal("Expected page info, got nil")
 	}
+	t.Logf("  Page: %d", *resp.Page.Number)
+	t.Logf("  Size: %d", *resp.Page.Size)
+	t.Logf("  Total Elements: %d", *resp.Page.TotalElements)
 
 	if resp.Embedded != nil && resp.Embedded.Applications != nil {
 		t.Logf("  Applications returned: %d", len(resp.Embedded.Applications))
